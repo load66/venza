@@ -13,28 +13,28 @@
 /* ─── RESET & ROOT ─────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#f4f5f7;
-  --bg1:#ffffff;
-  --bg2:#ffffff;
-  --bg3:#f4f5f7;
-  --bg4:#e8eaed;
-  --border:#e2e4e8;
-  --border2:#d0d3d9;
+  --bg:#1c1e24;
+  --bg1:#23262f;
+  --bg2:#2a2d38;
+  --bg3:#31343f;
+  --bg4:#3a3d4a;
+  --border:#3a3d4a;
+  --border2:#44475a;
   --toyota:#eb0a1e;
-  --toyota2:#c5001a;
-  --gold:#b8860b;
-  --gold2:#d4a017;
-  --green:#1a7a42;
-  --green2:#1e9b52;
-  --blue:#1a5fa8;
-  --blue2:#2272d4;
-  --orange:#c05800;
-  --orange2:#d96b00;
-  --text:#1a1d23;
-  --text2:#5a6070;
-  --text3:#9aa0ae;
-  --shadow:0 1px 4px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+  --toyota2:#ff3347;
+  --gold:#d4960a;
+  --gold2:#f0b530;
+  --green:#1a9e52;
+  --green2:#22d46e;
+  --blue:#2272d4;
+  --blue2:#4d9eff;
+  --orange:#d97a00;
+  --orange2:#f59e0b;
+  --text:#eef0f5;
+  --text2:#9aa0b8;
+  --text3:#5a6080;
+  --shadow:0 2px 8px rgba(0,0,0,.3),0 4px 20px rgba(0,0,0,.2);
+  --shadow-sm:0 1px 4px rgba(0,0,0,.25);
   --safe-top:env(safe-area-inset-top);
   --safe-bot:env(safe-area-inset-bottom);
 }
@@ -95,11 +95,11 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   box-shadow:var(--shadow-sm);
 }
 .mileage-pill:active{opacity:.7;transform:scale(.97)}
-.mileage-pill:hover{border-color:var(--green2);background:#e8f8ef}
+.mileage-pill:hover{border-color:var(--green2);background:var(--bg4)}
 .mi-num{
   font-family:'JetBrains Mono',monospace;
   font-size:16px;font-weight:500;
-  color:var(--green);line-height:1;
+  color:var(--green2);line-height:1;
 }
 .mi-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
 
@@ -181,10 +181,10 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   font-size:12px;color:var(--text);
   text-align:right;word-break:break-word;line-height:1.4;
 }
-.row-val.red{color:#c0392b;font-weight:600}
-.row-val.green{color:var(--green)}
-.row-val.orange{color:var(--orange)}
-.row-val.gold{color:var(--gold)}
+.row-val.red{color:var(--toyota2);font-weight:600}
+.row-val.green{color:var(--green2)}
+.row-val.orange{color:var(--orange2)}
+.row-val.gold{color:var(--gold2)}
 
 /* ─── HERO CARD ────────────────────────────────────────────── */
 .hero{
@@ -265,10 +265,10 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
 .alert-body{}
 .alert-title{font-weight:600;margin-bottom:2px;font-size:13px}
-.alert.red{background:#fff5f5;border:1px solid #fecaca;color:#c0392b}
-.alert.green{background:#f0fdf4;border:1px solid #bbf7d0;color:var(--green)}
-.alert.gold{background:#fffbeb;border:1px solid #fde68a;color:#92620a}
-.alert.blue{background:#eff6ff;border:1px solid #bfdbfe;color:var(--blue)}
+.alert.red{background:rgba(235,10,30,.1);border:1px solid rgba(235,10,30,.25);color:#ff7080}
+.alert.green{background:rgba(34,212,110,.08);border:1px solid rgba(34,212,110,.2);color:var(--green2)}
+.alert.gold{background:rgba(212,150,10,.08);border:1px solid rgba(212,150,10,.2);color:var(--gold2)}
+.alert.blue{background:rgba(34,114,212,.1);border:1px solid rgba(34,114,212,.25);color:var(--blue2)}
 
 /* ─── SERVICE LOG ──────────────────────────────────────────── */
 .log-item{
@@ -281,7 +281,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .log-item.user-entry{border-left-color:var(--blue)}
 .log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}
 .log-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}
-.log-mi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green);white-space:nowrap;font-weight:600}
+.log-mi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green2);white-space:nowrap;font-weight:600}
 .log-type{
   font-family:'Bebas Neue',sans-serif;
   font-size:14px;letter-spacing:1px;
@@ -292,9 +292,9 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .log-shop{font-size:11px;color:var(--text3)}
 .log-cost{
   font-family:'JetBrains Mono',monospace;
-  font-size:14px;font-weight:700;color:var(--orange);
+  font-size:14px;font-weight:700;color:var(--orange2);
 }
-.log-link{font-size:11px;color:var(--blue);text-decoration:none;font-weight:500}
+.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
 .delete-btn{
   position:absolute;top:10px;right:10px;
   color:var(--text3);font-size:14px;padding:4px;
@@ -302,18 +302,18 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 }
 .delete-btn:hover{color:var(--toyota)}
 .total-row{
-  background:var(--text);border:none;
+  background:var(--bg4);border:1px solid var(--border2);
   border-radius:12px;padding:14px 16px;
   display:flex;justify-content:space-between;align-items:center;
   margin-top:4px;
 }
 .total-label{
   font-family:'Bebas Neue',sans-serif;
-  font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.6);
+  font-size:13px;letter-spacing:2px;color:var(--text2);
 }
 .total-val{
   font-family:'Bebas Neue',sans-serif;
-  font-size:26px;color:#ffffff;
+  font-size:26px;color:var(--text);
 }
 
 /* ─── FORM ─────────────────────────────────────────────────── */
@@ -341,7 +341,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   font-family:'Outfit',sans-serif;font-size:14px;
   outline:none;transition:border-color .2s,box-shadow .2s;
   -webkit-appearance:none;
-  color-scheme:light;
+  color-scheme:dark;
 }
 .fi:focus,.fs:focus,.ft:focus{
   border-color:var(--toyota);
@@ -359,7 +359,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .btn-primary:active{transform:scale(.98);background:#c90019}
 .btn-ghost{
   width:100%;padding:13px;
-  background:var(--bg3);color:var(--text);
+  background:var(--bg3);color:var(--text2);
   border:1.5px solid var(--border2);border-radius:10px;
   font-size:14px;font-family:'Outfit',sans-serif;
   transition:all .2s;
@@ -395,10 +395,10 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   letter-spacing:.5px;text-transform:uppercase;
   margin-top:3px;
 }
-.badge.red{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
-.badge.orange{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
-.badge.green{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
-.badge.gray{background:#f1f2f4;color:#9aa0ae;border:1px solid #d0d3d9}
+.badge.red{background:rgba(235,10,30,.15);color:#ff7080;border:1px solid rgba(235,10,30,.3)}
+.badge.orange{background:rgba(217,122,0,.12);color:var(--orange2);border:1px solid rgba(217,122,0,.3)}
+.badge.green{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
+.badge.gray{background:rgba(90,96,128,.2);color:var(--text3);border:1px solid rgba(90,96,128,.3)}
 
 /* ─── PARTS ────────────────────────────────────────────────── */
 .part-item{
@@ -462,28 +462,28 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .step-t strong{color:var(--text)}
 .step-t code{
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;background:#f1f2f4;
-  padding:1px 5px;border-radius:3px;color:var(--orange);
+  font-size:11px;background:var(--bg4);
+  padding:1px 5px;border-radius:3px;color:var(--orange2);
 }
 .g-warn{
-  background:#fff5f5;border:1px solid #fecaca;
+  background:rgba(235,10,30,.08);border:1px solid rgba(235,10,30,.2);
   border-radius:8px;padding:10px 12px;margin-bottom:12px;
-  font-size:12px;color:#b91c1c;line-height:1.6;
+  font-size:12px;color:#ff8090;line-height:1.6;
 }
 .g-info{
-  background:#eff6ff;border:1px solid #bfdbfe;
+  background:rgba(34,114,212,.08);border:1px solid rgba(34,114,212,.2);
   border-radius:8px;padding:10px 12px;margin-bottom:12px;
-  font-size:12px;color:var(--blue);line-height:1.6;
+  font-size:12px;color:var(--blue2);line-height:1.6;
 }
 .g-tip{
-  background:#f0fdf4;border:1px solid #bbf7d0;
+  background:rgba(34,212,110,.07);border:1px solid rgba(34,212,110,.18);
   border-radius:8px;padding:10px 12px;margin-top:12px;
-  font-size:12px;color:var(--green);line-height:1.6;
+  font-size:12px;color:var(--green2);line-height:1.6;
 }
 .g-gold{
-  background:#fffbeb;border:1px solid #fde68a;
+  background:rgba(212,150,10,.08);border:1px solid rgba(212,150,10,.2);
   border-radius:8px;padding:10px 12px;margin-bottom:12px;
-  font-size:12px;color:#92620a;line-height:1.6;
+  font-size:12px;color:var(--gold2);line-height:1.6;
 }
 
 /* ─── WARRANTY ─────────────────────────────────────────────── */
@@ -509,9 +509,9 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   padding:4px 10px;border-radius:6px;
   white-space:nowrap;flex-shrink:0;
 }
-.wc-badge.active{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
-.wc-badge.check{background:#fffbeb;color:#92620a;border:1px solid #fde68a}
-.wc-badge.expired{background:#f1f2f4;color:#9aa0ae;border:1px solid #d0d3d9}
+.wc-badge.active{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
+.wc-badge.check{background:rgba(212,150,10,.1);color:var(--gold2);border:1px solid rgba(212,150,10,.25)}
+.wc-badge.expired{background:rgba(90,96,128,.15);color:var(--text3);border:1px solid rgba(90,96,128,.25)}
 .wc-body{padding:12px 16px}
 .wc-row{
   display:flex;justify-content:space-between;
@@ -522,7 +522,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .wc-row-k{color:var(--text2)}
 .wc-row-v{
   font-family:'JetBrains Mono',monospace;
-  color:var(--text);text-align:right;font-weight:500;
+  color:var(--text);text-align:right;font-weight:500;font-size:11px;
 }
 
 /* ─── MODAL ────────────────────────────────────────────────── */
@@ -536,8 +536,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .overlay.open{display:flex;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .modal{
-  background:var(--bg1);
-  border:1px solid var(--border);
+  background:var(--bg2);
+  border:1px solid var(--border2);
   border-radius:22px 22px 0 0;
   padding:20px 16px;
   padding-bottom:calc(24px + var(--safe-bot));
@@ -545,7 +545,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   max-height:85vh;
   display:flex;flex-direction:column;
   animation:slideUp .28s cubic-bezier(.25,.46,.45,.94);
-  box-shadow:0 -4px 30px rgba(0,0,0,.12);
+  box-shadow:0 -4px 30px rgba(0,0,0,.5);
 }
 .modal-scroll{
   overflow-y:auto;
@@ -585,7 +585,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 /* ─── TOYOTA SCHEDULE TABLE ────────────────────────────────── */
 .sched-table{width:100%;border-collapse:collapse;font-size:11px}
 .sched-table th{
-  background:#f1f2f4;color:var(--text2);
+  background:var(--bg4);color:var(--text2);
   padding:7px 8px;text-align:center;
   font-family:'JetBrains Mono',monospace;font-size:10px;
   border:1px solid var(--border);white-space:nowrap;
@@ -607,8 +607,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   padding:9px 12px;border-radius:10px;
   margin-bottom:6px;
   border:1px solid var(--border);
-  background:#ffffff;
-  box-shadow:var(--shadow-sm);
+  background:var(--bg2);
+  box-shadow:none;
 }
 .sm-icon{font-size:18px;flex-shrink:0}
 .sm-info{flex:1;min-width:0}
@@ -620,10 +620,10 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   font-size:10px;padding:3px 8px;border-radius:6px;
   white-space:nowrap;flex-shrink:0;font-weight:700;
 }
-.sm-overdue{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
-.sm-soon{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
-.sm-upcoming{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
-.sm-future{background:#f8f9fa;color:#9aa0ae;border:1px solid #e2e4e8}
+.sm-overdue{background:rgba(235,10,30,.15);color:#ff7080;border:1px solid rgba(235,10,30,.3)}
+.sm-soon{background:rgba(217,122,0,.12);color:var(--orange2);border:1px solid rgba(217,122,0,.3)}
+.sm-upcoming{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
+.sm-future{background:var(--bg4);color:var(--text3);border:1px solid var(--border2)}
 </style>
 </head>
 <body>
@@ -1467,9 +1467,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
     <div style="flex-shrink:0;margin-bottom:12px">
       <input type="number" class="fi" id="miInput" placeholder="64751"
         inputmode="numeric"
-        style="font-size:30px;font-family:'JetBrains Mono',monospace;text-align:center;
-               letter-spacing:3px;padding:14px;font-weight:600;
-               background:#f8f9fa;border:2px solid var(--border2);border-radius:12px">
+        style="font-size:30px;font-family:'JetBrains Mono',monospace;text-align:center;letter-spacing:3px;padding:14px;font-weight:600;background:var(--bg3);border:2px solid var(--border2);border-radius:12px;color:var(--text)">
     </div>
 
     <!-- Scrollable maintenance list -->
