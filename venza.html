@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Venza">
+<title>Venza Garage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & ROOT ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#080808;
+  --bg1:#0f0f0f;
+  --bg2:#161616;
+  --bg3:#1e1e1e;
+  --bg4:#282828;
+  --border:#242424;
+  --border2:#333;
+  --toyota:#eb0a1e;
+  --toyota2:#ff3347;
+  --gold:#c9952a;
+  --gold2:#f0b84a;
+  --green:#1a8c4e;
+  --green2:#22c96e;
+  --blue:#1a6eb5;
+  --blue2:#3b9eff;
+  --orange:#c46a00;
+  --orange2:#ff9a2e;
+  --text:#f2f2f2;
+  --text2:#9a9a9a;
+  --text3:#555;
+  --safe-top:env(safe-area-inset-top);
+  --safe-bot:env(safe-area-inset-bottom);
+}
+html{background:var(--bg);height:100%}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100%;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+
+/* ─── STATUS BAR SPACER ────────────────────────────────────── */
+.status-bar{
+  height:calc(var(--safe-top) + 0px);
+  background:var(--bg1);
+  min-height:0;
+}
+
+/* ─── HEADER ───────────────────────────────────────────────── */
+.header{
+  background:var(--bg1);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.header-left{}
+.header-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:26px;letter-spacing:3px;
+  color:var(--text);line-height:1;
+  display:flex;align-items:center;gap:6px;
+}
+.header-logo-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--toyota);
+  box-shadow:0 0 8px var(--toyota);
+  flex-shrink:0;
+}
+.header-sub{
+  font-size:10px;color:var(--text3);
+  letter-spacing:1.5px;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+  margin-top:2px;
+}
+.mileage-pill{
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:6px 12px;
+  text-align:right;
+  cursor:pointer;
+  transition:border-color .2s;
+}
+.mileage-pill:active{opacity:.7}
+.mileage-pill:hover{border-color:var(--green2)}
+.mi-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:16px;font-weight:500;
+  color:var(--green2);line-height:1;
+}
+.mi-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* ─── NAV TABS ─────────────────────────────────────────────── */
+.nav-wrap{
+  position:sticky;top:65px;z-index:190;
+  background:var(--bg1);
+  border-bottom:1px solid var(--border);
+}
+.nav{
+  display:flex;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding:0 4px;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{
+  flex:none;
+  padding:10px 14px;
+  font-family:'Outfit',sans-serif;
+  font-size:12px;font-weight:600;
+  color:var(--text3);
+  border-bottom:2px solid transparent;
+  letter-spacing:.5px;
+  white-space:nowrap;
+  transition:all .2s;
+  text-transform:uppercase;
+}
+.nav-btn.active{color:var(--toyota);border-bottom-color:var(--toyota)}
+
+/* ─── PAGES ────────────────────────────────────────────────── */
+.page{display:none;padding:16px;max-width:600px;margin:0 auto;
+  padding-bottom:calc(24px + var(--safe-bot));}
+.page.active{display:block;animation:fadeUp .25s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── SHARED COMPONENTS ────────────────────────────────────── */
+.section-label{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:12px;letter-spacing:3px;
+  color:var(--text3);
+  margin:20px 0 8px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+.card-head{
+  padding:12px 16px 10px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:14px;letter-spacing:2px;
+  color:var(--text2);
+}
+.card-body{padding:0}
+
+.row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  gap:12px;
+}
+.row:last-child{border-bottom:none}
+.row-key{font-size:13px;color:var(--text2);flex-shrink:0;line-height:1.4}
+.row-val{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--text);
+  text-align:right;word-break:break-word;line-height:1.4;
+}
+.row-val.red{color:var(--toyota);font-weight:600}
+.row-val.green{color:var(--green2)}
+.row-val.orange{color:var(--orange2)}
+.row-val.gold{color:var(--gold2)}
+
+/* ─── HERO CARD ────────────────────────────────────────────── */
+.hero{
+  background:linear-gradient(135deg,#120408 0%,#1a0508 50%,#120408 100%);
+  border:1px solid #2a0a0e;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:10px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;top:-40px;right:-40px;
+  width:180px;height:180px;
+  background:radial-gradient(circle,rgba(235,10,30,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-label{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:10px;letter-spacing:3px;
+  color:var(--toyota);margin-bottom:8px;
+}
+.hero-mi{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;line-height:1;
+  color:var(--text);
+}
+.hero-mi span{color:var(--toyota)}
+.hero-desc{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5}
+.progress-track{
+  height:3px;background:var(--bg4);
+  border-radius:2px;margin-top:14px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--green) 0%,var(--toyota) 100%);
+  border-radius:2px;
+  transition:width 1.2s cubic-bezier(.25,.46,.45,.94);
+}
+.progress-labels{
+  display:flex;justify-content:space-between;
+  margin-top:5px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--text3);
+}
+
+/* ─── GAUGE GRID ───────────────────────────────────────────── */
+.gauges{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;margin-bottom:10px;
+}
+.gauge{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;
+  position:relative;overflow:hidden;
+}
+.gauge::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:var(--accent,var(--toyota));
+}
+.g-val{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;line-height:1;margin-bottom:4px;
+  color:var(--text);
+}
+.g-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+
+/* ─── ALERT BOX ────────────────────────────────────────────── */
+.alert{
+  border-radius:10px;padding:12px 14px;
+  margin-bottom:10px;font-size:12px;
+  line-height:1.6;display:flex;gap:10px;align-items:flex-start;
+}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-body{}
+.alert-title{font-weight:600;margin-bottom:2px;font-size:13px}
+.alert.red{background:rgba(235,10,30,.08);border:1px solid rgba(235,10,30,.2);color:#ff8090}
+.alert.green{background:rgba(34,201,110,.08);border:1px solid rgba(34,201,110,.2);color:var(--green2)}
+.alert.gold{background:rgba(201,149,42,.08);border:1px solid rgba(201,149,42,.2);color:var(--gold2)}
+.alert.blue{background:rgba(59,158,255,.08);border:1px solid rgba(59,158,255,.2);color:var(--blue2)}
+
+/* ─── SERVICE LOG ──────────────────────────────────────────── */
+.log-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-left:3px solid var(--green);
+  border-radius:10px;padding:14px;margin-bottom:8px;
+  position:relative;
+}
+.log-item.user-entry{border-left-color:var(--blue2)}
+.log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}
+.log-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}
+.log-mi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green2);white-space:nowrap}
+.log-type{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:14px;letter-spacing:1px;
+  color:var(--text);margin-bottom:4px;
+}
+.log-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.log-foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.log-shop{font-size:11px;color:var(--text3)}
+.log-cost{
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;font-weight:500;color:var(--orange2);
+}
+.log-link{font-size:11px;color:var(--blue2);text-decoration:none}
+.delete-btn{
+  position:absolute;top:10px;right:10px;
+  color:var(--text3);font-size:14px;padding:4px;
+  transition:color .2s;
+}
+.delete-btn:hover{color:var(--toyota)}
+.total-row{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:14px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:4px;
+}
+.total-label{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:13px;letter-spacing:2px;color:var(--text2);
+}
+.total-val{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:24px;color:var(--text);
+}
+
+/* ─── FORM ─────────────────────────────────────────────────── */
+.form-section{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;padding:16px;margin-bottom:10px;
+}
+.form-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:16px;letter-spacing:2px;
+  color:var(--text);margin-bottom:16px;
+}
+.fl{margin-bottom:14px}
+.fl label{
+  display:block;font-size:10px;color:var(--text3);
+  letter-spacing:1.5px;text-transform:uppercase;
+  font-family:'Outfit',sans-serif;font-weight:600;
+  margin-bottom:6px;
+}
+.fi,.fs,.ft{
+  width:100%;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:11px 13px;color:var(--text);
+  font-family:'Outfit',sans-serif;font-size:14px;
+  outline:none;transition:border-color .2s;
+  -webkit-appearance:none;
+  color-scheme:dark;
+}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--toyota)}
+.ft{resize:vertical;min-height:76px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-primary{
+  width:100%;padding:14px;
+  background:var(--toyota);color:#fff;
+  border-radius:10px;font-weight:700;font-size:15px;
+  letter-spacing:.5px;transition:all .2s;
+  font-family:'Outfit',sans-serif;
+}
+.btn-primary:active{transform:scale(.98);background:#c90019}
+.btn-ghost{
+  width:100%;padding:13px;
+  background:var(--bg3);color:var(--text2);
+  border:1px solid var(--border2);border-radius:10px;
+  font-size:14px;font-family:'Outfit',sans-serif;
+  transition:all .2s;
+}
+.btn-ghost:active{opacity:.7}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+
+/* ─── UPCOMING ─────────────────────────────────────────────── */
+.svc-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-bottom:1px solid var(--border);
+}
+.svc-item:last-child{border-bottom:none}
+.svc-dot{
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+}
+.svc-dot.next{background:var(--toyota);box-shadow:0 0 8px rgba(235,10,30,.6)}
+.svc-dot.watch{background:var(--orange2)}
+.svc-dot.routine{background:var(--green2)}
+.svc-dot.long{background:var(--text3)}
+.svc-info{flex:1}
+.svc-name{font-size:13px;color:var(--text);line-height:1.4}
+.svc-note{font-size:11px;color:var(--text3);margin-top:2px}
+.svc-right{text-align:right;flex-shrink:0}
+.svc-mi{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--text3);
+}
+.badge{
+  display:inline-block;
+  font-size:9px;padding:2px 7px;
+  border-radius:4px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  margin-top:3px;
+}
+.badge.red{background:rgba(235,10,30,.15);color:var(--toyota2);border:1px solid rgba(235,10,30,.3)}
+.badge.orange{background:rgba(255,154,46,.12);color:var(--orange2);border:1px solid rgba(255,154,46,.25)}
+.badge.green{background:rgba(34,201,110,.1);color:var(--green2);border:1px solid rgba(34,201,110,.2)}
+.badge.gray{background:rgba(85,85,85,.2);color:var(--text3);border:1px solid rgba(85,85,85,.3)}
+
+/* ─── PARTS ────────────────────────────────────────────────── */
+.part-item{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+}
+.part-item:last-child{border-bottom:none}
+.part-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px}
+.part-name{font-size:13px;color:var(--text);font-weight:500}
+.part-price{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;color:var(--orange2);
+  white-space:nowrap;flex-shrink:0;
+}
+.part-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:3px}
+.part-link{font-size:11px;color:var(--blue2);text-decoration:none}
+.part-missing{font-size:11px;color:var(--text3);font-style:italic}
+
+/* ─── GUIDES ───────────────────────────────────────────────── */
+.guide-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:8px;overflow:hidden;
+}
+.guide-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;cursor:pointer;
+  user-select:none;
+  transition:background .15s;
+}
+.guide-head:active{background:var(--bg3)}
+.guide-head-left{}
+.guide-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:16px;letter-spacing:1.5px;color:var(--text);
+}
+.guide-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.guide-chevron{
+  color:var(--text3);font-size:20px;
+  transition:transform .3s cubic-bezier(.25,.46,.45,.94);
+  flex-shrink:0;
+}
+.guide-item.open .guide-chevron{transform:rotate(180deg)}
+.guide-body{
+  display:none;
+  padding:0 16px 16px;
+  border-top:1px solid var(--border);
+  padding-top:14px;
+}
+.guide-item.open .guide-body{display:block}
+
+.step{display:flex;gap:12px;margin-bottom:13px;align-items:flex-start}
+.step:last-of-type{margin-bottom:0}
+.step-n{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--toyota);color:#fff;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+.step-t{font-size:13px;color:var(--text2);line-height:1.6}
+.step-t strong{color:var(--text)}
+.step-t code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;background:var(--bg4);
+  padding:1px 5px;border-radius:3px;color:var(--orange2);
+}
+.g-warn{
+  background:rgba(235,10,30,.07);border:1px solid rgba(235,10,30,.2);
+  border-radius:8px;padding:10px 12px;margin-bottom:12px;
+  font-size:12px;color:#ff9099;line-height:1.6;
+}
+.g-info{
+  background:rgba(59,158,255,.07);border:1px solid rgba(59,158,255,.2);
+  border-radius:8px;padding:10px 12px;margin-bottom:12px;
+  font-size:12px;color:var(--blue2);line-height:1.6;
+}
+.g-tip{
+  background:rgba(34,201,110,.07);border:1px solid rgba(34,201,110,.2);
+  border-radius:8px;padding:10px 12px;margin-top:12px;
+  font-size:12px;color:var(--green2);line-height:1.6;
+}
+.g-gold{
+  background:rgba(201,149,42,.07);border:1px solid rgba(201,149,42,.2);
+  border-radius:8px;padding:10px 12px;margin-bottom:12px;
+  font-size:12px;color:var(--gold2);line-height:1.6;
+}
+
+/* ─── WARRANTY ─────────────────────────────────────────────── */
+.warranty-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:8px;overflow:hidden;
+}
+.wc-head{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;border-bottom:1px solid var(--border);
+}
+.wc-icon{font-size:20px;flex-shrink:0}
+.wc-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:15px;letter-spacing:1.5px;color:var(--text);
+}
+.wc-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.wc-badge{
+  margin-left:auto;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  padding:4px 10px;border-radius:6px;
+  white-space:nowrap;flex-shrink:0;
+}
+.wc-badge.active{background:rgba(34,201,110,.12);color:var(--green2);border:1px solid rgba(34,201,110,.25)}
+.wc-badge.check{background:rgba(201,149,42,.12);color:var(--gold2);border:1px solid rgba(201,149,42,.25)}
+.wc-badge.expired{background:rgba(85,85,85,.15);color:var(--text3);border:1px solid rgba(85,85,85,.25)}
+.wc-body{padding:12px 16px}
+.wc-row{
+  display:flex;justify-content:space-between;
+  padding:7px 0;border-bottom:1px solid var(--border);
+  font-size:12px;gap:10px;
+}
+.wc-row:last-child{border-bottom:none}
+.wc-row-k{color:var(--text2)}
+.wc-row-v{
+  font-family:'JetBrains Mono',monospace;
+  color:var(--text);text-align:right;
+}
+
+/* ─── MODAL ────────────────────────────────────────────────── */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.7);z-index:500;
+  align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
+.overlay.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:20px 20px 0 0;
+  padding:20px 16px;
+  padding-bottom:calc(20px + var(--safe-bot));
+  width:100%;max-width:500px;
+  animation:slideUp .25s cubic-bezier(.25,.46,.45,.94);
+}
+@keyframes slideUp{from{transform:translateY(60px)}to{transform:translateY(0)}}
+.modal-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;letter-spacing:2px;
+  margin-bottom:16px;
+}
+.modal-grip{
+  width:36px;height:4px;
+  background:var(--border2);border-radius:2px;
+  margin:0 auto 16px;
+}
+
+/* ─── TOAST ────────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:calc(80px + var(--safe-bot));left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:10px 18px;
+  font-size:13px;color:var(--text);
+  white-space:nowrap;z-index:600;
+  opacity:0;transition:all .3s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar{width:0;height:0}
+
+/* ─── TOYOTA SCHEDULE TABLE ────────────────────────────────── */
+.sched-table{width:100%;border-collapse:collapse;font-size:11px}
+.sched-table th{
+  background:var(--bg3);color:var(--text2);
+  padding:7px 8px;text-align:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  border:1px solid var(--border);white-space:nowrap;
+}
+.sched-table td{
+  padding:7px 8px;border:1px solid var(--border);
+  text-align:center;vertical-align:middle;color:var(--text2);
+}
+.sched-table td:first-child{text-align:left;color:var(--text);font-size:12px}
+.sched-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.sched-check{color:var(--toyota);font-size:14px;font-weight:700}
+.sched-replace{color:var(--green2);font-size:14px;font-weight:700}
+.sched-inspect{color:var(--gold2);font-size:12px}
+.sched-note{font-size:10px;color:var(--text3)}
+.sched-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div class="status-bar"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="header-logo">
+      <div class="header-logo-dot"></div>
+      VENZA GARAGE
+    </div>
+    <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN">VIN ··· 062382 · tap to copy</div>
+  </div>
+  <div class="mileage-pill" onclick="openMileModal()">
+    <div class="mi-num" id="topMi">64,751</div>
+    <div class="mi-label">odometer ✎</div>
+  </div>
+</header>
+
+<!-- NAV -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <button class="nav-btn active" onclick="go('dash')">Dashboard</button>
+    <button class="nav-btn" onclick="go('log')">Service Log</button>
+    <button class="nav-btn" onclick="go('upcoming')">Schedule</button>
+    <button class="nav-btn" onclick="go('parts')">Parts</button>
+    <button class="nav-btn" onclick="go('guides')">Guides</button>
+    <button class="nav-btn" onclick="go('warranty')">Warranty</button>
+    <button class="nav-btn" onclick="go('specs')">Specs</button>
+    <button class="nav-btn" onclick="go('backup')">⚙ Backup</button>
+  </nav>
+</div>
+
+<!-- ═══ DASHBOARD ═══════════════════════════════════════════════ -->
+<div id="page-dash" class="page active">
+
+  <div class="hero">
+    <div class="hero-label">⭐ Next Service Due</div>
+    <div class="hero-mi"><span id="dNextMi">69,590</span> mi</div>
+    <div class="hero-desc">Oil change · Tire rotation · HV Battery filter inspect</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="dProgress" style="width:0%"></div>
+    </div>
+    <div class="progress-labels">
+      <span id="dLast">Last: 64,590</span>
+      <span id="dRemain">— mi remaining</span>
+    </div>
+  </div>
+
+  <div class="gauges">
+    <div class="gauge" style="--accent:var(--green2)">
+      <div class="g-val" id="dMi" style="color:var(--green2)">64,751</div>
+      <div class="g-label">Current Miles</div>
+    </div>
+    <div class="gauge" style="--accent:var(--orange2)">
+      <div class="g-val" style="color:var(--orange2)" id="dTotal">$527.57</div>
+      <div class="g-label">Total Spent</div>
+    </div>
+    <div class="gauge" style="--accent:var(--gold2)">
+      <div class="g-val" style="color:var(--gold2)">$34.54</div>
+      <div class="g-label">Per Oil Change</div>
+    </div>
+    <div class="gauge" style="--accent:var(--blue2)">
+      <div class="g-val" style="color:var(--blue2)" id="dCount">4</div>
+      <div class="g-label">Log Entries</div>
+    </div>
+  </div>
+
+  <div class="section-label">Quick Specs</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="row"><span class="row-key">Required Oil</span><span class="row-val red">0W-16 FULL SYN ONLY</span></div>
+      <div class="row"><span class="row-key">Oil Capacity</span><span class="row-val">4.8 qt (add 4.5 first)</span></div>
+      <div class="row"><span class="row-key">Lug Nut Torque</span><span class="row-val orange">80 ft-lbs</span></div>
+      <div class="row"><span class="row-key">Tire Pressure</span><span class="row-val">33 PSI F / 33 PSI R</span></div>
+      <div class="row"><span class="row-key">Fuel Type</span><span class="row-val green">Regular 87 · Top Tier</span></div>
+      <div class="row"><span class="row-key">Timing</span><span class="row-val green">Chain — No Service</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Recent Inspection (02/24/26)</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="row"><span class="row-key">Brake Pads (all 4)</span><span class="row-val green">7 mm — Good</span></div>
+      <div class="row"><span class="row-key">Tread LF/RF/LR</span><span class="row-val orange">6/32" — Monitor</span></div>
+      <div class="row"><span class="row-key">Tread RR</span><span class="row-val orange">7/32" — Monitor</span></div>
+      <div class="row"><span class="row-key">HV Battery Filter</span><span class="row-val green">OK</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SERVICE LOG ══════════════════════════════════════════════ -->
+<div id="page-log" class="page">
+  <button class="btn-primary" onclick="go('add')" style="margin-bottom:14px">＋ Add Service Entry</button>
+  <div id="logList"></div>
+  <div class="total-row">
+    <span class="total-label">Total Invested</span>
+    <span class="total-val" id="totalVal">$527.57</span>
+  </div>
+</div>
+
+<!-- ═══ ADD ENTRY ════════════════════════════════════════════════ -->
+<div id="page-add" class="page">
+  <div class="form-section">
+    <div class="form-title">New Service Entry</div>
+    <div class="alert blue" style="margin-bottom:16px">
+      <div class="alert-icon">💡</div>
+      <div>After saving, I'll ask for your purchase link so it gets stored permanently in Parts.</div>
+    </div>
+    <div class="fg2">
+      <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
+      <div class="fl"><label>Mileage</label><input type="number" class="fi" id="fMi" placeholder="64751"></div>
+    </div>
+    <div class="fl">
+      <label>Service Type</label>
+      <select class="fs" id="fType" onchange="prefill()">
+        <option value="">— Select type —</option>
+        <option value="oiltires">Oil Change + Tire Rotation + Inspection</option>
+        <option value="oil">Oil Change Only</option>
+        <option value="tires">Tire Rotation</option>
+        <option value="cabin">Cabin Air Filter</option>
+        <option value="engine_filter">Engine Air Filter</option>
+        <option value="trans">Transmission Fluid D&F</option>
+        <option value="diff">Rear Differential D&F</option>
+        <option value="coolant">Engine Coolant Drain & Fill</option>
+        <option value="inv_coolant">Inverter Coolant Drain & Fill</option>
+        <option value="alignment">Wheel Alignment</option>
+        <option value="tires_new">New Tires</option>
+        <option value="brakes">Brake Service</option>
+        <option value="plugs">Spark Plugs</option>
+        <option value="hvfilter_inspect">HV Battery Cooling Filter — Inspect</option>
+        <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
+        <option value="valvomax">ValvoMax Drain Valve Install</option>
+        <option value="wipers">Wiper Blades</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="fl">
+      <label>Description / Details</label>
+      <textarea class="ft" id="fDesc" placeholder="Parts used, part numbers, shop notes..."></textarea>
+    </div>
+    <div class="fg2">
+      <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"></div>
+      <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
+    </div>
+    <div class="fl">
+      <label>Purchase Link (optional)</label>
+      <input type="url" class="fi" id="fLink" placeholder="https://...">
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="go('log')">Cancel</button>
+      <button class="btn-primary" onclick="saveEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ UPCOMING SCHEDULE ════════════════════════════════════════ -->
+<div id="page-upcoming" class="page">
+
+  <div class="section-label">Your Custom Schedule</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="svc-item">
+        <div class="svc-dot next"></div>
+        <div class="svc-info">
+          <div class="svc-name">Oil Change + Tire Rotation + Inspection</div>
+          <div class="svc-note">Mobil 1 0W-16 · Filter 90915-YZZN1 · ValvoMax bag</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">69,590 mi</div><div class="badge red">Next Up</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot next"></div>
+        <div class="svc-info">
+          <div class="svc-name">HV Battery Cooling Filter — Inspect</div>
+          <div class="svc-note">Visually check near rear seat — every 5,000 mi</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">69,590 mi</div><div class="badge red">Next Up</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot routine"></div>
+        <div class="svc-info">
+          <div class="svc-name">Cabin Air Filter</div>
+          <div class="svc-note">A-Premium APCA4605 — link saved in Parts</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">~79,751 mi</div><div class="badge green">Routine</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot routine"></div>
+        <div class="svc-info">
+          <div class="svc-name">HV Battery Cooling Filter — Clean</div>
+          <div class="svc-note">Clean every 20,000 miles per Toyota manual</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">~84,590 mi</div><div class="badge green">Routine</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot routine"></div>
+        <div class="svc-info">
+          <div class="svc-name">Engine Air Filter</div>
+          <div class="svc-note">#17801-YZZ16 — get link at next purchase</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">~94,590 mi</div><div class="badge green">Routine</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot watch"></div>
+        <div class="svc-info">
+          <div class="svc-name">New Tires + Alignment</div>
+          <div class="svc-note">Tread at 6–7/32" as of 02/24/26 — monitor</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">TBD</div><div class="badge orange">Watch</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot long"></div>
+        <div class="svc-info">
+          <div class="svc-name">Engine Coolant Drain & Fill</div>
+          <div class="svc-note">Toyota SLLC #00272-SLLC2 · Toyota spec: 100k/10yr</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">~100,000 mi</div><div class="badge gray">Long-term</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot long"></div>
+        <div class="svc-info">
+          <div class="svc-name">Spark Plugs</div>
+          <div class="svc-note">Iridium — NGK or Denso OEM only</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">~120,000 mi</div><div class="badge gray">Long-term</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot long"></div>
+        <div class="svc-info">
+          <div class="svc-name">Transmission Fluid D&F</div>
+          <div class="svc-note">ATF WS #00289-ATFWS — custom 60k interval</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">124,590 mi</div><div class="badge gray">Long-term</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot long"></div>
+        <div class="svc-info">
+          <div class="svc-name">Rear Differential D&F</div>
+          <div class="svc-note">ATF WS #00289-ATFWS — same visit as trans</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">124,590 mi</div><div class="badge gray">Long-term</div></div>
+      </div>
+      <div class="svc-item">
+        <div class="svc-dot long"></div>
+        <div class="svc-info">
+          <div class="svc-name">Inverter Coolant Drain & Fill</div>
+          <div class="svc-note">Toyota SLLC — Toyota spec: 150k/180 months first</div>
+        </div>
+        <div class="svc-right"><div class="svc-mi">~150,000 mi</div><div class="badge gray">Long-term</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Official Toyota Schedule (from manual)</div>
+  <div class="alert gold">
+    <div class="alert-icon">📋</div>
+    <div><strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. You've chosen 5,000 mi — more conservative and perfectly valid.</div>
+  </div>
+  <div class="sched-wrap">
+    <table class="sched-table">
+      <tr>
+        <th>Service Item</th>
+        <th>5k</th><th>10k</th><th>15k</th><th>20k</th><th>30k</th><th>60k</th><th>90k</th><th>100k</th><th>120k</th>
+      </tr>
+      <tr>
+        <td>Engine Oil & Filter <span class="sched-note">(0W-16)</span></td>
+        <td>—</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td>
+      </tr>
+      <tr>
+        <td>Tire Rotation</td>
+        <td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td>
+      </tr>
+      <tr>
+        <td>HV Battery Filter — Inspect</td>
+        <td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td>
+      </tr>
+      <tr>
+        <td>HV Battery Filter — Clean</td>
+        <td>—</td><td>—</td><td>—</td><td class="sched-replace">C</td><td>—</td><td class="sched-replace">C</td><td>—</td><td class="sched-replace">C</td><td class="sched-replace">C</td>
+      </tr>
+      <tr>
+        <td>Cabin Air Filter</td>
+        <td>—</td><td>—</td><td class="sched-inspect">I</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td>
+      </tr>
+      <tr>
+        <td>Engine Air Filter</td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td>
+      </tr>
+      <tr>
+        <td>Brake Inspection</td>
+        <td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td>
+      </tr>
+      <tr>
+        <td>Engine/Inverter Coolant</td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td>—</td>
+      </tr>
+      <tr>
+        <td>Spark Plugs</td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td>
+      </tr>
+    </table>
+  </div>
+  <div style="font-size:10px;color:var(--text3);margin-top:6px;line-height:1.6">
+    I = Inspect · R = Replace · C = Clean · Source: 2021 Toyota Venza Warranty & Maintenance Guide
+  </div>
+</div>
+
+<!-- ═══ PARTS ═════════════════════════════════════════════════════ -->
+<div id="page-parts" class="page">
+
+  <div class="section-label">Fluids & Filters</div>
+  <div class="card"><div class="card-body">
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">Mobil 1 0W-16 Full Synthetic 5 qt</span><span class="part-price">$27.97</span></div>
+      <div class="part-num">Amazon ASIN: B07Y5MG3MX</div>
+      <a class="part-link" href="https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534" target="_blank">→ walmart.com — verified 03/2026</a>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">OEM Oil Filter</span><span class="part-price">$6.57</span></div>
+      <div class="part-num">Part: 90915-YZZN1</div>
+      <a class="part-link" href="https://parts.toyota.com/" target="_blank">→ parts.toyota.com</a>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">Cabin Air Filter (Activated Carbon)</span><span class="part-price">$11.18</span></div>
+      <div class="part-num">Part: APCA4605 / Item: 1004KW2G</div>
+      <a class="part-link" href="https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid" target="_blank">→ a-premium.com — confirmed fit</a>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">Engine Air Filter</span><span class="part-price">$15.59</span></div>
+      <div class="part-num">Part: 17801-YZZ16 (105A ELEMENT)</div>
+      <div class="part-missing">⚠ Purchase link not saved — ask at next buy</div>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">ATF WS — Transmission & Rear Diff</span><span class="part-price">Dealer</span></div>
+      <div class="part-num">Part: 00289-ATFWS</div>
+      <div class="part-missing">⚠ Purchase link not saved — ask at next buy</div>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">Toyota Super Long Life Coolant</span><span class="part-price">—</span></div>
+      <div class="part-num">Part: 00272-SLLC2 (Pink, Pre-mixed 50/50)</div>
+      <div class="part-missing">⚠ Purchase link not saved — ask at next buy</div>
+    </div>
+  </div></div>
+
+  <div class="section-label">ValvoMax Drain System</div>
+  <div class="card"><div class="card-body">
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">ValvoMax Drain Valve M12-1.25</span><span class="part-price">$54.99</span></div>
+      <div class="part-num">Thread: M12-1.25 Quick Twist · VITON O-ring seal</div>
+      <a class="part-link" href="https://www.valvomax.com/collections/all" target="_blank">→ valvomax.com — M12-1.25</a>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">ValvoMax Drain Bag Starter Kit</span><span class="part-price">$19.99</span></div>
+      <div class="part-num">Replaces traditional drain pan</div>
+      <a class="part-link" href="https://www.valvomax.com/collections/all" target="_blank">→ valvomax.com — accessories</a>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">ValvoMax Replacement Kit</span><span class="part-price">$4.99</span></div>
+      <div class="part-num">Washers + Tether + Sticker</div>
+      <a class="part-link" href="https://www.valvomax.com/collections/all" target="_blank">→ valvomax.com — accessories</a>
+    </div>
+  </div></div>
+
+  <div class="section-label">Tools (One-Time)</div>
+  <div class="card"><div class="card-body">
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">Smart Jerry 64mm Oil Filter Wrench</span><span style="color:var(--green2);font-size:12px">✔ Purchased</span></div>
+      <div class="part-num">14-flute Steel — HEX side only to loosen</div>
+      <a class="part-link" href="https://www.amazon.com/SMART-JERRY-Compatible-Toyotas-Cartridge/dp/B0DPMRNBKH" target="_blank">→ amazon.com — B0DPMRNBKH</a>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">VEVOR Torque Wrench 1/2" Drive</span><span style="color:var(--green2);font-size:12px">✔ Purchased</span></div>
+      <div class="part-num">10–150 ft-lbs</div>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">Car Ramps — VEVOR High Profile</span><span style="color:var(--green2);font-size:12px">✔ Purchased</span></div>
+      <div class="part-num">13,000 lb GVW</div>
+    </div>
+    <div class="part-item">
+      <div class="part-row1"><span class="part-name">Lisle 24680 Spill-Free Funnel</span><span style="color:var(--text2);font-size:12px">Recommended</span></div>
+      <div class="part-num">For coolant air bleed — 2" neck fits Toyota SLLC</div>
+    </div>
+  </div></div>
+
+  <div class="section-label">Free Oil Disposal</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">AutoZone — Webb City</span><span class="row-val" style="font-size:10px">1024 S Madison St · (417) 673-3290</span></div>
+    <div class="row"><span class="row-key">O'Reilly — Webb City</span><span class="row-val" style="font-size:10px">1001 S Madison St · (417) 673-4972</span></div>
+  </div></div>
+</div>
+
+<!-- ═══ GUIDES ════════════════════════════════════════════════════ -->
+<div id="page-guides" class="page">
+
+  <!-- OIL CHANGE -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">🔧 Oil Change — ValvoMax</div>
+        <div class="guide-meta">Every 5,000 mi (custom) · ~30 min · $34.54 · Toyota spec: 10k/12 mo</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-warn"><strong>⚠ OIL ONLY:</strong> SAE 0W-16 Full Synthetic — Mobil 1 5 qt from Walmart. The 0W-20 label looks nearly identical. Verify before pouring. Toyota manual confirms: 0W-20 only acceptable as one-time emergency substitute.</div>
+      <div class="g-info"><strong>Parts:</strong> Mobil 1 0W-16 (5 qt) · Filter 90915-YZZN1 · ValvoMax drain bag kit · Fresh gloves + rags</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Confirm oil label</strong> — verify <code>0W-16</code> in bold on jug. Double-check before opening.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Warm engine 5–10 min</strong>, then shut off and cool 10–15 min. Oil should be warm (flows better) but not scalding hot.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Drive onto ramps</strong>, apply parking brake firmly, place wheel chocks behind rear tires.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Crack oil filler cap</strong> on top of engine — do not remove, just loosen to allow air flow during drain.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Remove undercover panel</strong> — 4 screws, <code>10mm socket</code>. Snug only when reinstalling. Never overtighten plastic fasteners.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Attach ValvoMax drain bag</strong> — screw drain tube onto valve clockwise. Oil flows automatically. Let drain <strong>15 full minutes</strong> for complete drain.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Swap filter while draining</strong> — Smart Jerry wrench, <strong>HEX side only</strong> to break loose (never use the square drive to loosen — can fracture). Hand-thread new filter then tighten to <code>13 ft-lbs</code> (18 Nm) or hand-snug + ¾ turn.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Close drain valve</strong> — unscrew drain tube counterclockwise. Oil stops instantly. Reinstall the steel safety cap hand-tight.</div></div>
+      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall undercover</strong> — 4 screws, 10mm, finger-snug only. Do not torque plastic.</div></div>
+      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Lower vehicle, add 4.5 qt</strong> of 0W-16. Start engine, idle 60–90 sec, shut off. Wait 5 min. Check dipstick — top off to <strong>upper hole</strong>. Total target: 4.8 qt.</div></div>
+      <div class="step"><div class="step-n">11</div><div class="step-t"><strong>Visual leak check</strong> — inspect under car around drain valve and filter. Should be completely dry.</div></div>
+      <div class="step"><div class="step-n">12</div><div class="step-t"><strong>Reset oil life</strong> — Settings → Vehicle → Maintenance Reset → Oil Maintenance Required.</div></div>
+      <div class="step"><div class="step-n">13</div><div class="step-t"><strong>Dispose free</strong> at AutoZone or O'Reilly in Webb City. Sealed container — they pump it out and accept used filters too.</div></div>
+      <div class="g-tip">💡 <strong>Dipstick (yellow handle):</strong> Upper hole = FULL. Lower hole = ADD. Always wipe, reinsert fully, pull again — first pull gives false high reading. Slightly under full is safer than overfilled.</div>
+    </div>
+  </div>
+
+  <!-- COOLANT -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">🌡️ Engine Coolant Drain & Fill</div>
+        <div class="guide-meta">Due ~100,000 mi / 120 months · Car Care Nut method</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-warn"><strong>⚠ FLUID ONLY:</strong> Toyota Super Long Life Coolant (SLLC) Part# 00272-SLLC2 — pink, pre-mixed 50/50. DO NOT use universal green/orange coolants. Toyota manual specifies SLLC or "similar non-silicate, non-amine, non-borate ethylene-glycol with long-life hybrid organic acid technology."</div>
+      <div class="g-info"><strong>Important:</strong> Venza Hybrid has TWO separate cooling systems — Engine coolant (100k first replacement) and Inverter coolant (150k first replacement). Both use Toyota SLLC pink. Best reference videos: search "2019+ RAV4 Hybrid coolant change" — same A25A-FXS engine.</div>
+      <div class="g-gold"><strong>Tools needed:</strong> Lisle 24680 spill-free funnel · 5/16" ID drain hose · Drain pan · Toyota SLLC coolant</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Let engine cool completely</strong> — minimum 2 hours after driving. Opening hot coolant system is dangerous.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Locate radiator petcock</strong> at bottom of radiator. Attach a <code>5/16" ID hose</code> to direct coolant into drain pan. Open petcock — drain fully.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>No water flush needed</strong> — Toyota manual and Car Care Nut method: straight drain and refill is correct. Flushing with water is unnecessary on a properly maintained cooling system.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Close petcock</strong> once fully drained.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Attach Lisle 24680</strong> spill-free funnel to radiator fill neck. This prevents air pockets and messy spills.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Fill with Toyota SLLC</strong> (pre-mixed 50/50) through the funnel until the funnel stays consistently full. Leave funnel attached.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Activate Maintenance Mode</strong> — required to run gas engine for air bleeding. Sequence: Gas pedal 2x → Neutral → 2x → Park → 2x → Start. Engine will run in gas mode.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Hold ~2,000 RPM</strong> until the cooling fan cycles <strong>twice</strong>. Continue adding coolant to funnel as the level drops — air is purging from the system.</div></div>
+      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Remove funnel, cap off</strong>. Let engine cool completely. Check coolant reservoir — top off to FULL line with Toyota SLLC if needed.</div></div>
+      <div class="g-tip">💡 Inverter coolant service is separate at ~150k miles. The inverter cooling system has its own reservoir (check your owner's manual for location). Both reservoirs take the same Toyota SLLC pink coolant.</div>
+    </div>
+  </div>
+
+  <!-- CABIN FILTER -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">💨 Cabin Air Filter</div>
+        <div class="guide-meta">~15,000 mi (custom) · Toyota spec: 30k · ~5 min DIY</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-info"><strong>Part:</strong> A-Premium Activated Carbon APCA4605 — $11.18. Activated carbon removes odors in addition to dust and pollen. Toyota manual notes: replace sooner if airflow from A/C is reduced or windows fog in Fresh mode.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Open glove box</strong> and completely empty its contents.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Squeeze sides of glove box</strong> inward — this compresses the side pins past the stops. Lower the glove box door fully.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Remove filter housing cover</strong> — unclip or slide the rectangular cover behind the open glove box opening.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Slide out old filter</strong>. Note the <strong>airflow direction arrow</strong> on the filter frame — the new one must match.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Insert new filter</strong> with arrow pointing in the same direction (typically toward the cabin/blower). Seat flat with no gaps at the edges.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Replace cover, restore glove box</strong>. Squeeze sides again to click back into stops. Done — no tools required.</div></div>
+      <div class="g-tip">💡 Toyota manual footnote: "Driving in heavy traffic, on dirt roads or in urban, dusty or desert areas may shorten filter life." If you notice reduced A/C airflow or foggy windows in Fresh mode, replace sooner regardless of mileage.</div>
+    </div>
+  </div>
+
+  <!-- ENGINE AIR FILTER -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">🌬️ Engine Air Filter</div>
+        <div class="guide-meta">~30,000 mi per Toyota manual · Part# 17801-YZZ16</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-info"><strong>Part:</strong> Toyota OEM #17801-YZZ16 — $15.59 at Frank Fletcher Toyota Parts. Toyota manual says: inspect for damage, excessive wear, and oiliness — replace if necessary at 30k intervals.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Open hood</strong>. Locate the air filter box — black rectangular plastic housing toward the front/side of the engine bay.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Release the clips</strong> securing the air box lid — typically spring clips on each side. Open the lid.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Remove old filter</strong>. Inspect the housing interior and wipe out any debris with a dry cloth.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Insert new filter</strong> — ensure all 4 edges seat flat against the housing with no gaps that could let unfiltered air bypass.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Close lid, secure clips</strong>. Done — no tools required for most clip-style housings.</div></div>
+      <div class="g-tip">💡 Quick inspection method: hold the old filter up to a light source. If you can't easily see light through it, it's due for replacement regardless of mileage interval.</div>
+    </div>
+  </div>
+
+  <!-- HV BATTERY FILTER -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">🔋 HV Battery Cooling Filter</div>
+        <div class="guide-meta">Inspect every 5,000 mi · Clean every 20,000 mi · Per Toyota manual</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-gold"><strong>Toyota Manual says:</strong> "Visually check the HV battery cooling intake filter for dirt or dust every 5,000 miles and clean if necessary. Clean every 20,000 miles." This is critical for hybrid battery longevity.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Locate the HV battery cooling intake</strong> — it is typically behind the rear seat area or in the cargo compartment area. Refer to your owner's manual for exact location on your specific Venza.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Every 5,000 mi — Inspect:</strong> Visually check for visible dust buildup, lint, or debris. If lightly dusty, a gentle tap or light vacuum is sufficient.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Every 20,000 mi — Clean:</strong> Remove the filter cover, take out the filter element, and clean with low-pressure air or a soft brush. Do not use water or wet cleaning.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Reinstall filter and cover</strong>. Ensure no gap that could allow unfiltered air into the battery cooling system.</div></div>
+      <div class="g-tip">💡 A clogged HV battery cooling filter can cause the hybrid battery to run hotter, which reduces battery life over time. This is one of the few hybrid-specific maintenance items that matters long-term.</div>
+    </div>
+  </div>
+
+  <!-- TIRE ROTATION -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">🔄 Tire Rotation</div>
+        <div class="guide-meta">Every 5,000 mi · Lug nut torque: 80 ft-lbs</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-info"><strong>AWD Pattern — Forward Cross:</strong> Rear tires move straight to the front. Front tires cross to opposite rear (RF → LR, LF → RR).</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Loosen all 5 lug nuts per wheel</strong> while tires are still on the ground — break them loose only, don't remove yet.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Jack up and support</strong> one corner at a time. Place jack stand under pinch weld point. Never work under a car on just a jack.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Swap per forward cross pattern</strong>. While wheels are off, visually inspect brake pads for wear and rotors for scoring or rust.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Hand-thread lug nuts</strong> in a star/cross pattern (never circular). Lower vehicle until tire contacts ground but doesn't fully carry weight.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Torque to <code>80 ft-lbs</code></strong> in star pattern with torque wrench. Lower fully, then do a final torque check on each lug.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Check tire pressures</strong> — target <code>33 PSI</code> all four corners. Top up if needed.</div></div>
+      <div class="g-tip">💡 Current tread depth as of 02/24/26: LF/RF/LR at 6/32", RR at 7/32". Toyota recommends replacement at 2/32". Plan for new tires together with alignment to maximize value.</div>
+    </div>
+  </div>
+
+  <!-- VALVOMAX INSTALL -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">🔩 ValvoMax — First-Time Install</div>
+        <div class="guide-meta">One-time only · Confirm torque at valvomax.com first</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-warn"><strong>⚠ CRITICAL:</strong> ValvoMax official torque spec for M12-1.25 is NOT confirmed from manufacturer documentation. Third-party reference: EZ Oil Drain Valve lists 20 ft-lbs for M12-1.25. Verify directly at valvomax.com before proceeding.</div>
+      <div class="g-info"><strong>What you need:</strong> ValvoMax M12-1.25 · 24mm socket · 1/2" drive torque wrench · Thread-clean rag · Fresh crush washer (included)</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Do this during your first oil change</strong> — do steps 1–6 of oil change guide first (drain old oil through OEM plug before installing ValvoMax).</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Remove OEM drain plug</strong> — <code>14mm socket</code>, <code>30 ft-lbs</code>. Let oil drain completely. Save crush washer only if ValvoMax can't be installed today.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Clean drain hole threads</strong> — wipe the oil pan's drain port threads with a clean dry rag. Remove any old gasket material or grit that could prevent O-ring from seating.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Install crush washer</strong> on ValvoMax — this is a one-time use washer (not needed on future oil changes).</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Thread ValvoMax by hand</strong> clockwise until snug. Then torque to manufacturer-specified value (<strong>verify at valvomax.com first</strong>) using <code>24mm socket</code>. Do NOT overtorque — can distort O-ring seat and cause weep.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Continue oil change</strong> — add oil, start engine, run 2 minutes, shut off. Do a visual inspection under the car — drain valve area should be completely dry.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Valve is now permanent</strong> — never remove it. All future oil drains: attach drain bag tube → oil flows. Unscrew tube → oil stops instantly.</div></div>
+      <div class="g-tip">💡 No crush washer needed on any future oil change — the VITON O-ring triple seal is the permanent seal. This saves ~$0.50 per change and one less step.</div>
+    </div>
+  </div>
+
+  <!-- OIL RESET -->
+  <div class="guide-item">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">⚙️ Oil Life Reset</div>
+        <div class="guide-meta">After every oil change · 30 seconds</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-gold">Toyota manual: "Reset the oil replacement reminder light ('MAINT REQD') or the message 'OIL MAINTENANCE REQUIRED' on the multi-information display after maintenance at every 5,000 miles."</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t">Turn vehicle to ON/Ready mode (power on, don't start engine).</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Go to: <strong>Settings → Vehicle → Maintenance Reset → Oil Maintenance Required</strong></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Confirm the reset. "MAINT REQD" light should extinguish.</div></div>
+      <div class="g-tip">💡 If the message doesn't appear, you may need to scroll through the multi-information display using the steering wheel controls until you find the maintenance reset menu.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ WARRANTY ══════════════════════════════════════════════════ -->
+<div id="page-warranty" class="page">
+
+  <div class="alert green">
+    <div class="alert-icon">✅</div>
+    <div><strong>Your coverage starts from in-service date.</strong> Keep this handy — all coverages below are from the official 2021 Toyota Venza Warranty & Maintenance Guide.</div>
+  </div>
+
+  <div class="section-label">Coverage Summary</div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">🛡️</div>
+      <div>
+        <div class="wc-title">Hybrid Battery Warranty</div>
+        <div class="wc-sub">Traction battery — best coverage</div>
+      </div>
+      <div class="wc-badge active">Active</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">10 Years / 150,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Hybrid traction battery pack</span></div>
+      <div class="wc-row"><span class="wc-row-k">Note</span><span class="wc-row-v">Whichever comes first</span></div>
+    </div>
+  </div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">⚡</div>
+      <div>
+        <div class="wc-title">Hybrid System Warranty</div>
+        <div class="wc-sub">Control modules, inverter, converter</div>
+      </div>
+      <div class="wc-badge active">Active</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">8 Years / 100,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Battery control module, hybrid control module, inverter with converter</span></div>
+    </div>
+  </div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">🔧</div>
+      <div>
+        <div class="wc-title">Powertrain Warranty</div>
+        <div class="wc-sub">Engine, transmission, drivetrain</div>
+      </div>
+      <div class="wc-badge active">Active</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / 60,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Engine internals, transmission, axles, drive shafts, CV joints, seals</span></div>
+    </div>
+  </div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">🚗</div>
+      <div>
+        <div class="wc-title">Basic / Bumper-to-Bumper</div>
+        <div class="wc-sub">Defects in materials or workmanship</div>
+      </div>
+      <div class="wc-badge expired">Likely Expired</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">36 Months / 36,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Note</span><span class="wc-row-v">Excludes: wear items, maintenance, environmental damage, misuse</span></div>
+    </div>
+  </div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">💺</div>
+      <div>
+        <div class="wc-title">Restraint Systems</div>
+        <div class="wc-sub">Seatbelts & airbags</div>
+      </div>
+      <div class="wc-badge active">Active</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / 60,000 Miles</span></div>
+    </div>
+  </div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">🦠</div>
+      <div>
+        <div class="wc-title">Corrosion Perforation</div>
+        <div class="wc-sub">Body panel rust-through</div>
+      </div>
+      <div class="wc-badge active">Active</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / Unlimited Miles</span></div>
+    </div>
+  </div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">💨</div>
+      <div>
+        <div class="wc-title">Federal Emission (Long-Term)</div>
+        <div class="wc-sub">Key emission components</div>
+      </div>
+      <div class="wc-badge active">Active</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">8 Years / 80,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Engine control module, catalytic converter, malfunction indicator light</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Important Notes from Manual</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">DIY OK?</span><span class="row-val green">Yes — Toyota cannot deny warranty solely because you used a non-dealer for maintenance</span></div>
+    <div class="row"><span class="row-key">Parts Required?</span><span class="row-val">Non-OEM parts OK — but OEM recommended for emission systems</span></div>
+    <div class="row"><span class="row-key">Records Required?</span><span class="row-val">Toyota cannot deny warranty solely for lack of records — but keep them anyway</span></div>
+    <div class="row"><span class="row-key">Emergency Contact</span><span class="row-val">Toyota Customer Experience: (800) 331-4331</span></div>
+  </div></div>
+</div>
+
+<!-- ═══ SPECS ══════════════════════════════════════════════════════ -->
+<div id="page-specs" class="page">
+
+  <div class="section-label">Vehicle Profile</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">Year / Model</span><span class="row-val">2021 Toyota Venza LE</span></div>
+    <div class="row"><span class="row-key">Trim</span><span class="row-val">Hybrid AWD</span></div>
+    <div class="row"><span class="row-key">Engine</span><span class="row-val">2.5L A25A-FXS</span></div>
+    <div class="row" onclick="copyVIN()" style="cursor:pointer"><span class="row-key">VIN <span style="color:var(--text3);font-size:10px">(tap to copy)</span></span><span class="row-val" style="font-size:10px;color:var(--blue2)">JTEAAAAAH8MJ062382</span></div>
+    <div class="row"><span class="row-key">Color</span><span class="row-val">White</span></div>
+    <div class="row"><span class="row-key">Location</span><span class="row-val">Carterville, MO</span></div>
+  </div></div>
+
+  <div class="section-label">Oil Specs</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">Required Oil</span><span class="row-val red">0W-16 FULL SYN ONLY</span></div>
+    <div class="row"><span class="row-key">API / ILSAC Spec</span><span class="row-val">API SP · ILSAC GF-6B</span></div>
+    <div class="row"><span class="row-key">Capacity</span><span class="row-val">4.8 qt with filter</span></div>
+    <div class="row"><span class="row-key">Fill Method</span><span class="row-val">Add 4.5 qt first → check dipstick</span></div>
+    <div class="row"><span class="row-key">Dipstick Handle</span><span class="row-val gold">Yellow</span></div>
+    <div class="row"><span class="row-key">Toyota Official Interval</span><span class="row-val">10,000 mi / 12 months (0W-16)</span></div>
+    <div class="row"><span class="row-key">Your Custom Interval</span><span class="row-val green">5,000 mi (more conservative)</span></div>
+    <div class="row"><span class="row-key">Emergency Substitute</span><span class="row-val red">0W-20 once only — replace ASAP</span></div>
+  </div></div>
+
+  <div class="section-label">Torque Specs</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">Oil Filter 90915-YZZN1</span><span class="row-val orange">13 ft-lbs (18 Nm)</span></div>
+    <div class="row"><span class="row-key">OEM Drain Plug (14mm)</span><span class="row-val orange">30 ft-lbs</span></div>
+    <div class="row"><span class="row-key">ValvoMax M12-1.25</span><span class="row-val red">⚠ Verify at valvomax.com</span></div>
+    <div class="row"><span class="row-key">Lug Nuts</span><span class="row-val orange">80 ft-lbs</span></div>
+    <div class="row"><span class="row-key">Undercover Screws</span><span class="row-val">10mm · Hand-snug only</span></div>
+    <div class="row"><span class="row-key">Filter Wrench Note</span><span class="row-val red">HEX side ONLY to loosen</span></div>
+  </div></div>
+
+  <div class="section-label">Tires & Wheels</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">Tire Size</span><span class="row-val">225/60R18</span></div>
+    <div class="row"><span class="row-key">OE Pressure F/R</span><span class="row-val">33 PSI / 33 PSI</span></div>
+    <div class="row"><span class="row-key">Bolt Pattern</span><span class="row-val">5 × 114.30 mm</span></div>
+    <div class="row"><span class="row-key">Lug Nut Torque</span><span class="row-val orange">80 ft-lbs</span></div>
+    <div class="row"><span class="row-key">Tires Installed</span><span class="row-val">~June 2023</span></div>
+    <div class="row"><span class="row-key">Tread (02/24/26)</span><span class="row-val orange">LF/RF/LR 6/32 · RR 7/32</span></div>
+  </div></div>
+
+  <div class="section-label">Fluids Reference</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">Engine Coolant</span><span class="row-val">Toyota SLLC #00272-SLLC2 (Pink 50/50)</span></div>
+    <div class="row"><span class="row-key">Inverter Coolant</span><span class="row-val">Toyota SLLC (same fluid, separate circuit)</span></div>
+    <div class="row"><span class="row-key">Transmission</span><span class="row-val">ATF WS #00289-ATFWS</span></div>
+    <div class="row"><span class="row-key">Rear Differential</span><span class="row-val">ATF WS #00289-ATFWS</span></div>
+    <div class="row"><span class="row-key">Fuel</span><span class="row-val green">Regular 87 · Top Tier certified</span></div>
+    <div class="row"><span class="row-key">Octane Booster</span><span class="row-val red">Not needed · Not recommended</span></div>
+  </div></div>
+
+  <div class="section-label">Hybrid System</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">Timing Chain</span><span class="row-val green">No service — life of engine</span></div>
+    <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val">Iridium · NGK or Denso OEM only</span></div>
+    <div class="row"><span class="row-key">Plug Interval</span><span class="row-val">120,000 mi per Toyota manual</span></div>
+    <div class="row"><span class="row-key">Brake Pads (02/24/26)</span><span class="row-val green">7 mm all 4 corners — Good</span></div>
+    <div class="row"><span class="row-key">HV Battery Warranty</span><span class="row-val green">10 yr / 150,000 mi</span></div>
+    <div class="row"><span class="row-key">Maintenance Mode</span><span class="row-val" style="font-size:10px">Gas pedal 2x→Neutral→2x→Park→2x→Start</span></div>
+  </div></div>
+</div>
+
+<!-- ═══ BACKUP & RESTORE ══════════════════════════════════════════ -->
+<div id="page-backup" class="page">
+
+  <div class="alert blue">
+    <div class="alert-icon">📱</div>
+    <div><strong>New phone or lost phone?</strong> Export your data as a JSON file, save it to iCloud/Files, then import it on any device. All service entries, mileage, and links are preserved.</div>
+  </div>
+
+  <div class="section-label">Backup</div>
+  <div class="form-section">
+    <div class="form-title" style="margin-bottom:8px">Export All Data</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Downloads a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">venza_backup.json</code> file. Save it to iCloud Drive, Google Drive, or email it to yourself. Keep a copy somewhere safe.</p>
+    <button class="btn-primary" onclick="exportData()">⬇ Export / Download Backup</button>
+  </div>
+
+  <div class="section-label">Restore</div>
+  <div class="form-section">
+    <div class="form-title" style="margin-bottom:8px">Import from Backup</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Select a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">venza_backup.json</code> file to restore. This will <strong style="color:var(--toyota)">replace all current data</strong> with the backup.</p>
+    <div class="fl">
+      <label>Select Backup File</label>
+      <input type="file" class="fi" id="importFile" accept=".json" onchange="importData(this)" style="padding:10px 12px;cursor:pointer">
+    </div>
+  </div>
+
+  <div class="section-label">Current Data Summary</div>
+  <div class="card"><div class="card-body">
+    <div class="row"><span class="row-key">Service Entries</span><span class="row-val green" id="bkCount">—</span></div>
+    <div class="row"><span class="row-key">Current Mileage</span><span class="row-val" id="bkMi">—</span></div>
+    <div class="row"><span class="row-key">Total Invested</span><span class="row-val orange" id="bkTotal">—</span></div>
+    <div class="row"><span class="row-key">Last Service</span><span class="row-val" id="bkLast">—</span></div>
+  </div></div>
+
+  <div class="section-label">For ChatGPT — Add Log Entry</div>
+  <div class="form-section" style="background:rgba(59,158,255,.05);border-color:rgba(59,158,255,.2)">
+    <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">📋 ChatGPT Instructions</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.7">Tell ChatGPT: <em style="color:var(--text)">"Add a log entry to my Venza app. Here is the format:"</em> then paste the template below.</p>
+    <div id="chatgptTemplate" style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer" onclick="copyTemplate()">// ADD THIS ENTRY to the DEFAULT array in the JS section
+// Find: "const DEFAULT = [" and add before the closing ]
+
+{
+  id: DATE.now(),          // auto-generated timestamp
+  date: 'YYYY-MM-DD',      // example: '2026-04-15'
+  mi: 69590,               // mileage when service was done
+  type: 'oiltires',        // see TYPE LIST below
+  desc: 'Full description of service, parts used, part numbers',
+  cost: 34.54,             // dollar amount
+  shop: 'DIY or shop name',
+  link: 'https://...',     // purchase link or leave ''
+  builtin: false           // always false for user entries
+},
+
+// TYPE LIST (use exact string):
+// oil, oiltires, tires, cabin, engine_filter,
+// trans, diff, coolant, inv_coolant, alignment,
+// tires_new, brakes, plugs, hvfilter_inspect,
+// hvfilter_clean, valvomax, wipers, other</div>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px">Tap the box above to copy the template to clipboard.</p>
+  </div>
+
+  <div class="section-label">Danger Zone</div>
+  <div class="form-section" style="background:rgba(235,10,30,.04);border-color:rgba(235,10,30,.2)">
+    <div class="form-title" style="color:var(--toyota);margin-bottom:8px">Reset to Factory Data</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Wipes all user-added entries and resets to the original 4 service records. Cannot be undone unless you have a backup.</p>
+    <button class="btn-ghost" style="border-color:rgba(235,10,30,.4);color:var(--toyota)" onclick="resetData()">🗑 Reset All Data</button>
+  </div>
+</div>
+
+<!-- ═══ MILEAGE MODAL ══════════════════════════════════════════════ -->
+<div class="overlay" id="miModal">
+  <div class="modal">
+    <div class="modal-grip"></div>
+    <div class="modal-title">Update Odometer</div>
+    <div class="fl"><label>Current Mileage</label><input type="number" class="fi" id="miInput" placeholder="64751"></div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="closeMiModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveMi()">Update</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── DATA ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   VENZA GARAGE — DATA LAYER
+   ═══════════════════════════════════════════════════════════════
+
+   TO ADD A LOG ENTRY (for ChatGPT or manual editing):
+   ────────────────────────────────────────────────────
+   Add an object to DEFAULT array below. Format:
+   {
+     id: 1234567,            ← any unique number
+     date: 'YYYY-MM-DD',     ← service date
+     mi: 65000,              ← mileage at service
+     type: 'oil',            ← see TYPE LIST below
+     desc: 'Description...',
+     cost: 34.54,            ← dollar amount (number)
+     shop: 'DIY or shop',
+     link: 'https://...',    ← purchase link or empty string ''
+     builtin: true           ← true = no delete button shown
+   }
+
+   TYPE LIST (use exact string):
+   oil, oiltires, tires, cabin, engine_filter,
+   trans, diff, coolant, inv_coolant, alignment,
+   tires_new, brakes, plugs, hvfilter_inspect,
+   hvfilter_clean, valvomax, wipers, other
+
+   VEHICLE CONSTANTS (easy to update):
+   ────────────────────────────────────
+*/
+const VIN         = 'JTEAAAAAH8MJ062382';
+const LAST_SVC_MI = 64590;   // mileage of last oil change
+const NEXT_SVC_MI = 69590;   // mileage of next oil change due
+
+/* ── DEFAULT LOG — All confirmed service history ─────────────── */
+const DEFAULT = [
+  // ── Entry 1: Full service at dealer ──────────────────────────
+  {
+    id: 1,
+    date: '2026-02-24',
+    mi: 64590,
+    type: 'oiltires',
+    desc: 'Oil change (Toyota 0W-16 qty 5) + filter 90915-YZZN1, tire rotation, transmission fluid D&F (ATF WS qty 4), rear diff D&F (ATF WS qty 2), multi-point inspection',
+    cost: 409.29,
+    shop: 'Frank Fletcher Toyota, Joplin MO',
+    link: '',
+    builtin: true
+  },
+  // ── Entry 2: Engine air filter DIY ───────────────────────────
+  {
+    id: 2,
+    date: '2026-02-24',
+    mi: 64590,
+    type: 'engine_filter',
+    desc: 'Engine air filter replaced DIY — Part #17801-YZZ16 (105A ELEMENT) | Invoice: 128452',
+    cost: 17.11,
+    shop: 'Frank Fletcher Toyota Parts',
+    link: '',
+    builtin: true
+  },
+  // ── Entry 3: Wheel alignment ──────────────────────────────────
+  {
+    id: 3,
+    date: '2026-02-25',
+    mi: 64629,
+    type: 'alignment',
+    desc: '4-wheel alignment ExpressAlign | Sales Order: 565383924 | Report: R000980 — 4-tire balance FREE under full warranty',
+    cost: 89.99,
+    shop: 'Discount Tire #2013, Joplin MO',
+    link: '',
+    builtin: true
+  },
+  // ── Entry 4: Cabin air filter DIY ────────────────────────────
+  {
+    id: 4,
+    date: '2026-03-03',
+    mi: 64751,
+    type: 'cabin',
+    desc: 'Cabin air filter replaced DIY — A-Premium Activated Carbon APCA4605 (Item #1004KW2G)',
+    cost: 11.18,
+    shop: 'DIY · a-premium.com',
+    link: 'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid',
+    builtin: true
+  },
+  // ── ADD NEW ENTRIES BELOW THIS LINE ──────────────────────────
+  // Copy the format above and paste here before the closing ];
+];
+
+const LABELS = {
+  oil:'Oil Change',oiltires:'Oil + Rotation + Inspection',tires:'Tire Rotation',
+  cabin:'Cabin Air Filter',engine_filter:'Engine Air Filter',
+  trans:'Transmission Fluid D&F',diff:'Rear Differential D&F',
+  coolant:'Engine Coolant D&F',inv_coolant:'Inverter Coolant D&F',
+  alignment:'Wheel Alignment',tires_new:'New Tires',brakes:'Brake Service',
+  plugs:'Spark Plugs',hvfilter_inspect:'HV Battery Filter — Inspect',
+  hvfilter_clean:'HV Battery Filter — Clean',valvomax:'ValvoMax Install',
+  wipers:'Wiper Blades',other:'Service'
+};
+
+const PREFILLS = {
+  oiltires:'Oil change (Mobil 1 0W-16, qty 4.8 qt) + filter 90915-YZZN1, tire rotation, multi-point inspection',
+  oil:'Oil change — Mobil 1 0W-16 (qty 4.8 qt) + filter 90915-YZZN1',
+  cabin:'Cabin air filter replaced DIY — A-Premium APCA4605',
+  engine_filter:'Engine air filter replaced DIY — Part #17801-YZZ16',
+  trans:'Transmission fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 4 qt)',
+  diff:'Rear differential fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 2 qt)',
+  coolant:'Engine coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
+  inv_coolant:'Inverter coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
+  plugs:'Spark plugs replaced — iridium OEM (NGK or Denso only)',
+  hvfilter_inspect:'HV battery cooling filter — visual inspection',
+  hvfilter_clean:'HV battery cooling filter — removed and cleaned',
+  valvomax:'ValvoMax M12-1.25 drain valve installed (permanent) — first oil change with new valve',
+  wipers:'Wiper blades replaced',
+};
+
+function getData(){const r=localStorage.getItem('vz_log');return r?JSON.parse(r):DEFAULT}
+function save(d){localStorage.setItem('vz_log',JSON.stringify(d))}
+function getMi(){return parseInt(localStorage.getItem('vz_mi')||'64751')}
+function setMi(m){localStorage.setItem('vz_mi',m)}
+
+/* ─── INIT ──────────────────────────────────────────────── */
+window.onload=()=>{
+  if(!localStorage.getItem('vz_log'))save(DEFAULT);
+  document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
+  renderAll();
+};
+
+function renderAll(){renderDash();renderLog()}
+
+/* ─── DASHBOARD ──────────────────────────────────────────── */
+function renderDash(){
+  const mi=getMi();
+  const last=64590,next=69590;
+  const pct=Math.min(100,((mi-last)/(next-last))*100);
+  const rem=Math.max(0,next-mi);
+  document.getElementById('topMi').textContent=mi.toLocaleString();
+  document.getElementById('dMi').textContent=mi.toLocaleString();
+  document.getElementById('dNextMi').textContent=next.toLocaleString();
+  document.getElementById('dLast').textContent='Last: '+last.toLocaleString();
+  document.getElementById('dRemain').textContent=rem>0?rem.toLocaleString()+' mi remaining':'DUE NOW!';
+  setTimeout(()=>{document.getElementById('dProgress').style.width=pct+'%'},100);
+  const d=getData();
+  let tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  document.getElementById('dTotal').textContent='$'+tot.toFixed(2);
+  document.getElementById('dCount').textContent=d.length;
+  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
+}
+
+/* ─── LOG ────────────────────────────────────────────────── */
+function renderLog(){
+  const d=getData().sort((a,b)=>b.mi-a.mi);
+  const el=document.getElementById('logList');
+  el.innerHTML=d.map(e=>{
+    const dt=new Date(e.date+'T00:00:00');
+    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const lnk=e.link?`<a class="log-link" href="${e.link}" target="_blank">→ ${new URL(e.link).hostname}</a>`:'';
+    const del=!e.builtin?`<button class="delete-btn" onclick="delEntry(${e.id})">✕</button>`:'';
+    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+      ${del}
+      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
+      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-desc">${e.desc}</div>
+      <div class="log-foot">
+        <div><div class="log-shop">${e.shop||''}</div>${lnk}</div>
+        <div class="log-cost">$${parseFloat(e.cost||0).toFixed(2)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  let tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
+}
+
+/* ─── ADD ENTRY ──────────────────────────────────────────── */
+function prefill(){
+  const t=document.getElementById('fType').value;
+  if(PREFILLS[t])document.getElementById('fDesc').value=PREFILLS[t];
+}
+function saveEntry(){
+  const date=document.getElementById('fDate').value;
+  const mi=document.getElementById('fMi').value;
+  const type=document.getElementById('fType').value||'other';
+  const desc=document.getElementById('fDesc').value.trim();
+  const cost=document.getElementById('fCost').value;
+  const shop=document.getElementById('fShop').value.trim();
+  const link=document.getElementById('fLink').value.trim();
+  if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
+  const d=getData();
+  d.push({id:Date.now(),date,mi:parseInt(mi),type,desc,cost:parseFloat(cost)||0,shop,link,builtin:false});
+  save(d);
+  if(parseInt(mi)>getMi())setMi(parseInt(mi));
+  renderAll();go('log');
+  ['fMi','fCost','fShop','fLink','fDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value='';
+  showToast('Entry saved ✓');
+}
+function delEntry(id){
+  if(!confirm('Delete this entry?'))return;
+  save(getData().filter(e=>e.id!==id));
+  renderAll();
+  showToast('Entry deleted');
+}
+
+/* ─── MILEAGE ────────────────────────────────────────────── */
+function openMiModal(){
+  document.getElementById('miInput').value=getMi();
+  document.getElementById('miModal').classList.add('open');
+}
+function closeMiModal(){document.getElementById('miModal').classList.remove('open')}
+function saveMi(){
+  const v=parseInt(document.getElementById('miInput').value);
+  if(v&&v>0){setMi(v);renderAll();showToast('Mileage updated ✓')}
+  closeMiModal();
+}
+document.getElementById('miModal').addEventListener('click',function(e){if(e.target===this)closeMiModal()});
+
+/* ─── NAV ────────────────────────────────────────────────── */
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,add:-1};
+  document.getElementById('page-'+id).classList.add('active');
+  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─── NAV ────────────────────────────────────────────────── */
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,add:-1};
+  document.getElementById('page-'+id).classList.add('active');
+  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
+  if(id==='backup')renderBackup();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─── GUIDES ─────────────────────────────────────────────── */
+function toggleGuide(head){
+  head.closest('.guide-item').classList.toggle('open');
+}
+
+/* ─── COPY VIN ───────────────────────────────────────────── */
+function copyVIN(){
+  navigator.clipboard.writeText(VIN).then(()=>{
+    showToast('VIN copied: '+VIN);
+  }).catch(()=>{
+    // fallback for older Safari
+    const el=document.createElement('textarea');
+    el.value=VIN;document.body.appendChild(el);
+    el.select();document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('VIN copied: '+VIN);
+  });
+}
+
+/* ─── COPY CHATGPT TEMPLATE ──────────────────────────────── */
+function copyTemplate(){
+  const t=document.getElementById('chatgptTemplate').textContent;
+  navigator.clipboard.writeText(t).then(()=>showToast('Template copied to clipboard ✓'))
+  .catch(()=>{
+    const el=document.createElement('textarea');
+    el.value=t;document.body.appendChild(el);
+    el.select();document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('Template copied ✓');
+  });
+}
+
+/* ─── BACKUP SUMMARY ─────────────────────────────────────── */
+function renderBackup(){
+  const d=getData();
+  const mi=getMi();
+  const tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
+  const last=sorted[0];
+  document.getElementById('bkCount').textContent=d.length+' entries';
+  document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
+  document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
+  if(last){
+    const dt=new Date(last.date+'T00:00:00');
+    document.getElementById('bkLast').textContent=
+      dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
+      ' — '+parseInt(last.mi).toLocaleString()+' mi';
+  }
+}
+
+/* ─── EXPORT (BACKUP) ────────────────────────────────────── */
+function exportData(){
+  const payload={
+    version: 1,
+    exported: new Date().toISOString(),
+    vin: VIN,
+    vehicle: '2021 Toyota Venza Hybrid AWD',
+    mileage: getMi(),
+    entries: getData()
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().split('T')[0];
+  a.href=url;
+  a.download='venza_backup_'+date+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Backup downloaded ✓ Save to iCloud!');
+}
+
+/* ─── IMPORT (RESTORE) ───────────────────────────────────── */
+function importData(input){
+  const file=input.files[0];
+  if(!file){return}
+  if(!file.name.endsWith('.json')){showToast('Please select a .json file');return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      // Support both direct array and wrapped backup format
+      const entries=Array.isArray(data)?data:(data.entries||null);
+      const mi=data.mileage||null;
+      if(!entries||!Array.isArray(entries)){
+        showToast('❌ Invalid backup file format');return;
+      }
+      if(!confirm('This will replace all '+getData().length+' current entries with '+entries.length+' entries from backup. Continue?')){
+        input.value='';return;
+      }
+      save(entries);
+      if(mi&&mi>0)setMi(mi);
+      renderAll();
+      renderBackup();
+      input.value='';
+      showToast('✓ Restored '+entries.length+' entries!');
+    }catch(err){
+      showToast('❌ Could not read file');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ─── RESET DATA ─────────────────────────────────────────── */
+function resetData(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
+  save(DEFAULT);
+  setMi(64751);
+  renderAll();
+  renderBackup();
+  showToast('Reset to factory data ✓');
+}
+
+/* ─── TOAST ──────────────────────────────────────────────── */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
