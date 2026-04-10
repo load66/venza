@@ -645,7 +645,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
       <div class="header-logo-dot"></div>
       VENZA GARAGE
     </div>
-    <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN">VIN ··· 062382 · tap to copy</div>
+    <div class="header-sub" id="headerVinHint" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN">VIN ··· 062382 · tap to copy</div>
   </div>
   <div class="mileage-pill" onclick="openMiModal()">
     <div class="mi-num" id="topMi">64,751</div>
@@ -675,7 +675,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   <div class="hero">
     <div class="hero-label">⭐ Next Service Due</div>
     <div class="hero-mi"><span id="dNextMi">69,590</span> mi</div>
-    <div class="hero-desc">Oil change · Tire rotation · HV Battery filter inspect</div>
+    <div class="hero-desc" id="dHeroDesc">Oil change · Tire rotation · HV Battery filter inspect</div>
     <div class="progress-track">
       <div class="progress-fill" id="dProgress" style="width:0%"></div>
     </div>
@@ -706,14 +706,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 
   <div class="section-label">Quick Specs</div>
   <div class="card">
-    <div class="card-body">
-      <div class="row"><span class="row-key">Required Oil</span><span class="row-val red">0W-16 FULL SYN ONLY</span></div>
-      <div class="row"><span class="row-key">Oil Capacity</span><span class="row-val">4.8 qt (add 4.5 first)</span></div>
-      <div class="row"><span class="row-key">Lug Nut Torque</span><span class="row-val orange">80 ft-lbs</span></div>
-      <div class="row"><span class="row-key">Tire Pressure</span><span class="row-val">33 PSI F / 33 PSI R</span></div>
-      <div class="row"><span class="row-key">Fuel Type</span><span class="row-val green">Regular 87 · Top Tier</span></div>
-      <div class="row"><span class="row-key">Timing</span><span class="row-val green">Chain — No Service</span></div>
-    </div>
+    <div class="card-body" id="dashQuickSpecs"></div>
   </div>
 
   <div class="section-label">Recent Inspection (02/24/26)</div>
@@ -825,102 +818,13 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 
   <div class="section-label">Your Custom Schedule</div>
   <div class="card">
-    <div class="card-body">
-      <div class="svc-item">
-        <div class="svc-dot next"></div>
-        <div class="svc-info">
-          <div class="svc-name">Oil Change + Tire Rotation + Inspection</div>
-          <div class="svc-note">Mobil 1 0W-16 · Filter 90915-YZZN1 · ValvoMax bag</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">69,590 mi</div><div class="badge red">Next Up</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot next"></div>
-        <div class="svc-info">
-          <div class="svc-name">HV Battery Cooling Filter — Inspect</div>
-          <div class="svc-note">Visually check near rear seat — every 5,000 mi</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">69,590 mi</div><div class="badge red">Next Up</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot routine"></div>
-        <div class="svc-info">
-          <div class="svc-name">Cabin Air Filter</div>
-          <div class="svc-note">A-Premium APCA4605 — link saved in Parts</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~79,751 mi</div><div class="badge green">Routine</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot routine"></div>
-        <div class="svc-info">
-          <div class="svc-name">HV Battery Cooling Filter — Clean</div>
-          <div class="svc-note">Clean every 20,000 miles per Toyota manual</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~84,590 mi</div><div class="badge green">Routine</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot routine"></div>
-        <div class="svc-info">
-          <div class="svc-name">Engine Air Filter</div>
-          <div class="svc-note">#17801-YZZ16 — get link at next purchase</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~94,590 mi</div><div class="badge green">Routine</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot watch"></div>
-        <div class="svc-info">
-          <div class="svc-name">New Tires + Alignment</div>
-          <div class="svc-note">Tread at 6–7/32" as of 02/24/26 — monitor</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">TBD</div><div class="badge orange">Watch</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Engine Coolant Drain & Fill</div>
-          <div class="svc-note">Toyota SLLC #00272-SLLC2 · Toyota spec: 100k/10yr</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~100,000 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Spark Plugs</div>
-          <div class="svc-note">Iridium — NGK or Denso OEM only</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~120,000 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Transmission Fluid D&F</div>
-          <div class="svc-note">ATF WS #00289-ATFWS — custom 60k interval</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">124,590 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Rear Differential D&F</div>
-          <div class="svc-note">ATF WS #00289-ATFWS — same visit as trans</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">124,590 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Inverter Coolant Drain & Fill</div>
-          <div class="svc-note">Toyota SLLC — Toyota spec: 150k/180 months first</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~150,000 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-    </div>
+    <div class="card-body" id="scheduleList"></div>
   </div>
 
   <div class="section-label">Official Toyota Schedule (from manual)</div>
   <div class="alert gold">
     <div class="alert-icon">📋</div>
-    <div><strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. You've chosen 5,000 mi — more conservative and perfectly valid.</div>
+    <div id="officialOilText"><strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. You've chosen 5,000 mi — more conservative and perfectly valid.</div>
   </div>
   <div class="sched-wrap">
     <table class="sched-table">
@@ -1247,116 +1151,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 
   <div class="section-label">Coverage Summary</div>
 
-  <div class="warranty-card">
-    <div class="wc-head">
-      <div class="wc-icon">🛡️</div>
-      <div>
-        <div class="wc-title">Hybrid Battery Warranty</div>
-        <div class="wc-sub">Traction battery — best coverage</div>
-      </div>
-      <div class="wc-badge active">Active</div>
-    </div>
-    <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">10 Years / 150,000 Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Hybrid traction battery pack</span></div>
-      <div class="wc-row"><span class="wc-row-k">Note</span><span class="wc-row-v">Whichever comes first</span></div>
-    </div>
-  </div>
-
-  <div class="warranty-card">
-    <div class="wc-head">
-      <div class="wc-icon">⚡</div>
-      <div>
-        <div class="wc-title">Hybrid System Warranty</div>
-        <div class="wc-sub">Control modules, inverter, converter</div>
-      </div>
-      <div class="wc-badge active">Active</div>
-    </div>
-    <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">8 Years / 100,000 Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Battery control module, hybrid control module, inverter with converter</span></div>
-    </div>
-  </div>
-
-  <div class="warranty-card">
-    <div class="wc-head">
-      <div class="wc-icon">🔧</div>
-      <div>
-        <div class="wc-title">Powertrain Warranty</div>
-        <div class="wc-sub">Engine, transmission, drivetrain</div>
-      </div>
-      <div class="wc-badge expired">Expired</div>
-    </div>
-    <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / 60,000 Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Exceeded mileage limit — 64,751 mi &gt; 60,000 mi</span></div>
-      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Engine internals, transmission, axles, drive shafts, CV joints, seals</span></div>
-    </div>
-  </div>
-
-  <div class="warranty-card">
-    <div class="wc-head">
-      <div class="wc-icon">🚗</div>
-      <div>
-        <div class="wc-title">Basic / Bumper-to-Bumper</div>
-        <div class="wc-sub">Defects in materials or workmanship</div>
-      </div>
-      <div class="wc-badge expired">Expired</div>
-    </div>
-    <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">36 Months / 36,000 Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Both limits exceeded — ~5 yrs &amp; 64,751 mi</span></div>
-      <div class="wc-row"><span class="wc-row-k">Note</span><span class="wc-row-v">Excludes: wear items, maintenance, environmental damage, misuse</span></div>
-    </div>
-  </div>
-
-  <div class="warranty-card">
-    <div class="wc-head">
-      <div class="wc-icon">💺</div>
-      <div>
-        <div class="wc-title">Restraint Systems</div>
-        <div class="wc-sub">Seatbelts &amp; airbags</div>
-      </div>
-      <div class="wc-badge expired">Expired</div>
-    </div>
-    <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / 60,000 Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Exceeded mileage limit — 64,751 mi &gt; 60,000 mi</span></div>
-    </div>
-  </div>
-
-  <div class="warranty-card">
-    <div class="wc-head">
-      <div class="wc-icon">🛡️</div>
-      <div>
-        <div class="wc-title">Corrosion Perforation</div>
-        <div class="wc-sub">Body panel rust-through</div>
-      </div>
-      <div class="wc-badge check">Verify Date</div>
-    </div>
-    <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months — Unlimited Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Date-dependent — verify your in-service date</span></div>
-      <div class="wc-row"><span class="wc-row-k">How to Check</span><span class="wc-row-v">If in-service before ~Apr 2021 → expired. After Apr 2021 → still active.</span></div>
-      <div class="wc-row"><span class="wc-row-k">Confirm At</span><span class="wc-row-v">toyota.com/owners or call (800) 331-4331</span></div>
-    </div>
-  </div>
-
-  <div class="warranty-card">
-    <div class="wc-head">
-      <div class="wc-icon">💨</div>
-      <div>
-        <div class="wc-title">Federal Emission (Long-Term)</div>
-        <div class="wc-sub">Key emission components</div>
-      </div>
-      <div class="wc-badge active">Active</div>
-    </div>
-    <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">8 Years / 80,000 Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Engine control module, catalytic converter, malfunction indicator light</span></div>
-    </div>
-  </div>
-
+  <div id="warrantyCards"></div>
   <div class="section-label">Important Notes from Manual</div>
   <div class="card"><div class="card-body">
     <div class="row"><span class="row-key">DIY OK?</span><span class="row-val green">Yes — Toyota cannot deny warranty solely because you used a non-dealer for maintenance</span></div>
@@ -1368,68 +1163,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 
 <!-- ═══ SPECS ══════════════════════════════════════════════════════ -->
 <div id="page-specs" class="page">
-
-  <div class="section-label">Vehicle Profile</div>
-  <div class="card"><div class="card-body">
-    <div class="row"><span class="row-key">Year / Model</span><span class="row-val">2021 Toyota Venza LE</span></div>
-    <div class="row"><span class="row-key">Trim</span><span class="row-val">Hybrid AWD</span></div>
-    <div class="row"><span class="row-key">Engine</span><span class="row-val">2.5L A25A-FXS</span></div>
-    <div class="row" onclick="copyVIN()" style="cursor:pointer"><span class="row-key">VIN <span style="color:var(--text3);font-size:10px">(tap to copy)</span></span><span class="row-val" style="font-size:10px;color:var(--blue2)">JTEAAAAAH8MJ062382</span></div>
-    <div class="row"><span class="row-key">Color</span><span class="row-val">White</span></div>
-    <div class="row"><span class="row-key">Location</span><span class="row-val">Carterville, MO</span></div>
-  </div></div>
-
-  <div class="section-label">Oil Specs</div>
-  <div class="card"><div class="card-body">
-    <div class="row"><span class="row-key">Required Oil</span><span class="row-val red">0W-16 FULL SYN ONLY</span></div>
-    <div class="row"><span class="row-key">API / ILSAC Spec</span><span class="row-val">API SP · ILSAC GF-6B</span></div>
-    <div class="row"><span class="row-key">Capacity</span><span class="row-val">4.8 qt with filter</span></div>
-    <div class="row"><span class="row-key">Fill Method</span><span class="row-val">Add 4.5 qt first → check dipstick</span></div>
-    <div class="row"><span class="row-key">Dipstick Handle</span><span class="row-val gold">Yellow</span></div>
-    <div class="row"><span class="row-key">Toyota Official Interval</span><span class="row-val">10,000 mi / 12 months (0W-16)</span></div>
-    <div class="row"><span class="row-key">Your Custom Interval</span><span class="row-val green">5,000 mi (more conservative)</span></div>
-    <div class="row"><span class="row-key">Emergency Substitute</span><span class="row-val red">0W-20 once only — replace ASAP</span></div>
-  </div></div>
-
-  <div class="section-label">Torque Specs</div>
-  <div class="card"><div class="card-body">
-    <div class="row"><span class="row-key">Oil Filter 90915-YZZN1</span><span class="row-val orange">13 ft-lbs (18 Nm)</span></div>
-    <div class="row"><span class="row-key">OEM Drain Plug (14mm)</span><span class="row-val orange">30 ft-lbs</span></div>
-    <div class="row"><span class="row-key">ValvoMax M12-1.25</span><span class="row-val red">⚠ Verify at valvomax.com</span></div>
-    <div class="row"><span class="row-key">Lug Nuts</span><span class="row-val orange">80 ft-lbs</span></div>
-    <div class="row"><span class="row-key">Undercover Screws</span><span class="row-val">10mm · Hand-snug only</span></div>
-    <div class="row"><span class="row-key">Filter Wrench Note</span><span class="row-val red">HEX side ONLY to loosen</span></div>
-  </div></div>
-
-  <div class="section-label">Tires & Wheels</div>
-  <div class="card"><div class="card-body">
-    <div class="row"><span class="row-key">Tire Size</span><span class="row-val">225/60R18</span></div>
-    <div class="row"><span class="row-key">OE Pressure F/R</span><span class="row-val">33 PSI / 33 PSI</span></div>
-    <div class="row"><span class="row-key">Bolt Pattern</span><span class="row-val">5 × 114.30 mm</span></div>
-    <div class="row"><span class="row-key">Lug Nut Torque</span><span class="row-val orange">80 ft-lbs</span></div>
-    <div class="row"><span class="row-key">Tires Installed</span><span class="row-val">~June 2023</span></div>
-    <div class="row"><span class="row-key">Tread (02/24/26)</span><span class="row-val orange">LF/RF/LR 6/32 · RR 7/32</span></div>
-  </div></div>
-
-  <div class="section-label">Fluids Reference</div>
-  <div class="card"><div class="card-body">
-    <div class="row"><span class="row-key">Engine Coolant</span><span class="row-val">Toyota SLLC #00272-SLLC2 (Pink 50/50)</span></div>
-    <div class="row"><span class="row-key">Inverter Coolant</span><span class="row-val">Toyota SLLC (same fluid, separate circuit)</span></div>
-    <div class="row"><span class="row-key">Transmission</span><span class="row-val">ATF WS #00289-ATFWS</span></div>
-    <div class="row"><span class="row-key">Rear Differential</span><span class="row-val">ATF WS #00289-ATFWS</span></div>
-    <div class="row"><span class="row-key">Fuel</span><span class="row-val green">Regular 87 · Top Tier certified</span></div>
-    <div class="row"><span class="row-key">Octane Booster</span><span class="row-val red">Not needed · Not recommended</span></div>
-  </div></div>
-
-  <div class="section-label">Hybrid System</div>
-  <div class="card"><div class="card-body">
-    <div class="row"><span class="row-key">Timing Chain</span><span class="row-val green">No service — life of engine</span></div>
-    <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val">Iridium · NGK or Denso OEM only</span></div>
-    <div class="row"><span class="row-key">Plug Interval</span><span class="row-val">120,000 mi per Toyota manual</span></div>
-    <div class="row"><span class="row-key">Brake Pads (02/24/26)</span><span class="row-val green">7 mm all 4 corners — Good</span></div>
-    <div class="row"><span class="row-key">HV Battery Warranty</span><span class="row-val green">10 yr / 150,000 mi</span></div>
-    <div class="row"><span class="row-key">Maintenance Mode</span><span class="row-val" style="font-size:10px">Gas pedal 2x→Neutral→2x→Park→2x→Start</span></div>
-  </div></div>
+  <div id="specsContent"></div>
 </div>
 
 <!-- ═══ BACKUP & RESTORE ══════════════════════════════════════════ -->
@@ -1463,6 +1197,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
     <div class="row"><span class="row-key">Current Mileage</span><span class="row-val" id="bkMi">—</span></div>
     <div class="row"><span class="row-key">Total Invested</span><span class="row-val orange" id="bkTotal">—</span></div>
     <div class="row"><span class="row-key">Last Service</span><span class="row-val" id="bkLast">—</span></div>
+    <div class="row"><span class="row-key">Profile</span><span class="row-val" id="bkProfile">—</span></div>
   </div></div>
 
   <div class="section-label">For ChatGPT — Add Log Entry</div>
@@ -1609,48 +1344,63 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 <div class="toast" id="toast"></div>
 
 <script>
-/* ─── DATA ──────────────────────────────────────────────── */
-/* ═══════════════════════════════════════════════════════════════
-   VENZA GARAGE — DATA LAYER
-   ═══════════════════════════════════════════════════════════════
+const APP_VERSION = 3;
+const STORAGE_KEYS = {
+  entries: 'vz_log',
+  mileage: 'vz_mi',
+  profile: 'vz_profile',
+  photoPrefix: 'vz_photo_'
+};
 
-   TO ADD A LOG ENTRY:
-   ────────────────────────────────────────────────────
-   LIVE DEVICE (already in use): Export backup from ⚙ Backup tab →
-   edit the "entries" array in the JSON → import it back. The app
-   reads from localStorage first, so DEFAULT only matters on a
-   fresh install or after a full Reset.
+const DEFAULT_PROFILE = {
+  ownerName: '',
+  vehicleYear: 2021,
+  vehicleModel: 'Toyota Venza',
+  vehicleTrim: 'LE Hybrid AWD',
+  VIN: 'JTEAAAAAH8MJ062382',
+  color: 'White',
+  location: 'Carterville, MO',
+  inServiceDate: '',
+  preferredOilIntervalMiles: 5000,
+  preferredOilIntervalMonths: 6,
+  preferredTransIntervalMiles: 60000,
+  preferredDiffIntervalMiles: 60000,
+  preferredTirePressureFront: 33,
+  preferredTirePressureRear: 33
+};
 
-   SOURCE FILE BASELINE: Add an object to DEFAULT array below.
-   This only affects fresh installs or after Reset. Format:
-   {
-     id: 1234567,            ← any unique number
-     date: 'YYYY-MM-DD',     ← service date
-     mi: 65000,              ← mileage at service
-     type: 'oil',            ← see TYPE LIST below
-     desc: 'Description...',
-     cost: 34.54,            ← dollar amount (number)
-     shop: 'DIY or shop',
-     link: 'https://...',    ← purchase link or empty string ''
-     builtin: true           ← true = no delete button shown
-   }
+const STATIC_SPECS = {
+  engine: '2.5L A25A-FXS',
+  requiredOil: '0W-16 FULL SYN ONLY',
+  oilApi: 'API SP · ILSAC GF-6B',
+  oilCapacity: '4.8 qt with filter',
+  oilFillMethod: 'Add 4.5 qt first → check dipstick',
+  oilEmergency: '0W-20 once only — replace ASAP',
+  dipstick: 'Yellow',
+  oilFilterPart: '90915-YZZN1',
+  engineAirFilterPart: '17801-YZZ16',
+  transFluidPart: '00289-ATFWS',
+  coolantPart: '00272-SLLC2',
+  tireSize: '225/60R18',
+  boltPattern: '5 × 114.30 mm',
+  lugTorque: '80 ft-lbs',
+  drainPlugTorque: '30 ft-lbs',
+  oilFilterTorque: '13 ft-lbs (18 Nm)',
+  undercoverScrews: '10mm · Hand-snug only',
+  valvomaxTorque: '⚠ Verify at valvomax.com',
+  fuel: 'Regular 87 · Top Tier certified',
+  octaneBooster: 'Not needed · Not recommended',
+  timing: 'Chain — No Service',
+  sparkPlugs: 'Iridium · NGK or Denso OEM only',
+  sparkPlugIntervalMiles: 120000,
+  maintenanceMode: 'Gas pedal 2x→Neutral→2x→Park→2x→Start',
+  tiresInstalled: '~June 2023',
+  tireTreadSnapshot: 'LF/RF/LR 6/32 · RR 7/32',
+  brakePadSnapshot: '7 mm all 4 corners — Good',
+  hvBatteryWarranty: '10 yr / 150,000 mi'
+};
 
-   TYPE LIST (use exact string):
-   oil, oiltires, tires, cabin, engine_filter,
-   trans, diff, coolant, inv_coolant, alignment,
-   tires_new, brakes, plugs, hvfilter_inspect,
-   hvfilter_clean, valvomax, wipers, other
-
-   VEHICLE CONSTANTS (easy to update):
-   ────────────────────────────────────
-*/
-const VIN         = 'JTEAAAAAH8MJ062382';
-const LAST_SVC_MI = 64590;   // mileage of last oil change
-const NEXT_SVC_MI = 69590;   // mileage of next oil change due
-
-/* ── DEFAULT LOG — All confirmed service history ─────────────── */
-const DEFAULT = [
-  // ── Entry 1: Full service at dealer ──────────────────────────
+const DEFAULT_ENTRIES = [
   {
     id: 1,
     date: '2026-02-24',
@@ -1662,7 +1412,6 @@ const DEFAULT = [
     link: '',
     builtin: true
   },
-  // ── Entry 2: Engine air filter DIY ───────────────────────────
   {
     id: 2,
     date: '2026-02-24',
@@ -1674,7 +1423,6 @@ const DEFAULT = [
     link: '',
     builtin: true
   },
-  // ── Entry 3: Wheel alignment ──────────────────────────────────
   {
     id: 3,
     date: '2026-02-25',
@@ -1686,7 +1434,6 @@ const DEFAULT = [
     link: '',
     builtin: true
   },
-  // ── Entry 4: Cabin air filter DIY ────────────────────────────
   {
     id: 4,
     date: '2026-03-03',
@@ -1697,603 +1444,1290 @@ const DEFAULT = [
     shop: 'DIY · a-premium.com',
     link: 'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid',
     builtin: true
-  },
-  // ── ADD NEW ENTRIES BELOW THIS LINE ──────────────────────────
-  // Copy the format above and paste here before the closing ];
+  }
 ];
 
 const LABELS = {
-  oil:'Oil Change',oiltires:'Oil + Rotation + Inspection',tires:'Tire Rotation',
-  cabin:'Cabin Air Filter',engine_filter:'Engine Air Filter',
-  trans:'Transmission Fluid D&F',diff:'Rear Differential D&F',
-  coolant:'Engine Coolant D&F',inv_coolant:'Inverter Coolant D&F',
-  alignment:'Wheel Alignment',tires_new:'New Tires',brakes:'Brake Service',
-  plugs:'Spark Plugs',hvfilter_inspect:'HV Battery Filter — Inspect',
-  hvfilter_clean:'HV Battery Filter — Clean',valvomax:'ValvoMax Install',
-  wipers:'Wiper Blades',other:'Service'
+  oil: 'Oil Change',
+  oiltires: 'Oil + Rotation + Inspection',
+  tires: 'Tire Rotation',
+  cabin: 'Cabin Air Filter',
+  engine_filter: 'Engine Air Filter',
+  trans: 'Transmission Fluid D&F',
+  diff: 'Rear Differential D&F',
+  coolant: 'Engine Coolant D&F',
+  inv_coolant: 'Inverter Coolant D&F',
+  alignment: 'Wheel Alignment',
+  tires_new: 'New Tires',
+  brakes: 'Brake Service',
+  plugs: 'Spark Plugs',
+  hvfilter_inspect: 'HV Battery Filter — Inspect',
+  hvfilter_clean: 'HV Battery Filter — Clean',
+  valvomax: 'ValvoMax Install',
+  wipers: 'Wiper Blades',
+  other: 'Service'
 };
 
 const PREFILLS = {
-  oiltires:'Oil change (Mobil 1 0W-16, qty 4.8 qt) + filter 90915-YZZN1, tire rotation, multi-point inspection',
-  oil:'Oil change — Mobil 1 0W-16 (qty 4.8 qt) + filter 90915-YZZN1',
-  cabin:'Cabin air filter replaced DIY — A-Premium APCA4605',
-  engine_filter:'Engine air filter replaced DIY — Part #17801-YZZ16',
-  trans:'Transmission fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 4 qt)',
-  diff:'Rear differential fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 2 qt)',
-  coolant:'Engine coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
-  inv_coolant:'Inverter coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
-  plugs:'Spark plugs replaced — iridium OEM (NGK or Denso only)',
-  hvfilter_inspect:'HV battery cooling filter — visual inspection',
-  hvfilter_clean:'HV battery cooling filter — removed and cleaned',
-  valvomax:'ValvoMax M12-1.25 drain valve installed (permanent) — first oil change with new valve',
-  wipers:'Wiper blades replaced',
+  oiltires: 'Oil change (Mobil 1 0W-16, qty 4.8 qt) + filter 90915-YZZN1, tire rotation, multi-point inspection',
+  oil: 'Oil change — Mobil 1 0W-16 (qty 4.8 qt) + filter 90915-YZZN1',
+  cabin: 'Cabin air filter replaced DIY — A-Premium APCA4605',
+  engine_filter: 'Engine air filter replaced DIY — Part #17801-YZZ16',
+  trans: 'Transmission fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 4 qt)',
+  diff: 'Rear differential fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 2 qt)',
+  coolant: 'Engine coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
+  inv_coolant: 'Inverter coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
+  plugs: 'Spark plugs replaced — iridium OEM (NGK or Denso only)',
+  hvfilter_inspect: 'HV battery cooling filter — visual inspection',
+  hvfilter_clean: 'HV battery cooling filter — removed and cleaned',
+  valvomax: 'ValvoMax M12-1.25 drain valve installed (permanent) — first oil change with new valve',
+  wipers: 'Wiper blades replaced'
 };
 
-function getData(){const r=localStorage.getItem('vz_log');return r?JSON.parse(r):DEFAULT}
-function save(d){localStorage.setItem('vz_log',JSON.stringify(d))}
-function getMi(){return parseInt(localStorage.getItem('vz_mi')||'64751')}
-function setMi(m){localStorage.setItem('vz_mi',m)}
-
-/* ─── INIT ──────────────────────────────────────────────── */
-window.onload=()=>{
-  if(!localStorage.getItem('vz_log'))save(DEFAULT);
-  document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
-  renderAll();
+const SHOP_PARTS = {
+  routine_oil: [
+    { name:'Mobil 1 0W-16 Full Synthetic 5 qt', qty:'1 jug (5 qt)', partNum:'B07Y5MG3MX', price:'$27.97', link:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534', note:'Need 4.8 qt — leftover good for top-off' },
+    { name:'Toyota OEM Oil Filter 90915-YZZN1', qty:'1 filter', partNum:'90915-YZZN1', price:'$6.57', link:'https://parts.toyota.com/', note:'Replace with every oil change' },
+    { name:'ValvoMax Drain Bag Starter Kit', qty:'1 bag', partNum:'Starter Kit', price:'$19.99', link:'https://www.valvomax.com/collections/all', note:'Reusable accessory if you use the ValvoMax system' }
+  ],
+  cabin_air_filter: [
+    { name:'A-Premium Activated Carbon Cabin Filter', qty:'1 filter', partNum:'APCA4605', price:'$11.18', link:'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid', note:'Confirmed fit for 2021 Venza' }
+  ],
+  engine_air_filter: [
+    { name:'Toyota Engine Air Filter', qty:'1 filter', partNum:'17801-YZZ16', price:'$15.59', link:'', note:'OEM engine air filter' }
+  ],
+  engine_coolant: [
+    { name:'Toyota Super Long Life Coolant (SLLC)', qty:'2 gallons', partNum:'00272-SLLC2', price:'~$30–40', link:'', note:'Pink · pre-mixed 50/50' },
+    { name:'Lisle 24680 Spill-Free Funnel', qty:'1 (one-time)', partNum:'24680', price:'~$20', link:'https://www.amazon.com/s?k=Lisle+24680', note:'Recommended for clean coolant bleeding' }
+  ],
+  inverter_coolant: [
+    { name:'Toyota Super Long Life Coolant (SLLC)', qty:'2 gallons', partNum:'00272-SLLC2', price:'~$30–40', link:'', note:'Same coolant as engine circuit, separate system' },
+    { name:'Lisle 24680 Spill-Free Funnel', qty:'1 (one-time)', partNum:'24680', price:'~$20', link:'https://www.amazon.com/s?k=Lisle+24680', note:'Recommended for clean coolant bleeding' }
+  ],
+  transmission_fluid: [
+    { name:'Toyota ATF WS Transmission Fluid', qty:'4 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Custom drain & fill interval part' }
+  ],
+  rear_diff_fluid: [
+    { name:'Toyota ATF WS Rear Differential Fluid', qty:'2 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Same fluid as transmission on your setup' }
+  ],
+  spark_plugs: [
+    { name:'NGK / Denso OEM Iridium Spark Plugs', qty:'4 plugs', partNum:'OEM iridium set', price:'~$60–80', link:'https://www.amazon.com/s?k=2021+toyota+venza+spark+plugs+ngk+denso', note:'Use OEM-equivalent iridium only' }
+  ]
 };
 
-function renderAll(){renderDash();renderLog()}
-
-/* ─── DASHBOARD ──────────────────────────────────────────── */
-function renderDash(){
-  const mi=getMi();
-  const d=getData();
-
-  // Find most recent oil-change entry to drive the progress bar dynamically
-  const oilEntries=d.filter(e=>['oil','oiltires'].includes(e.type)).sort((a,b)=>b.mi-a.mi);
-  const lastOilMi=oilEntries.length?oilEntries[0].mi:LAST_SVC_MI;
-  const nextOilMi=lastOilMi+5000; // 5,000 mi custom interval
-
-  // Clamp progress 0–100 in both directions
-  const raw=((mi-lastOilMi)/(nextOilMi-lastOilMi))*100;
-  const pct=Math.min(100,Math.max(0,raw));
-  const rem=Math.max(0,nextOilMi-mi);
-
-  document.getElementById('topMi').textContent=mi.toLocaleString();
-  document.getElementById('dMi').textContent=mi.toLocaleString();
-  document.getElementById('dNextMi').textContent=nextOilMi.toLocaleString();
-  document.getElementById('dLast').textContent='Last: '+lastOilMi.toLocaleString();
-  document.getElementById('dRemain').textContent=rem>0?rem.toLocaleString()+' mi remaining':'DUE NOW!';
-  setTimeout(()=>{document.getElementById('dProgress').style.width=pct+'%'},100);
-
-  // Live total cost
-  const tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
-  document.getElementById('dTotal').textContent='$'+tot.toFixed(2);
-  document.getElementById('dCount').textContent=d.length;
-  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
-
-  // Live per-oil-change cost: average of all oil change entries
-  const oilCost=oilEntries.length
-    ? (oilEntries.reduce((a,e)=>a+parseFloat(e.cost||0),0)/oilEntries.length).toFixed(2)
-    : '34.54'; // fallback if no oil entries logged yet
-  document.getElementById('dOilCost').textContent='$'+oilCost;
+function clone(value){ return JSON.parse(JSON.stringify(value)); }
+function safeJSONParse(raw, fallback){
+  try{ return JSON.parse(raw); }catch(_){ return fallback; }
+}
+function toNumber(value, fallback=null){
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+function escapeHtml(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function formatNumber(value){
+  const n = toNumber(value, null);
+  return n === null ? '—' : Math.round(n).toLocaleString();
+}
+function startOfDay(date){
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function parseISODate(value){
+  if(!value || typeof value !== 'string') return null;
+  const date = new Date(value + 'T00:00:00');
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+function formatDateShort(value){
+  const date = parseISODate(value);
+  return date ? date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+}
+function formatDateLong(value){
+  const date = parseISODate(value);
+  return date ? date.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
+}
+function addMonthsISO(dateStr, months){
+  const date = parseISODate(dateStr);
+  if(!date || !Number.isFinite(months)) return null;
+  const out = new Date(date);
+  const day = out.getDate();
+  out.setDate(1);
+  out.setMonth(out.getMonth() + months);
+  const maxDay = new Date(out.getFullYear(), out.getMonth() + 1, 0).getDate();
+  out.setDate(Math.min(day, maxDay));
+  return out.toISOString().split('T')[0];
+}
+function daysUntil(dateStr){
+  const date = parseISODate(dateStr);
+  if(!date) return null;
+  return Math.ceil((startOfDay(date) - startOfDay(new Date())) / 86400000);
+}
+function getHostname(url){
+  try{ return new URL(url).hostname; }catch(_){ return url || ''; }
+}
+function collectPhotoKeys(){
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.startsWith(STORAGE_KEYS.photoPrefix)) keys.push(key);
+  }
+  return keys;
+}
+function clearAllPhotos(){
+  collectPhotoKeys().forEach(key => localStorage.removeItem(key));
+}
+function getDefaultMileage(){
+  return DEFAULT_ENTRIES.reduce((max, entry) => Math.max(max, toNumber(entry.mi, 0)), 64751);
+}
+function sanitizeEntries(entries){
+  if(!Array.isArray(entries)) return clone(DEFAULT_ENTRIES);
+  return entries.map((entry, index) => ({
+    id: entry?.id ?? Date.now() + index,
+    date: typeof entry?.date === 'string' && entry.date ? entry.date : new Date().toISOString().split('T')[0],
+    mi: toNumber(entry?.mi, 0),
+    type: entry?.type || 'other',
+    desc: entry?.desc || '',
+    cost: toNumber(entry?.cost, 0),
+    shop: entry?.shop || '',
+    link: entry?.link || '',
+    builtin: !!entry?.builtin
+  }));
+}
+function loadEntries(){
+  const parsed = safeJSONParse(localStorage.getItem(STORAGE_KEYS.entries), null);
+  return sanitizeEntries(parsed || DEFAULT_ENTRIES);
+}
+function saveEntries(entries){
+  localStorage.setItem(STORAGE_KEYS.entries, JSON.stringify(sanitizeEntries(entries)));
+}
+function loadProfile(){
+  const parsed = safeJSONParse(localStorage.getItem(STORAGE_KEYS.profile), null);
+  return {
+    ...clone(DEFAULT_PROFILE),
+    ...(parsed && typeof parsed === 'object' ? parsed : {})
+  };
+}
+function saveProfile(profile){
+  localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify({ ...clone(DEFAULT_PROFILE), ...(profile || {}) }));
+}
+function loadMileage(){
+  const stored = toNumber(localStorage.getItem(STORAGE_KEYS.mileage), null);
+  if(stored && stored > 0) return stored;
+  const highestEntry = loadEntries().reduce((max, entry) => Math.max(max, toNumber(entry.mi, 0)), 0);
+  return Math.max(getDefaultMileage(), highestEntry || 0);
+}
+function saveMileage(mileage){
+  localStorage.setItem(STORAGE_KEYS.mileage, String(toNumber(mileage, getDefaultMileage())));
+}
+function getData(){ return loadEntries(); }
+function save(entries){ saveEntries(entries); }
+function getProfile(){ return loadProfile(); }
+function getMi(){ return loadMileage(); }
+function setMi(mileage){ saveMileage(mileage); }
+function getVIN(){ return (getProfile().VIN || DEFAULT_PROFILE.VIN || '').trim(); }
+function getVehicleDisplay(profile=getProfile()){
+  const year = profile.vehicleYear || '';
+  const model = profile.vehicleModel || '';
+  const trim = profile.vehicleTrim || '';
+  return [year, model, trim].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+}
+function getOwnerDisplay(profile=getProfile()){
+  return profile.ownerName?.trim() || 'Vehicle Owner';
 }
 
-/* ─── LOG ────────────────────────────────────────────────── */
+function initializeAppState(){
+  if(!localStorage.getItem(STORAGE_KEYS.entries)) saveEntries(DEFAULT_ENTRIES);
+  else saveEntries(loadEntries());
+  if(!localStorage.getItem(STORAGE_KEYS.profile)) saveProfile(DEFAULT_PROFILE);
+  else saveProfile(loadProfile());
+  if(!localStorage.getItem(STORAGE_KEYS.mileage)) saveMileage(getDefaultMileage());
+}
+
+function getMaintenanceRules(profile=getProfile()){
+  return [
+    {
+      id:'routine_oil',
+      name:'Oil Change + Tire Rotation + Inspection',
+      matchingLogTypes:['oil','oiltires'],
+      dueEveryMiles: toNumber(profile.preferredOilIntervalMiles, 5000),
+      dueEveryMonths: toNumber(profile.preferredOilIntervalMonths, 6),
+      note:'Mobil 1 0W-16 · Filter 90915-YZZN1 · routine inspection visit',
+      sortOrder:10,
+      label:'Custom'
+    },
+    {
+      id:'hv_battery_filter_inspect',
+      name:'HV Battery Cooling Filter — Inspect',
+      matchingLogTypes:['hvfilter_inspect','oiltires'],
+      dueEveryMiles: 5000,
+      dueEveryMonths: 6,
+      note:'Toyota manual: visually inspect every 5,000 miles and clean if necessary',
+      sortOrder:20,
+      label:'Toyota'
+    },
+    {
+      id:'hv_battery_filter_clean',
+      name:'HV Battery Cooling Filter — Clean',
+      matchingLogTypes:['hvfilter_clean'],
+      dueEveryMiles: 20000,
+      dueEveryMonths: null,
+      initialDueMiles: 20000,
+      note:'Toyota manual: clean every 20,000 miles',
+      sortOrder:30,
+      label:'Toyota'
+    },
+    {
+      id:'cabin_air_filter',
+      name:'Cabin Air Filter',
+      matchingLogTypes:['cabin'],
+      dueEveryMiles: 15000,
+      dueEveryMonths: null,
+      initialDueMiles: 30000,
+      note:'Custom convenience interval based on your current app setup',
+      sortOrder:40,
+      label:'Custom'
+    },
+    {
+      id:'engine_air_filter',
+      name:'Engine Air Filter',
+      matchingLogTypes:['engine_filter'],
+      dueEveryMiles: 30000,
+      dueEveryMonths: null,
+      initialDueMiles: 30000,
+      note:'Toyota manual replacement interval',
+      sortOrder:50,
+      label:'Toyota'
+    },
+    {
+      id:'engine_coolant',
+      name:'Engine Coolant Drain & Fill',
+      matchingLogTypes:['coolant'],
+      dueEveryMiles: 50000,
+      dueEveryMonths: 60,
+      initialDueMiles: 100000,
+      initialDueMonths: 120,
+      note:'Toyota SLLC · first due 100k/120 months, then every 50k/60 months',
+      sortOrder:60,
+      label:'Toyota'
+    },
+    {
+      id:'inverter_coolant',
+      name:'Inverter Coolant Drain & Fill',
+      matchingLogTypes:['inv_coolant'],
+      dueEveryMiles: 50000,
+      dueEveryMonths: 60,
+      initialDueMiles: 150000,
+      initialDueMonths: 180,
+      note:'Toyota SLLC · first due 150k/180 months, then every 50k/60 months',
+      sortOrder:70,
+      label:'Toyota'
+    },
+    {
+      id:'spark_plugs',
+      name:'Spark Plugs',
+      matchingLogTypes:['plugs'],
+      dueEveryMiles: 120000,
+      dueEveryMonths: null,
+      initialDueMiles: 120000,
+      note:'Toyota manual interval · iridium plugs',
+      sortOrder:80,
+      label:'Toyota'
+    },
+    {
+      id:'transmission_fluid',
+      name:'Transmission Fluid D&F',
+      matchingLogTypes:['trans'],
+      dueEveryMiles: toNumber(profile.preferredTransIntervalMiles, 60000),
+      dueEveryMonths: null,
+      initialDueMiles: toNumber(profile.preferredTransIntervalMiles, 60000),
+      note:'Custom interval',
+      sortOrder:90,
+      label:'Custom'
+    },
+    {
+      id:'rear_diff_fluid',
+      name:'Rear Differential D&F',
+      matchingLogTypes:['diff'],
+      dueEveryMiles: toNumber(profile.preferredDiffIntervalMiles, 60000),
+      dueEveryMonths: null,
+      initialDueMiles: toNumber(profile.preferredDiffIntervalMiles, 60000),
+      note:'Custom interval',
+      sortOrder:100,
+      label:'Custom'
+    },
+    {
+      id:'wheel_alignment_watch',
+      name:'Wheel Alignment',
+      matchingLogTypes:['alignment'],
+      dueEveryMiles: null,
+      dueEveryMonths: null,
+      note:'Watch item — check when steering pulls, wheel is off-center, or with new tires',
+      sortOrder:110,
+      label:'Watch',
+      watchOnly:true
+    },
+    {
+      id:'tires_watch',
+      name:'Tires',
+      matchingLogTypes:['tires_new'],
+      dueEveryMiles: null,
+      dueEveryMonths: null,
+      note:'Watch tread depth, wear pattern, and tire age',
+      sortOrder:120,
+      label:'Watch',
+      watchOnly:true
+    }
+  ];
+}
+
+function getLatestMatchingServiceEntryByRule(rule, entries=getData()){
+  return [...entries]
+    .filter(entry => rule.matchingLogTypes.includes(entry.type))
+    .sort((a,b) => (toNumber(b.mi,0) - toNumber(a.mi,0)) || (new Date(b.date) - new Date(a.date)))[0] || null;
+}
+
+function getServiceStatus(rule, milesLeft, daysLeft){
+  if(rule.watchOnly) return 'watch';
+  if((milesLeft !== null && milesLeft <= 0) || (daysLeft !== null && daysLeft <= 0)) return 'overdue';
+  if((milesLeft !== null && milesLeft <= 500) || (daysLeft !== null && daysLeft <= 30)) return 'soon';
+  if((milesLeft !== null && milesLeft <= 3000) || (daysLeft !== null && daysLeft <= 90)) return 'upcoming';
+  return 'future';
+}
+
+function computeRecurringServiceNextDue(rule, entries=getData(), profile=getProfile(), currentMileage=getMi()){
+  const latest = getLatestMatchingServiceEntryByRule(rule, entries);
+  let nextMileage = null;
+  let nextDate = null;
+
+  if(!rule.watchOnly){
+    if(latest){
+      if(rule.dueEveryMiles !== null && toNumber(latest.mi, null) !== null){
+        nextMileage = toNumber(latest.mi, 0) + toNumber(rule.dueEveryMiles, 0);
+      }
+      if(rule.dueEveryMonths !== null && latest.date){
+        nextDate = addMonthsISO(latest.date, toNumber(rule.dueEveryMonths, 0));
+      }
+    } else {
+      if(rule.initialDueMiles !== undefined && rule.initialDueMiles !== null) nextMileage = toNumber(rule.initialDueMiles, null);
+      else if(rule.dueEveryMiles !== null) nextMileage = toNumber(rule.dueEveryMiles, null);
+
+      if(profile.inServiceDate){
+        if(rule.initialDueMonths !== undefined && rule.initialDueMonths !== null) nextDate = addMonthsISO(profile.inServiceDate, toNumber(rule.initialDueMonths, 0));
+        else if(rule.dueEveryMonths !== null) nextDate = addMonthsISO(profile.inServiceDate, toNumber(rule.dueEveryMonths, 0));
+      }
+    }
+  }
+
+  const milesLeft = nextMileage !== null ? nextMileage - currentMileage : null;
+  const daysLeft = nextDate ? daysUntil(nextDate) : null;
+  const status = getServiceStatus(rule, milesLeft, daysLeft);
+
+  return {
+    rule,
+    latest,
+    nextMileage,
+    nextDate,
+    milesLeft,
+    daysLeft,
+    status
+  };
+}
+
+function getAllServiceStatuses(entries=getData(), profile=getProfile(), currentMileage=getMi()){
+  const statusOrder = { overdue:0, soon:1, upcoming:2, future:3, watch:4 };
+  return getMaintenanceRules(profile)
+    .map(rule => computeRecurringServiceNextDue(rule, entries, profile, currentMileage))
+    .sort((a,b) => {
+      const ao = statusOrder[a.status] ?? 99;
+      const bo = statusOrder[b.status] ?? 99;
+      if(ao !== bo) return ao - bo;
+      const am = a.nextMileage ?? Number.MAX_SAFE_INTEGER;
+      const bm = b.nextMileage ?? Number.MAX_SAFE_INTEGER;
+      if(am !== bm) return am - bm;
+      const ad = a.nextDate ? parseISODate(a.nextDate).getTime() : Number.MAX_SAFE_INTEGER;
+      const bd = b.nextDate ? parseISODate(b.nextDate).getTime() : Number.MAX_SAFE_INTEGER;
+      if(ad !== bd) return ad - bd;
+      return (a.rule.sortOrder ?? 999) - (b.rule.sortOrder ?? 999);
+    });
+}
+
+function formatDueMileageText(mileage){
+  return mileage === null ? '—' : `${formatNumber(mileage)} mi`;
+}
+function formatDueDateText(dateStr){
+  return dateStr ? formatDateShort(dateStr) : '—';
+}
+function formatDueSummary(item){
+  if(item.nextMileage !== null && item.nextDate) return `${formatDueMileageText(item.nextMileage)} or ${formatDueDateText(item.nextDate)}`;
+  if(item.nextMileage !== null) return formatDueMileageText(item.nextMileage);
+  if(item.nextDate) return formatDueDateText(item.nextDate);
+  return item.latest ? `Last done ${formatNumber(item.latest.mi)} mi` : 'Watch item';
+}
+function formatRemainingText(item){
+  if(item.status === 'watch') return item.latest ? `Last: ${formatDateShort(item.latest.date)} · ${formatNumber(item.latest.mi)} mi` : 'Monitor as needed';
+  if(item.status === 'overdue'){
+    if(item.milesLeft !== null && item.milesLeft <= 0) return `${formatNumber(Math.abs(item.milesLeft))} mi overdue`;
+    if(item.daysLeft !== null && item.daysLeft <= 0) return `${Math.abs(item.daysLeft)} day(s) overdue`;
+  }
+  if(item.milesLeft !== null) return `${formatNumber(item.milesLeft)} mi remaining`;
+  if(item.daysLeft !== null) return `${item.daysLeft} day(s) remaining`;
+  return 'No due data';
+}
+function getBadgeClass(status){
+  if(status === 'overdue') return 'red';
+  if(status === 'soon') return 'red';
+  if(status === 'upcoming') return 'green';
+  if(status === 'watch') return 'orange';
+  return 'gray';
+}
+function getBadgeText(status){
+  if(status === 'overdue') return 'Overdue';
+  if(status === 'soon') return 'Next Up';
+  if(status === 'upcoming') return 'Routine';
+  if(status === 'watch') return 'Watch';
+  return 'Long-term';
+}
+function getDotClass(status){
+  if(status === 'overdue' || status === 'soon') return 'next';
+  if(status === 'upcoming') return 'routine';
+  if(status === 'watch') return 'watch';
+  return 'long';
+}
+
+function renderHeader(){
+  const vin = getVIN();
+  const suffix = vin ? vin.slice(-6) : '—';
+  const headerVinHint = document.getElementById('headerVinHint');
+  if(headerVinHint) headerVinHint.textContent = `VIN ··· ${suffix} · tap to copy`;
+}
+
+function renderDash(){
+  const mileage = getMi();
+  const entries = getData();
+  const profile = getProfile();
+  const statuses = getAllServiceStatuses(entries, profile, mileage);
+  const heroItem = statuses.find(item => !item.rule.watchOnly) || statuses[0];
+  const oilItem = statuses.find(item => item.rule.id === 'routine_oil') || heroItem;
+  const oilEntries = entries.filter(entry => ['oil','oiltires'].includes(entry.type));
+  const total = entries.reduce((sum, entry) => sum + toNumber(entry.cost, 0), 0);
+  const avgOil = oilEntries.length
+    ? oilEntries.reduce((sum, entry) => sum + toNumber(entry.cost, 0), 0) / oilEntries.length
+    : 34.54;
+
+  const progressBase = oilItem?.latest ? toNumber(oilItem.latest.mi, 0) : Math.max(0, mileage - toNumber(profile.preferredOilIntervalMiles, 5000));
+  const progressDue = oilItem?.nextMileage ?? (progressBase + toNumber(profile.preferredOilIntervalMiles, 5000));
+  const progressRange = Math.max(1, progressDue - progressBase);
+  const progressPct = Math.min(100, Math.max(0, ((mileage - progressBase) / progressRange) * 100));
+
+  document.getElementById('topMi').textContent = formatNumber(mileage);
+  document.getElementById('dMi').textContent = formatNumber(mileage);
+  document.getElementById('dTotal').textContent = `$${total.toFixed(2)}`;
+  document.getElementById('dOilCost').textContent = `$${avgOil.toFixed(2)}`;
+  document.getElementById('dCount').textContent = String(entries.length);
+  document.getElementById('totalVal').textContent = `$${total.toFixed(2)}`;
+
+  if(heroItem){
+    document.getElementById('dNextMi').textContent = formatNumber(heroItem.nextMileage ?? mileage);
+    document.getElementById('dHeroDesc').textContent = `${heroItem.rule.name} · ${heroItem.rule.note || formatRemainingText(heroItem)}`;
+    document.getElementById('dLast').textContent = heroItem.latest
+      ? `Last: ${formatNumber(heroItem.latest.mi)}`
+      : (profile.inServiceDate ? `In service: ${formatDateShort(profile.inServiceDate)}` : 'No matching service yet');
+    document.getElementById('dRemain').textContent = formatRemainingText(heroItem).toUpperCase();
+  }
+
+  setTimeout(() => {
+    document.getElementById('dProgress').style.width = `${progressPct}%`;
+  }, 80);
+
+  const dashQuickSpecs = document.getElementById('dashQuickSpecs');
+  if(dashQuickSpecs){
+    dashQuickSpecs.innerHTML = `
+      <div class="row"><span class="row-key">Required Oil</span><span class="row-val red">${escapeHtml(STATIC_SPECS.requiredOil)}</span></div>
+      <div class="row"><span class="row-key">Oil Capacity</span><span class="row-val">${escapeHtml(STATIC_SPECS.oilCapacity.replace('with filter','(add 4.5 first)'))}</span></div>
+      <div class="row"><span class="row-key">Lug Nut Torque</span><span class="row-val orange">${escapeHtml(STATIC_SPECS.lugTorque)}</span></div>
+      <div class="row"><span class="row-key">Tire Pressure</span><span class="row-val">${escapeHtml(String(profile.preferredTirePressureFront))} PSI F / ${escapeHtml(String(profile.preferredTirePressureRear))} PSI R</span></div>
+      <div class="row"><span class="row-key">Fuel Type</span><span class="row-val green">${escapeHtml(STATIC_SPECS.fuel)}</span></div>
+      <div class="row"><span class="row-key">Oil Interval</span><span class="row-val green">${formatNumber(profile.preferredOilIntervalMiles)} mi / ${escapeHtml(String(profile.preferredOilIntervalMonths))} mo</span></div>
+    `;
+  }
+}
+
 function renderLog(){
-  const d=getData().sort((a,b)=>b.mi-a.mi);
-  const el=document.getElementById('logList');
-  el.innerHTML=d.map(e=>{
-    const dt=new Date(e.date+'T00:00:00');
-    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const lnk=e.link?`<a class="log-link" href="${e.link}" target="_blank">→ ${new URL(e.link).hostname}</a>`:'';
-    const del=!e.builtin
-      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
-      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
-    // Receipt photo
-    const photo=getPhoto(e.id);
-    const photoHtml=photo
-      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+  const entries = [...getData()].sort((a,b) => (toNumber(b.mi,0) - toNumber(a.mi,0)) || (new Date(b.date) - new Date(a.date)));
+  const logList = document.getElementById('logList');
+  if(!logList) return;
+  logList.innerHTML = entries.map(entry => {
+    const photo = getPhoto(entry.id);
+    const linkHtml = entry.link ? `<a class="log-link" href="${escapeHtml(entry.link)}" target="_blank">→ ${escapeHtml(getHostname(entry.link))}</a>` : '';
+    const deleteHtml = !entry.builtin
+      ? `<button class="delete-btn" onclick="delEntry(${entry.id})" title="Delete this entry">✕</button>`
+      : `<button class="delete-btn" onclick="delBuiltin(${entry.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    const photoHtml = photo
+      ? `<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${entry.id})">
           <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
-          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${entry.id})">remove</span></div>
         </div>`
-      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
-          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
-          background:none;cursor:pointer;width:100%;transition:all .2s"
-          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
-          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
-          📷 Add Receipt Photo
-        </button>`;
-    return`<div class="log-item ${!e.builtin?'user-entry':''}">
-      ${del}
-      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
-      <div class="log-type">${LABELS[e.type]||'Service'}</div>
-      <div class="log-desc">${e.desc}</div>
+      : `<button onclick="addPhotoToEntry(${entry.id})" style="margin-top:8px;font-size:11px;color:var(--text3);border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;background:none;cursor:pointer;width:100%;transition:all .2s" onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">📷 Add Receipt Photo</button>`;
+
+    return `<div class="log-item ${!entry.builtin ? 'user-entry' : ''}">
+      ${deleteHtml}
+      <div class="log-top"><span class="log-date">${formatDateShort(entry.date)}</span><span class="log-mi">${formatNumber(entry.mi)} mi</span></div>
+      <div class="log-type">${escapeHtml(LABELS[entry.type] || 'Service')}</div>
+      <div class="log-desc">${escapeHtml(entry.desc)}</div>
       <div class="log-foot">
-        <div><div class="log-shop">${e.shop||''}</div>${lnk}</div>
-        <div class="log-cost">$${parseFloat(e.cost||0).toFixed(2)}</div>
+        <div><div class="log-shop">${escapeHtml(entry.shop || '')}</div>${linkHtml}</div>
+        <div class="log-cost">$${toNumber(entry.cost, 0).toFixed(2)}</div>
       </div>
       ${photoHtml}
     </div>`;
   }).join('');
-  let tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
-  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
 }
 
-/* ─── ADD ENTRY ──────────────────────────────────────────── */
-function prefill(){
-  const t=document.getElementById('fType').value;
-  if(PREFILLS[t])document.getElementById('fDesc').value=PREFILLS[t];
-}
-function saveEntry(){
-  const date=document.getElementById('fDate').value;
-  const mi=document.getElementById('fMi').value;
-  const type=document.getElementById('fType').value||'other';
-  const desc=document.getElementById('fDesc').value.trim();
-  const cost=document.getElementById('fCost').value;
-  const shop=document.getElementById('fShop').value.trim();
-  const link=document.getElementById('fLink').value.trim();
-  if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
-  const newId=Date.now();
-  const d=getData();
-  d.push({id:newId,date,mi:parseInt(mi),type,desc,cost:parseFloat(cost)||0,shop,link,builtin:false});
-  save(d);
-  // Save photo if one was selected
-  if(window._pendingPhoto){
-    savePhoto(newId, window._pendingPhoto);
-    window._pendingPhoto=null;
-  }
-  if(parseInt(mi)>getMi())setMi(parseInt(mi));
-  renderAll();go('log');
-  ['fMi','fCost','fShop','fLink','fDesc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fType').value='';
-  clearPhoto();
-  showToast('Entry saved ✓');
-}
-function delEntry(id){
-  if(!confirm('Delete this entry?'))return;
-  save(getData().filter(e=>e.id!==id));
-  renderAll();
-  showToast('Entry deleted');
-}
+function renderUpcoming(){
+  const mileage = getMi();
+  const statuses = getAllServiceStatuses(getData(), getProfile(), mileage);
+  const scheduleList = document.getElementById('scheduleList');
+  if(!scheduleList) return;
 
-/* ─── MAINTENANCE SCHEDULE (smart predictor data) ────────────── */
-const MAINTENANCE_ITEMS = [
-  { id:'oil',     name:'Oil Change + Tire Rotation',    icon:'🔧', dueMi:69590,  interval:5000,  soon:500  },
-  { id:'hvfi',    name:'HV Battery Filter — Inspect',   icon:'🔋', dueMi:69590,  interval:5000,  soon:500  },
-  { id:'cabin',   name:'Cabin Air Filter',               icon:'💨', dueMi:79751,  interval:15000, soon:1500 },
-  { id:'hvfc',    name:'HV Battery Filter — Clean',     icon:'🧹', dueMi:84590,  interval:20000, soon:2000 },
-  { id:'engair',  name:'Engine Air Filter',              icon:'🌬️', dueMi:94590,  interval:30000, soon:2000 },
-  { id:'tires',   name:'New Tires + Alignment',          icon:'🛞', dueMi:null,   interval:null,  soon:null, note:'Monitor tread — currently 6/32"' },
-  { id:'coolant', name:'Engine Coolant Drain & Fill',    icon:'🌡️', dueMi:100000, interval:50000, soon:3000 },
-  { id:'plugs',   name:'Spark Plugs (iridium)',           icon:'⚡', dueMi:120000, interval:60000, soon:3000 },
-  { id:'trans',   name:'Transmission Fluid D&F',         icon:'⚙️', dueMi:124590, interval:60000, soon:3000 },
-  { id:'diff',    name:'Rear Differential D&F',          icon:'🔩', dueMi:124590, interval:60000, soon:3000 },
-  { id:'invcool', name:'Inverter Coolant Drain & Fill',  icon:'🌡️', dueMi:150000, interval:50000, soon:3000 },
-];
-
-function getSmartStatus(mi){
-  return MAINTENANCE_ITEMS.map(item => {
-    if(!item.dueMi) return { ...item, status:'watch', miLeft:null };
-    const miLeft = item.dueMi - mi;
-    let status;
-    if(miLeft <= 0)              status = 'overdue';
-    else if(miLeft <= item.soon) status = 'soon';
-    else if(miLeft <= 3000)      status = 'upcoming';
-    else                         status = 'future';
-    return { ...item, miLeft, status };
-  });
-}
-
-function renderSmartList(mi){
-  const items = getSmartStatus(mi);
-  const el = document.getElementById('smartList');
-  el.innerHTML = items.map(item => {
-    let badgeClass, badgeText;
-    if(item.status==='overdue'){
-      badgeClass='sm-overdue';
-      badgeText='OVERDUE '+Math.abs(item.miLeft).toLocaleString()+'mi';
-    } else if(item.status==='soon'){
-      badgeClass='sm-soon';
-      badgeText=item.miLeft.toLocaleString()+' mi left';
-    } else if(item.status==='upcoming'){
-      badgeClass='sm-upcoming';
-      badgeText=item.miLeft.toLocaleString()+' mi left';
-    } else if(item.status==='watch'){
-      badgeClass='sm-future';badgeText='MONITOR';
-    } else {
-      badgeClass='sm-future';
-      badgeText=item.miLeft?item.miLeft.toLocaleString()+' mi left':'—';
-    }
-    const detail = item.note || (item.dueMi?'Due at '+item.dueMi.toLocaleString()+' mi':'');
-    return `<div class="sm-item">
-      <div class="sm-icon">${item.icon}</div>
-      <div class="sm-info">
-        <div class="sm-name">${item.name}</div>
-        <div class="sm-detail">${detail}</div>
+  scheduleList.innerHTML = statuses.map(item => {
+    const extra = item.latest ? `Last: ${formatDateShort(item.latest.date)} · ${formatNumber(item.latest.mi)} mi` : (item.rule.label ? `${item.rule.label} rule` : '');
+    const note = [item.rule.note, extra].filter(Boolean).join(' · ');
+    return `<div class="svc-item">
+      <div class="svc-dot ${getDotClass(item.status)}"></div>
+      <div class="svc-info">
+        <div class="svc-name">${escapeHtml(item.rule.name)}</div>
+        <div class="svc-note">${escapeHtml(note)}</div>
       </div>
-      <div class="sm-badge ${badgeClass}">${badgeText}</div>
+      <div class="svc-right">
+        <div class="svc-mi">${escapeHtml(formatDueSummary(item))}</div>
+        <div class="badge ${getBadgeClass(item.status)}">${escapeHtml(getBadgeText(item.status))}</div>
+      </div>
     </div>`;
   }).join('');
-  document.getElementById('smartPreview').style.display='block';
-}
 
-/* ─── MILEAGE MODAL ──────────────────────────────────────────── */
-function openMiModal(){
-  const cur = getMi();
-  document.getElementById('miInput').value = cur;
-  document.getElementById('smartPreview').style.display = 'none';
-  document.getElementById('miModal').classList.add('open');
-  setTimeout(()=>{ renderSmartList(cur); document.getElementById('miInput').focus(); }, 200);
-  document.getElementById('miInput').oninput = function(){
-    const v = parseInt(this.value);
-    if(v && v > 50000 && v < 300000) renderSmartList(v);
-  };
-}
-function closeMiModal(){ document.getElementById('miModal').classList.remove('open'); }
-function saveMi(){
-  const v = parseInt(document.getElementById('miInput').value);
-  if(v && v > 0){ setMi(v); renderAll(); showToast('Mileage updated to '+v.toLocaleString()+' mi ✓'); }
-  closeMiModal();
-}
-document.getElementById('miModal').addEventListener('click',function(e){
-  if(e.target===this) closeMiModal();
-});
-
-/* ─── NAV ────────────────────────────────────────────────── */
-/* ─── NAV ────────────────────────────────────────────────── */
-function go(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,shop:9,add:-1};
-  document.getElementById('page-'+id).classList.add('active');
-  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
-  if(id==='backup')renderBackup();
-  if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
-  if(id==='shop')renderShop();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ─── GUIDES ─────────────────────────────────────────────── */
-function toggleGuide(head){
-  head.closest('.guide-item').classList.toggle('open');
-}
-
-/* ─── COPY VIN ───────────────────────────────────────────── */
-function copyVIN(){
-  navigator.clipboard.writeText(VIN).then(()=>{
-    showToast('VIN copied: '+VIN);
-  }).catch(()=>{
-    // fallback for older Safari
-    const el=document.createElement('textarea');
-    el.value=VIN;document.body.appendChild(el);
-    el.select();document.execCommand('copy');
-    document.body.removeChild(el);
-    showToast('VIN copied: '+VIN);
-  });
-}
-
-/* ─── COPY CHATGPT TEMPLATE ──────────────────────────────── */
-function copyTemplate(){
-  const t=document.getElementById('chatgptTemplate').textContent;
-  navigator.clipboard.writeText(t).then(()=>showToast('Template copied to clipboard ✓'))
-  .catch(()=>{
-    const el=document.createElement('textarea');
-    el.value=t;document.body.appendChild(el);
-    el.select();document.execCommand('copy');
-    document.body.removeChild(el);
-    showToast('Template copied ✓');
-  });
-}
-
-/* ─── BACKUP SUMMARY ─────────────────────────────────────── */
-function renderBackup(){
-  const d=getData();
-  const mi=getMi();
-  const tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
-  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
-  const last=sorted[0];
-  const photoCount=d.filter(e=>getPhoto(e.id)).length;
-  document.getElementById('bkCount').textContent=d.length+' entries · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
-  document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
-  document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
-  if(last){
-    const dt=new Date(last.date+'T00:00:00');
-    document.getElementById('bkLast').textContent=
-      dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
-      ' — '+parseInt(last.mi).toLocaleString()+' mi';
+  const officialOilText = document.getElementById('officialOilText');
+  if(officialOilText){
+    officialOilText.innerHTML = `<strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. Your profile is set to ${formatNumber(getProfile().preferredOilIntervalMiles)} mi / ${escapeHtml(String(getProfile().preferredOilIntervalMonths))} months — more conservative and fully owner-adjustable.`;
   }
 }
 
-/* ─── EXPORT (BACKUP) ────────────────────────────────────── */
-function exportData(){
-  // Collect all receipt photos from localStorage
-  const photos = {};
-  const entries = getData();
-  entries.forEach(e=>{
-    const p = getPhoto(e.id);
-    if(p) photos[e.id] = p;
-  });
+function getWarrantyItems(){
+  return [
+    {
+      id:'hybrid_battery',
+      icon:'🛡️',
+      title:'Hybrid Battery Warranty',
+      sub:'Traction battery pack',
+      durationMonths:120,
+      durationMiles:150000,
+      covers:'Hybrid traction battery pack'
+    },
+    {
+      id:'hybrid_system',
+      icon:'⚡',
+      title:'Hybrid System Warranty',
+      sub:'Control modules, inverter, converter',
+      durationMonths:96,
+      durationMiles:100000,
+      covers:'Battery control module, hybrid control module, inverter with converter'
+    },
+    {
+      id:'powertrain',
+      icon:'🔧',
+      title:'Powertrain Warranty',
+      sub:'Engine, transmission, drivetrain',
+      durationMonths:60,
+      durationMiles:60000,
+      covers:'Engine internals, transmission, axles, drive shafts, CV joints, seals'
+    },
+    {
+      id:'basic',
+      icon:'🚗',
+      title:'Basic / Bumper-to-Bumper',
+      sub:'Defects in materials or workmanship',
+      durationMonths:36,
+      durationMiles:36000,
+      covers:'General Toyota-supplied components, subject to exclusions'
+    },
+    {
+      id:'restraint',
+      icon:'💺',
+      title:'Restraint Systems',
+      sub:'Seatbelts & airbags',
+      durationMonths:60,
+      durationMiles:60000,
+      covers:'Seatbelt and airbag system defects in materials or workmanship'
+    },
+    {
+      id:'corrosion',
+      icon:'🛡️',
+      title:'Corrosion Perforation',
+      sub:'Body panel rust-through',
+      durationMonths:60,
+      durationMiles:null,
+      covers:'Original body panels that perforate from corrosion'
+    },
+    {
+      id:'federal_emission',
+      icon:'💨',
+      title:'Federal Emission (Long-Term)',
+      sub:'Key emission components',
+      durationMonths:96,
+      durationMiles:80000,
+      covers:'Engine control module, catalytic converter, malfunction indicator light'
+    }
+  ];
+}
 
-  const payload={
-    version: 2,
-    exported: new Date().toISOString(),
-    vin: VIN,
-    vehicle: '2021 Toyota Venza Hybrid AWD',
-    mileage: getMi(),
-    entries: entries,
-    photos: photos  // base64 images keyed by entry id
+function evaluateWarrantyItem(item, profile=getProfile(), currentMileage=getMi()){
+  const hasDate = !!profile.inServiceDate;
+  const expiryDate = hasDate && item.durationMonths !== null ? addMonthsISO(profile.inServiceDate, item.durationMonths) : null;
+  const daysLeft = expiryDate ? daysUntil(expiryDate) : null;
+  const milesLeft = item.durationMiles !== null ? item.durationMiles - currentMileage : null;
+  const expiredByMiles = milesLeft !== null && milesLeft < 0;
+  const expiredByDate = daysLeft !== null && daysLeft < 0;
+
+  if(item.durationMonths !== null && !hasDate){
+    if(expiredByMiles){
+      return {
+        badgeClass:'expired',
+        badgeText:'Expired',
+        statusText:`Mileage limit exceeded — ${formatNumber(currentMileage)} mi > ${formatNumber(item.durationMiles)} mi`,
+        detailText:'In-service date not set. Add it in Profile to verify the time limit for future checks.',
+        expiryDate:null,
+        milesLeft
+      };
+    }
+    return {
+      badgeClass:'check',
+      badgeText:'Set date',
+      statusText:'In-service date is required to confirm the time-based portion of this coverage.',
+      detailText:item.durationMiles !== null ? `Mileage side still shows ${formatNumber(Math.max(0, milesLeft))} mi remaining.` : 'Mileage does not control this coverage.',
+      expiryDate:null,
+      milesLeft
+    };
+  }
+
+  if(expiredByMiles || expiredByDate){
+    return {
+      badgeClass:'expired',
+      badgeText:'Expired',
+      statusText:[
+        expiredByMiles ? `Mileage limit exceeded — ${formatNumber(currentMileage)} mi > ${formatNumber(item.durationMiles)} mi` : '',
+        expiredByDate ? `Date limit passed — ${formatDateLong(expiryDate)}` : ''
+      ].filter(Boolean).join(' · '),
+      detailText:'Whichever comes first applies.',
+      expiryDate,
+      milesLeft
+    };
+  }
+
+  return {
+    badgeClass:'active',
+    badgeText:'Active',
+    statusText:[
+      item.durationMiles !== null ? `${formatNumber(Math.max(0, milesLeft))} mi remaining` : 'Unlimited mileage',
+      expiryDate ? `Through ${formatDateLong(expiryDate)}` : ''
+    ].filter(Boolean).join(' · '),
+    detailText:'Whichever comes first applies.',
+    expiryDate,
+    milesLeft
+  };
+}
+
+function renderWarranty(){
+  const warrantyCards = document.getElementById('warrantyCards');
+  if(!warrantyCards) return;
+  const profile = getProfile();
+  const currentMileage = getMi();
+
+  warrantyCards.innerHTML = getWarrantyItems().map(item => {
+    const evald = evaluateWarrantyItem(item, profile, currentMileage);
+    return `<div class="warranty-card">
+      <div class="wc-head">
+        <div class="wc-icon">${item.icon}</div>
+        <div>
+          <div class="wc-title">${escapeHtml(item.title)}</div>
+          <div class="wc-sub">${escapeHtml(item.sub)}</div>
+        </div>
+        <div class="wc-badge ${evald.badgeClass}">${escapeHtml(evald.badgeText)}</div>
+      </div>
+      <div class="wc-body">
+        <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">${item.durationMonths !== null ? `${Math.round(item.durationMonths/12)} Years` : '—'}${item.durationMiles !== null ? ` / ${formatNumber(item.durationMiles)} Miles` : ' / Unlimited Miles'}</span></div>
+        <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">${escapeHtml(evald.statusText)}</span></div>
+        <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">${escapeHtml(item.covers)}</span></div>
+        <div class="wc-row"><span class="wc-row-k">Notes</span><span class="wc-row-v">${escapeHtml(evald.detailText)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSpecs(){
+  const profile = getProfile();
+  const specsContent = document.getElementById('specsContent');
+  if(!specsContent) return;
+  const statuses = getAllServiceStatuses(getData(), profile, getMi());
+  const transItem = statuses.find(item => item.rule.id === 'transmission_fluid');
+  const diffItem = statuses.find(item => item.rule.id === 'rear_diff_fluid');
+  const oilItem = statuses.find(item => item.rule.id === 'routine_oil');
+
+  specsContent.innerHTML = `
+    <div class="section-label">Vehicle Profile</div>
+    <div class="card"><div class="card-body">
+      <div class="row"><span class="row-key">Year / Model</span><span class="row-val">${escapeHtml(String(profile.vehicleYear))} ${escapeHtml(profile.vehicleModel)}</span></div>
+      <div class="row"><span class="row-key">Trim</span><span class="row-val">${escapeHtml(profile.vehicleTrim)}</span></div>
+      <div class="row"><span class="row-key">Owner</span><span class="row-val">${escapeHtml(profile.ownerName || '—')}</span></div>
+      <div class="row"><span class="row-key">Engine</span><span class="row-val">${escapeHtml(STATIC_SPECS.engine)}</span></div>
+      <div class="row" onclick="copyVIN()" style="cursor:pointer"><span class="row-key">VIN <span style="color:var(--text3);font-size:10px">(tap to copy)</span></span><span class="row-val" style="font-size:10px;color:var(--blue2)">${escapeHtml(getVIN())}</span></div>
+      <div class="row"><span class="row-key">Color</span><span class="row-val">${escapeHtml(profile.color || '—')}</span></div>
+      <div class="row"><span class="row-key">Location</span><span class="row-val">${escapeHtml(profile.location || '—')}</span></div>
+      <div class="row"><span class="row-key">In-Service Date</span><span class="row-val">${escapeHtml(profile.inServiceDate ? formatDateLong(profile.inServiceDate) : 'Set in Profile')}</span></div>
+    </div></div>
+
+    <div class="section-label">Profile & Settings</div>
+    <div class="form-section">
+      <div class="form-title">Edit Profile / Service Preferences</div>
+      <div class="fg2">
+        <div class="fl"><label>Owner Name</label><input class="fi" id="p_ownerName" value="${escapeHtml(profile.ownerName)}"></div>
+        <div class="fl"><label>VIN</label><input class="fi" id="p_VIN" value="${escapeHtml(profile.VIN)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Vehicle Year</label><input class="fi" id="p_vehicleYear" type="number" value="${escapeHtml(String(profile.vehicleYear))}"></div>
+        <div class="fl"><label>Vehicle Model</label><input class="fi" id="p_vehicleModel" value="${escapeHtml(profile.vehicleModel)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Vehicle Trim</label><input class="fi" id="p_vehicleTrim" value="${escapeHtml(profile.vehicleTrim)}"></div>
+        <div class="fl"><label>Color</label><input class="fi" id="p_color" value="${escapeHtml(profile.color)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Location</label><input class="fi" id="p_location" value="${escapeHtml(profile.location)}"></div>
+        <div class="fl"><label>In-Service Date</label><input class="fi" id="p_inServiceDate" type="date" value="${escapeHtml(profile.inServiceDate)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Preferred Oil Interval Miles</label><input class="fi" id="p_preferredOilIntervalMiles" type="number" value="${escapeHtml(String(profile.preferredOilIntervalMiles))}"></div>
+        <div class="fl"><label>Preferred Oil Interval Months</label><input class="fi" id="p_preferredOilIntervalMonths" type="number" value="${escapeHtml(String(profile.preferredOilIntervalMonths))}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Preferred Trans Interval Miles</label><input class="fi" id="p_preferredTransIntervalMiles" type="number" value="${escapeHtml(String(profile.preferredTransIntervalMiles))}"></div>
+        <div class="fl"><label>Preferred Diff Interval Miles</label><input class="fi" id="p_preferredDiffIntervalMiles" type="number" value="${escapeHtml(String(profile.preferredDiffIntervalMiles))}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Tire Pressure Front PSI</label><input class="fi" id="p_preferredTirePressureFront" type="number" value="${escapeHtml(String(profile.preferredTirePressureFront))}"></div>
+        <div class="fl"><label>Tire Pressure Rear PSI</label><input class="fi" id="p_preferredTirePressureRear" type="number" value="${escapeHtml(String(profile.preferredTirePressureRear))}"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="resetProfileSettings()">Reset Profile Defaults</button>
+        <button class="btn-primary" onclick="saveProfileSettings()">Save Settings</button>
+      </div>
+    </div>
+
+    <div class="section-label">Service Preferences Snapshot</div>
+    <div class="card"><div class="card-body">
+      <div class="row"><span class="row-key">Oil / Rotation Rule</span><span class="row-val green">Every ${formatNumber(profile.preferredOilIntervalMiles)} mi / ${escapeHtml(String(profile.preferredOilIntervalMonths))} mo</span></div>
+      <div class="row"><span class="row-key">Oil Next Due</span><span class="row-val">${escapeHtml(formatDueSummary(oilItem))}</span></div>
+      <div class="row"><span class="row-key">Transmission Next Due</span><span class="row-val">${escapeHtml(formatDueSummary(transItem))}</span></div>
+      <div class="row"><span class="row-key">Rear Diff Next Due</span><span class="row-val">${escapeHtml(formatDueSummary(diffItem))}</span></div>
+      <div class="row"><span class="row-key">Tire Pressure Target</span><span class="row-val">${escapeHtml(String(profile.preferredTirePressureFront))} PSI F / ${escapeHtml(String(profile.preferredTirePressureRear))} PSI R</span></div>
+    </div></div>
+
+    <div class="section-label">Oil Specs</div>
+    <div class="card"><div class="card-body">
+      <div class="row"><span class="row-key">Required Oil</span><span class="row-val red">${escapeHtml(STATIC_SPECS.requiredOil)}</span></div>
+      <div class="row"><span class="row-key">API / ILSAC Spec</span><span class="row-val">${escapeHtml(STATIC_SPECS.oilApi)}</span></div>
+      <div class="row"><span class="row-key">Capacity</span><span class="row-val">${escapeHtml(STATIC_SPECS.oilCapacity)}</span></div>
+      <div class="row"><span class="row-key">Fill Method</span><span class="row-val">${escapeHtml(STATIC_SPECS.oilFillMethod)}</span></div>
+      <div class="row"><span class="row-key">Dipstick Handle</span><span class="row-val gold">${escapeHtml(STATIC_SPECS.dipstick)}</span></div>
+      <div class="row"><span class="row-key">Toyota Official Interval</span><span class="row-val">10,000 mi / 12 months (0W-16)</span></div>
+      <div class="row"><span class="row-key">Your Custom Interval</span><span class="row-val green">${formatNumber(profile.preferredOilIntervalMiles)} mi / ${escapeHtml(String(profile.preferredOilIntervalMonths))} months</span></div>
+      <div class="row"><span class="row-key">Emergency Substitute</span><span class="row-val red">${escapeHtml(STATIC_SPECS.oilEmergency)}</span></div>
+    </div></div>
+
+    <div class="section-label">Torque Specs</div>
+    <div class="card"><div class="card-body">
+      <div class="row"><span class="row-key">Oil Filter ${escapeHtml(STATIC_SPECS.oilFilterPart)}</span><span class="row-val orange">${escapeHtml(STATIC_SPECS.oilFilterTorque)}</span></div>
+      <div class="row"><span class="row-key">OEM Drain Plug (14mm)</span><span class="row-val orange">${escapeHtml(STATIC_SPECS.drainPlugTorque)}</span></div>
+      <div class="row"><span class="row-key">ValvoMax M12-1.25</span><span class="row-val red">${escapeHtml(STATIC_SPECS.valvomaxTorque)}</span></div>
+      <div class="row"><span class="row-key">Lug Nuts</span><span class="row-val orange">${escapeHtml(STATIC_SPECS.lugTorque)}</span></div>
+      <div class="row"><span class="row-key">Undercover Screws</span><span class="row-val">${escapeHtml(STATIC_SPECS.undercoverScrews)}</span></div>
+      <div class="row"><span class="row-key">Filter Wrench Note</span><span class="row-val red">HEX side ONLY to loosen</span></div>
+    </div></div>
+
+    <div class="section-label">Tires & Wheels</div>
+    <div class="card"><div class="card-body">
+      <div class="row"><span class="row-key">Tire Size</span><span class="row-val">${escapeHtml(STATIC_SPECS.tireSize)}</span></div>
+      <div class="row"><span class="row-key">OE Pressure F/R</span><span class="row-val">${escapeHtml(String(profile.preferredTirePressureFront))} PSI / ${escapeHtml(String(profile.preferredTirePressureRear))} PSI</span></div>
+      <div class="row"><span class="row-key">Bolt Pattern</span><span class="row-val">${escapeHtml(STATIC_SPECS.boltPattern)}</span></div>
+      <div class="row"><span class="row-key">Lug Nut Torque</span><span class="row-val orange">${escapeHtml(STATIC_SPECS.lugTorque)}</span></div>
+      <div class="row"><span class="row-key">Tires Installed</span><span class="row-val">${escapeHtml(STATIC_SPECS.tiresInstalled)}</span></div>
+      <div class="row"><span class="row-key">Tread (02/24/26)</span><span class="row-val orange">${escapeHtml(STATIC_SPECS.tireTreadSnapshot)}</span></div>
+    </div></div>
+
+    <div class="section-label">Fluids Reference</div>
+    <div class="card"><div class="card-body">
+      <div class="row"><span class="row-key">Engine Coolant</span><span class="row-val">Toyota SLLC #${escapeHtml(STATIC_SPECS.coolantPart)} (Pink 50/50)</span></div>
+      <div class="row"><span class="row-key">Inverter Coolant</span><span class="row-val">Toyota SLLC (same fluid, separate circuit)</span></div>
+      <div class="row"><span class="row-key">Transmission</span><span class="row-val">ATF WS #${escapeHtml(STATIC_SPECS.transFluidPart)}</span></div>
+      <div class="row"><span class="row-key">Rear Differential</span><span class="row-val">ATF WS #${escapeHtml(STATIC_SPECS.transFluidPart)}</span></div>
+      <div class="row"><span class="row-key">Fuel</span><span class="row-val green">${escapeHtml(STATIC_SPECS.fuel)}</span></div>
+      <div class="row"><span class="row-key">Octane Booster</span><span class="row-val red">${escapeHtml(STATIC_SPECS.octaneBooster)}</span></div>
+    </div></div>
+
+    <div class="section-label">Hybrid System</div>
+    <div class="card"><div class="card-body">
+      <div class="row"><span class="row-key">Timing Chain</span><span class="row-val green">${escapeHtml(STATIC_SPECS.timing)}</span></div>
+      <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val">${escapeHtml(STATIC_SPECS.sparkPlugs)}</span></div>
+      <div class="row"><span class="row-key">Plug Interval</span><span class="row-val">${formatNumber(STATIC_SPECS.sparkPlugIntervalMiles)} mi per Toyota manual</span></div>
+      <div class="row"><span class="row-key">Brake Pads (02/24/26)</span><span class="row-val green">${escapeHtml(STATIC_SPECS.brakePadSnapshot)}</span></div>
+      <div class="row"><span class="row-key">HV Battery Warranty</span><span class="row-val green">${escapeHtml(STATIC_SPECS.hvBatteryWarranty)}</span></div>
+      <div class="row"><span class="row-key">Maintenance Mode</span><span class="row-val" style="font-size:10px">${escapeHtml(STATIC_SPECS.maintenanceMode)}</span></div>
+    </div></div>
+  `;
+}
+
+function saveProfileSettings(){
+  const nextProfile = {
+    ownerName: document.getElementById('p_ownerName')?.value.trim() || '',
+    vehicleYear: toNumber(document.getElementById('p_vehicleYear')?.value, DEFAULT_PROFILE.vehicleYear),
+    vehicleModel: document.getElementById('p_vehicleModel')?.value.trim() || DEFAULT_PROFILE.vehicleModel,
+    vehicleTrim: document.getElementById('p_vehicleTrim')?.value.trim() || DEFAULT_PROFILE.vehicleTrim,
+    VIN: document.getElementById('p_VIN')?.value.trim() || DEFAULT_PROFILE.VIN,
+    color: document.getElementById('p_color')?.value.trim() || DEFAULT_PROFILE.color,
+    location: document.getElementById('p_location')?.value.trim() || DEFAULT_PROFILE.location,
+    inServiceDate: document.getElementById('p_inServiceDate')?.value || '',
+    preferredOilIntervalMiles: toNumber(document.getElementById('p_preferredOilIntervalMiles')?.value, DEFAULT_PROFILE.preferredOilIntervalMiles),
+    preferredOilIntervalMonths: toNumber(document.getElementById('p_preferredOilIntervalMonths')?.value, DEFAULT_PROFILE.preferredOilIntervalMonths),
+    preferredTransIntervalMiles: toNumber(document.getElementById('p_preferredTransIntervalMiles')?.value, DEFAULT_PROFILE.preferredTransIntervalMiles),
+    preferredDiffIntervalMiles: toNumber(document.getElementById('p_preferredDiffIntervalMiles')?.value, DEFAULT_PROFILE.preferredDiffIntervalMiles),
+    preferredTirePressureFront: toNumber(document.getElementById('p_preferredTirePressureFront')?.value, DEFAULT_PROFILE.preferredTirePressureFront),
+    preferredTirePressureRear: toNumber(document.getElementById('p_preferredTirePressureRear')?.value, DEFAULT_PROFILE.preferredTirePressureRear)
   };
 
-  const photoCount = Object.keys(photos).length;
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  const date=new Date().toISOString().split('T')[0];
-  a.href=url;
-  a.download='venza_backup_'+date+'.json';
+  saveProfile(nextProfile);
+  renderAll();
+  if(document.getElementById('page-shop')?.classList.contains('active')) renderShop();
+  showToast('Profile settings saved ✓');
+}
+
+function resetProfileSettings(){
+  if(!confirm('Reset profile/settings to default values?')) return;
+  saveProfile(DEFAULT_PROFILE);
+  renderAll();
+  if(document.getElementById('page-shop')?.classList.contains('active')) renderShop();
+  showToast('Profile reset to defaults ✓');
+}
+
+function renderBackup(){
+  const entries = getData();
+  const mileage = getMi();
+  const total = entries.reduce((sum, entry) => sum + toNumber(entry.cost, 0), 0);
+  const last = [...entries].sort((a,b) => (toNumber(b.mi,0) - toNumber(a.mi,0)) || (new Date(b.date) - new Date(a.date)))[0];
+  const photoCount = entries.filter(entry => getPhoto(entry.id)).length;
+  const profile = getProfile();
+
+  document.getElementById('bkCount').textContent = `${entries.length} entries · ${photoCount} receipt photo${photoCount !== 1 ? 's' : ''}`;
+  document.getElementById('bkMi').textContent = `${formatNumber(mileage)} mi`;
+  document.getElementById('bkTotal').textContent = `$${total.toFixed(2)}`;
+  document.getElementById('bkLast').textContent = last ? `${formatDateShort(last.date)} — ${formatNumber(last.mi)} mi` : '—';
+  const bkProfile = document.getElementById('bkProfile');
+  if(bkProfile) bkProfile.textContent = `${getVehicleDisplay(profile)} · VIN ${getVIN().slice(-6)}`;
+}
+
+function exportData(){
+  const entries = getData();
+  const photos = {};
+  entries.forEach(entry => {
+    const photo = getPhoto(entry.id);
+    if(photo) photos[entry.id] = photo;
+  });
+
+  const payload = {
+    version: APP_VERSION,
+    exported: new Date().toISOString(),
+    vin: getVIN(),
+    vehicle: getVehicleDisplay(),
+    mileage: getMi(),
+    profile: getProfile(),
+    entries,
+    photos
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `venza_backup_${date}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast(`Backup saved ✓ — ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}`);
+  showToast(`Backup saved ✓ — ${entries.length} entries + ${Object.keys(photos).length} photo${Object.keys(photos).length !== 1 ? 's' : ''}`);
 }
 
-/* ─── IMPORT (RESTORE) ───────────────────────────────────── */
 function importData(input){
-  const file=input.files[0];
-  if(!file){return}
-  if(!file.name.endsWith('.json')){showToast('Please select a .json file');return}
-  const reader=new FileReader();
-  reader.onload=function(e){
+  const file = input.files?.[0];
+  if(!file) return;
+  if(!file.name.toLowerCase().endsWith('.json')){ showToast('Please select a .json file'); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(event){
     try{
-      const data=JSON.parse(e.target.result);
-      const entries=Array.isArray(data)?data:(data.entries||null);
-      const mi=data.mileage||null;
-      const photos=data.photos||{};
-      const photoCount=Object.keys(photos).length;
+      const parsed = JSON.parse(event.target.result);
+      let entries = null;
+      let mileage = null;
+      let profile = null;
+      let photos = {};
 
-      if(!entries||!Array.isArray(entries)){
-        showToast('❌ Invalid backup file format');return;
+      if(Array.isArray(parsed)){
+        entries = parsed;
+      } else if(parsed && typeof parsed === 'object') {
+        entries = Array.isArray(parsed.entries) ? parsed.entries : null;
+        mileage = toNumber(parsed.mileage, null);
+        profile = parsed.profile && typeof parsed.profile === 'object' ? parsed.profile : null;
+        photos = parsed.photos && typeof parsed.photos === 'object' ? parsed.photos : {};
       }
-      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?\n\nThis replaces all current data. Continue?`)){
-        input.value='';return;
+
+      if(!entries){ showToast('❌ Invalid backup file format'); return; }
+      const photoCount = Object.keys(photos).length;
+      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount !== 1 ? 's' : ''}?\n\nThis replaces current entries, mileage, photos, and any saved profile included in the backup.`)){
+        input.value = '';
+        return;
       }
 
-      // Restore entries
-      save(entries);
-      if(mi&&mi>0)setMi(mi);
-
-      // Restore photos
-      Object.entries(photos).forEach(([id,imgData])=>{
-        try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
+      saveEntries(entries);
+      if(mileage && mileage > 0) saveMileage(mileage);
+      if(profile) saveProfile(profile);
+      clearAllPhotos();
+      Object.entries(photos).forEach(([id, data]) => {
+        try{ localStorage.setItem(`${STORAGE_KEYS.photoPrefix}${id}`, data); }catch(_){ /* ignore oversize restore item */ }
       });
 
       renderAll();
-      renderBackup();
-      input.value='';
-      showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}!`);
-    }catch(err){
+      if(document.getElementById('page-shop')?.classList.contains('active')) renderShop();
+      input.value = '';
+      showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount !== 1 ? 's' : ''}`);
+    } catch(_err){
       showToast('❌ Could not read backup file');
     }
   };
   reader.readAsText(file);
 }
 
-/* ─── RESET DATA ─────────────────────────────────────────── */
 function resetData(){
-  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
-  // Clear all photos first
-  getData().forEach(e=>localStorage.removeItem('vz_photo_'+e.id));
-  save(DEFAULT);
-  setMi(64751);
+  if(!confirm('Reset ALL data to factory defaults?\n\nThis will reset entries, mileage, profile/settings, and receipt photos. Export a backup first if you want to keep anything.')) return;
+  clearAllPhotos();
+  saveEntries(DEFAULT_ENTRIES);
+  saveMileage(getDefaultMileage());
+  saveProfile(DEFAULT_PROFILE);
+  clearPhoto();
   renderAll();
-  renderBackup();
+  if(document.getElementById('page-shop')?.classList.contains('active')) renderShop();
   showToast('Reset to factory data ✓');
 }
 
-/* ─── TOAST ──────────────────────────────────────────────── */
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+function prefill(){
+  const type = document.getElementById('fType').value;
+  if(PREFILLS[type]) document.getElementById('fDesc').value = PREFILLS[type];
 }
-/* ─── GENERATE PRINT REPORT ──────────────────────────────────── */
-function generatePrint(){
-  // Pre-fill mileage if empty
-  const miEl = document.getElementById('prMileage');
-  if(!miEl.value) miEl.value = getMi();
 
-  const owner   = document.getElementById('prOwner').value.trim() || 'Vehicle Owner';
-  const model   = document.getElementById('prModel').value.trim();
-  const curMi   = parseInt(miEl.value) || getMi();
-  const filter  = document.getElementById('prFilter').value;
-  const today   = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+function saveEntry(){
+  const date = document.getElementById('fDate').value;
+  const mileage = toNumber(document.getElementById('fMi').value, null);
+  const type = document.getElementById('fType').value || 'other';
+  const desc = document.getElementById('fDesc').value.trim();
+  const cost = toNumber(document.getElementById('fCost').value, 0);
+  const shop = document.getElementById('fShop').value.trim();
+  const link = document.getElementById('fLink').value.trim();
+
+  if(!date || !mileage || !desc){ showToast('Please fill in date, mileage & description'); return; }
+
+  const entries = getData();
+  const newId = Date.now();
+  entries.push({
+    id: newId,
+    date,
+    mi: mileage,
+    type,
+    desc,
+    cost,
+    shop,
+    link,
+    builtin: false
+  });
+  saveEntries(entries);
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto = null;
+  }
+  if(mileage > getMi()) saveMileage(mileage);
+
+  ['fMi','fCost','fShop','fLink','fDesc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fType').value = '';
+  clearPhoto();
+  renderAll();
+  if(document.getElementById('page-shop')?.classList.contains('active')) renderShop();
+  go('log');
+  showToast('Entry saved ✓');
+}
+
+function delEntry(id){
+  if(!confirm('Delete this service entry?\n\nThis cannot be undone.')) return;
+  saveEntries(getData().filter(entry => entry.id !== id));
+  localStorage.removeItem(`${STORAGE_KEYS.photoPrefix}${id}`);
+  renderAll();
+  if(document.getElementById('page-shop')?.classList.contains('active')) renderShop();
+  showToast('Entry deleted');
+}
+function delBuiltin(id){
+  if(!confirm('Delete this original service record?\n\n(This is a baseline entry — only delete it if you intentionally want it gone.)')) return;
+  delEntry(id);
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+function openMiModal(){
+  const overlay = document.getElementById('miModal');
+  const input = document.getElementById('miInput');
+  input.value = getMi();
+  renderSmartList(getMi());
+  document.getElementById('smartPreview').style.display = 'block';
+  overlay.classList.add('open');
+  setTimeout(() => input.focus(), 80);
+}
+function closeMiModal(){ document.getElementById('miModal').classList.remove('open'); }
+function saveMi(){
+  const value = toNumber(document.getElementById('miInput').value, null);
+  if(value && value > 0){
+    saveMileage(value);
+    renderAll();
+    if(document.getElementById('page-shop')?.classList.contains('active')) renderShop();
+    showToast(`Mileage updated to ${formatNumber(value)} mi ✓`);
+  }
+  closeMiModal();
+}
+function renderSmartList(mileage){
+  const items = getAllServiceStatuses(getData(), getProfile(), mileage);
+  const list = document.getElementById('smartList');
+  if(!list) return;
+
+  list.innerHTML = items.map(item => {
+    const badgeClass = item.status === 'overdue' ? 'sm-overdue'
+      : item.status === 'soon' ? 'sm-soon'
+      : item.status === 'upcoming' ? 'sm-upcoming'
+      : 'sm-future';
+    const badgeText = item.status === 'overdue' ? 'OVERDUE'
+      : item.status === 'soon' ? 'NEXT'
+      : item.status === 'upcoming' ? 'UPCOMING'
+      : item.status === 'watch' ? 'WATCH'
+      : 'LATER';
+    return `<div class="sm-item">
+      <div class="sm-icon">${item.rule.id.includes('oil') ? '🔧' : item.rule.id.includes('hv') ? '🔋' : item.rule.id.includes('coolant') ? '🌡️' : item.rule.id.includes('spark') ? '⚡' : item.rule.id.includes('trans') ? '⚙️' : item.rule.id.includes('diff') ? '🔩' : item.rule.id.includes('alignment') ? '📐' : item.rule.id.includes('tires') ? '🛞' : '🧰'}</div>
+      <div class="sm-info">
+        <div class="sm-name">${escapeHtml(item.rule.name)}</div>
+        <div class="sm-detail">${escapeHtml(formatDueSummary(item))} · ${escapeHtml(formatRemainingText(item))}</div>
+      </div>
+      <div class="sm-badge ${badgeClass}">${badgeText}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('miModal').addEventListener('click', function(event){
+  if(event.target === this) closeMiModal();
+});
+document.getElementById('miInput').addEventListener('input', function(){
+  renderSmartList(toNumber(this.value, getMi()));
+});
+
+function go(id){
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  const map = {dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,shop:9,add:-1};
+  document.getElementById(`page-${id}`).classList.add('active');
+  const navIndex = map[id];
+  if(navIndex >= 0) document.querySelectorAll('.nav-btn')[navIndex].classList.add('active');
+
+  if(id === 'backup') renderBackup();
+  if(id === 'printlog') renderPrintDefaults();
+  if(id === 'shop') renderShop();
+  if(id === 'upcoming') renderUpcoming();
+  if(id === 'warranty') renderWarranty();
+  if(id === 'specs') renderSpecs();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function toggleGuide(head){
+  head.closest('.guide-item').classList.toggle('open');
+}
+
+function copyVIN(){
+  const vin = getVIN();
+  navigator.clipboard.writeText(vin).then(() => {
+    showToast(`VIN copied: ${vin}`);
+  }).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = vin;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast(`VIN copied: ${vin}`);
+  });
+}
+
+function copyTemplate(){
+  const template = document.getElementById('chatgptTemplate').textContent;
+  navigator.clipboard.writeText(template).then(() => showToast('Template copied to clipboard ✓')).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = template;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('Template copied ✓');
+  });
+}
+
+function renderPrintDefaults(){
+  const profile = getProfile();
+  document.getElementById('prOwner').value = profile.ownerName || '';
+  document.getElementById('prModel').value = getVehicleDisplay(profile);
+  document.getElementById('prMileage').value = getMi();
+}
+
+function generatePrint(){
+  const profile = getProfile();
+  const owner = document.getElementById('prOwner').value.trim() || getOwnerDisplay(profile);
+  const model = document.getElementById('prModel').value.trim() || getVehicleDisplay(profile);
+  const currentMileage = toNumber(document.getElementById('prMileage').value, getMi());
+  const filter = document.getElementById('prFilter').value;
+  const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   const todayISO = new Date().toISOString().split('T')[0];
 
-  // Filter entries
-  let entries = getData().sort((a,b)=>a.mi-b.mi);
-  if(filter==='oil') entries = entries.filter(e=>['oil','oiltires'].includes(e.type));
-  if(filter==='recent'){
-    const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear()-1);
-    entries = entries.filter(e=>new Date(e.date)>=cutoff);
+  let entries = [...getData()].sort((a,b) => (toNumber(a.mi,0) - toNumber(b.mi,0)) || (new Date(a.date) - new Date(b.date)));
+  if(filter === 'oil') entries = entries.filter(entry => ['oil','oiltires'].includes(entry.type));
+  if(filter === 'recent'){
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 1);
+    entries = entries.filter(entry => new Date(entry.date) >= cutoff);
   }
 
-  const totalCost = entries.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  const totalCost = entries.reduce((sum, entry) => sum + toNumber(entry.cost, 0), 0);
+  const serviceStatuses = getAllServiceStatuses(entries, profile, currentMileage);
 
-  // Smart upcoming items
-  const upcoming = getSmartStatus(curMi).filter(i=>i.status!=='future'||i.status==='watch').slice(0,6);
-
-  // Build rows
-  const rows = entries.map((e,i)=>{
-    const dt = new Date(e.date+'T00:00:00');
-    const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const typeLabel = LABELS[e.type]||'Service';
-    const bg = i%2===0?'#ffffff':'#f8f9fb';
+  const rows = entries.map((entry, index) => {
+    const bg = index % 2 === 0 ? '#ffffff' : '#f8f9fb';
     return `<tr style="background:${bg}">
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${ds}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi).toLocaleString()} mi</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${typeLabel}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${e.desc}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${e.shop||'—'}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#c05800;text-align:right;white-space:nowrap">$${parseFloat(e.cost||0).toFixed(2)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${formatDateShort(entry.date)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${formatNumber(entry.mi)} mi</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${escapeHtml(LABELS[entry.type] || 'Service')}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${escapeHtml(entry.desc)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(entry.shop || '—')}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#c05800;text-align:right;white-space:nowrap">$${toNumber(entry.cost, 0).toFixed(2)}</td>
     </tr>`;
   }).join('');
 
-  const upcomingRows = getSmartStatus(curMi).map(item=>{
-    if(!item.dueMi && item.status!=='watch') return '';
-    const color = item.status==='overdue'?'#dc2626':item.status==='soon'?'#c2410c':item.status==='upcoming'?'#15803d':'#9aa0ae';
-    const label = item.status==='overdue'?'OVERDUE':item.status==='soon'?`${item.miLeft?.toLocaleString()} mi`:item.status==='upcoming'?`${item.miLeft?.toLocaleString()} mi`:item.miLeft?`${item.miLeft.toLocaleString()} mi`:'Monitor';
+  const upcomingRows = serviceStatuses.map(item => {
+    const color = item.status === 'overdue' ? '#dc2626' : item.status === 'soon' ? '#c2410c' : item.status === 'upcoming' ? '#15803d' : item.status === 'watch' ? '#b45309' : '#9aa0ae';
     return `<tr>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px">${item.icon} ${item.name}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.dueMi?item.dueMi.toLocaleString()+' mi':'—'}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${label}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px">${escapeHtml(item.rule.name)}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(formatDueSummary(item))}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${escapeHtml(formatRemainingText(item))}</td>
     </tr>`;
-  }).filter(Boolean).join('');
+  }).join('');
 
-  // Collect photos for PDF
-  const photoEntries = entries.filter(e => getPhoto(e.id));
+  const photoEntries = entries.filter(entry => getPhoto(entry.id));
   const photoSection = photoEntries.length > 0 ? `
-  <!-- SECTION: RECEIPT PHOTOS -->
   <div class="section" style="page-break-before:always">
     <div class="section-head">
-      <div class="section-num">${photoEntries.length > 0 ? '5' : ''}</div>
+      <div class="section-num">5</div>
       <div class="section-title">Receipt Photos (${photoEntries.length} Attached)</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      ${photoEntries.map(e=>{
-        const dt = new Date(e.date+'T00:00:00');
-        const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-        return `<div style="border:1px solid #e2e4e8;border-radius:10px;overflow:hidden">
+      ${photoEntries.map(entry => `
+        <div style="border:1px solid #e2e4e8;border-radius:10px;overflow:hidden">
           <div style="background:#1a1d23;padding:8px 12px;display:flex;justify-content:space-between">
-            <span style="color:#fff;font-size:11px;font-weight:600">${LABELS[e.type]||'Service'}</span>
-            <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi).toLocaleString()} mi</span>
+            <span style="color:#fff;font-size:11px;font-weight:600">${escapeHtml(LABELS[entry.type] || 'Service')}</span>
+            <span style="color:rgba(255,255,255,.5);font-size:10px">${formatDateShort(entry.date)} · ${formatNumber(entry.mi)} mi</span>
           </div>
-          <img src="${getPhoto(e.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
-          <div style="padding:8px 12px;font-size:11px;color:#555">${e.shop||'DIY'} · $${parseFloat(e.cost||0).toFixed(2)}</div>
-        </div>`;
-      }).join('')}
+          <img src="${getPhoto(entry.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
+          <div style="padding:8px 12px;font-size:11px;color:#555">${escapeHtml(entry.shop || 'DIY')} · $${toNumber(entry.cost, 0).toFixed(2)}</div>
+        </div>`).join('')}
     </div>
   </div>` : '';
 
+  const nextOil = serviceStatuses.find(item => item.rule.id === 'routine_oil');
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Vehicle Maintenance Record — ${model}</title>
+<title>Vehicle Maintenance Record — ${escapeHtml(model)}</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Outfit',Arial,sans-serif;color:#1a1d23;background:#fff;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-
-  /* ── HEADER ── */
   .header{background:#1a1d23;color:#fff;padding:28px 32px 22px;position:relative;overflow:hidden}
-  .header::after{content:'';position:absolute;right:-30px;top:-30px;width:200px;height:200px;
-    border-radius:50%;background:rgba(235,10,30,.12);pointer-events:none}
+  .header::after{content:'';position:absolute;right:-30px;top:-30px;width:200px;height:200px;border-radius:50%;background:rgba(235,10,30,.12);pointer-events:none}
   .header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
   .brand{display:flex;align-items:center;gap:12px}
-  .brand-icon{width:46px;height:46px;background:#eb0a1e;border-radius:12px;
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px}
+  .brand-icon{width:46px;height:46px;background:#eb0a1e;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px}
   .brand-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;line-height:1}
   .brand-sub{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
   .doc-label{text-align:right}
   .doc-type{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.4);text-transform:uppercase}
   .doc-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#fff;margin-top:2px}
   .doc-date{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px}
-
-  /* ── VEHICLE STRIP ── */
-  .vehicle-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
-    border-top:1px solid rgba(255,255,255,.1);padding-top:16px}
+  .vehicle-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid rgba(255,255,255,.1);padding-top:16px}
   .vs-item{padding-right:20px}
   .vs-label{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
   .vs-val{font-size:13px;color:#fff;font-weight:600}
   .vs-val.vin{font-size:10px;color:rgba(255,255,255,.8);font-family:monospace;letter-spacing:1px}
-
-  /* ── SECTIONS ── */
   .body{padding:28px 32px}
   .section{margin-bottom:26px}
-  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;
-    padding-bottom:8px;border-bottom:2px solid #1a1d23}
-  .section-num{width:22px;height:22px;background:#eb0a1e;color:#fff;border-radius:50%;
-    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1a1d23}
+  .section-num{width:22px;height:22px;background:#eb0a1e;color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#1a1d23}
-
-  /* ── DECLARATION BOX ── */
-  .declaration{background:#f8f9fb;border:1px solid #e2e4e8;border-left:4px solid #eb0a1e;
-    border-radius:8px;padding:16px 18px;margin-bottom:18px}
+  .declaration{background:#f8f9fb;border:1px solid #e2e4e8;border-left:4px solid #eb0a1e;border-radius:8px;padding:16px 18px;margin-bottom:18px}
   .declaration p{font-size:12px;color:#444;line-height:1.8;margin-bottom:8px}
   .declaration p:last-child{margin-bottom:0}
   .declaration strong{color:#1a1d23}
-
-  /* ── TABLE ── */
-  table{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;
-    border:1px solid #e2e4e8}
-  thead th{background:#1a1d23;color:#fff;padding:10px 10px;font-size:10px;
-    letter-spacing:1.5px;text-transform:uppercase;font-weight:600;text-align:left}
+  table{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;border:1px solid #e2e4e8}
+  thead th{background:#1a1d23;color:#fff;padding:10px 10px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;text-align:left}
   thead th:last-child{text-align:right}
-
-  /* ── INFO GRID ── */
   .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
   .info-box{background:#f8f9fb;border:1px solid #e2e4e8;border-radius:8px;padding:12px 14px}
   .info-label{font-size:9px;color:#9aa0ae;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
   .info-val{font-size:13px;color:#1a1d23;font-weight:600}
-
-  /* ── TOTALS ── */
-  .totals-row{background:#1a1d23;color:#fff;padding:12px 16px;
-    display:flex;justify-content:space-between;align-items:center}
+  .totals-row{background:#1a1d23;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
   .totals-label{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.5)}
   .totals-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff}
-
-  /* ── SIGNATURE ── */
   .sig-section{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px}
   .sig-box{border-top:1.5px solid #1a1d23;padding-top:8px}
   .sig-label{font-size:10px;color:#9aa0ae;letter-spacing:1px;text-transform:uppercase}
   .sig-val{font-size:12px;color:#1a1d23;margin-top:4px;font-weight:500}
-
-  /* ── FOOTER ── */
-  .footer{background:#f8f9fb;border-top:1px solid #e2e4e8;
-    padding:14px 32px;display:flex;justify-content:space-between;align-items:center;
-    font-size:9px;color:#9aa0ae;letter-spacing:.5px}
+  .footer{background:#f8f9fb;border-top:1px solid #e2e4e8;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#9aa0ae;letter-spacing:.5px}
   .footer-note{max-width:500px;line-height:1.6}
   .footer-page{text-align:right;flex-shrink:0}
-
-  /* ── PRINT ── */
-  @media print{
-    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .no-print{display:none!important}
-    .section{page-break-inside:avoid}
-    @page{margin:0;size:letter portrait}
-  }
-  @media screen{
-    body{max-width:820px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,.1)}
-    .print-btn{
-      position:fixed;bottom:30px;right:30px;
-      background:#eb0a1e;color:#fff;border:none;
-      padding:14px 22px;border-radius:12px;font-size:14px;font-weight:700;
-      cursor:pointer;font-family:'Outfit',sans-serif;
-      box-shadow:0 4px 20px rgba(235,10,30,.4);
-      display:flex;align-items:center;gap:8px;
-      z-index:999;transition:all .2s;
-    }
-    .print-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(235,10,30,.5)}
-    .back-btn{
-      position:fixed;bottom:30px;left:30px;
-      background:#1a1d23;color:#fff;border:none;
-      padding:14px 22px;border-radius:12px;font-size:14px;font-weight:700;
-      cursor:pointer;font-family:'Outfit',sans-serif;
-      box-shadow:0 4px 16px rgba(0,0,0,.3);
-      display:flex;align-items:center;gap:8px;z-index:999;
-    }
-  }
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.no-print{display:none!important}.section{page-break-inside:avoid}@page{margin:0;size:letter portrait}}
+  @media screen{body{max-width:820px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,.1)}.print-btn{position:fixed;bottom:30px;right:30px;background:#eb0a1e;color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 20px rgba(235,10,30,.4);display:flex;align-items:center;gap:8px;z-index:999;transition:all .2s}.print-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(235,10,30,.5)}.back-btn{position:fixed;bottom:30px;left:30px;background:#1a1d23;color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;z-index:999}}
 </style>
 </head>
 <body>
-
-<!-- PRINT / BACK BUTTONS (screen only) -->
 <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
 <button class="back-btn no-print" onclick="window.close()">← Back</button>
-
-<!-- ── HEADER ────────────────────────────────────────────────── -->
 <div class="header">
   <div class="header-top">
     <div class="brand">
@@ -2306,196 +2740,104 @@ function generatePrint(){
     <div class="doc-label">
       <div class="doc-type">Document Type</div>
       <div class="doc-title">Owner Maintenance Log</div>
-      <div class="doc-date">Generated: ${today}</div>
+      <div class="doc-date">Generated: ${escapeHtml(today)}</div>
     </div>
   </div>
   <div class="vehicle-strip">
-    <div class="vs-item">
-      <div class="vs-label">Vehicle</div>
-      <div class="vs-val">${model}</div>
-    </div>
-    <div class="vs-item">
-      <div class="vs-label">VIN</div>
-      <div class="vs-val vin">${VIN}</div>
-    </div>
-    <div class="vs-item">
-      <div class="vs-label">Owner</div>
-      <div class="vs-val">${owner}</div>
-    </div>
-    <div class="vs-item">
-      <div class="vs-label">Current Mileage</div>
-      <div class="vs-val">${curMi.toLocaleString()} mi</div>
-    </div>
+    <div class="vs-item"><div class="vs-label">Vehicle</div><div class="vs-val">${escapeHtml(model)}</div></div>
+    <div class="vs-item"><div class="vs-label">VIN</div><div class="vs-val vin">${escapeHtml(getVIN())}</div></div>
+    <div class="vs-item"><div class="vs-label">Owner</div><div class="vs-val">${escapeHtml(owner)}</div></div>
+    <div class="vs-item"><div class="vs-label">Current Mileage</div><div class="vs-val">${formatNumber(currentMileage)} mi</div></div>
   </div>
 </div>
-
-<!-- ── BODY ─────────────────────────────────────────────────── -->
 <div class="body">
-
-  <!-- SECTION 1: OWNER DECLARATION -->
   <div class="section">
-    <div class="section-head">
-      <div class="section-num">1</div>
-      <div class="section-title">Owner Declaration & Certification</div>
-    </div>
+    <div class="section-head"><div class="section-num">1</div><div class="section-title">Owner Declaration & Certification</div></div>
     <div class="declaration">
-      <p>I, <strong>${owner}</strong>, hereby certify that the vehicle identified above has been maintained according to the manufacturer's recommended maintenance schedule as outlined in the <strong>2021 Toyota Venza Warranty &amp; Maintenance Guide</strong>.</p>
-      <p>All services listed in this record were performed using <strong>manufacturer-specified fluids, filters, and components</strong> per Toyota OEM specifications. Oil changes were performed using <strong>SAE 0W-16 Full Synthetic motor oil (ILSAC GF-6B / API SP)</strong> with genuine Toyota oil filter part #90915-YZZN1, as specified by Toyota for this vehicle.</p>
-      <p><strong>Per the 2021 Toyota Venza Warranty &amp; Maintenance Guide, Page 31:</strong> <em>"Maintenance and repair services may be performed by you or by any automotive service provider you choose. Toyota will not deny a warranty claim solely because you used a service provider other than a Toyota dealership for maintenance and repairs."</em></p>
+      <p>I, <strong>${escapeHtml(owner)}</strong>, certify that the vehicle identified above has been maintained according to the manufacturer's recommended maintenance schedule and my saved service preferences inside this Venza Garage log.</p>
+      <p>All services listed here were recorded with manufacturer-specified or noted equivalent fluids, filters, and components. Oil service in this record is tracked around <strong>SAE 0W-16 Full Synthetic motor oil</strong> with Toyota filter part <strong>#${escapeHtml(STATIC_SPECS.oilFilterPart)}</strong>.</p>
+      <p><strong>Toyota maintenance record note:</strong> Toyota states maintenance and repairs may be performed by you or by any automotive service provider you choose, while damage caused by improper maintenance is not covered. This document helps preserve a complete owner-kept record.</p>
     </div>
-
     <div class="info-grid">
-      <div class="info-box">
-        <div class="info-label">Required Oil Specification</div>
-        <div class="info-val">SAE 0W-16 Full Synthetic</div>
-        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">ILSAC GF-6B / API SP · 4.8 qt capacity</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label">Oil Filter</div>
-        <div class="info-val">Toyota OEM #90915-YZZN1</div>
-        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Genuine Toyota / Denso · 13 ft-lbs torque</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label">Service Interval (Custom)</div>
-        <div class="info-val">Every 5,000 Miles</div>
-        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Toyota spec: 10,000 mi / 12 months with 0W-16</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label">Toyota Warranty Contact</div>
-        <div class="info-val">(800) 331-4331</div>
-        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Toyota Customer Experience Center</div>
-      </div>
+      <div class="info-box"><div class="info-label">Required Oil Specification</div><div class="info-val">${escapeHtml(STATIC_SPECS.requiredOil)}</div><div style="font-size:10px;color:#9aa0ae;margin-top:3px">${escapeHtml(STATIC_SPECS.oilApi)} · ${escapeHtml(STATIC_SPECS.oilCapacity)}</div></div>
+      <div class="info-box"><div class="info-label">Oil Filter</div><div class="info-val">Toyota OEM #${escapeHtml(STATIC_SPECS.oilFilterPart)}</div><div style="font-size:10px;color:#9aa0ae;margin-top:3px">${escapeHtml(STATIC_SPECS.oilFilterTorque)} torque spec</div></div>
+      <div class="info-box"><div class="info-label">Saved Oil Interval</div><div class="info-val">Every ${formatNumber(profile.preferredOilIntervalMiles)} Miles</div><div style="font-size:10px;color:#9aa0ae;margin-top:3px">${escapeHtml(String(profile.preferredOilIntervalMonths))} month reminder setting</div></div>
+      <div class="info-box"><div class="info-label">Profile In-Service Date</div><div class="info-val">${escapeHtml(profile.inServiceDate ? formatDateLong(profile.inServiceDate) : 'Not Set')}</div><div style="font-size:10px;color:#9aa0ae;margin-top:3px">Set in Profile to improve warranty tracking</div></div>
     </div>
   </div>
-
-  <!-- SECTION 2: SERVICE HISTORY -->
   <div class="section">
-    <div class="section-head">
-      <div class="section-num">2</div>
-      <div class="section-title">Complete Service History (${entries.length} Entries)</div>
-    </div>
+    <div class="section-head"><div class="section-num">2</div><div class="section-title">Complete Service History (${entries.length} Entries)</div></div>
     <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Mileage</th>
-          <th>Service</th>
-          <th>Description / Parts Used</th>
-          <th>Performed By</th>
-          <th style="text-align:right">Cost</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Date</th><th>Mileage</th><th>Service</th><th>Description / Parts Used</th><th>Performed By</th><th style="text-align:right">Cost</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    <div class="totals-row" style="border-radius:0 0 8px 8px">
-      <span class="totals-label">Total Invested in Maintenance</span>
-      <span class="totals-val">$${totalCost.toFixed(2)}</span>
-    </div>
+    <div class="totals-row" style="border-radius:0 0 8px 8px"><span class="totals-label">Total Invested in Maintenance</span><span class="totals-val">$${totalCost.toFixed(2)}</span></div>
   </div>
-
-  <!-- SECTION 3: UPCOMING SCHEDULE -->
   <div class="section">
-    <div class="section-head">
-      <div class="section-num">3</div>
-      <div class="section-title">Upcoming Maintenance Schedule</div>
-    </div>
+    <div class="section-head"><div class="section-num">3</div><div class="section-title">Upcoming Maintenance Schedule</div></div>
     <table>
-      <thead>
-        <tr>
-          <th>Service Item</th>
-          <th>Due At</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Service Item</th><th>Due At</th><th>Status</th></tr></thead>
       <tbody>${upcomingRows}</tbody>
     </table>
   </div>
-
-  <!-- SECTION 4: SIGNATURE -->
   <div class="section">
-    <div class="section-head">
-      <div class="section-num">4</div>
-      <div class="section-title">Owner Certification</div>
-    </div>
-    <p style="font-size:12px;color:#555;line-height:1.7;margin-bottom:24px">
-      I declare that the information contained in this maintenance record is accurate and complete to the best of my knowledge. All services were performed using manufacturer-specified parts and fluids. This document serves as the official maintenance record for the vehicle identified herein.
-    </p>
+    <div class="section-head"><div class="section-num">4</div><div class="section-title">Owner Certification</div></div>
+    <p style="font-size:12px;color:#555;line-height:1.7;margin-bottom:24px">I declare that the information contained in this maintenance record is accurate and complete to the best of my knowledge. This document serves as the official owner-kept maintenance record for the vehicle identified above.</p>
     <div class="sig-section">
-      <div class="sig-box">
-        <div class="sig-label">Owner Signature</div>
-        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
-        <div class="sig-val">${owner}</div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-label">Date Signed</div>
-        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
-        <div class="sig-val">${today}</div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-label">Vehicle Mileage at Signing</div>
-        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
-        <div class="sig-val">${curMi.toLocaleString()} miles</div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-label">Next Service Due</div>
-        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
-        <div class="sig-val">${(curMi + 5000).toLocaleString()} miles</div>
-      </div>
+      <div class="sig-box"><div class="sig-label">Owner Signature</div><div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div><div class="sig-val">${escapeHtml(owner)}</div></div>
+      <div class="sig-box"><div class="sig-label">Date Signed</div><div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div><div class="sig-val">${escapeHtml(today)}</div></div>
+      <div class="sig-box"><div class="sig-label">Vehicle Mileage at Signing</div><div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div><div class="sig-val">${formatNumber(currentMileage)} miles</div></div>
+      <div class="sig-box"><div class="sig-label">Next Oil Service Due</div><div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div><div class="sig-val">${escapeHtml(nextOil ? formatDueSummary(nextOil) : 'Check app')}</div></div>
     </div>
   </div>
-
 </div>
-
 ${photoSection}
-
-<!-- ── FOOTER ────────────────────────────────────────────────── -->
-<div class="footer">
-  <div class="footer-note">
-    <strong>Vehicle:</strong> ${model} · <strong>VIN:</strong> ${VIN} · <strong>Generated:</strong> ${today} by Venza Garage App<br>
-    This record was prepared by the vehicle owner per the 2021 Toyota Venza Warranty &amp; Maintenance Guide, which states Toyota will not deny a warranty claim solely because maintenance was performed by a non-dealer. Retain all receipts and invoices with this record.
-  </div>
-  <div class="footer-page">Page 1 of 1<br>Document #VMR-${todayISO.replace(/-/g,'')}</div>
-</div>
-
+<div class="footer"><div class="footer-note"><strong>Vehicle:</strong> ${escapeHtml(model)} · <strong>VIN:</strong> ${escapeHtml(getVIN())} · <strong>Generated:</strong> ${escapeHtml(today)} by Venza Garage App<br>This file includes owner-kept service entries, saved profile settings, and upcoming maintenance logic based on the app's rules engine.</div><div class="footer-page">Document #VMR-${todayISO.replace(/-/g,'')}</div></div>
 </body>
 </html>`;
 
-  const w = window.open('','_blank','width=900,height=700');
-  if(!w){ showToast('Allow popups to open the report'); return; }
-  w.document.write(html);
-  w.document.close();
+  const win = window.open('', '_blank', 'width=900,height=700');
+  if(!win){ showToast('Allow popups to open the report'); return; }
+  win.document.write(html);
+  win.document.close();
 }
-/* ════════════════════════════════════════════════════════════════
-   PHOTO RECEIPT SYSTEM
-   ════════════════════════════════════════════════════════════════ */
 
-/* Storage: photos kept separate from log data to avoid size issues */
-function getPhoto(id){ return localStorage.getItem('vz_photo_'+id)||null; }
-function savePhoto(id,data){ try{ localStorage.setItem('vz_photo_'+id,data); }catch(e){ showToast('Photo too large — try a smaller image'); } }
-function removePhoto(id){ localStorage.removeItem('vz_photo_'+id); renderLog(); showToast('Photo removed'); }
+function getPhoto(id){ return localStorage.getItem(`${STORAGE_KEYS.photoPrefix}${id}`) || null; }
+function savePhoto(id, data){
+  try{ localStorage.setItem(`${STORAGE_KEYS.photoPrefix}${id}`, data); }
+  catch(_){ showToast('Photo too large — try a smaller image'); }
+}
+function removePhoto(id){
+  localStorage.removeItem(`${STORAGE_KEYS.photoPrefix}${id}`);
+  renderLog();
+  showToast('Photo removed');
+}
 
-/* Compress image to max 800px wide, 70% quality JPEG */
-function compressImage(file, cb){
+function compressImage(file, callback){
   const reader = new FileReader();
-  reader.onload = function(e){
-    const img = new Image();
-    img.onload = function(){
+  reader.onload = function(event){
+    const image = new Image();
+    image.onload = function(){
       const MAX = 900;
-      let w = img.width, h = img.height;
-      if(w > MAX){ h = Math.round(h * MAX/w); w = MAX; }
+      let width = image.width;
+      let height = image.height;
+      if(width > MAX){
+        height = Math.round(height * (MAX / width));
+        width = MAX;
+      }
       const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      cb(canvas.toDataURL('image/jpeg', 0.72));
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.72));
     };
-    img.src = e.target.result;
+    image.src = event.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-/* Handle photo selected from file input on ADD FORM */
 function handlePhotoSelect(input){
-  if(!input.files[0]) return;
+  if(!input.files?.[0]) return;
   compressImage(input.files[0], function(data){
     window._pendingPhoto = data;
     document.getElementById('fPhotoImg').src = data;
@@ -2504,38 +2846,33 @@ function handlePhotoSelect(input){
     document.getElementById('fPhotoArea').style.borderColor = 'var(--green2)';
   });
 }
-
-/* Handle drag-and-drop */
-function handlePhotoDrop(e){
-  e.preventDefault();
-  const file = e.dataTransfer.files[0];
+function handlePhotoDrop(event){
+  event.preventDefault();
+  const file = event.dataTransfer.files?.[0];
   if(file && file.type.startsWith('image/')){
     compressImage(file, function(data){
       window._pendingPhoto = data;
       document.getElementById('fPhotoImg').src = data;
       document.getElementById('fPhotoPreview').style.display = 'block';
       document.getElementById('fPhotoPlaceholder').style.display = 'none';
+      document.getElementById('fPhotoArea').style.borderColor = 'var(--green2)';
     });
   }
 }
-
-/* Clear photo from ADD FORM */
 function clearPhoto(){
   window._pendingPhoto = null;
   document.getElementById('fPhotoInput').value = '';
   document.getElementById('fPhotoPreview').style.display = 'none';
   document.getElementById('fPhotoPlaceholder').style.display = 'block';
   document.getElementById('fPhotoArea').style.borderColor = 'var(--border2)';
-  const img = document.getElementById('fPhotoImg');
-  if(img) img.src = '';
+  document.getElementById('fPhotoImg').src = '';
 }
-
-/* Add photo to EXISTING log entry */
 function addPhotoToEntry(id){
   const input = document.createElement('input');
-  input.type = 'file'; input.accept = 'image/*';
+  input.type = 'file';
+  input.accept = 'image/*';
   input.onchange = function(){
-    if(!input.files[0]) return;
+    if(!input.files?.[0]) return;
     compressImage(input.files[0], function(data){
       savePhoto(id, data);
       renderLog();
@@ -2544,8 +2881,6 @@ function addPhotoToEntry(id){
   };
   input.click();
 }
-
-/* View photo full screen */
 function viewPhoto(id){
   const data = getPhoto(id);
   if(!data) return;
@@ -2554,121 +2889,96 @@ function viewPhoto(id){
   overlay.innerHTML = `
     <img src="${data}" style="max-width:100%;max-height:75vh;border-radius:10px;object-fit:contain">
     <div style="display:flex;gap:12px">
-      <button onclick="this.closest('div[style]').remove()"
-        style="background:#fff;color:#1a1d23;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
-        ✕ Close
-      </button>
+      <button onclick="this.closest('div[style]').remove()" style="background:#fff;color:#1a1d23;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">✕ Close</button>
     </div>`;
-  overlay.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
+  overlay.addEventListener('click', function(event){ if(event.target === this) this.remove(); });
   document.body.appendChild(overlay);
 }
 
-/* ════════════════════════════════════════════════════════════════
-   DELETE FOR ALL ENTRIES (including builtin — for testing)
-   ════════════════════════════════════════════════════════════════ */
-/* ─── DELETE INDIVIDUAL ENTRY ────────────────────────────────── */
-function delEntry(id){
-  if(!confirm('Delete this service entry?\n\nThis cannot be undone.')) return;
-  save(getData().filter(e=>e.id!==id));
-  localStorage.removeItem('vz_photo_'+id);
-  renderAll();
-  showToast('Entry deleted');
-}
-/* For builtin entries — asks extra confirmation */
-function delBuiltin(id){
-  if(!confirm('Delete this original service record?\n\n(This is a factory entry — only delete for testing purposes.)')) return;
-  delEntry(id);
-}
-
-/* ════════════════════════════════════════════════════════════════
-   SMART SHOPPING LIST
-   ════════════════════════════════════════════════════════════════ */
-const SHOP_PARTS = {
-  oil: [
-    { name:'Mobil 1 0W-16 Full Synthetic 5 qt', qty:'1 jug (5 qt)', partNum:'B07Y5MG3MX', price:'$27.97', link:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534', note:'Need 4.8 qt — leftover good for top-off', urgent:true },
-    { name:'Toyota OEM Oil Filter 90915-YZZN1', qty:'1 filter', partNum:'90915-YZZN1', price:'$6.57', link:'https://parts.toyota.com/', note:'Always replace with every oil change', urgent:true },
-    { name:'ValvoMax Drain Bag Starter Kit', qty:'1 bag', partNum:'Starter Kit', price:'$19.99', link:'https://www.valvomax.com/collections/all', note:'Reusable — refill bags separately after first use', urgent:false },
-  ],
-  cabin: [
-    { name:'A-Premium Activated Carbon Cabin Filter', qty:'1 filter', partNum:'APCA4605', price:'$11.18', link:'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid', note:'Confirmed fit for 2021 Venza', urgent:true },
-  ],
-  engine_filter: [
-    { name:'Toyota Engine Air Filter', qty:'1 filter', partNum:'17801-YZZ16', price:'$15.59', link:'', note:'Get link at Frank Fletcher Toyota Parts next visit', urgent:true },
-  ],
-  coolant: [
-    { name:'Toyota Super Long Life Coolant (SLLC)', qty:'2 gallons', partNum:'00272-SLLC2', price:'~$30–40', link:'', note:'Pink · Pre-mixed 50/50 · Need ~1.5 gallons for full drain', urgent:true },
-    { name:'Lisle 24680 Spill-Free Funnel', qty:'1 (one-time)', partNum:'Lisle 24680', price:'~$20', link:'https://www.amazon.com/s?k=Lisle+24680', note:'Required for air-free fill', urgent:false },
-  ],
-  trans: [
-    { name:'Toyota ATF WS Transmission Fluid', qty:'4 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Get link at Frank Fletcher Toyota Parts', urgent:true },
-  ],
-  diff: [
-    { name:'Toyota ATF WS Rear Diff Fluid', qty:'2 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Same fluid as transmission — can combine order', urgent:true },
-  ],
-  plugs: [
-    { name:'NGK Iridium Spark Plugs (set of 4)', qty:'4 plugs', partNum:'OEM iridium', price:'~$60–80', link:'https://www.amazon.com/s?k=NGK+iridium+spark+plugs+2021+Toyota+Venza', note:'NGK or Denso OEM only — no substitutes', urgent:true },
-  ],
-};
-
 function renderShop(){
-  const mi = getMi();
-  const status = getSmartStatus(mi);
-  const el = document.getElementById('shopContent');
-
-  // Find what's due within next 15k miles
-  const dueItems = status.filter(i => i.dueMi && (i.status==='overdue'||i.status==='soon'||i.status==='upcoming'));
-  const alwaysOil = status.find(i=>i.id==='oil');
-
-  // Build shopping list
-  let allParts = [];
-  const addedParts = new Set();
-
-  // Always include oil change supplies
-  (SHOP_PARTS.oil||[]).forEach(p=>{ if(!addedParts.has(p.partNum)){ allParts.push({...p,service:'Oil Change + Tire Rotation',serviceIcon:'🔧'}); addedParts.add(p.partNum); } });
-
-  dueItems.forEach(item=>{
-    const parts = SHOP_PARTS[item.id]||[];
-    parts.forEach(p=>{ if(!addedParts.has(p.partNum)){ allParts.push({...p,service:item.name,serviceIcon:item.icon}); addedParts.add(p.partNum); } });
+  const mileage = getMi();
+  const statuses = getAllServiceStatuses(getData(), getProfile(), mileage);
+  const relevant = statuses.filter(item => ['overdue','soon','upcoming'].includes(item.status));
+  const itemsToSource = [];
+  const oilRule = statuses.find(item => item.rule.id === 'routine_oil');
+  if(oilRule) itemsToSource.push(oilRule);
+  relevant.forEach(item => {
+    if(!itemsToSource.find(existing => existing.rule.id === item.rule.id)) itemsToSource.push(item);
   });
 
-  const totalEst = allParts.filter(p=>p.price.startsWith('$')&&!p.price.includes('–')).reduce((a,p)=>a+parseFloat(p.price.replace('$','').replace(',','')||0),0);
+  const parts = [];
+  const seen = new Set();
+  itemsToSource.forEach(item => {
+    (SHOP_PARTS[item.rule.id] || []).forEach(part => {
+      const key = `${part.partNum}|${part.name}`;
+      if(seen.has(key)) return;
+      seen.add(key);
+      parts.push({ ...part, service: item.rule.name });
+    });
+  });
 
-  el.innerHTML = `
+  const totalEstimate = parts.reduce((sum, part) => {
+    if(/^\$\d/.test(part.price)) return sum + toNumber(part.price.replace(/[$,]/g,''), 0);
+    return sum;
+  }, 0);
+
+  const shopContent = document.getElementById('shopContent');
+  if(!shopContent) return;
+
+  if(parts.length === 0){
+    shopContent.innerHTML = `
+      <div class="alert green"><div class="alert-icon">🛒</div><div><strong>No urgent shopping list right now.</strong> Your saved rules do not have any matching parts due soon based on current mileage.</div></div>`;
+    return;
+  }
+
+  shopContent.innerHTML = `
     <div class="alert green" style="margin-bottom:10px">
       <div class="alert-icon">🛒</div>
-      <div><strong>${allParts.length} items</strong> needed for upcoming services · Estimated: ~$${(totalEst||'—')} + dealer parts</div>
+      <div><strong>${parts.length} items</strong> suggested from your rules engine · Estimated visible total: ~$${totalEstimate.toFixed(2)} + dealer-priced parts</div>
     </div>
-
-    <div class="section-label" style="margin-top:0">Based on ${mi.toLocaleString()} current miles</div>
-
-    ${allParts.map((p,i)=>`
-    <div class="card" style="margin-bottom:8px">
-      <div style="padding:12px 14px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px">
-          <div style="flex:1">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">${p.serviceIcon} ${p.service}</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)">${p.name}</div>
+    <div class="section-label" style="margin-top:0">Based on ${formatNumber(mileage)} current miles</div>
+    ${parts.map(part => `
+      <div class="card" style="margin-bottom:8px">
+        <div style="padding:12px 14px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px">
+            <div style="flex:1">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">${escapeHtml(part.service)}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">${escapeHtml(part.name)}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:14px;font-weight:700;color:var(--orange2)">${escapeHtml(part.price)}</div>
+              <div style="font-size:10px;color:var(--text3)">qty: ${escapeHtml(part.qty)}</div>
+            </div>
           </div>
-          <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:14px;font-weight:700;color:var(--orange2)">${p.price}</div>
-            <div style="font-size:10px;color:var(--text3)">qty: ${p.qty}</div>
-          </div>
+          <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-bottom:6px">Part: ${escapeHtml(part.partNum)}</div>
+          ${part.note ? `<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">💡 ${escapeHtml(part.note)}</div>` : ''}
+          ${part.link ? `<a href="${escapeHtml(part.link)}" target="_blank" style="display:inline-block;background:var(--toyota);color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;transition:opacity .2s">→ Buy Now</a>` : `<span style="font-size:11px;color:var(--text3);font-style:italic">⚠ No link saved yet — ask at next purchase</span>`}
         </div>
-        <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-bottom:6px">Part: ${p.partNum}</div>
-        ${p.note?`<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">💡 ${p.note}</div>`:''}
-        ${p.link
-          ?`<a href="${p.link}" target="_blank" style="display:inline-block;background:var(--toyota);color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;transition:opacity .2s">→ Buy Now</a>`
-          :`<span style="font-size:11px;color:var(--text3);font-style:italic">⚠ No link saved yet — ask at next purchase</span>`}
-      </div>
-    </div>`).join('')}
-
+      </div>`).join('')}
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:4px">
       <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💰 Estimated Total</div>
-      <div style="font-size:22px;font-weight:700;font-family:'Bebas Neue',sans-serif;color:var(--text)">~$${totalEst.toFixed(2)} <span style="font-size:12px;color:var(--text3);font-family:'Outfit',sans-serif;font-weight:400">+ dealer-priced parts</span></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px">vs. ~$180–250 at dealer for oil change alone</div>
-    </div>
-  `;
+      <div style="font-size:22px;font-weight:700;font-family:'Bebas Neue',sans-serif;color:var(--text)">~$${totalEstimate.toFixed(2)} <span style="font-size:12px;color:var(--text3);font-family:'Outfit',sans-serif;font-weight:400">+ dealer-priced parts</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">Built from your current profile, mileage, and maintenance rules</div>
+    </div>`;
 }
+
+function renderAll(){
+  renderHeader();
+  renderDash();
+  renderLog();
+  renderUpcoming();
+  renderWarranty();
+  renderSpecs();
+  renderBackup();
+  renderPrintDefaults();
+}
+
+window.onload = () => {
+  initializeAppState();
+  document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+  renderAll();
+};
+
 </script>
 </body>
 </html>
