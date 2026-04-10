@@ -37,16 +37,21 @@
   --shadow-sm:0 1px 4px rgba(0,0,0,.25);
   --safe-top:env(safe-area-inset-top);
   --safe-bot:env(safe-area-inset-bottom);
+  --safe-left:env(safe-area-inset-left);
+  --safe-right:env(safe-area-inset-right);
+  --header-h:64px;
 }
-html{background:var(--bg);height:100%}
+html{background:var(--bg);height:100%;-webkit-text-size-adjust:100%}
 body{
   font-family:'Outfit',sans-serif;
   background:var(--bg);
   color:var(--text);
   min-height:100%;
+  width:100%;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
+a,input,select,textarea,button{touch-action:manipulation}
 button{cursor:pointer;border:none;background:none;font-family:inherit}
 
 /* ─── STATUS BAR SPACER ────────────────────────────────────── */
@@ -61,16 +66,18 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   background:var(--bg1);
   border-bottom:1px solid var(--border);
   padding:12px 16px 10px;
-  display:flex;align-items:center;justify-content:space-between;
+  padding-left:max(16px,var(--safe-left));
+  padding-right:max(16px,var(--safe-right));
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
   position:sticky;top:0;z-index:200;
   box-shadow:var(--shadow-sm);
 }
-.header-left{}
+.header-left{min-width:0;flex:1}
 .header-logo{
   font-family:'Bebas Neue',sans-serif;
-  font-size:26px;letter-spacing:3px;
+  font-size:clamp(22px,6.5vw,26px);letter-spacing:3px;
   color:var(--text);line-height:1;
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;gap:6px;min-width:0;
 }
 .header-logo-dot{
   width:8px;height:8px;border-radius:50%;
@@ -82,7 +89,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   font-size:10px;color:var(--text3);
   letter-spacing:1.5px;text-transform:uppercase;
   font-family:'JetBrains Mono',monospace;
-  margin-top:2px;
+  margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .mileage-pill{
   background:var(--bg3);
@@ -93,6 +100,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   cursor:pointer;
   transition:all .2s;
   box-shadow:var(--shadow-sm);
+  flex-shrink:0;
 }
 .mileage-pill:active{opacity:.7;transform:scale(.97)}
 .mileage-pill:hover{border-color:var(--green2);background:var(--bg4)}
@@ -103,37 +111,43 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 }
 .mi-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
 
-/* ─── NAV TABS ─────────────────────────────────────────────── */
+/* ─── NAV MENU ─────────────────────────────────────────────── */
 .nav-wrap{
-  position:sticky;top:65px;z-index:190;
+  position:sticky;top:var(--header-h);z-index:190;
   background:var(--bg1);
   border-bottom:1px solid var(--border);
   box-shadow:var(--shadow-sm);
+  padding:8px 16px;
+  padding-left:max(16px,var(--safe-left));
+  padding-right:max(16px,var(--safe-right));
 }
-.nav{
-  display:flex;
-  overflow-x:auto;
-  scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
-  padding:0 4px;
+.nav-trigger{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;
+  padding:11px 14px;box-shadow:var(--shadow-sm);
 }
-.nav::-webkit-scrollbar{display:none}
-.nav-btn{
-  flex:none;
-  padding:10px 14px;
-  font-family:'Outfit',sans-serif;
-  font-size:12px;font-weight:600;
-  color:var(--text3);
-  border-bottom:2px solid transparent;
-  letter-spacing:.5px;
-  white-space:nowrap;
-  transition:all .2s;
-  text-transform:uppercase;
+.nav-trigger-left{display:flex;flex-direction:column;align-items:flex-start;min-width:0;flex:1}
+.nav-trigger-kicker{font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.nav-trigger-label{font-size:13px;font-weight:600;color:var(--text);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-trigger-chevron{font-size:18px;color:var(--text2);line-height:1;transition:transform .2s ease;flex-shrink:0}
+.nav-wrap.open .nav-trigger-chevron{transform:rotate(180deg)}
+.nav-menu{display:none;margin-top:8px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.nav-wrap.open .nav-menu{display:block;animation:fadeUp .18s ease both}
+.nav-option{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:13px 14px;text-align:left;color:var(--text2);font-size:13px;font-weight:600;
+  border-bottom:1px solid var(--border);background:transparent;
 }
-.nav-btn.active{color:var(--toyota);border-bottom-color:var(--toyota)}
+.nav-option:last-child{border-bottom:none}
+.nav-option.active{color:var(--toyota);background:rgba(235,10,30,.06)}
+.nav-option-label{display:flex;align-items:center;gap:10px;min-width:0}
+.nav-option-check{color:var(--toyota);font-size:12px;opacity:0;transition:opacity .2s}
+.nav-option.active .nav-option-check{opacity:1}
 
 /* ─── PAGES ────────────────────────────────────────────────── */
 .page{display:none;padding:16px;max-width:600px;margin:0 auto;
+  padding-left:max(16px,var(--safe-left));
+  padding-right:max(16px,var(--safe-right));
   padding-bottom:calc(24px + var(--safe-bot));}
 .page.active{display:block;animation:fadeUp .25s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -211,8 +225,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 }
 .hero-mi{
   font-family:'Bebas Neue',sans-serif;
-  font-size:48px;line-height:1;
-  color:#ffffff;
+  font-size:clamp(34px,10vw,48px);line-height:1.02;
+  color:#ffffff;overflow-wrap:anywhere;
 }
 .hero-mi span{color:#ff6b7a}
 .hero-desc{font-size:12px;color:rgba(255,255,255,.55);margin-top:4px;line-height:1.5}
@@ -608,7 +622,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .sched-replace{color:var(--green2);font-size:14px;font-weight:700}
 .sched-inspect{color:var(--gold2);font-size:12px}
 .sched-note{font-size:10px;color:var(--text3)}
-.sched-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.sched-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid var(--border)}
 /* ─── SMART MAINTENANCE ITEM ────────────────────────────────── */
 .sm-item{
   display:flex;align-items:center;gap:10px;
@@ -632,6 +646,23 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .sm-soon{background:rgba(217,122,0,.12);color:var(--orange2);border:1px solid rgba(217,122,0,.3)}
 .sm-upcoming{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
 .sm-future{background:var(--bg4);color:var(--text3);border:1px solid var(--border2)}
+
+@supports (-webkit-touch-callout:none){
+  .fi,.fs,.ft{font-size:16px}
+}
+@media (max-width:430px){
+  .header{align-items:flex-start}
+  .mileage-pill{padding:6px 12px}
+  .fg2,.btn-row{grid-template-columns:1fr}
+  .guide-head{gap:10px}
+  .guide-head-left{min-width:0;flex:1}
+  .guide-title{font-size:clamp(14px,4.8vw,16px)}
+  .modal{padding-left:14px;padding-right:14px}
+}
+@media (max-width:360px){
+  .gauges{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -654,19 +685,26 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 </header>
 
 <!-- NAV -->
-<div class="nav-wrap">
-  <nav class="nav">
-    <button class="nav-btn active" onclick="go('dash')">Dashboard</button>
-    <button class="nav-btn" onclick="go('log')">Service Log</button>
-    <button class="nav-btn" onclick="go('upcoming')">Schedule</button>
-    <button class="nav-btn" onclick="go('parts')">Parts</button>
-    <button class="nav-btn" onclick="go('guides')">Guides</button>
-    <button class="nav-btn" onclick="go('warranty')">Warranty</button>
-    <button class="nav-btn" onclick="go('specs')">Specs</button>
-    <button class="nav-btn" onclick="go('backup')">⚙ Backup</button>
-    <button class="nav-btn" onclick="go('printlog')">🖨 Print</button>
-    <button class="nav-btn" onclick="go('shop')">🛒 Shopping</button>
-  </nav>
+<div class="nav-wrap" id="navWrap">
+  <button class="nav-trigger" id="navTrigger" type="button" onclick="toggleNavMenu()" aria-expanded="false" aria-controls="navMenu">
+    <span class="nav-trigger-left">
+      <span class="nav-trigger-kicker">Menu</span>
+      <span class="nav-trigger-label" id="navMenuLabel">Dashboard</span>
+    </span>
+    <span class="nav-trigger-chevron">▾</span>
+  </button>
+  <div class="nav-menu" id="navMenu">
+    <button class="nav-option active" data-page="dash" type="button" onclick="go('dash')"><span class="nav-option-label">Dashboard</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="log" type="button" onclick="go('log')"><span class="nav-option-label">Service Log</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="upcoming" type="button" onclick="go('upcoming')"><span class="nav-option-label">Schedule</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="parts" type="button" onclick="go('parts')"><span class="nav-option-label">Parts</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="guides" type="button" onclick="go('guides')"><span class="nav-option-label">Guides</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="warranty" type="button" onclick="go('warranty')"><span class="nav-option-label">Warranty</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="specs" type="button" onclick="go('specs')"><span class="nav-option-label">Specs</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="backup" type="button" onclick="go('backup')"><span class="nav-option-label">⚙ Backup</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="printlog" type="button" onclick="go('printlog')"><span class="nav-option-label">🖨 Print</span><span class="nav-option-check">✓</span></button>
+    <button class="nav-option" data-page="shop" type="button" onclick="go('shop')"><span class="nav-option-label">🛒 Shopping</span><span class="nav-option-check">✓</span></button>
+  </div>
 </div>
 
 <!-- ═══ DASHBOARD ═══════════════════════════════════════════════ -->
@@ -1972,12 +2010,60 @@ function heroLastText(bundle){
   return `Last: ${lastDate} · ${lastMi}`;
 }
 
+const NAV_LABELS = {
+  dash:'Dashboard',
+  log:'Service Log',
+  upcoming:'Schedule',
+  parts:'Parts',
+  guides:'Guides',
+  warranty:'Warranty',
+  specs:'Specs',
+  backup:'⚙ Backup',
+  printlog:'🖨 Print',
+  shop:'🛒 Shopping',
+  add:'Add Entry'
+};
+function syncChromeOffsets(){
+  const header = document.querySelector('.header');
+  if(header){
+    document.documentElement.style.setProperty('--header-h', `${Math.round(header.offsetHeight)}px`);
+  }
+}
+function updateNavState(id){
+  const label = document.getElementById('navMenuLabel');
+  if(label) label.textContent = NAV_LABELS[id] || 'Menu';
+  document.querySelectorAll('.nav-option').forEach(btn=>btn.classList.remove('active'));
+  const active = document.querySelector(`.nav-option[data-page="${id}"]`);
+  if(active) active.classList.add('active');
+}
+function toggleNavMenu(force){
+  const wrap = document.getElementById('navWrap');
+  const trigger = document.getElementById('navTrigger');
+  if(!wrap || !trigger) return;
+  const open = typeof force === 'boolean' ? force : !wrap.classList.contains('open');
+  wrap.classList.toggle('open', open);
+  trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeNavMenu(){
+  toggleNavMenu(false);
+}
+
 /* ─── INIT ──────────────────────────────────────────────── */
 window.onload=()=>{
   if(!localStorage.getItem('vz_log'))save(DEFAULT);
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   renderAll();
+  updateNavState('dash');
+  syncChromeOffsets();
+  requestAnimationFrame(syncChromeOffsets);
+  setTimeout(syncChromeOffsets, 250);
 };
+window.addEventListener('resize', syncChromeOffsets);
+window.addEventListener('orientationchange', ()=>setTimeout(syncChromeOffsets, 200));
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('navWrap');
+  if(wrap && !wrap.contains(e.target)) closeNavMenu();
+});
 
 function renderAll(){
   renderDash();
@@ -2210,14 +2296,14 @@ document.getElementById('miModal').addEventListener('click',function(e){
 /* ─── NAV ────────────────────────────────────────────────── */
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,shop:9,add:-1};
   document.getElementById('page-'+id).classList.add('active');
-  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
+  updateNavState(id);
+  closeNavMenu();
   if(id==='backup')renderBackup();
   if(id==='upcoming')renderUpcoming();
   if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
   if(id==='shop')renderShop();
+  syncChromeOffsets();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
