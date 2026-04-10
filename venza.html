@@ -111,26 +111,33 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   box-shadow:var(--shadow-sm);
 }
 .nav{
-  display:flex;
-  overflow-x:auto;
-  scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
-  padding:0 4px;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+  padding:8px 10px 10px;
 }
-.nav::-webkit-scrollbar{display:none}
 .nav-btn{
-  flex:none;
-  padding:10px 14px;
+  width:100%;
+  min-width:0;
+  padding:9px 6px;
   font-family:'Outfit',sans-serif;
-  font-size:12px;font-weight:600;
-  color:var(--text3);
-  border-bottom:2px solid transparent;
-  letter-spacing:.5px;
-  white-space:nowrap;
+  font-size:11px;font-weight:600;
+  color:var(--text2);
+  border:1px solid var(--border2);
+  border-radius:10px;
+  background:var(--bg3);
+  letter-spacing:.35px;
+  white-space:normal;
+  line-height:1.2;
+  text-align:center;
   transition:all .2s;
   text-transform:uppercase;
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-.nav-btn.active{color:var(--toyota);border-bottom-color:var(--toyota)}
+.nav-btn.active{color:var(--toyota);border-color:rgba(235,10,30,.38);background:rgba(235,10,30,.06)}
 
 /* ─── PAGES ────────────────────────────────────────────────── */
 .page{display:none;padding:16px;max-width:600px;margin:0 auto;
@@ -227,10 +234,10 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   transition:width 1.2s cubic-bezier(.25,.46,.45,.94);
 }
 .progress-labels{
-  display:flex;justify-content:space-between;
+  display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;
   margin-top:5px;
   font-family:'JetBrains Mono',monospace;
-  font-size:9px;color:var(--text3);
+  font-size:8px;color:var(--text3);
 }
 
 /* ─── GAUGE GRID ───────────────────────────────────────────── */
