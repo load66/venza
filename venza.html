@@ -274,7 +274,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .log-item{
   background:var(--bg2);border:1px solid var(--border);
   border-left:3px solid var(--green);
-  border-radius:10px;padding:14px;margin-bottom:8px;
+  border-radius:10px;padding:14px 40px 14px 14px;margin-bottom:8px;
   position:relative;
   box-shadow:var(--shadow-sm);
 }
@@ -297,10 +297,18 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
 .delete-btn{
   position:absolute;top:10px;right:10px;
-  color:var(--text3);font-size:14px;padding:4px;
-  transition:color .2s;
+  color:#ffffff;
+  background:var(--toyota);
+  border-radius:50%;
+  width:22px;height:22px;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+  opacity:0.7;
+  line-height:1;
 }
-.delete-btn:hover{color:var(--toyota)}
+.delete-btn:hover{opacity:1;transform:scale(1.1)}
+.delete-btn:active{transform:scale(.95)}
 .total-row{
   background:var(--bg4);border:1px solid var(--border2);
   border-radius:12px;padding:14px 16px;
@@ -657,6 +665,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
     <button class="nav-btn" onclick="go('specs')">Specs</button>
     <button class="nav-btn" onclick="go('backup')">⚙ Backup</button>
     <button class="nav-btn" onclick="go('printlog')">🖨 Print</button>
+    <button class="nav-btn" onclick="go('shop')">🛒 Shopping</button>
   </nav>
 </div>
 
@@ -776,11 +785,39 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
       <label>Purchase Link (optional)</label>
       <input type="url" class="fi" id="fLink" placeholder="https://...">
     </div>
+    <!-- RECEIPT PHOTO UPLOAD -->
+    <div class="fl">
+      <label>Receipt / Photo (optional)</label>
+      <div id="fPhotoArea" style="border:2px dashed var(--border2);border-radius:10px;
+           padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
+           onclick="document.getElementById('fPhotoInput').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--toyota)'"
+           ondragleave="this.style.borderColor='var(--border2)'"
+           ondrop="handlePhotoDrop(event)">
+        <div id="fPhotoPreview" style="display:none">
+          <img id="fPhotoImg" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain">
+          <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+            <button onclick="event.stopPropagation();clearPhoto()" style="font-size:11px;color:var(--toyota);background:none;border:none;cursor:pointer;padding:4px 8px">✕ Remove</button>
+          </div>
+        </div>
+        <div id="fPhotoPlaceholder">
+          <div style="font-size:28px;margin-bottom:6px">📷</div>
+          <div style="font-size:13px;color:var(--text2);font-weight:500">Tap to add receipt photo</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">Camera or Photo Library · Stored locally · Included in PDF</div>
+        </div>
+      </div>
+      <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
+    </div>
     <div class="btn-row">
       <button class="btn-ghost" onclick="go('log')">Cancel</button>
       <button class="btn-primary" onclick="saveEntry()">Save Entry</button>
     </div>
   </div>
+</div>
+
+<!-- ═══ SMART SHOPPING LIST ══════════════════════════════════════ -->
+<div id="page-shop" class="page">
+  <div id="shopContent"></div>
 </div>
 
 <!-- ═══ UPCOMING SCHEDULE ════════════════════════════════════════ -->
@@ -1701,7 +1738,23 @@ function renderLog(){
     const dt=new Date(e.date+'T00:00:00');
     const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const lnk=e.link?`<a class="log-link" href="${e.link}" target="_blank">→ ${new URL(e.link).hostname}</a>`:'';
-    const del=!e.builtin?`<button class="delete-btn" onclick="delEntry(${e.id})">✕</button>`:'';
+    const del=!e.builtin
+      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
+      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    // Receipt photo
+    const photo=getPhoto(e.id);
+    const photoHtml=photo
+      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+        </div>`
+      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+          background:none;cursor:pointer;width:100%;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+          📷 Add Receipt Photo
+        </button>`;
     return`<div class="log-item ${!e.builtin?'user-entry':''}">
       ${del}
       <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
@@ -1711,6 +1764,7 @@ function renderLog(){
         <div><div class="log-shop">${e.shop||''}</div>${lnk}</div>
         <div class="log-cost">$${parseFloat(e.cost||0).toFixed(2)}</div>
       </div>
+      ${photoHtml}
     </div>`;
   }).join('');
   let tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
@@ -1731,13 +1785,20 @@ function saveEntry(){
   const shop=document.getElementById('fShop').value.trim();
   const link=document.getElementById('fLink').value.trim();
   if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
+  const newId=Date.now();
   const d=getData();
-  d.push({id:Date.now(),date,mi:parseInt(mi),type,desc,cost:parseFloat(cost)||0,shop,link,builtin:false});
+  d.push({id:newId,date,mi:parseInt(mi),type,desc,cost:parseFloat(cost)||0,shop,link,builtin:false});
   save(d);
+  // Save photo if one was selected
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
   if(parseInt(mi)>getMi())setMi(parseInt(mi));
   renderAll();go('log');
   ['fMi','fCost','fShop','fLink','fDesc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fType').value='';
+  clearPhoto();
   showToast('Entry saved ✓');
 }
 function delEntry(id){
@@ -1844,13 +1905,13 @@ function go(id){
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,add:-1};
+  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,shop:9,add:-1};
   document.getElementById('page-'+id).classList.add('active');
   const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
   if(id==='backup')renderBackup();
-  if(id==='printlog'){
-    document.getElementById('prMileage').value = getMi();
-  }
+  if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
+  if(id==='shop')renderShop();
+  if(id==='shop') renderShop();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -2026,6 +2087,31 @@ function generatePrint(){
       <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${label}</td>
     </tr>`;
   }).filter(Boolean).join('');
+
+  // Collect photos for PDF
+  const photoEntries = entries.filter(e => getPhoto(e.id));
+  const photoSection = photoEntries.length > 0 ? `
+  <!-- SECTION: RECEIPT PHOTOS -->
+  <div class="section" style="page-break-before:always">
+    <div class="section-head">
+      <div class="section-num">${photoEntries.length > 0 ? '5' : ''}</div>
+      <div class="section-title">Receipt Photos (${photoEntries.length} Attached)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      ${photoEntries.map(e=>{
+        const dt = new Date(e.date+'T00:00:00');
+        const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        return `<div style="border:1px solid #e2e4e8;border-radius:10px;overflow:hidden">
+          <div style="background:#1a1d23;padding:8px 12px;display:flex;justify-content:space-between">
+            <span style="color:#fff;font-size:11px;font-weight:600">${LABELS[e.type]||'Service'}</span>
+            <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi).toLocaleString()} mi</span>
+          </div>
+          <img src="${getPhoto(e.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
+          <div style="padding:8px 12px;font-size:11px;color:#555">${e.shop||'DIY'} · $${parseFloat(e.cost||0).toFixed(2)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>` : '';
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -2298,6 +2384,8 @@ function generatePrint(){
 
 </div>
 
+\${photoSection}
+
 <!-- ── FOOTER ────────────────────────────────────────────────── -->
 <div class="footer">
   <div class="footer-note">
@@ -2314,6 +2402,210 @@ function generatePrint(){
   if(!w){ showToast('Allow popups to open the report'); return; }
   w.document.write(html);
   w.document.close();
+}
+/* ════════════════════════════════════════════════════════════════
+   PHOTO RECEIPT SYSTEM
+   ════════════════════════════════════════════════════════════════ */
+
+/* Storage: photos kept separate from log data to avoid size issues */
+function getPhoto(id){ return localStorage.getItem('vz_photo_'+id)||null; }
+function savePhoto(id,data){ try{ localStorage.setItem('vz_photo_'+id,data); }catch(e){ showToast('Photo too large — try a smaller image'); } }
+function removePhoto(id){ localStorage.removeItem('vz_photo_'+id); renderLog(); showToast('Photo removed'); }
+
+/* Compress image to max 800px wide, 70% quality JPEG */
+function compressImage(file, cb){
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const MAX = 900;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = Math.round(h * MAX/w); w = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      cb(canvas.toDataURL('image/jpeg', 0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Handle photo selected from file input on ADD FORM */
+function handlePhotoSelect(input){
+  if(!input.files[0]) return;
+  compressImage(input.files[0], function(data){
+    window._pendingPhoto = data;
+    document.getElementById('fPhotoImg').src = data;
+    document.getElementById('fPhotoPreview').style.display = 'block';
+    document.getElementById('fPhotoPlaceholder').style.display = 'none';
+    document.getElementById('fPhotoArea').style.borderColor = 'var(--green2)';
+  });
+}
+
+/* Handle drag-and-drop */
+function handlePhotoDrop(e){
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if(file && file.type.startsWith('image/')){
+    compressImage(file, function(data){
+      window._pendingPhoto = data;
+      document.getElementById('fPhotoImg').src = data;
+      document.getElementById('fPhotoPreview').style.display = 'block';
+      document.getElementById('fPhotoPlaceholder').style.display = 'none';
+    });
+  }
+}
+
+/* Clear photo from ADD FORM */
+function clearPhoto(){
+  window._pendingPhoto = null;
+  document.getElementById('fPhotoInput').value = '';
+  document.getElementById('fPhotoPreview').style.display = 'none';
+  document.getElementById('fPhotoPlaceholder').style.display = 'block';
+  document.getElementById('fPhotoArea').style.borderColor = 'var(--border2)';
+  const img = document.getElementById('fPhotoImg');
+  if(img) img.src = '';
+}
+
+/* Add photo to EXISTING log entry */
+function addPhotoToEntry(id){
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = function(){
+    if(!input.files[0]) return;
+    compressImage(input.files[0], function(data){
+      savePhoto(id, data);
+      renderLog();
+      showToast('Receipt photo saved ✓');
+    });
+  };
+  input.click();
+}
+
+/* View photo full screen */
+function viewPhoto(id){
+  const data = getPhoto(id);
+  if(!data) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px';
+  overlay.innerHTML = `
+    <img src="${data}" style="max-width:100%;max-height:75vh;border-radius:10px;object-fit:contain">
+    <div style="display:flex;gap:12px">
+      <button onclick="this.closest('div[style]').remove()"
+        style="background:#fff;color:#1a1d23;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
+        ✕ Close
+      </button>
+    </div>`;
+  overlay.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
+  document.body.appendChild(overlay);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DELETE FOR ALL ENTRIES (including builtin — for testing)
+   ════════════════════════════════════════════════════════════════ */
+/* ─── DELETE INDIVIDUAL ENTRY ────────────────────────────────── */
+function delEntry(id){
+  if(!confirm('Delete this service entry?\n\nThis cannot be undone.')) return;
+  save(getData().filter(e=>e.id!==id));
+  localStorage.removeItem('vz_photo_'+id);
+  renderAll();
+  showToast('Entry deleted');
+}
+/* For builtin entries — asks extra confirmation */
+function delBuiltin(id){
+  if(!confirm('Delete this original service record?\n\n(This is a factory entry — only delete for testing purposes.)')) return;
+  delEntry(id);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SMART SHOPPING LIST
+   ════════════════════════════════════════════════════════════════ */
+const SHOP_PARTS = {
+  oil: [
+    { name:'Mobil 1 0W-16 Full Synthetic 5 qt', qty:'1 jug (5 qt)', partNum:'B07Y5MG3MX', price:'$27.97', link:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534', note:'Need 4.8 qt — leftover good for top-off', urgent:true },
+    { name:'Toyota OEM Oil Filter 90915-YZZN1', qty:'1 filter', partNum:'90915-YZZN1', price:'$6.57', link:'https://parts.toyota.com/', note:'Always replace with every oil change', urgent:true },
+    { name:'ValvoMax Drain Bag Starter Kit', qty:'1 bag', partNum:'Starter Kit', price:'$19.99', link:'https://www.valvomax.com/collections/all', note:'Reusable — refill bags separately after first use', urgent:false },
+  ],
+  cabin: [
+    { name:'A-Premium Activated Carbon Cabin Filter', qty:'1 filter', partNum:'APCA4605', price:'$11.18', link:'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid', note:'Confirmed fit for 2021 Venza', urgent:true },
+  ],
+  engine_filter: [
+    { name:'Toyota Engine Air Filter', qty:'1 filter', partNum:'17801-YZZ16', price:'$15.59', link:'', note:'Get link at Frank Fletcher Toyota Parts next visit', urgent:true },
+  ],
+  coolant: [
+    { name:'Toyota Super Long Life Coolant (SLLC)', qty:'2 gallons', partNum:'00272-SLLC2', price:'~$30–40', link:'', note:'Pink · Pre-mixed 50/50 · Need ~1.5 gallons for full drain', urgent:true },
+    { name:'Lisle 24680 Spill-Free Funnel', qty:'1 (one-time)', partNum:'Lisle 24680', price:'~$20', link:'https://www.amazon.com/s?k=Lisle+24680', note:'Required for air-free fill', urgent:false },
+  ],
+  trans: [
+    { name:'Toyota ATF WS Transmission Fluid', qty:'4 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Get link at Frank Fletcher Toyota Parts', urgent:true },
+  ],
+  diff: [
+    { name:'Toyota ATF WS Rear Diff Fluid', qty:'2 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Same fluid as transmission — can combine order', urgent:true },
+  ],
+  plugs: [
+    { name:'NGK Iridium Spark Plugs (set of 4)', qty:'4 plugs', partNum:'OEM iridium', price:'~$60–80', link:'https://www.amazon.com/s?k=NGK+iridium+spark+plugs+2021+Toyota+Venza', note:'NGK or Denso OEM only — no substitutes', urgent:true },
+  ],
+};
+
+function renderShop(){
+  const mi = getMi();
+  const status = getSmartStatus(mi);
+  const el = document.getElementById('shopContent');
+
+  // Find what's due within next 15k miles
+  const dueItems = status.filter(i => i.dueMi && (i.status==='overdue'||i.status==='soon'||i.status==='upcoming'));
+  const alwaysOil = status.find(i=>i.id==='oil');
+
+  // Build shopping list
+  let allParts = [];
+  const addedParts = new Set();
+
+  // Always include oil change supplies
+  (SHOP_PARTS.oil||[]).forEach(p=>{ if(!addedParts.has(p.partNum)){ allParts.push({...p,service:'Oil Change + Tire Rotation',serviceIcon:'🔧'}); addedParts.add(p.partNum); } });
+
+  dueItems.forEach(item=>{
+    const parts = SHOP_PARTS[item.id]||[];
+    parts.forEach(p=>{ if(!addedParts.has(p.partNum)){ allParts.push({...p,service:item.name,serviceIcon:item.icon}); addedParts.add(p.partNum); } });
+  });
+
+  const totalEst = allParts.filter(p=>p.price.startsWith('$')&&!p.price.includes('–')).reduce((a,p)=>a+parseFloat(p.price.replace('$','').replace(',','')||0),0);
+
+  el.innerHTML = `
+    <div class="alert green" style="margin-bottom:10px">
+      <div class="alert-icon">🛒</div>
+      <div><strong>${allParts.length} items</strong> needed for upcoming services · Estimated: ~$${(totalEst||'—')} + dealer parts</div>
+    </div>
+
+    <div class="section-label" style="margin-top:0">Based on ${mi.toLocaleString()} current miles</div>
+
+    ${allParts.map((p,i)=>`
+    <div class="card" style="margin-bottom:8px">
+      <div style="padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px">
+          <div style="flex:1">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">${p.serviceIcon} ${p.service}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${p.name}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:14px;font-weight:700;color:var(--orange2)">${p.price}</div>
+            <div style="font-size:10px;color:var(--text3)">qty: ${p.qty}</div>
+          </div>
+        </div>
+        <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-bottom:6px">Part: ${p.partNum}</div>
+        ${p.note?`<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">💡 ${p.note}</div>`:''}
+        ${p.link
+          ?`<a href="${p.link}" target="_blank" style="display:inline-block;background:var(--toyota);color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;transition:opacity .2s">→ Buy Now</a>`
+          :`<span style="font-size:11px;color:var(--text3);font-style:italic">⚠ No link saved yet — ask at next purchase</span>`}
+      </div>
+    </div>`).join('')}
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:4px">
+      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💰 Estimated Total</div>
+      <div style="font-size:22px;font-weight:700;font-family:'Bebas Neue',sans-serif;color:var(--text)">~$${totalEst.toFixed(2)} <span style="font-size:12px;color:var(--text3);font-family:'Outfit',sans-serif;font-weight:400">+ dealer-priced parts</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">vs. ~$180–250 at dealer for oil change alone</div>
+    </div>
+  `;
 }
 </script>
 </body>
