@@ -1285,10 +1285,11 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
         <div class="wc-title">Powertrain Warranty</div>
         <div class="wc-sub">Engine, transmission, drivetrain</div>
       </div>
-      <div class="wc-badge active">Active</div>
+      <div class="wc-badge expired">Expired</div>
     </div>
     <div class="wc-body">
       <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / 60,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Exceeded mileage limit — 64,751 mi &gt; 60,000 mi</span></div>
       <div class="wc-row"><span class="wc-row-k">Covers</span><span class="wc-row-v">Engine internals, transmission, axles, drive shafts, CV joints, seals</span></div>
     </div>
   </div>
@@ -1300,10 +1301,11 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
         <div class="wc-title">Basic / Bumper-to-Bumper</div>
         <div class="wc-sub">Defects in materials or workmanship</div>
       </div>
-      <div class="wc-badge expired">Likely Expired</div>
+      <div class="wc-badge expired">Expired</div>
     </div>
     <div class="wc-body">
       <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">36 Months / 36,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Both limits exceeded — ~5 yrs &amp; 64,751 mi</span></div>
       <div class="wc-row"><span class="wc-row-k">Note</span><span class="wc-row-v">Excludes: wear items, maintenance, environmental damage, misuse</span></div>
     </div>
   </div>
@@ -1313,26 +1315,30 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
       <div class="wc-icon">💺</div>
       <div>
         <div class="wc-title">Restraint Systems</div>
-        <div class="wc-sub">Seatbelts & airbags</div>
+        <div class="wc-sub">Seatbelts &amp; airbags</div>
       </div>
-      <div class="wc-badge active">Active</div>
+      <div class="wc-badge expired">Expired</div>
     </div>
     <div class="wc-body">
       <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / 60,000 Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Exceeded mileage limit — 64,751 mi &gt; 60,000 mi</span></div>
     </div>
   </div>
 
   <div class="warranty-card">
     <div class="wc-head">
-      <div class="wc-icon">🦠</div>
+      <div class="wc-icon">🛡️</div>
       <div>
         <div class="wc-title">Corrosion Perforation</div>
         <div class="wc-sub">Body panel rust-through</div>
       </div>
-      <div class="wc-badge active">Active</div>
+      <div class="wc-badge check">Verify Date</div>
     </div>
     <div class="wc-body">
-      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months / Unlimited Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months — Unlimited Miles</span></div>
+      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Date-dependent — verify your in-service date</span></div>
+      <div class="wc-row"><span class="wc-row-k">How to Check</span><span class="wc-row-v">If in-service before ~Apr 2021 → expired. After Apr 2021 → still active.</span></div>
+      <div class="wc-row"><span class="wc-row-k">Confirm At</span><span class="wc-row-v">toyota.com/owners or call (800) 331-4331</span></div>
     </div>
   </div>
 
@@ -1499,7 +1505,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 
   <div class="alert blue">
     <div class="alert-icon">🖨️</div>
-    <div><strong>Professional Maintenance Record</strong> — generates a printable PDF-ready report that Toyota dealerships and service centers recognize as a valid DIY maintenance record.</div>
+    <div><strong>Professional Maintenance Record</strong> — generates a printable PDF-ready document showing your complete DIY service history. Per your Toyota manual, non-dealer maintenance does not void your warranty — this record helps you demonstrate proper maintenance if ever needed.</div>
   </div>
 
   <div class="form-section">
@@ -1892,15 +1898,6 @@ document.getElementById('miModal').addEventListener('click',function(e){
 });
 
 /* ─── NAV ────────────────────────────────────────────────── */
-function go(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,add:-1};
-  document.getElementById('page-'+id).classList.add('active');
-  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
 /* ─── NAV ────────────────────────────────────────────────── */
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1911,7 +1908,6 @@ function go(id){
   if(id==='backup')renderBackup();
   if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
   if(id==='shop')renderShop();
-  if(id==='shop') renderShop();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1954,7 +1950,8 @@ function renderBackup(){
   const tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
   const sorted=[...d].sort((a,b)=>b.mi-a.mi);
   const last=sorted[0];
-  document.getElementById('bkCount').textContent=d.length+' entries';
+  const photoCount=d.filter(e=>getPhoto(e.id)).length;
+  document.getElementById('bkCount').textContent=d.length+' entries · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
   document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
   document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
   if(last){
@@ -1967,14 +1964,25 @@ function renderBackup(){
 
 /* ─── EXPORT (BACKUP) ────────────────────────────────────── */
 function exportData(){
+  // Collect all receipt photos from localStorage
+  const photos = {};
+  const entries = getData();
+  entries.forEach(e=>{
+    const p = getPhoto(e.id);
+    if(p) photos[e.id] = p;
+  });
+
   const payload={
-    version: 1,
+    version: 2,
     exported: new Date().toISOString(),
     vin: VIN,
     vehicle: '2021 Toyota Venza Hybrid AWD',
     mileage: getMi(),
-    entries: getData()
+    entries: entries,
+    photos: photos  // base64 images keyed by entry id
   };
+
+  const photoCount = Object.keys(photos).length;
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -1985,7 +1993,7 @@ function exportData(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('Backup downloaded ✓ Save to iCloud!');
+  showToast(`Backup saved ✓ — ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}`);
 }
 
 /* ─── IMPORT (RESTORE) ───────────────────────────────────── */
@@ -1997,23 +2005,33 @@ function importData(input){
   reader.onload=function(e){
     try{
       const data=JSON.parse(e.target.result);
-      // Support both direct array and wrapped backup format
       const entries=Array.isArray(data)?data:(data.entries||null);
       const mi=data.mileage||null;
+      const photos=data.photos||{};
+      const photoCount=Object.keys(photos).length;
+
       if(!entries||!Array.isArray(entries)){
         showToast('❌ Invalid backup file format');return;
       }
-      if(!confirm('This will replace all '+getData().length+' current entries with '+entries.length+' entries from backup. Continue?')){
+      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?\n\nThis replaces all current data. Continue?`)){
         input.value='';return;
       }
+
+      // Restore entries
       save(entries);
       if(mi&&mi>0)setMi(mi);
+
+      // Restore photos
+      Object.entries(photos).forEach(([id,imgData])=>{
+        try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
+      });
+
       renderAll();
       renderBackup();
       input.value='';
-      showToast('✓ Restored '+entries.length+' entries!');
+      showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}!`);
     }catch(err){
-      showToast('❌ Could not read file');
+      showToast('❌ Could not read backup file');
     }
   };
   reader.readAsText(file);
@@ -2022,6 +2040,8 @@ function importData(input){
 /* ─── RESET DATA ─────────────────────────────────────────── */
 function resetData(){
   if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
+  // Clear all photos first
+  getData().forEach(e=>localStorage.removeItem('vz_photo_'+e.id));
   save(DEFAULT);
   setMi(64751);
   renderAll();
@@ -2238,7 +2258,7 @@ function generatePrint(){
       <div class="brand-icon">🚗</div>
       <div>
         <div class="brand-name">VEHICLE MAINTENANCE RECORD</div>
-        <div class="brand-sub">Official DIY Service Documentation</div>
+        <div class="brand-sub">Owner-Kept Service Documentation</div>
       </div>
     </div>
     <div class="doc-label">
@@ -2390,7 +2410,7 @@ ${photoSection}
 <div class="footer">
   <div class="footer-note">
     <strong>Vehicle:</strong> ${model} · <strong>VIN:</strong> ${VIN} · <strong>Generated:</strong> ${today} by Venza Garage App<br>
-    This document complies with Toyota's owner maintenance policy per the 2021 Venza Warranty &amp; Maintenance Guide. Retain all receipts and invoices with this record.
+    This record was prepared by the vehicle owner per the 2021 Toyota Venza Warranty &amp; Maintenance Guide, which states Toyota will not deny a warranty claim solely because maintenance was performed by a non-dealer. Retain all receipts and invoices with this record.
   </div>
   <div class="footer-page">Page 1 of 1<br>Document #VMR-${todayISO.replace(/-/g,'')}</div>
 </div>
