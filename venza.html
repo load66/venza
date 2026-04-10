@@ -1852,7 +1852,8 @@ function normalizeMasterSourceFingerprint(source){
   const store = (source.store||'').trim().toLowerCase();
   const label = (source.label||'').trim().toLowerCase();
   const price = Number.isFinite(Number(source.unitPrice)) ? Number(source.unitPrice).toFixed(2) : '0.00';
-  return [url,store,label,price].join('|');
+  if(url) return [url,price].join('|');
+  return [store,label,price].join('|');
 }
 function normalizeMasterPartSources(sources){
   if(!Array.isArray(sources)) return [];
@@ -1900,6 +1901,58 @@ function saveMasterParts(parts){
 function normalizeKey(value=''){
   return String(value).toLowerCase().replace(/[^a-z0-9]+/g,'');
 }
+function normalizeComparableName(value=''){
+  return String(value)
+    .toLowerCase()
+    .replace(/mobil\s+1/g,'mobil1')
+    .replace(/0w[-\s]?16/g,'0w16')
+    .replace(/5\s*(qt|quart|quarts)/g,'5qt')
+    .replace(/(advanced|fuel|economy|full|synthetic|motor|genuine|toyota|oem)/g,' ')
+    .replace(/[^a-z0-9]+/g,' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort()
+    .join(' ');
+}
+function getMasterPartMergeKey(part){
+  const pn = normalizeKey(part.partNum || '');
+  if(pn) return `pn:${pn}`;
+  const nameKey = normalizeComparableName(part.name || '');
+  return `nm:${part.serviceType || 'other'}:${nameKey}`;
+}
+function mergeDuplicateMasterParts(){
+  const parts = normalizeMasterParts(getMasterParts());
+  const inventory = getInventory();
+  const map = new Map();
+  const idMap = new Map();
+  parts.forEach(part=>{
+    const key = getMasterPartMergeKey(part);
+    const existing = map.get(key);
+    if(!existing){
+      map.set(key, {...part, sources:[...(part.sources||[])]});
+      idMap.set(String(part.id), String(part.id));
+      return;
+    }
+    existing.name = existing.name.length >= part.name.length ? existing.name : part.name;
+    existing.serviceType = existing.serviceType || part.serviceType || 'other';
+    existing.category = existing.category !== 'other' ? existing.category : (part.category || 'other');
+    existing.partNum = existing.partNum || part.partNum || '';
+    existing.unitCost = Number(existing.unitCost||0) > 0 ? Number(existing.unitCost||0) : Number(part.unitCost||0);
+    existing.statusLabel = existing.statusLabel && existing.statusLabel !== 'From inventory' ? existing.statusLabel : (part.statusLabel || existing.statusLabel);
+    existing.note = existing.note || part.note || '';
+    existing.countInOilAvg = !!existing.countInOilAvg || !!part.countInOilAvg;
+    existing.sources = normalizeMasterPartSources([...(existing.sources||[]), ...(part.sources||[])]);
+    idMap.set(String(part.id), String(existing.id));
+  });
+  const merged = Array.from(map.values());
+  const updatedInventory = inventory.map(item=>({
+    ...item,
+    masterPartId: item.masterPartId ? (idMap.get(String(item.masterPartId)) || item.masterPartId) : item.masterPartId
+  }));
+  saveMasterParts(merged);
+  saveInventory(updatedInventory);
+  return merged;
+}
 function guessMasterCategory(serviceType='other'){
   if(['oil','oiltires','cabin','engine_filter','trans','diff','coolant','inv_coolant','wipers','hvfilter_inspect','hvfilter_clean'].includes(serviceType)) return 'fluids_filters';
   if(serviceType==='valvomax') return 'valvomax';
@@ -1922,6 +1975,11 @@ function findMatchingMasterPart(payload, parts=getMasterParts()){
     if(byName) return byName;
     const looseName = parts.find(part=>normalizeKey(part.name || '') === nameKey);
     if(looseName) return looseName;
+  }
+  const comparableKey = normalizeComparableName(payload.name || '');
+  if(comparableKey){
+    const fuzzy = parts.find(part=>part.serviceType === (payload.serviceType || part.serviceType) && normalizeComparableName(part.name || '') === comparableKey);
+    if(fuzzy) return fuzzy;
   }
   return null;
 }
@@ -2598,13 +2656,42 @@ async function requestReminderPermission(){
   }
 }
 
+document.addEventListener('click', (e)=>{
+  const editMasterBtn = e.target.closest('[data-edit-master]');
+  if(editMasterBtn){
+    editMasterPart(editMasterBtn.getAttribute('data-edit-master'));
+    return;
+  }
+  const deleteMasterBtn = e.target.closest('[data-delete-master]');
+  if(deleteMasterBtn){
+    deleteMasterPart(deleteMasterBtn.getAttribute('data-delete-master'));
+    return;
+  }
+  const editInventoryBtn = e.target.closest('[data-edit-inventory]');
+  if(editInventoryBtn){
+    editInventoryItem(editInventoryBtn.getAttribute('data-edit-inventory'));
+    return;
+  }
+  const adjustInventoryBtn = e.target.closest('[data-adjust-inventory]');
+  if(adjustInventoryBtn){
+    adjustInventoryQty(adjustInventoryBtn.getAttribute('data-adjust-inventory'), Number(adjustInventoryBtn.getAttribute('data-adjust-delta')||0));
+    return;
+  }
+  const deleteInventoryBtn = e.target.closest('[data-delete-inventory]');
+  if(deleteInventoryBtn){
+    deleteInventoryItem(deleteInventoryBtn.getAttribute('data-delete-inventory'));
+  }
+});
+
 /* ─── INIT ──────────────────────────────────────────────── */
 window.onload=()=>{
   if(!localStorage.getItem('vz_log'))save(DEFAULT);
   if(!localStorage.getItem(INVENTORY_KEY))saveInventory(DEFAULT_INVENTORY);
   if(!localStorage.getItem(MASTER_PARTS_KEY))saveMasterParts(DEFAULT_MASTER_PARTS);
   ensureMasterPartsReady();
+  mergeDuplicateMasterParts();
   syncMasterPartsFromInventory();
+  mergeDuplicateMasterParts();
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   setInventoryFormOpen(false);
   renderAll();
@@ -2824,11 +2911,11 @@ function renderParts(){
           <div class="inv-qty ${qtyClass}">${qty} on hand</div>
         </div>
         <div class="inv-actions">
-          <button class="inv-btn" onclick="editInventoryItem('${escapeHtmlAttr(item.id)}')">Edit</button>
-          ${master ? `<button class="inv-btn" onclick="editMasterPart('${escapeHtmlAttr(master.id)}')">Master Part</button>` : ''}
-          <button class="inv-btn" onclick="adjustInventoryQty('${escapeHtmlAttr(item.id)}',1)">+1</button>
-          <button class="inv-btn" onclick="adjustInventoryQty('${escapeHtmlAttr(item.id)}',-1)">-1</button>
-          <button class="inv-btn danger" onclick="deleteInventoryItem('${escapeHtmlAttr(item.id)}')">Delete</button>
+          <button type="button" class="inv-btn" data-edit-inventory="${escapeHtmlAttr(item.id)}">Edit</button>
+          ${master ? `<button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(master.id)}">Master Part</button>` : ''}
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="1">+1</button>
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="-1">-1</button>
+          <button type="button" class="inv-btn danger" data-delete-inventory="${escapeHtmlAttr(item.id)}">Delete</button>
         </div>
       </div>`;
     }).join('');
@@ -2857,8 +2944,8 @@ function renderParts(){
           <div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>
           ${sourcesHtml}
           <div class="inv-actions" style="margin-top:12px">
-            <button class="inv-btn" onclick="editMasterPart('${escapeHtmlAttr(part.id)}')">Edit</button>
-            <button class="inv-btn danger" onclick="deleteMasterPart('${escapeHtmlAttr(part.id)}')">Delete</button>
+            <button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button>
+            <button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button>
           </div>
         </div>`;
       }).join('');
@@ -2935,6 +3022,7 @@ function saveMasterPart(){
   if(idx===-1){ showToast('Master part not found'); return; }
   parts[idx] = {...parts[idx],name,serviceType,category,partNum,unitCost,statusLabel,note,countInOilAvg};
   saveMasterParts(parts);
+  mergeDuplicateMasterParts();
   renderParts();
   closeMasterPartEditor();
   showToast('Master part updated ✓');
@@ -2948,6 +3036,7 @@ function deleteMasterPart(id){
     const updatedInventory = getInventory().map(item=>String(item.masterPartId||'')===String(id) ? {...item, masterPartId:''} : item);
     saveInventory(updatedInventory);
   }
+  mergeDuplicateMasterParts();
   renderParts();
   renderEntryInventoryUI();
   closeMasterPartEditor();
@@ -2995,6 +3084,7 @@ function saveInventoryItem(){
     inv.push(payload);
   }
   saveInventory(inv);
+  mergeDuplicateMasterParts();
   clearInventoryForm();
   setInventoryFormOpen(false);
   renderParts();
