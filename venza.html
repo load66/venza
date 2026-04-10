@@ -388,6 +388,49 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 }
 .btn-ghost:active{opacity:.7}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.item-builder{
+  display:flex;flex-direction:column;gap:10px;
+}
+.item-editor{
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+}
+.item-editor-top{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:10px;
+}
+.item-editor-title{
+  font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.5px;
+}
+.item-remove{
+  color:var(--toyota);font-size:11px;font-weight:700;
+  border:1px solid rgba(235,10,30,.25);border-radius:999px;padding:4px 10px;
+}
+.item-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item-check{
+  display:flex;align-items:center;gap:8px;margin-top:10px;
+  font-size:12px;color:var(--text2)
+}
+.item-check input{accent-color:var(--toyota);width:16px;height:16px}
+.item-builder-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:2px}
+.item-add{
+  width:100%;padding:11px 13px;background:var(--bg3);color:var(--text2);
+  border:1.5px dashed var(--border2);border-radius:10px;font-size:13px;font-weight:600;
+}
+.log-parts{
+  margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;display:flex;flex-direction:column;gap:8px;
+}
+.log-part{
+  background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:9px 10px;
+}
+.log-part-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.log-part-name{font-size:12px;color:var(--text);font-weight:600;line-height:1.45}
+.log-part-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange2);white-space:nowrap}
+.log-part-meta{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}
+.log-part-link{font-size:10px;color:var(--blue2);text-decoration:none;display:inline-block;margin-top:4px}
+.log-part-avg{display:inline-block;font-size:9px;padding:2px 6px;border-radius:999px;border:1px solid rgba(212,150,10,.25);background:rgba(212,150,10,.08);color:var(--gold2);margin-top:5px}
 
 /* ─── UPCOMING ─────────────────────────────────────────────── */
 .svc-item{
@@ -653,7 +696,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 @media (max-width:430px){
   .header{align-items:flex-start}
   .mileage-pill{padding:6px 12px}
-  .fg2,.btn-row{grid-template-columns:1fr}
+  .fg2,.btn-row,.item-grid{grid-template-columns:1fr}
   .guide-head{gap:10px}
   .guide-head-left{min-width:0;flex:1}
   .guide-title{font-size:clamp(14px,4.8vw,16px)}
@@ -782,7 +825,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
     <div class="form-title">New Service Entry</div>
     <div class="alert blue" style="margin-bottom:16px">
       <div class="alert-icon">💡</div>
-      <div>After saving, I'll ask for your purchase link so it gets stored permanently in Parts.</div>
+      <div>Add as many purchased items as you want for one service log. Each item can store its own part #, store, link, price, and whether it should count toward the oil-change average.</div>
     </div>
     <div class="fg2">
       <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
@@ -821,8 +864,12 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
       <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
     </div>
     <div class="fl">
-      <label>Purchase Link (optional)</label>
-      <input type="url" class="fi" id="fLink" placeholder="https://...">
+      <label>Purchased Items / Links (optional)</label>
+      <div class="item-builder" id="fItemsList"></div>
+      <div class="item-builder-actions">
+        <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Tip: for accurate <strong style="color:var(--text2)">Avg Oil Change</strong>, check <strong style="color:var(--gold2)">Use in oil avg</strong> only on the oil-related items for that entry.</div>
     </div>
     <!-- RECEIPT PHOTO UPLOAD -->
     <div class="fl">
@@ -1452,7 +1499,16 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   desc: 'Description, parts used, part numbers...',
   cost: 34.54,              // dollar amount (number, not string)
   shop: 'DIY or shop name',
-  link: 'https://...',      // purchase link, or empty string ''
+  items: [
+    {
+      name: 'Mobil 1 0W-16',
+      partNum: '',
+      store: 'Walmart',
+      link: 'https://...',
+      price: 27.97,
+      useInOilAvg: true
+    }
+  ],
   builtin: true             // true = shows gray delete btn (factory entry)
 },
 
@@ -1462,6 +1518,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 // tires_new, brakes, plugs, hvfilter_inspect,
 // hvfilter_clean, valvomax, wipers, other
 
+// Each service entry can now hold multiple purchased items/links via items:[...].
+// If an item should count toward Avg Oil Change, set useInOilAvg: true on that item.
 // NOTE: DEFAULT array only affects fresh installs or after Reset.
 // If localStorage already has data, the app reads that — not DEFAULT.</div>
     <p style="font-size:11px;color:var(--text3);margin-top:8px">Tap the box above to copy Path B template to clipboard.</p>
@@ -1586,7 +1644,16 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
      desc: 'Description...',
      cost: 34.54,            ← dollar amount (number)
      shop: 'DIY or shop',
-     link: 'https://...',    ← purchase link or empty string ''
+     items: [               ← optional purchased items for this service
+       {
+         name: 'Mobil 1 0W-16',
+         partNum: '',
+         store: 'Walmart',
+         link: 'https://...',
+         price: 27.97,
+         useInOilAvg: true
+       }
+     ],
      builtin: true           ← true = no delete button shown
    }
 
@@ -1684,6 +1751,120 @@ const PREFILLS = {
   wipers:'Wiper blades replaced',
 };
 
+function getNumericPrice(value){
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+function getLinkHostLabel(url){
+  try{return new URL(url).hostname;}catch(err){return 'Open link';}
+}
+function getFormItemRows(){
+  return [...document.querySelectorAll('.item-editor')];
+}
+function createItemRow(data={}){
+  const wrap = document.createElement('div');
+  wrap.className = 'item-editor';
+  wrap.innerHTML = `
+    <div class="item-editor-top">
+      <div class="item-editor-title">Purchased Item</div>
+      <button type="button" class="item-remove" onclick="removeItemRow(this)">Remove</button>
+    </div>
+    <div class="item-grid">
+      <div class="fl"><label>Item Name</label><input type="text" class="fi item-name" placeholder="Mobil 1 0W-16" value="${data.name || ''}"></div>
+      <div class="fl"><label>Part #</label><input type="text" class="fi item-part" placeholder="90915-YZZN1" value="${data.partNum || ''}"></div>
+      <div class="fl"><label>Store</label><input type="text" class="fi item-store" placeholder="Walmart / Toyota / Amazon" value="${data.store || ''}"></div>
+      <div class="fl"><label>Price ($)</label><input type="number" class="fi item-price" placeholder="0.00" step="0.01" value="${data.price!==undefined && data.price!=='' ? data.price : ''}"></div>
+    </div>
+    <div class="fl" style="margin-bottom:0"><label>Link</label><input type="url" class="fi item-link" placeholder="https://..." value="${data.link || ''}"></div>
+    <label class="item-check"><input type="checkbox" class="item-oilavg" ${data.useInOilAvg ? 'checked' : ''}> Use in oil avg</label>
+  `;
+  return wrap;
+}
+function addItemRow(data={}){
+  const list = document.getElementById('fItemsList');
+  if(!list) return;
+  list.appendChild(createItemRow(data));
+}
+function removeItemRow(btn){
+  const list = document.getElementById('fItemsList');
+  if(!list) return;
+  const row = btn.closest('.item-editor');
+  if(row) row.remove();
+  if(!getFormItemRows().length) addItemRow();
+}
+function getFormItems(){
+  return getFormItemRows().map(row=>({
+    name: row.querySelector('.item-name')?.value.trim() || '',
+    partNum: row.querySelector('.item-part')?.value.trim() || '',
+    store: row.querySelector('.item-store')?.value.trim() || '',
+    link: row.querySelector('.item-link')?.value.trim() || '',
+    price: row.querySelector('.item-price')?.value.trim() || '',
+    useInOilAvg: !!row.querySelector('.item-oilavg')?.checked
+  })).map(item=>({
+    ...item,
+    price: getNumericPrice(item.price) ?? ''
+  })).filter(item=>item.name || item.partNum || item.store || item.link || item.price!=='' );
+}
+function sumEntryItems(entry, predicate=()=>true){
+  return normalizeEntryItems(entry.items).reduce((sum,item)=>{
+    const price = getNumericPrice(item.price);
+    return predicate(item) && price!==null ? sum + price : sum;
+  }, 0);
+}
+function getEntryDisplayCost(entry){
+  const itemTotal = sumEntryItems(entry);
+  if(itemTotal > 0 && (!Number.isFinite(Number(entry.cost)) || Number(entry.cost) === 0)) return itemTotal;
+  return Number(entry.cost || 0);
+}
+function getOilAverageEntryCost(entry){
+  const markedItemTotal = sumEntryItems(entry, item=>item.useInOilAvg);
+  if(markedItemTotal > 0) return markedItemTotal;
+  if(Number.isFinite(Number(entry.oilAvgCost)) && Number(entry.oilAvgCost) > 0) return Number(entry.oilAvgCost);
+  if(entry.type === 'oil' && Number.isFinite(Number(entry.cost)) && Number(entry.cost) > 0) return Number(entry.cost);
+  return null;
+}
+function seedSuggestedItemsForType(type){
+  const list = document.getElementById('fItemsList');
+  if(!list) return;
+  const rows = getFormItemRows();
+  const hasMeaningfulData = rows.some(row=>[
+    row.querySelector('.item-name')?.value,
+    row.querySelector('.item-part')?.value,
+    row.querySelector('.item-store')?.value,
+    row.querySelector('.item-link')?.value,
+    row.querySelector('.item-price')?.value
+  ].some(Boolean));
+  if(hasMeaningfulData) return;
+  list.innerHTML = '';
+  if(type === 'oil' || type === 'oiltires'){
+    addItemRow({name:'Engine Oil', useInOilAvg:true});
+    addItemRow({name:'Oil Filter', useInOilAvg:true});
+  }else{
+    addItemRow();
+  }
+}
+function resetServiceForm(){
+  ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value='';
+  const list = document.getElementById('fItemsList');
+  if(list){
+    list.innerHTML='';
+    addItemRow();
+  }
+  clearPhoto();
+}
+
+function normalizeEntryItems(items){
+  if(!Array.isArray(items)) return [];
+  return items.filter(Boolean).map(item=>({
+    name:(item.name||'').trim(),
+    partNum:(item.partNum||'').trim(),
+    store:(item.store||'').trim(),
+    link:(item.link||'').trim(),
+    price:Number.isFinite(Number(item.price)) ? Number(item.price) : '',
+    useInOilAvg:!!item.useInOilAvg
+  })).filter(item=>item.name || item.partNum || item.store || item.link || item.price!=='' );
+}
 function normalizeEntries(entries){
   if(!Array.isArray(entries)) return [];
   return entries.filter(Boolean).map(e=>({
@@ -1694,6 +1875,8 @@ function normalizeEntries(entries){
     cost: Number.isFinite(Number(e.cost)) ? Number(e.cost) : 0,
     shop: e.shop || '',
     link: e.link || '',
+    items: normalizeEntryItems(e.items),
+    oilAvgCost: Number.isFinite(Number(e.oilAvgCost)) ? Number(e.oilAvgCost) : '',
     builtin: !!e.builtin
   }));
 }
@@ -2053,6 +2236,7 @@ window.onload=()=>{
   if(!localStorage.getItem('vz_log'))save(DEFAULT);
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   renderAll();
+  if(!document.getElementById('fItemsList')?.children.length) addItemRow();
   updateNavState('dash');
   syncChromeOffsets();
   requestAnimationFrame(syncChromeOffsets);
@@ -2081,14 +2265,15 @@ function renderDash(){
   document.getElementById('topMi').textContent = mi.toLocaleString();
   document.getElementById('dMi').textContent = mi.toLocaleString();
 
-  const tot = d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  const tot = d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
   document.getElementById('dTotal').textContent='$'+tot.toFixed(2);
   document.getElementById('dCount').textContent=d.length;
   document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
 
   const oilEntries = d.filter(e=>['oil','oiltires'].includes(e.type)).sort(compareEntriesLatest);
-  const oilCost = oilEntries.length
-    ? (oilEntries.reduce((a,e)=>a+parseFloat(e.cost||0),0)/oilEntries.length).toFixed(2)
+  const oilValues = oilEntries.map(getOilAverageEntryCost).filter(v=>v!==null);
+  const oilCost = oilValues.length
+    ? (oilValues.reduce((a,v)=>a+v,0)/oilValues.length).toFixed(2)
     : '34.54';
   document.getElementById('dOilCost').textContent='$'+oilCost;
 
@@ -2160,11 +2345,25 @@ function renderLog(){
   el.innerHTML=d.map(e=>{
     const dt=new Date(e.date+'T00:00:00');
     const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const lnk=e.link?`<a class="log-link" href="${e.link}" target="_blank">→ ${new URL(e.link).hostname}</a>`:'';
+    const legacyLink = e.link ? `<a class="log-link" href="${e.link}" target="_blank">→ ${getLinkHostLabel(e.link)}</a>` : '';
     const del=!e.builtin
       ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
       :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
-    // Receipt photo
+    const itemCards = normalizeEntryItems(e.items).map(item=>{
+      const price = getNumericPrice(item.price);
+      const linkHtml = item.link ? `<a class="log-part-link" href="${item.link}" target="_blank">→ ${getLinkHostLabel(item.link)}</a>` : '';
+      const metaBits = [item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ');
+      return `<div class="log-part">
+        <div class="log-part-top">
+          <div class="log-part-name">${item.name || 'Purchased item'}</div>
+          <div class="log-part-price">${price!==null ? `$${price.toFixed(2)}` : '—'}</div>
+        </div>
+        ${metaBits ? `<div class="log-part-meta">${metaBits}</div>` : ''}
+        ${linkHtml}
+        ${item.useInOilAvg ? `<div class="log-part-avg">Counts in oil avg</div>` : ''}
+      </div>`;
+    }).join('');
+    const itemsHtml = itemCards || legacyLink ? `<div class="log-parts">${itemCards}${!itemCards && legacyLink ? `<div>${legacyLink}</div>` : legacyLink && !itemCards.includes(legacyLink) ? `<div>${legacyLink}</div>` : ''}</div>` : '';
     const photo=getPhoto(e.id);
     const photoHtml=photo
       ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
@@ -2184,13 +2383,14 @@ function renderLog(){
       <div class="log-type">${LABELS[e.type]||'Service'}</div>
       <div class="log-desc">${e.desc}</div>
       <div class="log-foot">
-        <div><div class="log-shop">${e.shop||''}</div>${lnk}</div>
-        <div class="log-cost">$${parseFloat(e.cost||0).toFixed(2)}</div>
+        <div><div class="log-shop">${e.shop||''}</div></div>
+        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
       </div>
+      ${itemsHtml}
       ${photoHtml}
     </div>`;
   }).join('');
-  let tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  let tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
   document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
 }
 
@@ -2198,6 +2398,7 @@ function renderLog(){
 function prefill(){
   const t=document.getElementById('fType').value;
   if(PREFILLS[t])document.getElementById('fDesc').value=PREFILLS[t];
+  seedSuggestedItemsForType(t);
 }
 function saveEntry(){
   const date=document.getElementById('fDate').value;
@@ -2206,22 +2407,32 @@ function saveEntry(){
   const desc=document.getElementById('fDesc').value.trim();
   const cost=document.getElementById('fCost').value;
   const shop=document.getElementById('fShop').value.trim();
-  const link=document.getElementById('fLink').value.trim();
+  const items=getFormItems();
   if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
+  const typedCost = getNumericPrice(cost);
+  const itemsTotal = items.reduce((sum,item)=>sum + (getNumericPrice(item.price) || 0), 0);
   const newId=Date.now();
   const d=getData();
-  d.push({id:newId,date,mi:parseInt(mi),type,desc,cost:parseFloat(cost)||0,shop,link,builtin:false});
+  d.push({
+    id:newId,
+    date,
+    mi:parseInt(mi),
+    type,
+    desc,
+    cost:typedCost!==null ? typedCost : itemsTotal,
+    shop,
+    link:'',
+    items,
+    builtin:false
+  });
   save(d);
-  // Save photo if one was selected
   if(window._pendingPhoto){
     savePhoto(newId, window._pendingPhoto);
     window._pendingPhoto=null;
   }
   if(parseInt(mi)>getMi())setMi(parseInt(mi));
   renderAll();go('log');
-  ['fMi','fCost','fShop','fLink','fDesc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fType').value='';
-  clearPhoto();
+  resetServiceForm();
   showToast('Entry saved ✓');
 }
 function delEntry(id){
@@ -2343,7 +2554,7 @@ function copyTemplate(){
 function renderBackup(){
   const d=getData();
   const mi=getMi();
-  const tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
   const sorted=[...d].sort((a,b)=>b.mi-a.mi);
   const last=sorted[0];
   const photoCount=d.filter(e=>getPhoto(e.id)).length;
@@ -2369,7 +2580,7 @@ function exportData(){
   });
 
   const payload={
-    version: 2,
+    version: 3,
     exported: new Date().toISOString(),
     vin: VIN,
     vehicle: '2021 Toyota Venza Hybrid AWD',
@@ -2472,7 +2683,7 @@ function generatePrint(){
     entries = entries.filter(e=>new Date(e.date)>=cutoff);
   }
 
-  const totalCost = entries.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  const totalCost = entries.reduce((a,e)=>a+getEntryDisplayCost(e),0);
 
   const maintenanceState = getRecurringServicesState(curMi);
   const upcoming = maintenanceState.rules.filter(i=>!i.watchOnly).sort(compareRecurring).slice(0,6);
@@ -2490,7 +2701,7 @@ function generatePrint(){
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${typeLabel}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${e.desc}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${e.shop||'—'}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#c05800;text-align:right;white-space:nowrap">$${parseFloat(e.cost||0).toFixed(2)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#c05800;text-align:right;white-space:nowrap">$${getEntryDisplayCost(e).toFixed(2)}</td>
     </tr>`;
   }).join('');
 
@@ -2524,7 +2735,7 @@ function generatePrint(){
             <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi).toLocaleString()} mi</span>
           </div>
           <img src="${getPhoto(e.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
-          <div style="padding:8px 12px;font-size:11px;color:#555">${e.shop||'DIY'} · $${parseFloat(e.cost||0).toFixed(2)}</div>
+          <div style="padding:8px 12px;font-size:11px;color:#555">${e.shop||'DIY'} · $${getEntryDisplayCost(e).toFixed(2)}</div>
         </div>`;
       }).join('')}
     </div>
