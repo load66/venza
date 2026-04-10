@@ -673,15 +673,16 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 <div id="page-dash" class="page active">
 
   <div class="hero">
-    <div class="hero-label">⭐ Next Service Due</div>
-    <div class="hero-mi"><span id="dNextMi">69,590</span> mi</div>
-    <div class="hero-desc">Oil change · Tire rotation · HV Battery filter inspect</div>
+    <div class="hero-label" id="dHeroLabel">⭐ True Next Due</div>
+    <div class="hero-mi" id="dHeroTitle">Oil Change</div>
+    <div class="hero-desc" id="dHeroDue">Next due: 69,590 mi or Aug 24, 2026</div>
+    <div class="hero-desc" id="dHeroTrigger" style="margin-top:8px;color:rgba(255,255,255,.7)">Mileage first · Due in 4,839 mi</div>
     <div class="progress-track">
       <div class="progress-fill" id="dProgress" style="width:0%"></div>
     </div>
     <div class="progress-labels">
-      <span id="dLast" style="color:rgba(255,255,255,.4)">Last: 64,590</span>
-      <span id="dRemain" style="color:rgba(255,255,255,.4)">— mi remaining</span>
+      <span id="dLast" style="color:rgba(255,255,255,.4)">Last: Feb 24, 2026 · 64,590 mi</span>
+      <span id="dRemain" style="color:rgba(255,255,255,.4)">Status: Future</span>
     </div>
   </div>
 
@@ -823,101 +824,17 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 <!-- ═══ UPCOMING SCHEDULE ════════════════════════════════════════ -->
 <div id="page-upcoming" class="page">
 
-  <div class="section-label">Your Custom Schedule</div>
+  <div class="section-label">Recurring Schedule</div>
   <div class="card">
-    <div class="card-body">
-      <div class="svc-item">
-        <div class="svc-dot next"></div>
-        <div class="svc-info">
-          <div class="svc-name">Oil Change + Tire Rotation + Inspection</div>
-          <div class="svc-note">Mobil 1 0W-16 · Filter 90915-YZZN1 · ValvoMax bag</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">69,590 mi</div><div class="badge red">Next Up</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot next"></div>
-        <div class="svc-info">
-          <div class="svc-name">HV Battery Cooling Filter — Inspect</div>
-          <div class="svc-note">Visually check near rear seat — every 5,000 mi</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">69,590 mi</div><div class="badge red">Next Up</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot routine"></div>
-        <div class="svc-info">
-          <div class="svc-name">Cabin Air Filter</div>
-          <div class="svc-note">A-Premium APCA4605 — link saved in Parts</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~79,751 mi</div><div class="badge green">Routine</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot routine"></div>
-        <div class="svc-info">
-          <div class="svc-name">HV Battery Cooling Filter — Clean</div>
-          <div class="svc-note">Clean every 20,000 miles per Toyota manual</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~84,590 mi</div><div class="badge green">Routine</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot routine"></div>
-        <div class="svc-info">
-          <div class="svc-name">Engine Air Filter</div>
-          <div class="svc-note">#17801-YZZ16 — get link at next purchase</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~94,590 mi</div><div class="badge green">Routine</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot watch"></div>
-        <div class="svc-info">
-          <div class="svc-name">New Tires + Alignment</div>
-          <div class="svc-note">Tread at 6–7/32" as of 02/24/26 — monitor</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">TBD</div><div class="badge orange">Watch</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Engine Coolant Drain & Fill</div>
-          <div class="svc-note">Toyota SLLC #00272-SLLC2 · Toyota spec: 100k/10yr</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~100,000 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Spark Plugs</div>
-          <div class="svc-note">Iridium — NGK or Denso OEM only</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~120,000 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Transmission Fluid D&F</div>
-          <div class="svc-note">ATF WS #00289-ATFWS — custom 60k interval</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">124,590 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Rear Differential D&F</div>
-          <div class="svc-note">ATF WS #00289-ATFWS — same visit as trans</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">124,590 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-      <div class="svc-item">
-        <div class="svc-dot long"></div>
-        <div class="svc-info">
-          <div class="svc-name">Inverter Coolant Drain & Fill</div>
-          <div class="svc-note">Toyota SLLC — Toyota spec: 150k/180 months first</div>
-        </div>
-        <div class="svc-right"><div class="svc-mi">~150,000 mi</div><div class="badge gray">Long-term</div></div>
-      </div>
-    </div>
+    <div class="card-body" id="upcomingRecurringList"></div>
   </div>
 
-  <div class="section-label">Official Toyota Schedule (from manual)</div>
+  <div class="section-label">Watch Items</div>
+  <div class="card">
+    <div class="card-body" id="upcomingWatchList"></div>
+  </div>
+
+<div class="section-label">Official Toyota Schedule (from manual)</div>
   <div class="alert gold">
     <div class="alert-icon">📋</div>
     <div><strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. You've chosen 5,000 mi — more conservative and perfectly valid.</div>
@@ -1729,10 +1646,331 @@ const PREFILLS = {
   wipers:'Wiper blades replaced',
 };
 
-function getData(){const r=localStorage.getItem('vz_log');return r?JSON.parse(r):DEFAULT}
-function save(d){localStorage.setItem('vz_log',JSON.stringify(d))}
-function getMi(){return parseInt(localStorage.getItem('vz_mi')||'64751')}
-function setMi(m){localStorage.setItem('vz_mi',m)}
+function normalizeEntries(entries){
+  if(!Array.isArray(entries)) return [];
+  return entries.filter(Boolean).map(e=>({
+    ...e,
+    id: e.id ?? Date.now()+Math.random(),
+    type: e.type || 'other',
+    desc: e.desc || '',
+    cost: Number.isFinite(Number(e.cost)) ? Number(e.cost) : 0,
+    shop: e.shop || '',
+    link: e.link || '',
+    builtin: !!e.builtin
+  }));
+}
+function getData(){
+  try{
+    const raw = localStorage.getItem('vz_log');
+    return normalizeEntries(raw ? JSON.parse(raw) : DEFAULT);
+  }catch(err){
+    return normalizeEntries(DEFAULT);
+  }
+}
+function save(d){localStorage.setItem('vz_log',JSON.stringify(normalizeEntries(d)))}
+function highestMileage(entries){
+  return normalizeEntries(entries).reduce((max,e)=>{
+    const mi = Number(e.mi);
+    return Number.isFinite(mi) ? Math.max(max, mi) : max;
+  }, 0);
+}
+function getMi(){
+  const stored = parseInt(localStorage.getItem('vz_mi')||'',10);
+  if(Number.isFinite(stored) && stored > 0) return stored;
+  return highestMileage(getData()) || 64751;
+}
+function setMi(m){
+  const n = parseInt(m,10);
+  if(Number.isFinite(n) && n > 0) localStorage.setItem('vz_mi', n);
+}
+function safeNum(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function parseLocalDate(value){
+  if(!value || typeof value !== 'string') return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if(!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2])-1, Number(m[3]), 12, 0, 0, 0);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+function todayLocal(){
+  const d = new Date();
+  d.setHours(12,0,0,0);
+  return d;
+}
+function dateToISO(d){
+  if(!d) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function addMonthsSafe(base, months){
+  if(!base || !Number.isFinite(months)) return null;
+  const d = new Date(base.getTime());
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth()+months);
+  const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
+  return d;
+}
+function diffDays(fromDate, toDate){
+  if(!fromDate || !toDate) return null;
+  const from = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+  const to = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+  return Math.ceil((to-from)/86400000);
+}
+function formatDateHuman(value){
+  const d = value instanceof Date ? value : parseLocalDate(value);
+  return d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+}
+function formatDueDate(value, estimated=false){
+  const txt = formatDateHuman(value);
+  return txt === '—' ? '—' : (estimated ? `Est. ${txt}` : txt);
+}
+function formatDueMileage(value){
+  return Number.isFinite(Number(value)) ? `${Number(value).toLocaleString()} mi` : '—';
+}
+function pluralize(value, unit){
+  const abs = Math.abs(value);
+  return `${abs.toLocaleString()} ${unit}${abs===1?'':'s'}`;
+}
+function compareEntriesLatest(a,b){
+  const ami = safeNum(a.mi) ?? -Infinity;
+  const bmi = safeNum(b.mi) ?? -Infinity;
+  if(bmi !== ami) return bmi - ami;
+  const ad = parseLocalDate(a.date);
+  const bd = parseLocalDate(b.date);
+  return (bd ? bd.getTime() : 0) - (ad ? ad.getTime() : 0);
+}
+const VEHICLE_PROFILE = {
+  estimatedInServiceDate: '2021-06-01'
+};
+const RECURRING_RULES = [
+  {id:'oil', name:'Oil Change', icon:'🔧', entryTypes:['oil','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'0W-16 full synthetic · custom 5,000 mi / 6 mo'},
+  {id:'tires', name:'Tire Rotation', icon:'🔄', entryTypes:['tires','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Rotate every 5,000 mi / 6 mo'},
+  {id:'hvfilter_inspect', name:'HV Battery Cooling Filter — Inspect', icon:'🔋', entryTypes:['hvfilter_inspect','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Inspect every 5,000 mi / 6 mo'},
+  {id:'cabin', name:'Cabin Air Filter', icon:'💨', entryTypes:['cabin'], milesInterval:15000, monthsInterval:18, soonMiles:1500, upcomingMiles:5000, soonDays:45, upcomingDays:120, note:'Activated carbon filter · custom 15,000 mi / 18 mo'},
+  {id:'hvfilter_clean', name:'HV Battery Cooling Filter — Clean', icon:'🧹', entryTypes:['hvfilter_clean'], milesInterval:20000, monthsInterval:24, soonMiles:2000, upcomingMiles:5000, soonDays:60, upcomingDays:180, note:'Toyota manual clean interval', initialAnchor:{date:'2026-02-24', mi:64590, estimated:false}},
+  {id:'engine_filter', name:'Engine Air Filter', icon:'🌬️', entryTypes:['engine_filter'], milesInterval:30000, monthsInterval:36, soonMiles:2000, upcomingMiles:7000, soonDays:90, upcomingDays:180, note:'Toyota part #17801-YZZ16'},
+  {id:'trans', name:'Transmission Fluid D&F', icon:'⚙️', entryTypes:['trans'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
+  {id:'diff', name:'Rear Differential D&F', icon:'🔩', entryTypes:['diff'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
+  {id:'coolant', name:'Engine Coolant Drain & Fill', icon:'🌡️', entryTypes:['coolant'], milesInterval:100000, monthsInterval:120, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota SLLC · 100k mi / 120 mo first interval', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
+  {id:'plugs', name:'Spark Plugs', icon:'⚡', entryTypes:['plugs'], milesInterval:120000, monthsInterval:144, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Iridium OEM only', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
+  {id:'inv_coolant', name:'Inverter Coolant Drain & Fill', icon:'🌡️', entryTypes:['inv_coolant'], milesInterval:150000, monthsInterval:180, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota SLLC · 150k mi / 180 mo first interval', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
+  {id:'tires_new', name:'New Tires + Alignment', icon:'🛞', watchOnly:true, note:'Watch tread depth — 6/32" to 7/32" as of 02/24/26'}
+];
+const RULE_ORDER = Object.fromEntries(RECURRING_RULES.map((rule, index)=>[rule.id, index]));
+function estimateMilesPerDay(entries, currentMi, referenceDate=todayLocal()){
+  const dated = normalizeEntries(entries)
+    .map(e=>({mi:safeNum(e.mi), date:parseLocalDate(e.date)}))
+    .filter(p=>p.mi!==null && p.date)
+    .sort((a,b)=>a.date-b.date);
+  const recent = dated.filter(p=>diffDays(p.date, referenceDate)!==null && diffDays(p.date, referenceDate) <= 365);
+  const base = recent.length >= 2 ? recent : dated;
+  if(base.length >= 2){
+    const first = base[0];
+    const last = base[base.length-1];
+    const days = Math.max(diffDays(first.date, last.date), 1);
+    const miles = last.mi - first.mi;
+    if(miles > 0 && days > 0) return miles / days;
+  }
+  const lastPoint = dated[dated.length-1];
+  if(lastPoint && currentMi > lastPoint.mi){
+    const days = Math.max(diffDays(lastPoint.date, referenceDate), 1);
+    const miles = currentMi - lastPoint.mi;
+    if(miles > 0 && days > 0) return miles / days;
+  }
+  return 25;
+}
+function getLatestEntryForRule(rule, entries){
+  return normalizeEntries(entries)
+    .filter(e=>rule.entryTypes && rule.entryTypes.includes(e.type))
+    .sort(compareEntriesLatest)[0] || null;
+}
+function buildRemainingText(item){
+  const d = item.daysRemaining;
+  const m = item.milesRemaining;
+  const overTime = d!==null && d < 0;
+  const overMiles = m!==null && m < 0;
+  if(item.watchOnly) return item.note || 'Monitor manually';
+  if(item.status === 'overdue'){
+    if(overTime && overMiles){
+      return item.currentDriver === 'time'
+        ? `OVERDUE by ${pluralize(d,'day')} · ${Math.abs(m).toLocaleString()} mi`
+        : `OVERDUE by ${Math.abs(m).toLocaleString()} mi · ${pluralize(d,'day')}`;
+    }
+    if(item.currentDriver === 'time' && d!==null) return `OVERDUE by ${pluralize(d,'day')}`;
+    if(item.currentDriver === 'mileage' && m!==null) return `OVERDUE by ${Math.abs(m).toLocaleString()} mi`;
+  }
+  if(item.currentDriver === 'time' && d!==null){
+    if(d === 0) return 'Due today';
+    return `Due in ${pluralize(d,'day')}`;
+  }
+  if(item.currentDriver === 'mileage' && m!==null){
+    if(m === 0) return 'Due now';
+    return `Due in ${m.toLocaleString()} mi`;
+  }
+  if(d!==null) return d < 0 ? `OVERDUE by ${pluralize(d,'day')}` : `Due in ${pluralize(d,'day')}`;
+  if(m!==null) return m < 0 ? `OVERDUE by ${Math.abs(m).toLocaleString()} mi` : `Due in ${m.toLocaleString()} mi`;
+  return 'Schedule unavailable';
+}
+function buildTriggerText(item){
+  if(item.watchOnly) return 'Watch only';
+  if(item.status === 'overdue' && item.isOverdueByTime && item.isOverdueByMileage) return 'Triggered by time & mileage';
+  if(item.currentDriver === 'time') return item.status === 'overdue' ? 'Time trigger' : 'Driven by time';
+  if(item.currentDriver === 'mileage') return item.status === 'overdue' ? 'Mileage trigger' : 'Driven by mileage';
+  return 'Monitor schedule';
+}
+function buildDueReason(item){
+  if(item.watchOnly) return 'watch only';
+  if(item.isOverdueByTime && item.isOverdueByMileage) return 'time & mileage';
+  if(item.isOverdueByTime) return 'time';
+  if(item.isOverdueByMileage) return 'mileage';
+  if(item.currentDriver === 'time') return 'time first';
+  if(item.currentDriver === 'mileage') return 'mileage first';
+  return 'monitor';
+}
+function getStatusBadgeClass(status){
+  return status === 'overdue' ? 'red' : status === 'due soon' ? 'orange' : status === 'upcoming' ? 'green' : 'gray';
+}
+function getDotClass(status){
+  return status === 'overdue' ? 'next' : status === 'due soon' ? 'watch' : status === 'upcoming' ? 'routine' : 'long';
+}
+function computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDay){
+  if(rule.watchOnly){
+    return {
+      ...rule,
+      watchOnly:true,
+      status:'future',
+      currentDriver:'watch',
+      dueReason:'watch only',
+      lastServiceDate:null,
+      lastServiceMileage:null,
+      nextDueDate:null,
+      nextDueMileage:null,
+      daysRemaining:null,
+      milesRemaining:null,
+      etaDaysToMileage:null,
+      remainingText:rule.note || 'Monitor manually',
+      triggerText:'Watch only',
+      dueLine:rule.note || 'Monitor manually',
+      progressPct:0,
+      sortScore:Number.POSITIVE_INFINITY,
+      estimatedDate:false,
+      watchOnly:true
+    };
+  }
+  const lastEntry = getLatestEntryForRule(rule, entries);
+  const anchor = lastEntry ? {
+    date: lastEntry.date,
+    mi: lastEntry.mi,
+    estimated:false
+  } : (rule.initialAnchor || {});
+  const lastServiceDate = parseLocalDate(anchor.date || '');
+  const lastServiceMileage = safeNum(anchor.mi);
+  const nextDueDate = lastServiceDate && Number.isFinite(rule.monthsInterval) ? addMonthsSafe(lastServiceDate, rule.monthsInterval) : null;
+  const nextDueMileage = lastServiceMileage!==null && Number.isFinite(rule.milesInterval) ? lastServiceMileage + rule.milesInterval : null;
+  const daysRemaining = nextDueDate ? diffDays(referenceDate, nextDueDate) : null;
+  const milesRemaining = nextDueMileage!==null ? nextDueMileage - currentMi : null;
+  const etaDaysToMileage = milesRemaining!==null && Number.isFinite(avgMilesPerDay) && avgMilesPerDay > 0 ? milesRemaining / avgMilesPerDay : null;
+  const isOverdueByTime = daysRemaining!==null && daysRemaining < 0;
+  const isOverdueByMileage = milesRemaining!==null && milesRemaining < 0;
+  const isSoonByTime = !isOverdueByTime && daysRemaining!==null && daysRemaining <= (rule.soonDays ?? 30);
+  const isSoonByMileage = !isOverdueByMileage && milesRemaining!==null && milesRemaining <= (rule.soonMiles ?? 500);
+  const isUpcomingByTime = !isOverdueByTime && !isSoonByTime && daysRemaining!==null && daysRemaining <= (rule.upcomingDays ?? 90);
+  const isUpcomingByMileage = !isOverdueByMileage && !isSoonByMileage && milesRemaining!==null && milesRemaining <= (rule.upcomingMiles ?? 2000);
+
+  let status = 'future';
+  if(isOverdueByTime || isOverdueByMileage) status = 'overdue';
+  else if(isSoonByTime || isSoonByMileage) status = 'due soon';
+  else if(isUpcomingByTime || isUpcomingByMileage) status = 'upcoming';
+
+  let currentDriver = 'unknown';
+  if(nextDueDate && nextDueMileage!==null){
+    if(isOverdueByTime && !isOverdueByMileage) currentDriver = 'time';
+    else if(isOverdueByMileage && !isOverdueByTime) currentDriver = 'mileage';
+    else if(daysRemaining!==null && etaDaysToMileage!==null) currentDriver = etaDaysToMileage <= daysRemaining ? 'mileage' : 'time';
+    else currentDriver = daysRemaining!==null ? 'time' : 'mileage';
+  }else if(nextDueDate){
+    currentDriver = 'time';
+  }else if(nextDueMileage!==null){
+    currentDriver = 'mileage';
+  }
+
+  const dueReason = buildDueReason({watchOnly:false, isOverdueByTime, isOverdueByMileage, currentDriver});
+  const estimatedDate = !!anchor.estimated && !lastEntry;
+  const remainingText = buildRemainingText({status, currentDriver, daysRemaining, milesRemaining, isOverdueByTime, isOverdueByMileage, watchOnly:false});
+  const triggerText = buildTriggerText({status, currentDriver, isOverdueByTime, isOverdueByMileage, watchOnly:false});
+  const dueLine = `Next due: ${formatDueMileage(nextDueMileage)} or ${formatDueDate(nextDueDate, estimatedDate)}`;
+  const progressPct = nextDueMileage!==null && lastServiceMileage!==null && nextDueMileage > lastServiceMileage
+    ? Math.max(0, Math.min(100, ((currentMi-lastServiceMileage)/(nextDueMileage-lastServiceMileage))*100))
+    : 0;
+  const effectiveDays = Math.min(
+    daysRemaining!==null ? daysRemaining : Number.POSITIVE_INFINITY,
+    etaDaysToMileage!==null ? etaDaysToMileage : Number.POSITIVE_INFINITY
+  );
+  const statusRank = {overdue:0,'due soon':1,upcoming:2,future:3}[status] ?? 9;
+  const sortScore = statusRank*1000000 + (Number.isFinite(effectiveDays) ? effectiveDays : 999999);
+
+  return {
+    ...rule,
+    watchOnly:false,
+    lastEntry,
+    lastServiceDate,
+    lastServiceMileage,
+    nextDueDate,
+    nextDueMileage,
+    daysRemaining,
+    milesRemaining,
+    etaDaysToMileage,
+    isOverdueByTime,
+    isOverdueByMileage,
+    status,
+    currentDriver,
+    dueReason,
+    remainingText,
+    triggerText,
+    dueLine,
+    progressPct,
+    sortScore,
+    estimatedDate,
+    avgMilesPerDay
+  };
+}
+function getRecurringServicesState(currentMi=getMi(), referenceDate=todayLocal()){
+  const entries = getData();
+  const avgMilesPerDay = estimateMilesPerDay(entries, currentMi, referenceDate);
+  const rules = RECURRING_RULES.map(rule=>computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDay));
+  return {entries, rules, avgMilesPerDay, referenceDate};
+}
+function compareRecurring(a,b){
+  if(a.watchOnly && !b.watchOnly) return 1;
+  if(!a.watchOnly && b.watchOnly) return -1;
+  if(a.sortScore !== b.sortScore) return a.sortScore - b.sortScore;
+  return (RULE_ORDER[a.id] ?? 999) - (RULE_ORDER[b.id] ?? 999);
+}
+function sameDueBundle(a,b){
+  return a.status === b.status &&
+    a.currentDriver === b.currentDriver &&
+    dateToISO(a.nextDueDate) === dateToISO(b.nextDueDate) &&
+    (a.nextDueMileage ?? null) === (b.nextDueMileage ?? null);
+}
+function getNextRecurringBundle(state){
+  const recurring = state.rules.filter(r=>!r.watchOnly && (r.nextDueDate || r.nextDueMileage!==null)).sort(compareRecurring);
+  const lead = recurring[0] || null;
+  if(!lead) return null;
+  return {lead, items: recurring.filter(r=>sameDueBundle(r, lead))};
+}
+function heroLastText(bundle){
+  const lead = bundle?.lead;
+  if(!lead) return 'Last: —';
+  const lastDate = lead.lastServiceDate ? formatDateHuman(lead.lastServiceDate) : '—';
+  const lastMi = lead.lastServiceMileage!==null ? `${lead.lastServiceMileage.toLocaleString()} mi` : '—';
+  return `Last: ${lastDate} · ${lastMi}`;
+}
 
 /* ─── INIT ──────────────────────────────────────────────── */
 window.onload=()=>{
@@ -1741,44 +1979,95 @@ window.onload=()=>{
   renderAll();
 };
 
-function renderAll(){renderDash();renderLog()}
+function renderAll(){
+  renderDash();
+  renderLog();
+  renderUpcoming();
+}
 
 /* ─── DASHBOARD ──────────────────────────────────────────── */
 function renderDash(){
-  const mi=getMi();
-  const d=getData();
+  const mi = getMi();
+  const d = getData();
+  const state = getRecurringServicesState(mi);
+  const bundle = getNextRecurringBundle(state);
 
-  // Find most recent oil-change entry to drive the progress bar dynamically
-  const oilEntries=d.filter(e=>['oil','oiltires'].includes(e.type)).sort((a,b)=>b.mi-a.mi);
-  const lastOilMi=oilEntries.length?oilEntries[0].mi:LAST_SVC_MI;
-  const nextOilMi=lastOilMi+5000; // 5,000 mi custom interval
+  document.getElementById('topMi').textContent = mi.toLocaleString();
+  document.getElementById('dMi').textContent = mi.toLocaleString();
 
-  // Clamp progress 0–100 in both directions
-  const raw=((mi-lastOilMi)/(nextOilMi-lastOilMi))*100;
-  const pct=Math.min(100,Math.max(0,raw));
-  const rem=Math.max(0,nextOilMi-mi);
-
-  document.getElementById('topMi').textContent=mi.toLocaleString();
-  document.getElementById('dMi').textContent=mi.toLocaleString();
-  document.getElementById('dNextMi').textContent=nextOilMi.toLocaleString();
-  document.getElementById('dLast').textContent='Last: '+lastOilMi.toLocaleString();
-  document.getElementById('dRemain').textContent=rem>0?rem.toLocaleString()+' mi remaining':'DUE NOW!';
-  setTimeout(()=>{document.getElementById('dProgress').style.width=pct+'%'},100);
-
-  // Live total cost
-  const tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+  const tot = d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
   document.getElementById('dTotal').textContent='$'+tot.toFixed(2);
   document.getElementById('dCount').textContent=d.length;
   document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
 
-  // Live per-oil-change cost: average of all oil change entries
-  const oilCost=oilEntries.length
+  const oilEntries = d.filter(e=>['oil','oiltires'].includes(e.type)).sort(compareEntriesLatest);
+  const oilCost = oilEntries.length
     ? (oilEntries.reduce((a,e)=>a+parseFloat(e.cost||0),0)/oilEntries.length).toFixed(2)
-    : '34.54'; // fallback if no oil entries logged yet
+    : '34.54';
   document.getElementById('dOilCost').textContent='$'+oilCost;
+
+  if(bundle){
+    const lead = bundle.lead;
+    const services = [...bundle.items].sort((a,b)=>(RULE_ORDER[a.id] ?? 999)-(RULE_ORDER[b.id] ?? 999)).map(i=>i.name).join(' · ');
+    const statusLabel = lead.status === 'due soon' ? 'Due Soon' : lead.status.charAt(0).toUpperCase()+lead.status.slice(1);
+    document.getElementById('dHeroLabel').textContent = `⭐ True Next Due · ${statusLabel}`;
+    document.getElementById('dHeroTitle').textContent = services;
+    document.getElementById('dHeroDue').textContent = lead.dueLine;
+    document.getElementById('dHeroTrigger').textContent = `${lead.currentDriver === 'time' ? 'Time first' : lead.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'} · ${lead.remainingText}`;
+    document.getElementById('dLast').textContent = heroLastText(bundle);
+    document.getElementById('dRemain').textContent = `Status: ${statusLabel} · ${lead.dueReason}`;
+    setTimeout(()=>{document.getElementById('dProgress').style.width = `${lead.progressPct}%`;}, 100);
+  }else{
+    document.getElementById('dHeroLabel').textContent = '⭐ True Next Due';
+    document.getElementById('dHeroTitle').textContent = 'No recurring schedule found';
+    document.getElementById('dHeroDue').textContent = 'Add a service entry to start the maintenance engine';
+    document.getElementById('dHeroTrigger').textContent = 'Time and mileage logic will update automatically';
+    document.getElementById('dLast').textContent = 'Last: —';
+    document.getElementById('dRemain').textContent = 'Status: Monitor';
+    document.getElementById('dProgress').style.width = '0%';
+  }
+}
+function renderUpcoming(){
+  const mi = getMi();
+  const state = getRecurringServicesState(mi);
+  const recurring = state.rules.filter(r=>!r.watchOnly).sort(compareRecurring);
+  const watchOnly = state.rules.filter(r=>r.watchOnly);
+  const recurringEl = document.getElementById('upcomingRecurringList');
+  const watchEl = document.getElementById('upcomingWatchList');
+  if(recurringEl){
+    recurringEl.innerHTML = recurring.map(item=>`
+      <div class="svc-item">
+        <div class="svc-dot ${getDotClass(item.status)}"></div>
+        <div class="svc-info">
+          <div class="svc-name">${item.name}</div>
+          <div class="svc-note">${item.dueLine}</div>
+          <div class="svc-note">${item.remainingText} · ${item.triggerText}</div>
+        </div>
+        <div class="svc-right">
+          <div class="svc-mi">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</div>
+          <div class="badge ${getStatusBadgeClass(item.status)}">${item.status === 'due soon' ? 'Due Soon' : item.status.charAt(0).toUpperCase()+item.status.slice(1)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  if(watchEl){
+    watchEl.innerHTML = watchOnly.map(item=>`
+      <div class="svc-item">
+        <div class="svc-dot watch"></div>
+        <div class="svc-info">
+          <div class="svc-name">${item.name}</div>
+          <div class="svc-note">${item.note || 'Monitor manually'}</div>
+        </div>
+        <div class="svc-right">
+          <div class="svc-mi">Manual</div>
+          <div class="badge orange">Watch</div>
+        </div>
+      </div>
+    `).join('') || `<div class="svc-item"><div class="svc-info"><div class="svc-name">No watch-only items</div><div class="svc-note">All tracked items are recurring services.</div></div></div>`;
+  }
 }
 
-/* ─── LOG ────────────────────────────────────────────────── */
+/* ─── LOG/* ─── LOG ────────────────────────────────────────────────── */
 function renderLog(){
   const d=getData().sort((a,b)=>b.mi-a.mi);
   const el=document.getElementById('logList');
@@ -1856,60 +2145,38 @@ function delEntry(id){
   showToast('Entry deleted');
 }
 
-/* ─── MAINTENANCE SCHEDULE (smart predictor data) ────────────── */
-const MAINTENANCE_ITEMS = [
-  { id:'oil',     name:'Oil Change + Tire Rotation',    icon:'🔧', dueMi:69590,  interval:5000,  soon:500  },
-  { id:'hvfi',    name:'HV Battery Filter — Inspect',   icon:'🔋', dueMi:69590,  interval:5000,  soon:500  },
-  { id:'cabin',   name:'Cabin Air Filter',               icon:'💨', dueMi:79751,  interval:15000, soon:1500 },
-  { id:'hvfc',    name:'HV Battery Filter — Clean',     icon:'🧹', dueMi:84590,  interval:20000, soon:2000 },
-  { id:'engair',  name:'Engine Air Filter',              icon:'🌬️', dueMi:94590,  interval:30000, soon:2000 },
-  { id:'tires',   name:'New Tires + Alignment',          icon:'🛞', dueMi:null,   interval:null,  soon:null, note:'Monitor tread — currently 6/32"' },
-  { id:'coolant', name:'Engine Coolant Drain & Fill',    icon:'🌡️', dueMi:100000, interval:50000, soon:3000 },
-  { id:'plugs',   name:'Spark Plugs (iridium)',           icon:'⚡', dueMi:120000, interval:60000, soon:3000 },
-  { id:'trans',   name:'Transmission Fluid D&F',         icon:'⚙️', dueMi:124590, interval:60000, soon:3000 },
-  { id:'diff',    name:'Rear Differential D&F',          icon:'🔩', dueMi:124590, interval:60000, soon:3000 },
-  { id:'invcool', name:'Inverter Coolant Drain & Fill',  icon:'🌡️', dueMi:150000, interval:50000, soon:3000 },
-];
-
-function getSmartStatus(mi){
-  return MAINTENANCE_ITEMS.map(item => {
-    if(!item.dueMi) return { ...item, status:'watch', miLeft:null };
-    const miLeft = item.dueMi - mi;
-    let status;
-    if(miLeft <= 0)              status = 'overdue';
-    else if(miLeft <= item.soon) status = 'soon';
-    else if(miLeft <= 3000)      status = 'upcoming';
-    else                         status = 'future';
-    return { ...item, miLeft, status };
-  });
+/* ─── MAINTENANCE ENGINE (whichever comes first) ─────────────── */
+function getSmartStatus(mi=getMi(), referenceDate=todayLocal()){
+  return getRecurringServicesState(mi, referenceDate).rules.sort(compareRecurring);
 }
-
 function renderSmartList(mi){
   const items = getSmartStatus(mi);
   const el = document.getElementById('smartList');
   el.innerHTML = items.map(item => {
-    let badgeClass, badgeText;
-    if(item.status==='overdue'){
-      badgeClass='sm-overdue';
-      badgeText='OVERDUE '+Math.abs(item.miLeft).toLocaleString()+'mi';
-    } else if(item.status==='soon'){
-      badgeClass='sm-soon';
-      badgeText=item.miLeft.toLocaleString()+' mi left';
-    } else if(item.status==='upcoming'){
-      badgeClass='sm-upcoming';
-      badgeText=item.miLeft.toLocaleString()+' mi left';
-    } else if(item.status==='watch'){
-      badgeClass='sm-future';badgeText='MONITOR';
-    } else {
-      badgeClass='sm-future';
-      badgeText=item.miLeft?item.miLeft.toLocaleString()+' mi left':'—';
-    }
-    const detail = item.note || (item.dueMi?'Due at '+item.dueMi.toLocaleString()+' mi':'');
+    const badgeText = item.watchOnly
+      ? 'WATCH'
+      : item.status === 'due soon'
+        ? `DUE SOON · ${item.currentDriver === 'time' && item.daysRemaining!==null ? `${Math.max(item.daysRemaining,0)}d` : item.milesRemaining!==null ? `${Math.max(item.milesRemaining,0).toLocaleString()}mi` : 'soon'}`
+        : item.status === 'overdue'
+          ? item.currentDriver === 'time' && item.daysRemaining!==null
+            ? `OVERDUE ${Math.abs(item.daysRemaining)}d`
+            : item.milesRemaining!==null
+              ? `OVERDUE ${Math.abs(item.milesRemaining).toLocaleString()}mi`
+              : 'OVERDUE'
+          : item.currentDriver === 'time' && item.daysRemaining!==null
+            ? `${item.daysRemaining}d left`
+            : item.milesRemaining!==null
+              ? `${item.milesRemaining.toLocaleString()} mi left`
+              : item.status.toUpperCase();
+    const badgeClass = item.watchOnly ? 'sm-future' : item.status === 'overdue' ? 'sm-overdue' : item.status === 'due soon' ? 'sm-soon' : item.status === 'upcoming' ? 'sm-upcoming' : 'sm-future';
+    const dueLine = item.watchOnly ? (item.note || 'Monitor manually') : item.dueLine;
+    const triggerLine = item.watchOnly ? 'Watch only' : `${item.remainingText} · ${item.triggerText}`;
     return `<div class="sm-item">
       <div class="sm-icon">${item.icon}</div>
       <div class="sm-info">
         <div class="sm-name">${item.name}</div>
-        <div class="sm-detail">${detail}</div>
+        <div class="sm-detail">${dueLine}</div>
+        <div class="sm-detail">${triggerLine}</div>
       </div>
       <div class="sm-badge ${badgeClass}">${badgeText}</div>
     </div>`;
@@ -1917,7 +2184,7 @@ function renderSmartList(mi){
   document.getElementById('smartPreview').style.display='block';
 }
 
-/* ─── MILEAGE MODAL ──────────────────────────────────────────── */
+/* ─── MILEAGE MODAL/* ─── MILEAGE MODAL ──────────────────────────────────────────── */
 function openMiModal(){
   const cur = getMi();
   document.getElementById('miInput').value = cur;
@@ -1948,6 +2215,7 @@ function go(id){
   document.getElementById('page-'+id).classList.add('active');
   const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
   if(id==='backup')renderBackup();
+  if(id==='upcoming')renderUpcoming();
   if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
   if(id==='shop')renderShop();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -2120,8 +2388,9 @@ function generatePrint(){
 
   const totalCost = entries.reduce((a,e)=>a+parseFloat(e.cost||0),0);
 
-  // Smart upcoming items
-  const upcoming = getSmartStatus(curMi).filter(i=>i.status!=='future'||i.status==='watch').slice(0,6);
+  const maintenanceState = getRecurringServicesState(curMi);
+  const upcoming = maintenanceState.rules.filter(i=>!i.watchOnly).sort(compareRecurring).slice(0,6);
+  const heroBundle = getNextRecurringBundle(maintenanceState);
 
   // Build rows
   const rows = entries.map((e,i)=>{
@@ -2139,16 +2408,16 @@ function generatePrint(){
     </tr>`;
   }).join('');
 
-  const upcomingRows = getSmartStatus(curMi).map(item=>{
-    if(!item.dueMi && item.status!=='watch') return '';
-    const color = item.status==='overdue'?'#dc2626':item.status==='soon'?'#c2410c':item.status==='upcoming'?'#15803d':'#9aa0ae';
-    const label = item.status==='overdue'?'OVERDUE':item.status==='soon'?`${item.miLeft?.toLocaleString()} mi`:item.status==='upcoming'?`${item.miLeft?.toLocaleString()} mi`:item.miLeft?`${item.miLeft.toLocaleString()} mi`:'Monitor';
+  const upcomingRows = upcoming.map(item=>{
+    const color = item.status==='overdue'?'#dc2626':item.status==='due soon'?'#c2410c':item.status==='upcoming'?'#15803d':'#9aa0ae';
+    const badge = item.status === 'due soon' ? 'DUE SOON' : item.status.toUpperCase();
     return `<tr>
       <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px">${item.icon} ${item.name}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.dueMi?item.dueMi.toLocaleString()+' mi':'—'}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${label}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.dueLine.replace('Next due: ','')}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${badge} · ${item.remainingText}</td>
     </tr>`;
-  }).filter(Boolean).join('');
+  }).join('');
 
   // Collect photos for PDF
   const photoEntries = entries.filter(e => getPhoto(e.id));
@@ -2403,7 +2672,8 @@ function generatePrint(){
       <thead>
         <tr>
           <th>Service Item</th>
-          <th>Due At</th>
+          <th>Next Due</th>
+          <th>Driver</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -2439,7 +2709,7 @@ function generatePrint(){
       <div class="sig-box">
         <div class="sig-label">Next Service Due</div>
         <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
-        <div class="sig-val">${(curMi + 5000).toLocaleString()} miles</div>
+        <div class="sig-val">${heroBundle?.lead ? heroBundle.lead.dueLine.replace('Next due: ','') : 'See schedule above'}</div>
       </div>
     </div>
   </div>
@@ -2616,9 +2886,7 @@ function renderShop(){
   const el = document.getElementById('shopContent');
 
   // Find what's due within next 15k miles
-  const dueItems = status.filter(i => i.dueMi && (i.status==='overdue'||i.status==='soon'||i.status==='upcoming'));
-  const alwaysOil = status.find(i=>i.id==='oil');
-
+  const dueItems = status.filter(i => !i.watchOnly && i.nextDueMileage!==null && (i.status==='overdue'||i.status==='due soon'||i.status==='upcoming'));
   // Build shopping list
   let allParts = [];
   const addedParts = new Set();
