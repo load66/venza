@@ -736,7 +736,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
     <button class="nav-btn" onclick="go('specs')">Specs</button>
     <button class="nav-btn" onclick="go('backup')">⚙ Backup</button>
     <button class="nav-btn" onclick="go('printlog')">🖨 Print</button>
-    <button class="nav-btn" onclick="go('shop')">🛒 Shopping</button>
   </nav>
 </div>
 
@@ -898,11 +897,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
       <button class="btn-primary" onclick="saveEntry()">Save Entry</button>
     </div>
   </div>
-</div>
-
-<!-- ═══ SMART SHOPPING LIST ══════════════════════════════════════ -->
-<div id="page-shop" class="page">
-  <div id="shopContent"></div>
 </div>
 
 <!-- ═══ UPCOMING SCHEDULE ════════════════════════════════════════ -->
@@ -3245,7 +3239,7 @@ document.getElementById('miModal').addEventListener('click',function(e){
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,shop:9,add:-1};
+  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,add:-1};
   document.getElementById('page-'+id).classList.add('active');
   const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
   if(id==='backup')renderBackup();
@@ -3253,7 +3247,6 @@ function go(id){
   if(id==='parts')renderParts();
   if(id==='add')renderEntryInventoryUI();
   if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
-  if(id==='shop')renderShop();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -3924,90 +3917,6 @@ function delBuiltin(id){
 /* ════════════════════════════════════════════════════════════════
    SMART SHOPPING LIST
    ════════════════════════════════════════════════════════════════ */
-const SHOP_PARTS = {
-  oil: [
-    { name:'Mobil 1 0W-16 Full Synthetic 5 qt', qty:'1 jug (5 qt)', partNum:'B07Y5MG3MX', price:'$27.97', link:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534', note:'Need 4.8 qt — leftover good for top-off', urgent:true },
-    { name:'Toyota OEM Oil Filter 90915-YZZN1', qty:'1 filter', partNum:'90915-YZZN1', price:'$6.57', link:'https://parts.toyota.com/', note:'Always replace with every oil change', urgent:true },
-    { name:'ValvoMax Drain Bag Starter Kit', qty:'1 bag', partNum:'Starter Kit', price:'$19.99', link:'https://www.valvomax.com/collections/all', note:'Reusable — refill bags separately after first use', urgent:false },
-  ],
-  cabin: [
-    { name:'A-Premium Activated Carbon Cabin Filter', qty:'1 filter', partNum:'APCA4605', price:'$11.18', link:'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid', note:'Confirmed fit for 2021 Venza', urgent:true },
-  ],
-  engine_filter: [
-    { name:'Toyota Engine Air Filter', qty:'1 filter', partNum:'17801-YZZ16', price:'$15.59', link:'', note:'Get link at Frank Fletcher Toyota Parts next visit', urgent:true },
-  ],
-  coolant: [
-    { name:'Toyota Super Long Life Coolant (SLLC)', qty:'2 gallons', partNum:'00272-SLLC2', price:'~$30–40', link:'', note:'Pink · Pre-mixed 50/50 · Need ~1.5 gallons for full drain', urgent:true },
-    { name:'Lisle 24680 Spill-Free Funnel', qty:'1 (one-time)', partNum:'Lisle 24680', price:'~$20', link:'https://www.amazon.com/s?k=Lisle+24680', note:'Required for air-free fill', urgent:false },
-  ],
-  trans: [
-    { name:'Toyota ATF WS Transmission Fluid', qty:'4 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Get link at Frank Fletcher Toyota Parts', urgent:true },
-  ],
-  diff: [
-    { name:'Toyota ATF WS Rear Diff Fluid', qty:'2 quarts', partNum:'00289-ATFWS', price:'Dealer price', link:'', note:'Same fluid as transmission — can combine order', urgent:true },
-  ],
-  plugs: [
-    { name:'NGK Iridium Spark Plugs (set of 4)', qty:'4 plugs', partNum:'OEM iridium', price:'~$60–80', link:'https://www.amazon.com/s?k=NGK+iridium+spark+plugs+2021+Toyota+Venza', note:'NGK or Denso OEM only — no substitutes', urgent:true },
-  ],
-};
-
-function renderShop(){
-  const mi = getMi();
-  const status = getSmartStatus(mi);
-  const el = document.getElementById('shopContent');
-
-  // Find what's due within next 15k miles
-  const dueItems = status.filter(i => !i.watchOnly && i.nextDueMileage!==null && (i.status==='overdue'||i.status==='due soon'||i.status==='upcoming'));
-  // Build shopping list
-  let allParts = [];
-  const addedParts = new Set();
-
-  // Always include oil change supplies
-  (SHOP_PARTS.oil||[]).forEach(p=>{ if(!addedParts.has(p.partNum)){ allParts.push({...p,service:'Oil Change + Tire Rotation',serviceIcon:'🔧'}); addedParts.add(p.partNum); } });
-
-  dueItems.forEach(item=>{
-    const parts = SHOP_PARTS[item.id]||[];
-    parts.forEach(p=>{ if(!addedParts.has(p.partNum)){ allParts.push({...p,service:item.name,serviceIcon:item.icon}); addedParts.add(p.partNum); } });
-  });
-
-  const totalEst = allParts.filter(p=>p.price.startsWith('$')&&!p.price.includes('–')).reduce((a,p)=>a+parseFloat(p.price.replace('$','').replace(',','')||0),0);
-
-  el.innerHTML = `
-    <div class="alert green" style="margin-bottom:10px">
-      <div class="alert-icon">🛒</div>
-      <div><strong>${allParts.length} items</strong> needed for upcoming services · Estimated: ~$${(totalEst||'—')} + dealer parts</div>
-    </div>
-
-    <div class="section-label" style="margin-top:0">Based on ${mi.toLocaleString()} current miles</div>
-
-    ${allParts.map((p,i)=>`
-    <div class="card" style="margin-bottom:8px">
-      <div style="padding:12px 14px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px">
-          <div style="flex:1">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">${p.serviceIcon} ${p.service}</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)">${p.name}</div>
-          </div>
-          <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:14px;font-weight:700;color:var(--orange2)">${p.price}</div>
-            <div style="font-size:10px;color:var(--text3)">qty: ${p.qty}</div>
-          </div>
-        </div>
-        <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-bottom:6px">Part: ${p.partNum}</div>
-        ${p.note?`<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">💡 ${p.note}</div>`:''}
-        ${p.link
-          ?`<a href="${p.link}" target="_blank" style="display:inline-block;background:var(--toyota);color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;transition:opacity .2s">→ Buy Now</a>`
-          :`<span style="font-size:11px;color:var(--text3);font-style:italic">⚠ No link saved yet — ask at next purchase</span>`}
-      </div>
-    </div>`).join('')}
-
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:4px">
-      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💰 Estimated Total</div>
-      <div style="font-size:22px;font-weight:700;font-family:'Bebas Neue',sans-serif;color:var(--text)">~$${totalEst.toFixed(2)} <span style="font-size:12px;color:var(--text3);font-family:'Outfit',sans-serif;font-weight:400">+ dealer-priced parts</span></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px">vs. ~$180–250 at dealer for oil change alone</div>
-    </div>
-  `;
-}
 </script>
 </body>
 </html>
