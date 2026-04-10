@@ -1500,6 +1500,14 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
     <div class="row"><span class="row-key">Last Service</span><span class="row-val" id="bkLast">—</span></div>
   </div></div>
 
+
+  <div class="section-label">New Car Generator</div>
+  <div class="form-section" style="background:rgba(34,212,110,.04);border-color:rgba(34,212,110,.18)">
+    <div class="form-title" style="margin-bottom:8px;color:var(--green2)">🚗 Generate Fresh Car App</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Create a clean <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">index.html</code> for another vehicle with 0 service logs, 0 inventory, and 0 receipt photos. Your current car data stays untouched.</p>
+    <button class="btn-primary" style="background:var(--green)" onclick="openNewCarGenerator()">Generate New Car App</button>
+  </div>
+
   <div class="section-label">For ChatGPT — Add Log Entry</div>
   <div class="form-section" style="background:rgba(59,158,255,.05);border-color:rgba(59,158,255,.2)">
     <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">📋 ChatGPT Instructions</div>
@@ -2932,6 +2940,235 @@ function resetData(){
   renderAll();
   renderBackup();
   showToast('Reset to factory data ✓');
+}
+
+
+/* ─── NEW CAR GENERATOR ─────────────────────────────────── */
+const NEW_CAR_BASE_PROFILE = {
+  year:'', make:'', model:'', trim:'', vin:'', startingMileage:0,
+  engine:'', drivetrain:'', tireSize:'', oilType:'0W-20 Full Synthetic', oilCapacity:'', fuelType:'Regular 87',
+  preferredRoutineIntervalMiles:5000, preferredRoutineIntervalMonths:6,
+  preferredOilIntervalMiles:5000, preferredOilIntervalMonths:6,
+  notes:''
+};
+function vehicleDisplayName(p){ return [p.year,p.make,p.model,p.trim].filter(Boolean).join(' ').trim() || 'New Vehicle'; }
+function vehicleGarageName(p){ return ([p.make,p.model].filter(Boolean).join(' ') || 'NEW CAR').toUpperCase() + ' GARAGE'; }
+function slugifyText(v=''){ return String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'new-car-maintenance-log'; }
+function escapeHtmlText(v=''){ return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function safeJsString(v=''){ return String(v).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function getNewCarState(){ if(!window._newCarGen){ window._newCarGen={step:1, profile:{...NEW_CAR_BASE_PROFILE}, outputs:null}; } return window._newCarGen; }
+function closeNewCarGenerator(){ document.getElementById('newCarGenOverlay')?.remove(); }
+function ensureNewCarOverlay(){
+  let overlay=document.getElementById('newCarGenOverlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.className='overlay open';
+    overlay.id='newCarGenOverlay';
+    overlay.innerHTML='<div class="modal"><div class="modal-grip"></div><div class="modal-scroll" id="newCarGenBody"></div></div>';
+    overlay.addEventListener('click',e=>{ if(e.target===overlay) closeNewCarGenerator(); });
+    document.body.appendChild(overlay);
+  }
+  return overlay;
+}
+function openNewCarGenerator(){ window._newCarGen={step:1, profile:{...NEW_CAR_BASE_PROFILE}, outputs:null}; renderNewCarGenerator(); }
+function renderNewCarGenerator(){
+  const state=getNewCarState();
+  const p=state.profile;
+  const body=ensureNewCarOverlay().querySelector('#newCarGenBody');
+  if(state.step===1){
+    body.innerHTML=`
+      <div class="modal-title">New Car Generator</div>
+      <div class="alert blue"><div class="alert-icon">🚘</div><div><strong>Step 1 of 3</strong><br>Enter the core vehicle identity for the new clean app.</div></div>
+      <div class="fg2">
+        <div class="fl"><label>Year *</label><input type="number" class="fi" id="ncYear" placeholder="2027" value="${escapeHtmlAttr(p.year)}"></div>
+        <div class="fl"><label>Starting Mileage *</label><input type="number" class="fi" id="ncMileage" min="0" step="1" placeholder="0" value="${escapeHtmlAttr(p.startingMileage)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Make *</label><input type="text" class="fi" id="ncMake" placeholder="Honda" value="${escapeHtmlAttr(p.make)}"></div>
+        <div class="fl"><label>Model *</label><input type="text" class="fi" id="ncModel" placeholder="CR-V" value="${escapeHtmlAttr(p.model)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Trim</label><input type="text" class="fi" id="ncTrim" placeholder="EX-L AWD" value="${escapeHtmlAttr(p.trim)}"></div>
+        <div class="fl"><label>VIN</label><input type="text" class="fi" id="ncVin" placeholder="Optional but recommended" value="${escapeHtmlAttr(p.vin)}"></div>
+      </div>
+      <div class="btn-row"><button class="btn-ghost" onclick="closeNewCarGenerator()">Cancel</button><button class="btn-primary" onclick="nextNewCarStep1()">Next</button></div>`;
+    return;
+  }
+  if(state.step===2){
+    body.innerHTML=`
+      <div class="modal-title">Vehicle Setup Details</div>
+      <div class="alert blue"><div class="alert-icon">⚙️</div><div><strong>Step 2 of 3</strong><br>These values shape the generated template. Leave unknown fields blank and fill them later in the new repo.</div></div>
+      <div class="fg2">
+        <div class="fl"><label>Engine</label><input type="text" class="fi" id="ncEngine" placeholder="2.5L Hybrid" value="${escapeHtmlAttr(p.engine)}"></div>
+        <div class="fl"><label>Drivetrain</label><input type="text" class="fi" id="ncDrive" placeholder="AWD / FWD / RWD" value="${escapeHtmlAttr(p.drivetrain)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Tire Size</label><input type="text" class="fi" id="ncTire" placeholder="225/60R18" value="${escapeHtmlAttr(p.tireSize)}"></div>
+        <div class="fl"><label>Fuel Type</label><input type="text" class="fi" id="ncFuel" placeholder="Regular 87" value="${escapeHtmlAttr(p.fuelType)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Oil Type</label><input type="text" class="fi" id="ncOilType" placeholder="0W-20 Full Synthetic" value="${escapeHtmlAttr(p.oilType)}"></div>
+        <div class="fl"><label>Oil Capacity</label><input type="text" class="fi" id="ncOilCap" placeholder="4.8 qt" value="${escapeHtmlAttr(p.oilCapacity)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Routine Interval Miles *</label><input type="number" class="fi" id="ncRoutineMiles" min="1000" step="500" value="${escapeHtmlAttr(p.preferredRoutineIntervalMiles)}"></div>
+        <div class="fl"><label>Routine Interval Months *</label><input type="number" class="fi" id="ncRoutineMonths" min="1" step="1" value="${escapeHtmlAttr(p.preferredRoutineIntervalMonths)}"></div>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Oil Interval Miles *</label><input type="number" class="fi" id="ncOilMiles" min="1000" step="500" value="${escapeHtmlAttr(p.preferredOilIntervalMiles)}"></div>
+        <div class="fl"><label>Oil Interval Months *</label><input type="number" class="fi" id="ncOilMonths" min="1" step="1" value="${escapeHtmlAttr(p.preferredOilIntervalMonths)}"></div>
+      </div>
+      <div class="fl"><label>Generator Notes</label><textarea class="ft" id="ncNotes" placeholder="Optional notes...">${escapeHtmlText(p.notes)}</textarea></div>
+      <div class="btn-row"><button class="btn-ghost" onclick="newCarBack()">Back</button><button class="btn-primary" onclick="previewNewCarStep()">Preview</button></div>`;
+    return;
+  }
+  if(state.step===3){
+    body.innerHTML=`
+      <div class="modal-title">Confirm Fresh Car App</div>
+      <div class="alert gold"><div class="alert-icon">⚠️</div><div><strong>Final confirmation</strong><br>This downloads a fresh <strong>index.html</strong> for <strong>${escapeHtmlText(vehicleDisplayName(p))}</strong> with 0 logs, 0 inventory, and 0 photos.</div></div>
+      <div class="card"><div class="card-body">
+        <div class="row"><span class="row-key">Vehicle</span><span class="row-val">${escapeHtmlText(vehicleDisplayName(p))}</span></div>
+        <div class="row"><span class="row-key">VIN</span><span class="row-val">${escapeHtmlText(p.vin || 'Not provided')}</span></div>
+        <div class="row"><span class="row-key">Starting Mileage</span><span class="row-val">${Number(p.startingMileage||0).toLocaleString()} mi</span></div>
+        <div class="row"><span class="row-key">Oil Interval</span><span class="row-val">${Number(p.preferredOilIntervalMiles||0).toLocaleString()} mi / ${p.preferredOilIntervalMonths} mo</span></div>
+        <div class="row"><span class="row-key">Routine Interval</span><span class="row-val">${Number(p.preferredRoutineIntervalMiles||0).toLocaleString()} mi / ${p.preferredRoutineIntervalMonths} mo</span></div>
+      </div></div>
+      <label class="inv-check"><input type="checkbox" id="ncConfirm1"> I already exported my current car backup</label>
+      <label class="inv-check"><input type="checkbox" id="ncConfirm2"> I understand the generated file starts with 0 data</label>
+      <label class="inv-check"><input type="checkbox" id="ncConfirm3"> I want this as a separate repo / app</label>
+      <div class="btn-row"><button class="btn-ghost" onclick="newCarBack()">Back</button><button class="btn-primary" style="background:var(--green)" onclick="generateFreshCarApp()">Generate Fresh App</button></div>`;
+    return;
+  }
+  if(state.step===4 && state.outputs){
+    const o=state.outputs;
+    body.innerHTML=`
+      <div class="modal-title">Fresh Car App Generated</div>
+      <div class="alert green"><div class="alert-icon">✅</div><div><strong>Success</strong><br>Your new file downloaded. Use the copy buttons below for a fast GitHub setup.</div></div>
+      ${renderGeneratorOutputCard('Generated File Name','index.html','File Name')}
+      ${renderGeneratorOutputCard('Suggested Repo Name',o.repoName,'Repo Name')}
+      ${renderGeneratorOutputCard('Repo Description',o.repoDescription,'Description')}
+      ${renderGeneratorOutputCard('Vehicle Summary',o.vehicleSummary,'Vehicle Summary',true)}
+      ${renderGeneratorOutputCard('GitHub Upload Steps',o.uploadSteps,'Upload Steps',true)}
+      ${renderGeneratorOutputCard('Maintenance Baseline',o.maintenanceBaseline,'Baseline',true)}
+      ${renderGeneratorOutputCard('Generator Notes',o.generatorNotes,'Notes',true)}
+      <div class="btn-row"><button class="btn-ghost" onclick="closeNewCarGenerator()">Close</button><button class="btn-primary" onclick="copyFullGeneratorPackage()">Copy Full Setup Package</button></div>`;
+  }
+}
+function renderGeneratorOutputCard(title, value, label, multi=false){
+  return `<div class="form-section" style="padding:12px 14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--text)">${title}</div><button class="inv-btn" onclick="copyTextValue(this.dataset.text, '${label}')" data-text="${escapeHtmlAttr(value)}">Copy ${label}</button></div><div style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.7;white-space:${multi?'pre-wrap':'normal'}">${escapeHtmlText(value)}</div></div>`;
+}
+function nextNewCarStep1(){
+  const state=getNewCarState();
+  const year=String(document.getElementById('ncYear').value||'').trim();
+  const make=document.getElementById('ncMake').value.trim();
+  const model=document.getElementById('ncModel').value.trim();
+  if(!/^\d{4}$/.test(year)){ showToast('Enter a valid 4-digit year'); return; }
+  if(!make || !model){ showToast('Make and model are required'); return; }
+  Object.assign(state.profile,{
+    year, make, model,
+    trim:document.getElementById('ncTrim').value.trim(),
+    vin:document.getElementById('ncVin').value.trim().toUpperCase().replace(/\s+/g,''),
+    startingMileage:Math.max(0, parseInt(document.getElementById('ncMileage').value||0,10) || 0)
+  });
+  state.step=2; renderNewCarGenerator();
+}
+function newCarBack(){ const state=getNewCarState(); state.step=Math.max(1,state.step-1); renderNewCarGenerator(); }
+function previewNewCarStep(){
+  const state=getNewCarState();
+  Object.assign(state.profile,{
+    engine:document.getElementById('ncEngine').value.trim(),
+    drivetrain:document.getElementById('ncDrive').value.trim(),
+    tireSize:document.getElementById('ncTire').value.trim(),
+    fuelType:document.getElementById('ncFuel').value.trim() || 'Regular 87',
+    oilType:document.getElementById('ncOilType').value.trim() || '0W-20 Full Synthetic',
+    oilCapacity:document.getElementById('ncOilCap').value.trim(),
+    preferredRoutineIntervalMiles:Math.max(1000, parseInt(document.getElementById('ncRoutineMiles').value||5000,10) || 5000),
+    preferredRoutineIntervalMonths:Math.max(1, parseInt(document.getElementById('ncRoutineMonths').value||6,10) || 6),
+    preferredOilIntervalMiles:Math.max(1000, parseInt(document.getElementById('ncOilMiles').value||5000,10) || 5000),
+    preferredOilIntervalMonths:Math.max(1, parseInt(document.getElementById('ncOilMonths').value||6,10) || 6),
+    notes:document.getElementById('ncNotes').value.trim()
+  });
+  state.step=3; renderNewCarGenerator();
+}
+async function getCurrentHtmlSource(){
+  try{
+    const res=await fetch(window.location.href,{cache:'no-store'});
+    if(res.ok) return await res.text();
+  }catch(err){}
+  return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+}
+function buildGeneratorOutputs(p){
+  const vehicle=vehicleDisplayName(p);
+  const repoName=slugifyText(`${p.year}-${p.make}-${p.model}-maintenance-log`);
+  return {
+    repoName,
+    repoDescription:`Single-file maintenance tracker for ${vehicle}`,
+    vehicleSummary:`Vehicle:\n${vehicle}\n\nVIN:\n${p.vin || 'Add later'}\n\nStarting Mileage:\n${Number(p.startingMileage||0).toLocaleString()}\n\nOil:\n${p.oilType || 'Add later'}\n\nOil Capacity:\n${p.oilCapacity || 'Add later'}\n\nTire Size:\n${p.tireSize || 'Add later'}\n\nPreferred Routine Service:\n${Number(p.preferredRoutineIntervalMiles||0).toLocaleString()} miles or ${p.preferredRoutineIntervalMonths} months, whichever comes first`,
+    uploadSteps:`1. Create a new GitHub repository using this repo name:\n${repoName}\n\n2. Upload the generated index.html file.\n3. Enable GitHub Pages in repository settings.\n4. Use root deployment.\n5. Open the published app and start logging service.`,
+    maintenanceBaseline:`This generated app starts with:\n- Oil interval: ${Number(p.preferredOilIntervalMiles||0).toLocaleString()} mi / ${p.preferredOilIntervalMonths} mo\n- Routine interval: ${Number(p.preferredRoutineIntervalMiles||0).toLocaleString()} mi / ${p.preferredRoutineIntervalMonths} mo\n- 0 service entries\n- 0 inventory\n- 0 receipt photos\n- Generic placeholders for guides, warranty, and specs`,
+    generatorNotes:`Old car data is not included.\nKeep the previous vehicle in its own backup and repo.\nUse this new file as a clean single-car app for ${vehicle}.`
+  };
+}
+function replaceBetween(source,startMarker,endMarker,replacement){
+  const start=source.indexOf(startMarker); if(start===-1) return source;
+  const end=source.indexOf(endMarker,start); if(end===-1) return source;
+  return source.slice(0,start) + replacement + source.slice(end);
+}
+function generateNewCarHtml(source,p){
+  const vehicle=vehicleDisplayName(p);
+  const garage=vehicleGarageName(p);
+  const slug=slugifyText(`${p.year}-${p.make}-${p.model}`);
+  const startMi=Math.max(0, Number(p.startingMileage||0));
+  const nextOil=startMi + Math.max(1000, Number(p.preferredOilIntervalMiles||5000));
+  const safeVin=safeJsString(p.vin||'');
+  const safeVehicle=safeJsString(vehicle);
+  const safeOilType=safeJsString(p.oilType || 'Preferred oil spec');
+  let html=source;
+  html=html.replace(/<title>.*?<\/title>/, `<title>${escapeHtmlText(vehicle)} Garage<\/title>`);
+  html=html.replace(/VENZA GARAGE/g, garage);
+  html=html.replace(/VIN ··· 062382 · tap to copy/g, `VIN ··· ${(p.vin || 'NEWCAR').slice(-6)} · tap to copy`);
+  html=html.replace(/const VIN\s*=\s*'[^']*';/, `const VIN         = '${safeVin}';`);
+  html=html.replace(/const LAST_SVC_MI\s*=\s*\d+;/, `const LAST_SVC_MI = ${startMi};`);
+  html=html.replace(/const NEXT_SVC_MI\s*=\s*\d+;/, `const NEXT_SVC_MI = ${nextOil};`);
+  html=html.replace(/const DEFAULT = \[[\s\S]*?\n\];/, 'const DEFAULT = [];');
+  html=html.replace(/vehicle:\s*'[^']*'/, `vehicle: '${safeVehicle}'`);
+  html=html.replace(/a\.download='[^']*_backup_'\+date\+'\.json';/, `a.download='${slug}_backup_'+date+'.json';`);
+  html=html.replace(/return highestMileage\(getData\(\)\) \|\| \d+;/, `return highestMileage(getData()) || ${startMi};`);
+  html=html.replace(/setMi\(\d+\);/, `setMi(${startMi});`);
+  html=html.replace(/<div class="mi-num" id="topMi">[^<]*<\/div>/, `<div class="mi-num" id="topMi">${startMi.toLocaleString()}<\/div>`);
+  html=html.replace(/<div class="g-val" id="dMi" style="color:var\(--green2\)">[^<]*<\/div>/, `<div class="g-val" id="dMi" style="color:var(--green2)">${startMi.toLocaleString()}<\/div>`);
+  html=html.replace(/<div class="g-val" style="color:var\(--orange\)" id="dTotal">[^<]*<\/div>/, '<div class="g-val" style="color:var(--orange)" id="dTotal">$0.00<\/div>');
+  html=html.replace(/<div class="g-val" style="color:var\(--gold\)" id="dOilCost">[^<]*<\/div>/, '<div class="g-val" style="color:var(--gold)" id="dOilCost">—<\/div>');
+  html=html.replace(/<div class="g-val" style="color:var\(--blue\)" id="dCount">[^<]*<\/div>/, '<div class="g-val" style="color:var(--blue)" id="dCount">0<\/div>');
+  html=html.replace(/<div class="hero-mi" id="dHeroTitle">[\s\S]*?<\/div>/, '<div class="hero-mi" id="dHeroTitle">No Service Data Yet<\/div>');
+  html=html.replace(/<div class="hero-desc" id="dHeroDue">[\s\S]*?<\/div>/, `<div class="hero-desc" id="dHeroDue">Fresh template for ${escapeHtmlText(vehicle)}<\/div>`);
+  html=html.replace(/<div class="hero-desc" id="dHeroTrigger"[\s\S]*?<\/div>/, '<div class="hero-desc" id="dHeroTrigger" style="margin-top:8px;color:rgba(255,255,255,.7)">Start by logging your first service entry<\/div>');
+  html=html.replace(/<span id="dLast"[\s\S]*?<\/span>/, '<span id="dLast" style="color:rgba(255,255,255,.4)">Last: —<\/span>');
+  html=html.replace(/<span id="dRemain"[\s\S]*?<\/span>/, '<span id="dRemain" style="color:rgba(255,255,255,.4)">Status: Template<\/span>');
+  html=html.replace(/<input type="text" class="fi" id="prModel" value="[^"]*">/, `<input type="text" class="fi" id="prModel" value="${escapeHtmlText(vehicle)}">`);
+  html=replaceBetween(html, '<div id="page-guides" class="page">', '<!-- ═══ WARRANTY', `<div id="page-guides" class="page"><div class="alert blue"><div class="alert-icon">🧰</div><div><strong>Generic guide template</strong> — Add vehicle-specific DIY guides after reviewing the manual for ${escapeHtmlText(vehicle)}.</div></div></div>\n\n<!-- ═══ WARRANTY`);
+  html=replaceBetween(html, '<div id="page-warranty" class="page">', '<!-- ═══ SPECS', `<div id="page-warranty" class="page"><div class="alert gold"><div class="alert-icon">🛡️</div><div><strong>Warranty placeholder</strong> — Add official warranty details later for ${escapeHtmlText(vehicle)}.</div></div></div>\n\n<!-- ═══ SPECS`);
+  html=replaceBetween(html, '<div id="page-specs" class="page">', '<!-- ═══ BACKUP', `<div id="page-specs" class="page"><div class="section-label">Vehicle Profile</div><div class="card"><div class="card-body"><div class="row"><span class="row-key">Vehicle</span><span class="row-val">${escapeHtmlText(vehicle)}</span></div><div class="row"><span class="row-key">VIN</span><span class="row-val">${escapeHtmlText(p.vin || 'Add later')}</span></div><div class="row"><span class="row-key">Engine</span><span class="row-val">${escapeHtmlText(p.engine || 'Add later')}</span></div><div class="row"><span class="row-key">Drivetrain</span><span class="row-val">${escapeHtmlText(p.drivetrain || 'Add later')}</span></div><div class="row"><span class="row-key">Oil Type</span><span class="row-val">${escapeHtmlText(p.oilType || 'Add later')}</span></div><div class="row"><span class="row-key">Oil Capacity</span><span class="row-val">${escapeHtmlText(p.oilCapacity || 'Add later')}</span></div><div class="row"><span class="row-key">Tire Size</span><span class="row-val">${escapeHtmlText(p.tireSize || 'Add later')}</span></div><div class="row"><span class="row-key">Routine Interval</span><span class="row-val green">${Number(p.preferredRoutineIntervalMiles||0).toLocaleString()} mi / ${p.preferredRoutineIntervalMonths} mo</span></div><div class="row"><span class="row-key">Oil Interval</span><span class="row-val green">${Number(p.preferredOilIntervalMiles||0).toLocaleString()} mi / ${p.preferredOilIntervalMonths} mo</span></div></div></div></div>\n\n<!-- ═══ BACKUP`);
+  html=replaceBetween(html, 'const RECURRING_RULES = [', 'const RULE_ORDER', `const RECURRING_RULES = [\n  {id:'oil', name:'Oil Change', icon:'🔧', entryTypes:['oil','oiltires'], milesInterval:${Math.max(1000, Number(p.preferredOilIntervalMiles||5000))}, monthsInterval:${Math.max(1, Number(p.preferredOilIntervalMonths||6))}, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'${safeOilType}'},\n  {id:'tires', name:'Tire Rotation', icon:'🔄', entryTypes:['tires','oiltires'], milesInterval:${Math.max(1000, Number(p.preferredRoutineIntervalMiles||5000))}, monthsInterval:${Math.max(1, Number(p.preferredRoutineIntervalMonths||6))}, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Routine interval ${Math.max(1000, Number(p.preferredRoutineIntervalMiles||5000))} mi / ${Math.max(1, Number(p.preferredRoutineIntervalMonths||6))} mo'},\n  {id:'cabin', name:'Cabin Air Filter', icon:'💨', entryTypes:['cabin'], watchOnly:true, note:'Add vehicle-specific interval later'},\n  {id:'engine_filter', name:'Engine Air Filter', icon:'🌬️', entryTypes:['engine_filter'], watchOnly:true, note:'Add vehicle-specific interval later'},\n  {id:'trans', name:'Transmission Service', icon:'🛢️', entryTypes:['trans'], watchOnly:true, note:'Set a custom interval if desired'},\n  {id:'coolant', name:'Coolant Service', icon:'🌡️', entryTypes:['coolant','inv_coolant'], watchOnly:true, note:'Add official coolant interval later'},\n  {id:'plugs', name:'Spark Plugs', icon:'⚡', entryTypes:['plugs'], watchOnly:true, note:'Add official spark-plug interval later'},\n  {id:'brakes', name:'Brake Service', icon:'🛑', entryTypes:['brakes'], watchOnly:true, note:'Monitor wear and add your own interval'}\n];\nconst RULE_ORDER`);
+  return html;
+}
+async function generateFreshCarApp(){
+  if(!document.getElementById('ncConfirm1')?.checked || !document.getElementById('ncConfirm2')?.checked || !document.getElementById('ncConfirm3')?.checked){ showToast('Check all confirmations first'); return; }
+  const state=getNewCarState();
+  showToast('Building fresh app...');
+  const source=await getCurrentHtmlSource();
+  const html=generateNewCarHtml(source,state.profile);
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='index.html'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  state.outputs=buildGeneratorOutputs(state.profile);
+  state.step=4; renderNewCarGenerator();
+  showToast('Fresh app downloaded ✓');
+}
+function copyFullGeneratorPackage(){
+  const o=getNewCarState().outputs; if(!o) return;
+  copyTextValue(`Generated File Name:\nindex.html\n\nSuggested Repo Name:\n${o.repoName}\n\nRepo Description:\n${o.repoDescription}\n\nVehicle Summary:\n${o.vehicleSummary}\n\nGitHub Upload Steps:\n${o.uploadSteps}\n\nMaintenance Baseline:\n${o.maintenanceBaseline}\n\nGenerator Notes:\n${o.generatorNotes}`,'Full setup package');
 }
 
 /* ─── TOAST ──────────────────────────────────────────────── */
