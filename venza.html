@@ -704,8 +704,10 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .reminder-row strong{color:var(--text2);font-weight:600}
 .lock-note{font-size:11px;color:var(--green2);margin-top:8px;line-height:1.6}
 
+html.modal-open,body.modal-open{overflow:hidden}
 #masterPartModal{z-index:750;align-items:center;justify-content:center;padding:16px;background:rgba(7,9,14,.74);backdrop-filter:none;-webkit-backdrop-filter:none}
 #masterPartModal .modal{width:min(560px, calc(100vw - 24px));max-height:min(78vh, 760px);border-radius:20px;padding:18px 16px;padding-bottom:18px;animation:masterPop .18s ease;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+#masterPartModal .modal-scroll{max-height:calc(min(78vh, 760px) - 132px)}
 #masterPartModal .modal-grip{display:none}
 #masterPartModal .modal-title{margin-bottom:12px}
 @keyframes masterPop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -774,6 +776,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   .modal-title{font-size:20px}
   #masterPartModal{padding:12px}
   #masterPartModal .modal{width:calc(100vw - 20px);max-height:74vh;border-radius:16px;padding:16px 14px}
+  #masterPartModal .modal-scroll{max-height:calc(74vh - 124px)}
 
   #miInput{font-size:26px !important;letter-spacing:2px !important}
 }
@@ -2769,6 +2772,7 @@ window.onload=()=>{
   if(!localStorage.getItem('vz_log'))save(DEFAULT);
   if(!localStorage.getItem(INVENTORY_KEY))saveInventory(DEFAULT_INVENTORY);
   if(!localStorage.getItem(MASTER_PARTS_KEY))saveMasterParts(DEFAULT_MASTER_PARTS);
+  ensureMasterPartModalPortal();
   ensureMasterPartsReady();
   mergeDuplicateMasterParts();
   syncMasterPartsFromInventory();
@@ -3057,7 +3061,35 @@ function clearInventoryForm(){
   document.getElementById('invType').value='oil';
   document.getElementById('invOilAvg').checked=false;
 }
+let masterPartModalScrollY = 0;
+function ensureMasterPartModalPortal(){
+  const modal = document.getElementById('masterPartModal');
+  if(modal && modal.parentElement !== document.body){
+    document.body.appendChild(modal);
+  }
+}
+function lockMasterPartModal(){
+  masterPartModalScrollY = window.scrollY || window.pageYOffset || 0;
+  document.documentElement.classList.add('modal-open');
+  document.body.classList.add('modal-open');
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${masterPartModalScrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+}
+function unlockMasterPartModal(){
+  document.documentElement.classList.remove('modal-open');
+  document.body.classList.remove('modal-open');
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  window.scrollTo(0, masterPartModalScrollY || 0);
+}
 function openMasterPartEditor(part){
+  ensureMasterPartModalPortal();
   const wrap = document.getElementById('masterPartEditorWrap');
   const modal = document.getElementById('masterPartModal');
   if(!wrap || !modal) return;
@@ -3071,11 +3103,20 @@ function openMasterPartEditor(part){
   document.getElementById('mpStatus').value = part?.statusLabel || '';
   document.getElementById('mpNote').value = part?.note || '';
   document.getElementById('mpOilAvg').checked = !!part?.countInOilAvg;
+  const modalScroll = modal.querySelector('.modal-scroll');
+  if(modalScroll) modalScroll.scrollTop = 0;
+  lockMasterPartModal();
   modal.classList.add('open');
+  requestAnimationFrame(()=>{
+    if(modalScroll) modalScroll.scrollTop = 0;
+    const firstField = document.getElementById('mpName');
+    if(firstField && typeof firstField.focus === 'function') firstField.focus({preventScroll:true});
+  });
 }
 function closeMasterPartEditor(){
   const modal = document.getElementById('masterPartModal');
   if(modal) modal.classList.remove('open');
+  unlockMasterPartModal();
   ['mpEditId','mpName','mpPart','mpCost','mpStatus','mpNote'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const typeEl=document.getElementById('mpType'); if(typeEl) typeEl.value='other';
   const catEl=document.getElementById('mpCategory'); if(catEl) catEl.value='other';
