@@ -2824,11 +2824,11 @@ function renderParts(){
           <div class="inv-qty ${qtyClass}">${qty} on hand</div>
         </div>
         <div class="inv-actions">
-          <button class="inv-btn" onclick="editInventoryItem(${JSON.stringify(item.id)})">Edit</button>
-          ${master ? `<button class="inv-btn" onclick="editMasterPart(${JSON.stringify(master.id)})">Master Part</button>` : ''}
-          <button class="inv-btn" onclick="adjustInventoryQty(${JSON.stringify(item.id)},1)">+1</button>
-          <button class="inv-btn" onclick="adjustInventoryQty(${JSON.stringify(item.id)},-1)">-1</button>
-          <button class="inv-btn danger" onclick="deleteInventoryItem(${JSON.stringify(item.id)})">Delete</button>
+          <button class="inv-btn" onclick="editInventoryItem('${escapeHtmlAttr(item.id)}')">Edit</button>
+          ${master ? `<button class="inv-btn" onclick="editMasterPart('${escapeHtmlAttr(master.id)}')">Master Part</button>` : ''}
+          <button class="inv-btn" onclick="adjustInventoryQty('${escapeHtmlAttr(item.id)}',1)">+1</button>
+          <button class="inv-btn" onclick="adjustInventoryQty('${escapeHtmlAttr(item.id)}',-1)">-1</button>
+          <button class="inv-btn danger" onclick="deleteInventoryItem('${escapeHtmlAttr(item.id)}')">Delete</button>
         </div>
       </div>`;
     }).join('');
@@ -2857,8 +2857,8 @@ function renderParts(){
           <div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>
           ${sourcesHtml}
           <div class="inv-actions" style="margin-top:12px">
-            <button class="inv-btn" onclick="editMasterPart(${JSON.stringify(part.id)})">Edit</button>
-            <button class="inv-btn danger" onclick="deleteMasterPart(${JSON.stringify(part.id)})">Delete</button>
+            <button class="inv-btn" onclick="editMasterPart('${escapeHtmlAttr(part.id)}')">Edit</button>
+            <button class="inv-btn danger" onclick="deleteMasterPart('${escapeHtmlAttr(part.id)}')">Delete</button>
           </div>
         </div>`;
       }).join('');
