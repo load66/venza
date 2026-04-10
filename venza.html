@@ -703,6 +703,73 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .reminder-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3)}
 .reminder-row strong{color:var(--text2);font-weight:600}
 .lock-note{font-size:11px;color:var(--green2);margin-top:8px;line-height:1.6}
+
+/* ─── MOBILE SAFARI FIT ───────────────────────────────────── */
+@media (max-width: 430px){
+  .header{padding:10px 12px 8px}
+  .header-logo{font-size:22px;letter-spacing:2.4px}
+  .header-sub{font-size:9px;letter-spacing:1.2px}
+  .mileage-pill{padding:5px 10px;border-radius:18px}
+  .mi-num{font-size:14px}
+  .mi-label{font-size:8px}
+
+  .nav{gap:5px;padding:8px 8px 10px}
+  .nav-btn{font-size:10px;min-height:40px;padding:8px 5px;border-radius:9px}
+
+  .page{padding:12px;padding-bottom:calc(20px + var(--safe-bot))}
+  .section-label{margin:16px 0 8px;font-size:11px;letter-spacing:2.4px}
+
+  .hero{padding:16px;border-radius:14px}
+  .hero-label{font-size:9px;letter-spacing:2.4px}
+  .hero-mi{font-size:clamp(28px, 11vw, 44px);line-height:.95;word-break:break-word}
+  .hero-desc{font-size:11px}
+  .progress-labels{font-size:7px;gap:6px}
+  .hero-actions{margin-top:10px}
+  .hero-mini{padding:8px 10px;font-size:11px}
+
+  .gauges{gap:6px}
+  .gauge{padding:12px;border-radius:10px}
+  .g-val{font-size:24px}
+  .g-label{font-size:8px}
+
+  .card{border-radius:12px}
+  .card-head{padding:10px 12px 9px}
+  .row{padding:9px 12px;gap:10px}
+  .row-key{font-size:12px}
+  .row-val{font-size:11px}
+
+  .log-item{padding:12px 36px 12px 12px}
+  .log-type{font-size:13px}
+  .log-desc,.step-t{font-size:12px}
+
+  .form-section{padding:14px;border-radius:12px}
+  .form-title{font-size:15px;letter-spacing:1.5px;margin-bottom:14px}
+  .fi,.fs,.ft{padding:10px 12px;font-size:16px}
+  .fg2{gap:8px}
+
+  .part-item,.inv-row,.svc-item{padding:10px 12px}
+  .part-name,.inv-name,.svc-name,.suggest-name{font-size:12px}
+  .part-price,.master-source-price{font-size:12px}
+  .inv-meta,.master-source-meta,.suggest-meta,.svc-note{font-size:9px}
+  .inv-actions{gap:6px}
+  .inv-btn,.mini-btn,.selected-use-btn,.suggest-btn{font-size:10px;padding:6px 8px}
+
+  .guide-head{padding:12px 14px}
+  .guide-title{font-size:14px}
+  .guide-meta{font-size:10px}
+  .guide-body{padding:0 14px 14px;padding-top:12px}
+
+  .warranty-card,.guide-item{border-radius:10px}
+  .wc-head{padding:12px 14px}
+  .wc-title{font-size:14px}
+  .wc-sub{font-size:10px}
+  .wc-row{font-size:11px}
+
+  .modal{padding:18px 14px;padding-bottom:calc(22px + var(--safe-bot))}
+  .modal-title{font-size:20px}
+
+  #miInput{font-size:26px !important;letter-spacing:2px !important}
+}
 </style>
 </head>
 <body>
@@ -1040,60 +1107,67 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
     <div><strong>Editable master references.</strong> These are your long-term reference parts. Buying something through Inventory automatically creates or updates the matching master part here, and saved store links stack up over time.</div>
   </div>
 
-  <div class="form-section" id="masterPartEditorWrap" style="display:none">
-    <input type="hidden" id="mpEditId">
-    <div class="form-title" id="mpFormTitle">Edit Master Part</div>
-    <div class="fg2">
-      <div class="fl"><label>Master Part Name</label><input type="text" class="fi" id="mpName" placeholder="Mobil 1 0W-16 Full Synthetic 5 qt"></div>
-      <div class="fl">
-        <label>Default Service Type</label>
-        <select class="fs" id="mpType">
-          <option value="oil">Oil Change</option>
-          <option value="oiltires">Oil + Rotation + Inspection</option>
-          <option value="tires">Tire Rotation</option>
-          <option value="cabin">Cabin Air Filter</option>
-          <option value="engine_filter">Engine Air Filter</option>
-          <option value="trans">Transmission Fluid D&F</option>
-          <option value="diff">Rear Differential D&F</option>
-          <option value="coolant">Engine Coolant D&F</option>
-          <option value="inv_coolant">Inverter Coolant D&F</option>
-          <option value="alignment">Wheel Alignment</option>
-          <option value="tires_new">New Tires</option>
-          <option value="brakes">Brake Service</option>
-          <option value="plugs">Spark Plugs</option>
-          <option value="hvfilter_inspect">HV Battery Filter — Inspect</option>
-          <option value="hvfilter_clean">HV Battery Filter — Clean</option>
-          <option value="valvomax">ValvoMax Install</option>
-          <option value="wipers">Wiper Blades</option>
-          <option value="other">Other</option>
-        </select>
+  <div class="overlay" id="masterPartModal" onclick="if(event.target===this)closeMasterPartEditor()">
+  <div class="modal">
+    <div class="modal-grip"></div>
+    <div class="modal-title" id="mpModalTitle">Edit Master Part</div>
+    <div class="modal-scroll">
+      <div class="form-section" id="masterPartEditorWrap" style="margin-bottom:0;background:transparent;border:none;box-shadow:none;padding:0">
+        <input type="hidden" id="mpEditId">
+        <div class="fg2">
+          <div class="fl"><label>Master Part Name</label><input type="text" class="fi" id="mpName" placeholder="Mobil 1 0W-16 Full Synthetic 5 qt"></div>
+          <div class="fl">
+            <label>Default Service Type</label>
+            <select class="fs" id="mpType">
+              <option value="oil">Oil Change</option>
+              <option value="oiltires">Oil + Rotation + Inspection</option>
+              <option value="tires">Tire Rotation</option>
+              <option value="cabin">Cabin Air Filter</option>
+              <option value="engine_filter">Engine Air Filter</option>
+              <option value="trans">Transmission Fluid D&F</option>
+              <option value="diff">Rear Differential D&F</option>
+              <option value="coolant">Engine Coolant D&F</option>
+              <option value="inv_coolant">Inverter Coolant D&F</option>
+              <option value="alignment">Wheel Alignment</option>
+              <option value="tires_new">New Tires</option>
+              <option value="brakes">Brake Service</option>
+              <option value="plugs">Spark Plugs</option>
+              <option value="hvfilter_inspect">HV Battery Filter — Inspect</option>
+              <option value="hvfilter_clean">HV Battery Filter — Clean</option>
+              <option value="valvomax">ValvoMax Install</option>
+              <option value="wipers">Wiper Blades</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg2">
+          <div class="fl">
+            <label>Category</label>
+            <select class="fs" id="mpCategory">
+              <option value="fluids_filters">Fluids & Filters</option>
+              <option value="valvomax">ValvoMax</option>
+              <option value="tools">Tools</option>
+              <option value="consumables">Consumables</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="fl"><label>Part # / SKU</label><input type="text" class="fi" id="mpPart" placeholder="90915-YZZN1"></div>
+        </div>
+        <div class="fg2">
+          <div class="fl"><label>Default Price ($ per unit)</label><input type="number" class="fi" id="mpCost" step="0.01" placeholder="27.97"></div>
+          <div class="fl"><label>Status Label</label><input type="text" class="fi" id="mpStatus" placeholder="Purchased / Recommended / Dealer"></div>
+        </div>
+        <div class="fl"><label>Notes</label><textarea class="ft" id="mpNote" placeholder="Reference note, fitment note, or reminder..."></textarea></div>
+        <label class="inv-check"><input type="checkbox" id="mpOilAvg"> Count this part in Avg Oil Change by default</label>
+        <div class="master-editor-note">This editor is now a pop-up sheet for faster editing on mobile.</div>
       </div>
     </div>
-    <div class="fg2">
-      <div class="fl">
-        <label>Category</label>
-        <select class="fs" id="mpCategory">
-          <option value="fluids_filters">Fluids & Filters</option>
-          <option value="valvomax">ValvoMax</option>
-          <option value="tools">Tools</option>
-          <option value="consumables">Consumables</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="fl"><label>Part # / SKU</label><input type="text" class="fi" id="mpPart" placeholder="90915-YZZN1"></div>
-    </div>
-    <div class="fg2">
-      <div class="fl"><label>Default Price ($ per unit)</label><input type="number" class="fi" id="mpCost" step="0.01" placeholder="27.97"></div>
-      <div class="fl"><label>Status Label</label><input type="text" class="fi" id="mpStatus" placeholder="Purchased / Recommended / Dealer"></div>
-    </div>
-    <div class="fl"><label>Notes</label><textarea class="ft" id="mpNote" placeholder="Reference note, fitment note, or reminder..."></textarea></div>
-    <label class="inv-check"><input type="checkbox" id="mpOilAvg"> Count this part in Avg Oil Change by default</label>
-    <div class="master-editor-note">This editor stays hidden until you open a part from the database below. New parts are usually created automatically by saving an inventory item.</div>
-    <div class="btn-row">
+    <div class="btn-row" style="margin-top:12px;flex-shrink:0">
       <button class="btn-ghost" onclick="closeMasterPartEditor()">Cancel</button>
       <button class="btn-primary" onclick="saveMasterPart()">Save Master Part</button>
     </div>
   </div>
+</div>
 
   <div class="card">
     <div class="card-head">
@@ -2978,9 +3052,10 @@ function clearInventoryForm(){
 }
 function openMasterPartEditor(part){
   const wrap = document.getElementById('masterPartEditorWrap');
-  if(!wrap) return;
+  const modal = document.getElementById('masterPartModal');
+  if(!wrap || !modal) return;
   document.getElementById('mpEditId').value = part?.id || '';
-  document.getElementById('mpFormTitle').textContent = 'Edit Master Part';
+  const titleEl = document.getElementById('mpModalTitle'); if(titleEl) titleEl.textContent = 'Edit Master Part';
   document.getElementById('mpName').value = part?.name || '';
   document.getElementById('mpType').value = part?.serviceType || 'other';
   document.getElementById('mpCategory').value = part?.category || 'other';
@@ -2989,12 +3064,11 @@ function openMasterPartEditor(part){
   document.getElementById('mpStatus').value = part?.statusLabel || '';
   document.getElementById('mpNote').value = part?.note || '';
   document.getElementById('mpOilAvg').checked = !!part?.countInOilAvg;
-  wrap.style.display = 'block';
-  wrap.scrollIntoView({behavior:'smooth',block:'start'});
+  modal.classList.add('open');
 }
 function closeMasterPartEditor(){
-  const wrap = document.getElementById('masterPartEditorWrap');
-  if(wrap) wrap.style.display='none';
+  const modal = document.getElementById('masterPartModal');
+  if(modal) modal.classList.remove('open');
   ['mpEditId','mpName','mpPart','mpCost','mpStatus','mpNote'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const typeEl=document.getElementById('mpType'); if(typeEl) typeEl.value='other';
   const catEl=document.getElementById('mpCategory'); if(catEl) catEl.value='other';
@@ -3003,8 +3077,8 @@ function closeMasterPartEditor(){
 function editMasterPart(id){
   const part = getMasterParts().find(x=>String(x.id)===String(id));
   if(!part) return;
-  openMasterPartEditor(part);
   go('parts');
+  openMasterPartEditor(part);
 }
 function saveMasterPart(){
   const id = document.getElementById('mpEditId').value;
