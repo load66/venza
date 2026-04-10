@@ -695,8 +695,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
       <div class="g-label">Total Spent</div>
     </div>
     <div class="gauge" style="--accent:var(--gold)">
-      <div class="g-val" style="color:var(--gold)">$34.54</div>
-      <div class="g-label">Per Oil Change</div>
+      <div class="g-val" style="color:var(--gold)" id="dOilCost">$34.54</div>
+      <div class="g-label">Avg Oil Change</div>
     </div>
     <div class="gauge" style="--accent:var(--blue)">
       <div class="g-val" style="color:var(--blue)" id="dCount">4</div>
@@ -1468,28 +1468,48 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   <div class="section-label">For ChatGPT — Add Log Entry</div>
   <div class="form-section" style="background:rgba(59,158,255,.05);border-color:rgba(59,158,255,.2)">
     <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">📋 ChatGPT Instructions</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.7">Tell ChatGPT: <em style="color:var(--text)">"Add a log entry to my Venza app. Here is the format:"</em> then paste the template below.</p>
-    <div id="chatgptTemplate" style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer" onclick="copyTemplate()">// ADD THIS ENTRY to the DEFAULT array in the JS section
-// Find: "const DEFAULT = [" and add before the closing ]
+
+    <div class="alert blue" style="margin-bottom:12px">
+      <div class="alert-icon">ℹ️</div>
+      <div><strong>Two ways to add entries — pick the right one:</strong><br>
+      <strong>Path A (live device):</strong> Export a backup → give JSON to ChatGPT → import it back.<br>
+      <strong>Path B (source file):</strong> Add to DEFAULT array in venza.html → re-upload to GitHub → affects fresh installs only.
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600">PATH A — Live Device (recommended for your current data)</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.7">
+      1. Tap <strong>Export Backup</strong> above → save the .json file<br>
+      2. Send the .json to ChatGPT and say: <em style="color:var(--text)">"Add this service entry to the entries array in my Venza backup file:"</em><br>
+      3. ChatGPT edits the JSON → download it → tap <strong>Import Backup</strong> to restore
+    </p>
+
+    <p style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600">PATH B — Source File (for updating the app baseline)</p>
+    <div id="chatgptTemplate" style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer" onclick="copyTemplate()">// In venza.html find: "// ADD NEW ENTRIES BELOW THIS LINE"
+// Paste this object before the closing ];
+// Then re-upload the file to GitHub.
 
 {
-  id: DATE.now(),          // auto-generated timestamp
-  date: 'YYYY-MM-DD',      // example: '2026-04-15'
-  mi: 69590,               // mileage when service was done
-  type: 'oiltires',        // see TYPE LIST below
-  desc: 'Full description of service, parts used, part numbers',
-  cost: 34.54,             // dollar amount
+  id: Date.now(),           // unique number — use Date.now() or any unique int
+  date: 'YYYY-MM-DD',       // e.g. '2026-05-01'
+  mi: 69590,                // odometer at time of service
+  type: 'oiltires',         // see TYPE LIST below
+  desc: 'Description, parts used, part numbers...',
+  cost: 34.54,              // dollar amount (number, not string)
   shop: 'DIY or shop name',
-  link: 'https://...',     // purchase link or leave ''
-  builtin: false           // always false for user entries
+  link: 'https://...',      // purchase link, or empty string ''
+  builtin: true             // true = shows gray delete btn (factory entry)
 },
 
 // TYPE LIST (use exact string):
 // oil, oiltires, tires, cabin, engine_filter,
 // trans, diff, coolant, inv_coolant, alignment,
 // tires_new, brakes, plugs, hvfilter_inspect,
-// hvfilter_clean, valvomax, wipers, other</div>
-    <p style="font-size:11px;color:var(--text3);margin-top:8px">Tap the box above to copy the template to clipboard.</p>
+// hvfilter_clean, valvomax, wipers, other
+
+// NOTE: DEFAULT array only affects fresh installs or after Reset.
+// If localStorage already has data, the app reads that — not DEFAULT.</div>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px">Tap the box above to copy Path B template to clipboard.</p>
   </div>
 
   <div class="section-label">Danger Zone</div>
@@ -1594,9 +1614,15 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
    VENZA GARAGE — DATA LAYER
    ═══════════════════════════════════════════════════════════════
 
-   TO ADD A LOG ENTRY (for ChatGPT or manual editing):
+   TO ADD A LOG ENTRY:
    ────────────────────────────────────────────────────
-   Add an object to DEFAULT array below. Format:
+   LIVE DEVICE (already in use): Export backup from ⚙ Backup tab →
+   edit the "entries" array in the JSON → import it back. The app
+   reads from localStorage first, so DEFAULT only matters on a
+   fresh install or after a full Reset.
+
+   SOURCE FILE BASELINE: Add an object to DEFAULT array below.
+   This only affects fresh installs or after Reset. Format:
    {
      id: 1234567,            ← any unique number
      date: 'YYYY-MM-DD',     ← service date
@@ -1720,20 +1746,36 @@ function renderAll(){renderDash();renderLog()}
 /* ─── DASHBOARD ──────────────────────────────────────────── */
 function renderDash(){
   const mi=getMi();
-  const last=64590,next=69590;
-  const pct=Math.min(100,((mi-last)/(next-last))*100);
-  const rem=Math.max(0,next-mi);
+  const d=getData();
+
+  // Find most recent oil-change entry to drive the progress bar dynamically
+  const oilEntries=d.filter(e=>['oil','oiltires'].includes(e.type)).sort((a,b)=>b.mi-a.mi);
+  const lastOilMi=oilEntries.length?oilEntries[0].mi:LAST_SVC_MI;
+  const nextOilMi=lastOilMi+5000; // 5,000 mi custom interval
+
+  // Clamp progress 0–100 in both directions
+  const raw=((mi-lastOilMi)/(nextOilMi-lastOilMi))*100;
+  const pct=Math.min(100,Math.max(0,raw));
+  const rem=Math.max(0,nextOilMi-mi);
+
   document.getElementById('topMi').textContent=mi.toLocaleString();
   document.getElementById('dMi').textContent=mi.toLocaleString();
-  document.getElementById('dNextMi').textContent=next.toLocaleString();
-  document.getElementById('dLast').textContent='Last: '+last.toLocaleString();
+  document.getElementById('dNextMi').textContent=nextOilMi.toLocaleString();
+  document.getElementById('dLast').textContent='Last: '+lastOilMi.toLocaleString();
   document.getElementById('dRemain').textContent=rem>0?rem.toLocaleString()+' mi remaining':'DUE NOW!';
   setTimeout(()=>{document.getElementById('dProgress').style.width=pct+'%'},100);
-  const d=getData();
-  let tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
+
+  // Live total cost
+  const tot=d.reduce((a,e)=>a+parseFloat(e.cost||0),0);
   document.getElementById('dTotal').textContent='$'+tot.toFixed(2);
   document.getElementById('dCount').textContent=d.length;
   document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
+
+  // Live per-oil-change cost: average of all oil change entries
+  const oilCost=oilEntries.length
+    ? (oilEntries.reduce((a,e)=>a+parseFloat(e.cost||0),0)/oilEntries.length).toFixed(2)
+    : '34.54'; // fallback if no oil entries logged yet
+  document.getElementById('dOilCost').textContent='$'+oilCost;
 }
 
 /* ─── LOG ────────────────────────────────────────────────── */
