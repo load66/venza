@@ -793,9 +793,9 @@ html.modal-open,body.modal-open{overflow:hidden}
       <div class="header-logo-dot"></div>
       VENZA GARAGE
     </div>
-    <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN">VIN ··· 062382 · tap to copy</div>
+    <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN" role="button" tabindex="0" aria-label="Copy VIN">VIN ··· 062382 · tap to copy</div>
   </div>
-  <div class="mileage-pill" onclick="openMiModal()">
+  <div class="mileage-pill" onclick="openMiModal()" role="button" tabindex="0" aria-label="Edit odometer mileage">
     <div class="mi-num" id="topMi">64,751</div>
     <div class="mi-label">odometer ✎</div>
   </div>
@@ -949,7 +949,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <!-- RECEIPT PHOTO UPLOAD -->
     <div class="fl">
       <label>Receipt / Photo (optional)</label>
-      <div id="fPhotoArea" style="border:2px dashed var(--border2);border-radius:10px;
+      <div id="fPhotoArea" role="button" tabindex="0" aria-label="Add receipt photo" style="border:2px dashed var(--border2);border-radius:10px;
            padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
            onclick="document.getElementById('fPhotoInput').click()"
            ondragover="event.preventDefault();this.style.borderColor='var(--toyota)'"
@@ -1014,7 +1014,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       </tr>
       <tr>
         <td>HV Battery Filter — Clean</td>
-        <td>—</td><td>—</td><td>—</td><td class="sched-replace">C</td><td>—</td><td class="sched-replace">C</td><td>—</td><td class="sched-replace">C</td><td class="sched-replace">C</td>
+        <td>—</td><td>—</td><td>—</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td>
       </tr>
       <tr>
         <td>Cabin Air Filter</td>
@@ -1029,8 +1029,12 @@ html.modal-open,body.modal-open{overflow:hidden}
         <td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td>
       </tr>
       <tr>
-        <td>Engine/Inverter Coolant</td>
+        <td>Engine Coolant</td>
         <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td>—</td>
+      </tr>
+      <tr>
+        <td>Inverter Coolant <span class="sched-note">(first due 150k)</span></td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
       </tr>
       <tr>
         <td>Spark Plugs</td>
@@ -1582,14 +1586,14 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="section-label">Backup</div>
   <div class="form-section">
     <div class="form-title" style="margin-bottom:8px">Export All Data</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Downloads a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">venza_backup.json</code> file. Save it to iCloud Drive, Google Drive, or email it to yourself. Keep a copy somewhere safe.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Downloads a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">venza_backup_<span style="white-space:nowrap">YYYY-MM-DD</span>.json</code> file. Save it to iCloud Drive, Google Drive, or email it to yourself. Keep a copy somewhere safe.</p>
     <button class="btn-primary" onclick="exportData()">⬇ Export / Download Backup</button>
   </div>
 
   <div class="section-label">Restore</div>
   <div class="form-section">
     <div class="form-title" style="margin-bottom:8px">Import from Backup</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Select a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">venza_backup.json</code> file to restore. This will <strong style="color:var(--toyota)">replace all current data</strong> with the backup.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Select a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">venza_backup_YYYY-MM-DD.json</code> file to restore. This will <strong style="color:var(--toyota)">replace all current data</strong> with the backup.</p>
     <div class="fl">
       <label>Select Backup File</label>
       <input type="file" class="fi" id="importFile" accept=".json" onchange="importData(this)" style="padding:10px 12px;cursor:pointer">
@@ -1653,7 +1657,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     </p>
 
     <p style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600">PATH B — Source File (for updating the app baseline)</p>
-    <div id="chatgptTemplate" style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer" onclick="copyTemplate()">// In venza.html find: "// ADD NEW ENTRIES BELOW THIS LINE"
+    <div id="chatgptTemplate" role="button" tabindex="0" aria-label="Copy ChatGPT template" style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer" onclick="copyTemplate()">// In venza.html find: "// ADD NEW ENTRIES BELOW THIS LINE"
 // Paste this object before the closing ];
 // Then re-upload the file to GitHub.
 
@@ -2211,6 +2215,76 @@ function escapeHtmlAttr(value=''){
     .replace(/"/g,'&quot;')
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;');
+}
+function escapeHtml(value=''){
+  return String(value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function safeText(value=''){
+  return escapeHtml(value).replace(/\n/g,'<br>');
+}
+function safeUrl(url=''){
+  if(!url) return '';
+  try{
+    const parsed = new URL(url, location.href);
+    return /^https?:$/i.test(parsed.protocol) ? parsed.href : '';
+  }catch(err){
+    return '';
+  }
+}
+function clearStoredPhotos(){
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.startsWith('vz_photo_')) keys.push(key);
+  }
+  keys.forEach(key=>localStorage.removeItem(key));
+}
+function openHtmlInNewTab(html, filename='venza-report.html'){
+  const w = window.open('','_blank','width=900,height=700');
+  if(w){
+    w.document.write(html);
+    w.document.close();
+    return true;
+  }
+  try{
+    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    return true;
+  }catch(err){
+    return false;
+  }
+}
+function updateGuideAccessibility(){
+  document.querySelectorAll('.guide-item').forEach(item=>{
+    const head = item.querySelector('.guide-head');
+    if(head) head.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+  });
+}
+function bindAccessibleClick(selector){
+  document.querySelectorAll(selector).forEach(el=>{
+    if(el.dataset.kbdBound === '1') return;
+    el.dataset.kbdBound = '1';
+    el.addEventListener('keydown', (evt)=>{
+      if(evt.key === 'Enter' || evt.key === ' '){
+        evt.preventDefault();
+        el.click();
+      }
+    });
+  });
 }
 function getSuggestedTypesForService(type){
   if(type==='oiltires') return ['oil','oiltires','tires','hvfilter_inspect'];
@@ -2779,6 +2853,7 @@ window.onload=()=>{
   mergeDuplicateMasterParts();
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   setInventoryFormOpen(false);
+  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick]');
   renderAll();
   resetEntryInventoryUses();
   renderReminderStrategy();
@@ -2790,6 +2865,7 @@ function renderAll(){
   renderUpcoming();
   renderParts();
   renderBackup();
+  updateGuideAccessibility();
 }
 
 /* ─── DASHBOARD ──────────────────────────────────────────── */
@@ -2889,7 +2965,8 @@ function renderLog(){
   el.innerHTML=d.map(e=>{
     const dt=new Date(e.date+'T00:00:00');
     const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const lnk=e.link?`<a class="log-link" href="${e.link}" target="_blank">→ ${getLinkHostLabel(e.link)}</a>`:'';
+    const safeEntryUrl = safeUrl(e.link);
+    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
     const del=!e.builtin
       ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
       :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
@@ -2916,13 +2993,14 @@ function renderLog(){
     }));
     const partsHtml = displayParts.length ? `<div class="log-parts">${displayParts.map(part=>{
       const meta = [part.partNum && `Part # ${part.partNum}`, part.store].filter(Boolean).join(' · ');
+      const safePartUrl = safeUrl(part.link);
       return `<div class="log-part">
         <div class="log-part-top">
-          <div class="log-part-name">${part.qty}× ${part.name}</div>
+          <div class="log-part-name">${part.qty}× ${safeText(part.name)}</div>
           <div class="log-part-price">$${(part.qty * part.price).toFixed(2)}</div>
         </div>
-        ${meta ? `<div class="log-part-meta">${meta}</div>` : ''}
-        ${part.link ? `<a class="log-part-link" href="${part.link}" target="_blank">→ ${getLinkHostLabel(part.link)}</a>` : ''}
+        ${meta ? `<div class="log-part-meta">${safeText(meta)}</div>` : ''}
+        ${safePartUrl ? `<a class="log-part-link" href="${safePartUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safePartUrl))}</a>` : ''}
         ${part.oilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
         ${part.fromInventory ? `<div class="parts-badge" style="background:rgba(34,114,212,.1);color:var(--blue2);border-color:rgba(34,114,212,.25)">From inventory</div>` : ''}
       </div>`;
@@ -2944,10 +3022,10 @@ function renderLog(){
       ${del}
       <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
       <div class="log-type">${LABELS[e.type]||'Service'}</div>
-      <div class="log-desc">${e.desc}</div>
+      <div class="log-desc">${safeText(e.desc)}</div>
       ${partsHtml}
       <div class="log-foot">
-        <div><div class="log-shop">${e.shop||''}</div>${lnk}</div>
+        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
         <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
       </div>
       ${photoHtml}
@@ -3377,13 +3455,6 @@ function saveEntry(){
   showToast('Entry saved ✓');
 }
 
-function delEntry(id){
-  if(!confirm('Delete this entry?'))return;
-  save(getData().filter(e=>e.id!==id));
-  renderAll();
-  showToast('Entry deleted');
-}
-
 /* ─── MAINTENANCE ENGINE (whichever comes first) ─────────────── */
 function getSmartStatus(mi=getMi(), referenceDate=todayLocal()){
   return getRecurringServicesState(mi, referenceDate).rules.sort(compareRecurring);
@@ -3464,6 +3535,7 @@ function go(id){
 /* ─── GUIDES ─────────────────────────────────────────────── */
 function toggleGuide(head){
   head.closest('.guide-item').classList.toggle('open');
+  updateGuideAccessibility();
 }
 
 /* ─── COPY VIN ───────────────────────────────────────────── */
@@ -3576,34 +3648,52 @@ function exportData(){
 function importData(input){
   const file=input.files[0];
   if(!file){return}
-  if(!file.name.endsWith('.json')){showToast('Please select a .json file');return}
+  if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return}
   const reader=new FileReader();
   reader.onload=function(e){
     try{
-      const data=JSON.parse(e.target.result);
-      const entries=Array.isArray(data)?data:(data.entries||null);
-      const mi=data.mileage||null;
-      const photos=data.photos||{};
-      const inventory=data.inventory||[];
-      const masterParts=data.masterParts||[];
+      const parsed=JSON.parse(e.target.result);
+      const isLegacyArray = Array.isArray(parsed);
+      const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
+      if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+      const entries=Array.isArray(data.entries)?data.entries:null;
+      const mi=Number(data.mileage||0) || null;
+      const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
+      const inventory=Array.isArray(data.inventory) ? data.inventory : [];
+      const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
       const oilAverageResetAt=data.oilAverageResetAt||'';
       const photoCount=Object.keys(photos).length;
+      const version = Number(data.version || 0);
+      const backupVin = String(data.vin || '').trim();
 
-      if(!entries||!Array.isArray(entries)){
-        showToast('❌ Invalid backup file format');return;
+      if(!entries){
+        showToast('❌ Invalid backup file format'); input.value=''; return;
       }
-      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?\n\nThis replaces all current data. Continue?`)){
+      if(version > 4){
+        showToast('This backup was created by a newer app version'); input.value=''; return;
+      }
+      if(backupVin && backupVin !== VIN){
+        const proceedMismatch = confirm(`This backup VIN does not match this app.
+
+Backup: ${backupVin}
+This app: ${VIN}
+
+Restore anyway?`);
+        if(!proceedMismatch){ input.value=''; return; }
+      }
+      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?
+
+This replaces all current data. Continue?`)){
         input.value='';return;
       }
 
-      // Restore entries + inventory
+      clearStoredPhotos();
       save(entries);
       saveInventory(inventory);
-      saveMasterParts(Array.isArray(masterParts) && masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
+      saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
       if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
       if(mi&&mi>0)setMi(mi);
 
-      // Restore photos
       Object.entries(photos).forEach(([id,imgData])=>{
         try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
       });
@@ -3614,6 +3704,7 @@ function importData(input){
       showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}!`);
     }catch(err){
       showToast('❌ Could not read backup file');
+      input.value='';
     }
   };
   reader.readAsText(file);
@@ -3623,7 +3714,7 @@ function importData(input){
 function resetData(){
   if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
   // Clear all photos first
-  getData().forEach(e=>localStorage.removeItem('vz_photo_'+e.id));
+  clearStoredPhotos();
   save(DEFAULT);
   saveInventory(DEFAULT_INVENTORY);
   saveMasterParts(DEFAULT_MASTER_PARTS);
@@ -3676,9 +3767,9 @@ function generatePrint(){
     return `<tr style="background:${bg}">
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${ds}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi).toLocaleString()} mi</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${typeLabel}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${e.desc}${formatEntryInventorySummary(e)?`<br><span style='color:#8b90a7'>Parts: ${formatEntryInventorySummary(e)}</span>`:''}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${e.shop||'—'}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${escapeHtml(typeLabel)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${safeText(e.desc)}${formatEntryInventorySummary(e)?`<br><span style='color:#8b90a7'>Parts: ${safeText(formatEntryInventorySummary(e))}</span>`:''}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(e.shop||'—')}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#c05800;text-align:right;white-space:nowrap">$${getEntryDisplayCost(e).toFixed(2)}</td>
     </tr>`;
   }).join('');
@@ -3687,8 +3778,8 @@ function generatePrint(){
     const color = item.status==='overdue'?'#dc2626':item.status==='due soon'?'#c2410c':item.status==='upcoming'?'#15803d':'#9aa0ae';
     const badge = item.status === 'due soon' ? 'DUE SOON' : item.status.toUpperCase();
     return `<tr>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px">${item.icon} ${item.name}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.dueLine.replace('Next due: ','')}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px">${escapeHtml(item.icon + " " + item.name)}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(item.dueLine.replace('Next due: ',''))}</td>
       <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</td>
       <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${badge} · ${item.remainingText}</td>
     </tr>`;
@@ -3709,11 +3800,11 @@ function generatePrint(){
         const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
         return `<div style="border:1px solid #e2e4e8;border-radius:10px;overflow:hidden">
           <div style="background:#1a1d23;padding:8px 12px;display:flex;justify-content:space-between">
-            <span style="color:#fff;font-size:11px;font-weight:600">${LABELS[e.type]||'Service'}</span>
+            <span style="color:#fff;font-size:11px;font-weight:600">${escapeHtml(LABELS[e.type]||'Service')}</span>
             <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi).toLocaleString()} mi</span>
           </div>
           <img src="${getPhoto(e.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
-          <div style="padding:8px 12px;font-size:11px;color:#555">${e.shop||'DIY'} · $${getEntryDisplayCost(e).toFixed(2)}</div>
+          <div style="padding:8px 12px;font-size:11px;color:#555">${escapeHtml(e.shop||'DIY')} · $${getEntryDisplayCost(e).toFixed(2)}</div>
         </div>`;
       }).join('')}
     </div>
@@ -3856,7 +3947,7 @@ function generatePrint(){
   <div class="vehicle-strip">
     <div class="vs-item">
       <div class="vs-label">Vehicle</div>
-      <div class="vs-val">${model}</div>
+      <div class="vs-val">${escapeHtml(model)}</div>
     </div>
     <div class="vs-item">
       <div class="vs-label">VIN</div>
@@ -3864,7 +3955,7 @@ function generatePrint(){
     </div>
     <div class="vs-item">
       <div class="vs-label">Owner</div>
-      <div class="vs-val">${owner}</div>
+      <div class="vs-val">${escapeHtml(owner)}</div>
     </div>
     <div class="vs-item">
       <div class="vs-label">Current Mileage</div>
@@ -3969,7 +4060,7 @@ function generatePrint(){
       <div class="sig-box">
         <div class="sig-label">Owner Signature</div>
         <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
-        <div class="sig-val">${owner}</div>
+        <div class="sig-val">${escapeHtml(owner)}</div>
       </div>
       <div class="sig-box">
         <div class="sig-label">Date Signed</div>
@@ -3999,16 +4090,16 @@ ${photoSection}
     <strong>Vehicle:</strong> ${model} · <strong>VIN:</strong> ${VIN} · <strong>Generated:</strong> ${today} by Venza Garage App<br>
     This record was prepared by the vehicle owner per the 2021 Toyota Venza Warranty &amp; Maintenance Guide, which states Toyota will not deny a warranty claim solely because maintenance was performed by a non-dealer. Retain all receipts and invoices with this record.
   </div>
-  <div class="footer-page">Page 1 of 1<br>Document #VMR-${todayISO.replace(/-/g,'')}</div>
+  <div class="footer-page">Multi-page if needed<br>Document #VMR-${todayISO.replace(/-/g,'')}</div>
 </div>
 
 </body>
 </html>`;
 
-  const w = window.open('','_blank','width=900,height=700');
-  if(!w){ showToast('Allow popups to open the report'); return; }
-  w.document.write(html);
-  w.document.close();
+  if(!openHtmlInNewTab(html, `venza-maintenance-record-${todayISO}.html`)){
+    showToast('Could not open report — allow popups and try again');
+    return;
+  }
 }
 /* ════════════════════════════════════════════════════════════════
    PHOTO RECEIPT SYSTEM
