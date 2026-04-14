@@ -3358,7 +3358,7 @@ function getScheduleFlag(rule){
   return {text:'Custom Target', cls:'custom'};
 }
 function areScheduleControlsOpen(){
-  return localStorage.getItem(SCHEDULE_UI_STATE_KEY) === '1';
+  return !!window._scheduleControlsOpen;
 }
 function updateScheduleControlsUI(){
   const card = document.getElementById('scheduleControlsCard');
@@ -3369,8 +3369,7 @@ function updateScheduleControlsUI(){
   head.setAttribute('aria-expanded', String(isOpen));
 }
 function setScheduleControlsOpen(isOpen){
-  if(isOpen) localStorage.setItem(SCHEDULE_UI_STATE_KEY, '1');
-  else localStorage.removeItem(SCHEDULE_UI_STATE_KEY);
+  window._scheduleControlsOpen = !!isOpen;
   updateScheduleControlsUI();
 }
 function toggleScheduleControls(){
