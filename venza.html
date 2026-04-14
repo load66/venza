@@ -935,7 +935,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="form-title">New Service Entry</div>
     <div class="alert blue" style="margin-bottom:16px">
       <div class="alert-icon">💡</div>
-      <div>Use your live inventory for parts you already bought. When you save this service, stock is deducted automatically.</div>
+      <div><strong>Super basic entry mode.</strong> Save only the date, mileage, service type, total cost, shop/DIY, optional notes, and an optional receipt photo.</div>
     </div>
     <div class="fg2">
       <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
@@ -965,29 +965,13 @@ html.modal-open,body.modal-open{overflow:hidden}
         <option value="other">Other</option>
       </select>
     </div>
-    <div class="fl" id="inventorySuggestBlock" style="display:none">
-      <label>Parts Needed for This Service</label>
-      <div id="inventoryRequiredSummary" style="font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.6"></div>
-      <div id="inventorySuggestList"></div>
-      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin:10px 0 8px">Use your inventory</div>
-      <div id="inventorySelectedList" style="margin-top:0"></div>
-      <div id="inventoryStockLockNote" style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Simple mode: review the recommended parts above, then tap a saved inventory item below if you already have it on hand.</div>
-    </div>
     <div class="fl">
-      <label>Description / Details</label>
-      <textarea class="ft" id="fDesc" placeholder="Parts used, part numbers, shop notes..."></textarea>
+      <label>Notes / Details</label>
+      <textarea class="ft" id="fDesc" placeholder="Quick notes about what was done..."></textarea>
     </div>
     <div class="fg2">
-      <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"></div>
+      <div class="fl"><label>Total Cost for This Service ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"></div>
       <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
-    </div>
-    <div class="fl">
-      <label>Purchased Items / Links (optional)</label>
-      <div class="item-builder" id="fItemsList"></div>
-      <div class="item-builder-actions">
-        <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
-      </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Tip: linked inventory rows deduct automatically when saved. You can still edit the row before saving if you need to fix quantity, link, or price.</div>
     </div>
     <!-- RECEIPT PHOTO UPLOAD -->
     <div class="fl">
@@ -1109,145 +1093,57 @@ html.modal-open,body.modal-open{overflow:hidden}
 <!-- ═══ PARTS ═════════════════════════════════════════════════════ -->
 <div id="page-parts" class="page">
 
-  <div class="section-label">Inventory On Hand</div>
+  <div class="section-label">Basic Parts List</div>
   <div class="alert blue">
-    <div class="alert-icon">📦</div>
-    <div><strong>Buy ahead and track stock.</strong> Save parts here when you catch a sale. When you use them in a service entry, stock is deducted automatically.</div>
+    <div class="alert-icon">🧩</div>
+    <div><strong>Simple editable parts list.</strong> Save each part with a purchase link, cost per unit, optional note, and optional receipt photo.</div>
   </div>
 
-  <button class="btn-primary" id="inventoryFormToggleBtn" onclick="toggleInventoryForm()" style="margin-bottom:10px">＋ Add Inventory Item</button>
+  <button class="btn-primary" id="partsFormToggleBtn" onclick="togglePartForm()" style="margin-bottom:10px">＋ Add Part</button>
 
-  <div class="form-section" id="inventoryFormWrap" style="display:none">
-    <input type="hidden" id="invEditId">
-    <input type="hidden" id="invMasterPartId">
-    <div class="form-title" id="invFormTitle">Add Inventory Item</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6">Saving inventory automatically links to the editable master parts database below. If the part already exists there, the app stacks the new store/link as another saved source instead of creating a duplicate.</div>
+  <div class="form-section" id="partFormWrap" style="display:none">
+    <input type="hidden" id="partEditId">
+    <div class="form-title" id="partFormTitle">Add Part</div>
+    <div class="fl"><label>Part Name</label><input type="text" class="fi" id="partName" placeholder="Toyota oil filter 90915-YZZN1"></div>
     <div class="fg2">
-      <div class="fl"><label>Item Name</label><input type="text" class="fi" id="invName" placeholder="Mobil 1 0W-16 Full Synthetic 5 qt"></div>
-      <div class="fl">
-        <label>Service Type</label>
-        <select class="fs" id="invType">
-          <option value="oil">Oil Change</option>
-          <option value="oiltires">Oil + Rotation + Inspection</option>
-          <option value="tires">Tire Rotation</option>
-          <option value="cabin">Cabin Air Filter</option>
-          <option value="engine_filter">Engine Air Filter</option>
-          <option value="trans">Transmission Fluid D&F</option>
-          <option value="diff">Rear Differential D&F</option>
-          <option value="coolant">Engine Coolant D&F</option>
-          <option value="inv_coolant">Inverter Coolant D&F</option>
-          <option value="alignment">Wheel Alignment</option>
-          <option value="tires_new">New Tires</option>
-          <option value="brakes">Brake Service</option>
-          <option value="plugs">Spark Plugs</option>
-          <option value="hvfilter_inspect">HV Battery Filter — Inspect</option>
-          <option value="hvfilter_clean">HV Battery Filter — Clean</option>
-          <option value="valvomax">ValvoMax Install</option>
-          <option value="wipers">Wiper Blades</option>
-          <option value="other">Other</option>
-        </select>
+      <div class="fl"><label>Cost Per Unit ($)</label><input type="number" class="fi" id="partCost" step="0.01" placeholder="4.99"></div>
+      <div class="fl"><label>Purchase Link</label><input type="url" class="fi" id="partLink" placeholder="https://..."></div>
+    </div>
+    <div class="fl"><label>Notes (optional)</label><textarea class="ft" id="partNote" placeholder="Optional note..."></textarea></div>
+    <div class="fl">
+      <label>Receipt Photo (optional)</label>
+      <div id="partPhotoArea" role="button" tabindex="0" aria-label="Add part receipt photo" style="border:2px dashed var(--border2);border-radius:10px;
+           padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
+           onclick="document.getElementById('partPhotoInput').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--toyota)'"
+           ondragleave="this.style.borderColor='var(--border2)'"
+           ondrop="handlePartPhotoDrop(event)">
+        <div id="partPhotoPreview" style="display:none">
+          <img id="partPhotoImg" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain">
+          <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+            <button onclick="event.stopPropagation();clearPartPhoto()" style="font-size:11px;color:var(--toyota);background:none;border:none;cursor:pointer;padding:4px 8px">✕ Remove</button>
+          </div>
+        </div>
+        <div id="partPhotoPlaceholder">
+          <div style="font-size:28px;margin-bottom:6px">🧾</div>
+          <div style="font-size:13px;color:var(--text2);font-weight:500">Tap to add part receipt photo</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">Stored locally with the part list</div>
+        </div>
       </div>
+      <input type="file" id="partPhotoInput" accept="image/*" style="display:none" onchange="handlePartPhotoSelect(this)">
     </div>
-    <div class="fg2">
-      <div class="fl"><label>Qty On Hand (units)</label><input type="number" class="fi" id="invQty" min="0" step="1" placeholder="1"></div>
-      <div class="fl"><label>Unit Price ($ per unit)</label><input type="number" class="fi" id="invCost" step="0.01" placeholder="27.97"></div>
-    </div>
-    <div class="fg2">
-      <div class="fl"><label>Part #</label><input type="text" class="fi" id="invPart" placeholder="90915-YZZN1"></div>
-      <div class="fl"><label>Store</label><input type="text" class="fi" id="invStore" placeholder="Walmart / Toyota / Amazon"></div>
-    </div>
-    <div class="fl"><label>Link</label><input type="url" class="fi" id="invLink" placeholder="https://..."></div>
-    <div class="fl"><label>Notes</label><textarea class="ft" id="invNote" placeholder="Optional note..."></textarea></div>
-    <label class="inv-check"><input type="checkbox" id="invOilAvg"> Count this item in Avg Oil Change when used</label>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6">Use this for consumables like oil, oil filters, drain washers, and other parts you want included in your running oil-change average.</div>
     <div class="btn-row">
-      <button class="btn-ghost" onclick="clearInventoryForm()">Clear</button>
-      <button class="btn-primary" onclick="saveInventoryItem()">Save Item</button>
+      <button class="btn-ghost" onclick="clearPartForm()">Clear</button>
+      <button class="btn-primary" onclick="saveBasicPart()">Save Part</button>
     </div>
   </div>
 
   <div class="card">
     <div class="card-head">
-      <div class="card-title">Inventory Database</div>
-      <div id="inventorySummary" style="font-size:11px;color:var(--text3)">0 items</div>
+      <div class="card-title">Parts List</div>
+      <div id="basicPartsSummary" style="font-size:11px;color:var(--text3)">0 parts</div>
     </div>
-    <div class="card-body" id="inventoryList"></div>
-  </div>
-
-  <div class="section-label">Master Parts Database</div>
-  <div class="alert gold">
-    <div class="alert-icon">🧠</div>
-    <div><strong>Editable master references.</strong> These are your long-term reference parts. Buying something through Inventory automatically creates or updates the matching master part here, and saved store links stack up over time.</div>
-  </div>
-
-  <div class="overlay" id="masterPartModal" onclick="if(event.target===this)closeMasterPartEditor()">
-  <div class="modal">
-    <div class="modal-grip"></div>
-    <div class="modal-title" id="mpModalTitle">Edit Master Part</div>
-    <div class="modal-scroll">
-      <div class="form-section" id="masterPartEditorWrap" style="margin-bottom:0;background:transparent;border:none;box-shadow:none;padding:0">
-        <input type="hidden" id="mpEditId">
-        <div class="fg2">
-          <div class="fl"><label>Master Part Name</label><input type="text" class="fi" id="mpName" placeholder="Mobil 1 0W-16 Full Synthetic 5 qt"></div>
-          <div class="fl">
-            <label>Default Service Type</label>
-            <select class="fs" id="mpType">
-              <option value="oil">Oil Change</option>
-              <option value="oiltires">Oil + Rotation + Inspection</option>
-              <option value="tires">Tire Rotation</option>
-              <option value="cabin">Cabin Air Filter</option>
-              <option value="engine_filter">Engine Air Filter</option>
-              <option value="trans">Transmission Fluid D&F</option>
-              <option value="diff">Rear Differential D&F</option>
-              <option value="coolant">Engine Coolant D&F</option>
-              <option value="inv_coolant">Inverter Coolant D&F</option>
-              <option value="alignment">Wheel Alignment</option>
-              <option value="tires_new">New Tires</option>
-              <option value="brakes">Brake Service</option>
-              <option value="plugs">Spark Plugs</option>
-              <option value="hvfilter_inspect">HV Battery Filter — Inspect</option>
-              <option value="hvfilter_clean">HV Battery Filter — Clean</option>
-              <option value="valvomax">ValvoMax Install</option>
-              <option value="wipers">Wiper Blades</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-        <div class="fg2">
-          <div class="fl">
-            <label>Category</label>
-            <select class="fs" id="mpCategory">
-              <option value="fluids_filters">Fluids & Filters</option>
-              <option value="valvomax">ValvoMax</option>
-              <option value="tools">Tools</option>
-              <option value="consumables">Consumables</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="fl"><label>Part # / SKU</label><input type="text" class="fi" id="mpPart" placeholder="90915-YZZN1"></div>
-        </div>
-        <div class="fg2">
-          <div class="fl"><label>Default Price ($ per unit)</label><input type="number" class="fi" id="mpCost" step="0.01" placeholder="27.97"></div>
-          <div class="fl"><label>Status Label</label><input type="text" class="fi" id="mpStatus" placeholder="Purchased / Recommended / Dealer"></div>
-        </div>
-        <div class="fl"><label>Notes</label><textarea class="ft" id="mpNote" placeholder="Reference note, fitment note, or reminder..."></textarea></div>
-        <label class="inv-check"><input type="checkbox" id="mpOilAvg"> Count this part in Avg Oil Change by default</label>
-        <div class="master-editor-note">This editor is now a pop-up sheet for faster editing on mobile.</div>
-      </div>
-    </div>
-    <div class="btn-row" style="margin-top:12px;flex-shrink:0">
-      <button class="btn-ghost" onclick="closeMasterPartEditor()">Cancel</button>
-      <button class="btn-primary" onclick="saveMasterPart()">Save Master Part</button>
-    </div>
-  </div>
-</div>
-
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">Master Parts</div>
-      <div id="masterPartsSummary" style="font-size:11px;color:var(--text3)">0 parts</div>
-    </div>
-    <div class="card-body" id="masterPartsList"></div>
+    <div class="card-body" id="basicPartsList"></div>
   </div>
 
   <div class="section-label">Free Oil Disposal</div>
@@ -1696,7 +1592,7 @@ html.modal-open,body.modal-open{overflow:hidden}
 
   <div class="alert blue">
     <div class="alert-icon">📱</div>
-    <div><strong>New phone or lost phone?</strong> Export your data as a JSON file, save it to iCloud/Files, then import it on any device. Service entries, mileage, inventory, master parts, stacked store links, and receipts are preserved.</div>
+    <div><strong>New phone or lost phone?</strong> Export your data as a JSON file, save it to iCloud/Files, then import it on any device. Service entries, mileage, your parts list, and receipt photos are preserved.</div>
   </div>
 
   <div class="section-label">Backup</div>
@@ -1861,7 +1757,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="card"><div class="card-body">
     <div class="row"><span class="row-key">Vehicle Info</span><span class="row-val green">VIN, year, model, color</span></div>
     <div class="row"><span class="row-key">Owner Statement</span><span class="row-val green">Certified DIY maintenance declaration</span></div>
-    <div class="row"><span class="row-key">Complete Log</span><span class="row-val green">All service entries with dates, mileage, parts</span></div>
+    <div class="row"><span class="row-key">Complete Log</span><span class="row-val green">All service entries with dates, mileage, notes</span></div>
     <div class="row"><span class="row-key">Upcoming Schedule</span><span class="row-val green">Next due services based on mileage</span></div>
     <div class="row"><span class="row-key">Toyota Reference</span><span class="row-val green">Per 2021 Venza Warranty & Maintenance Guide</span></div>
     <div class="row"><span class="row-key">Format</span><span class="row-val green">Print to PDF via Safari Share button</span></div>
@@ -4606,7 +4502,7 @@ function generatePrint(){
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${ds}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi).toLocaleString()} mi</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${escapeHtml(typeLabel)}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${safeText(e.desc)}${formatEntryInventorySummary(e)?`<br><span style='color:#8b90a7'>Parts: ${safeText(formatEntryInventorySummary(e))}</span>`:''}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${safeText(e.desc)}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(e.shop||'—')}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#c05800;text-align:right;white-space:nowrap">$${getEntryDisplayCost(e).toFixed(2)}</td>
     </tr>`;
@@ -4853,7 +4749,7 @@ function generatePrint(){
           <th>Date</th>
           <th>Mileage</th>
           <th>Service</th>
-          <th>Description / Parts Used</th>
+          <th>Description / Notes</th>
           <th>Performed By</th>
           <th style="text-align:right">Cost</th>
         </tr>
@@ -5024,11 +4920,12 @@ function viewPhoto(id){
   const data = getPhoto(id);
   if(!data) return;
   const overlay = document.createElement('div');
+  overlay.className = 'vz-lightbox';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px';
   overlay.innerHTML = `
     <img src="${data}" style="max-width:100%;max-height:75vh;border-radius:10px;object-fit:contain">
     <div style="display:flex;gap:12px">
-      <button onclick="this.closest('div[style]').remove()"
+      <button onclick="this.closest('.vz-lightbox').remove()"
         style="background:#fff;color:#1a1d23;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
         ✕ Close
       </button>
@@ -5057,6 +4954,460 @@ function delBuiltin(id){
 /* ════════════════════════════════════════════════════════════════
    SMART SHOPPING LIST
    ════════════════════════════════════════════════════════════════ */
+
+
+/* ════════════════════════════════════════════════════════════════
+   SIMPLE MODE OVERRIDES — BASIC SERVICE ENTRY + BASIC PARTS LIST
+   ════════════════════════════════════════════════════════════════ */
+const BASIC_PARTS_KEY = 'vz_basic_parts';
+const BASIC_PART_PHOTO_PREFIX = 'vz_part_photo_';
+
+function normalizeBasicParts(items){
+  if(!Array.isArray(items)) return [];
+  return items.filter(Boolean).map(item=>({
+    id: item.id ?? Date.now()+Math.random(),
+    name: String(item.name||'').trim(),
+    link: String(item.link||'').trim(),
+    unitCost: Number.isFinite(Number(item.unitCost)) ? Number(item.unitCost) : 0,
+    note: String(item.note||'').trim()
+  })).filter(item=>item.name);
+}
+function migrateLegacyBasicParts(){
+  if(localStorage.getItem(BASIC_PARTS_KEY)) return;
+  let seed = [];
+  try{
+    const legacyInventory = typeof getInventory === 'function' ? getInventory() : [];
+    seed = normalizeBasicParts(legacyInventory.map(item=>({
+      id: item.id,
+      name: item.name,
+      link: item.link,
+      unitCost: item.unitCost,
+      note: [item.partNum && `Part # ${item.partNum}`, item.store, item.note].filter(Boolean).join(' · ')
+    })));
+  }catch(err){ seed = []; }
+  if(seed.length) localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(seed));
+}
+function getBasicPartsList(){
+  migrateLegacyBasicParts();
+  try{
+    const raw = localStorage.getItem(BASIC_PARTS_KEY);
+    return normalizeBasicParts(raw ? JSON.parse(raw) : []);
+  }catch(err){
+    return [];
+  }
+}
+function saveBasicPartsList(items){
+  localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
+}
+function getBasicPartPhoto(id){ return localStorage.getItem(BASIC_PART_PHOTO_PREFIX + id) || null; }
+function saveBasicPartPhoto(id,data){ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id,data); }catch(err){ showToast('Part photo too large — try a smaller image'); } }
+function removeBasicPartPhoto(id){ localStorage.removeItem(BASIC_PART_PHOTO_PREFIX + id); }
+function clearStoredPartPhotos(){
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.startsWith(BASIC_PART_PHOTO_PREFIX)) keys.push(key);
+  }
+  keys.forEach(key=>localStorage.removeItem(key));
+}
+function togglePartForm(forceOpen){
+  const wrap = document.getElementById('partFormWrap');
+  const btn = document.getElementById('partsFormToggleBtn');
+  if(!wrap || !btn) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : wrap.style.display === 'none';
+  wrap.style.display = shouldOpen ? 'block' : 'none';
+  btn.textContent = shouldOpen ? '− Hide Part Form' : '＋ Add Part';
+  if(shouldOpen) wrap.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function clearPartPhoto(){
+  window._pendingPartPhoto = null;
+  window._pendingPartPhotoRemoved = true;
+  const input = document.getElementById('partPhotoInput'); if(input) input.value = '';
+  const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'none';
+  const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'block';
+  const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--border2)';
+  const img = document.getElementById('partPhotoImg'); if(img) img.src='';
+}
+function clearPartForm(){
+  const fields = ['partEditId','partName','partCost','partLink','partNote'];
+  fields.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const title = document.getElementById('partFormTitle'); if(title) title.textContent = 'Add Part';
+  clearPartPhoto();
+  window._pendingPartPhotoRemoved = false;
+}
+function handlePartPhotoSelect(input){
+  if(!input?.files?.[0]) return;
+  compressImage(input.files[0], function(data){
+    window._pendingPartPhoto = data;
+    window._pendingPartPhotoRemoved = false;
+    const img = document.getElementById('partPhotoImg'); if(img) img.src = data;
+    const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'block';
+    const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'none';
+    const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--green2)';
+  });
+}
+function handlePartPhotoDrop(e){
+  e.preventDefault();
+  const file = e.dataTransfer?.files?.[0];
+  if(file && file.type.startsWith('image/')){
+    compressImage(file, function(data){
+      window._pendingPartPhoto = data;
+      window._pendingPartPhotoRemoved = false;
+      const img = document.getElementById('partPhotoImg'); if(img) img.src = data;
+      const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'block';
+      const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'none';
+      const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--green2)';
+    });
+  }
+}
+function viewImageOverlay(data){
+  if(!data) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'vz-lightbox';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px';
+  overlay.innerHTML = `
+    <img src="${data}" style="max-width:100%;max-height:75vh;border-radius:10px;object-fit:contain">
+    <div style="display:flex;gap:12px">
+      <button onclick="this.closest('.vz-lightbox').remove()"
+        style="background:#fff;color:#1a1d23;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
+        ✕ Close
+      </button>
+    </div>`;
+  overlay.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
+  document.body.appendChild(overlay);
+}
+function viewBasicPartPhoto(id){ viewImageOverlay(getBasicPartPhoto(id)); }
+function editBasicPart(id){
+  const part = getBasicPartsList().find(item=>String(item.id)===String(id));
+  if(!part) return;
+  togglePartForm(true);
+  document.getElementById('partEditId').value = part.id;
+  document.getElementById('partName').value = part.name || '';
+  document.getElementById('partCost').value = Number(part.unitCost||0) > 0 ? Number(part.unitCost||0) : '';
+  document.getElementById('partLink').value = part.link || '';
+  document.getElementById('partNote').value = part.note || '';
+  const title = document.getElementById('partFormTitle'); if(title) title.textContent = 'Edit Part';
+  const existingPhoto = getBasicPartPhoto(part.id);
+  if(existingPhoto){
+    window._pendingPartPhoto = existingPhoto;
+    window._pendingPartPhotoRemoved = false;
+    const img = document.getElementById('partPhotoImg'); if(img) img.src = existingPhoto;
+    const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'block';
+    const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'none';
+    const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--green2)';
+  }else{
+    clearPartPhoto();
+    window._pendingPartPhotoRemoved = false;
+  }
+  go('parts');
+}
+function saveBasicPart(){
+  const editId = document.getElementById('partEditId')?.value || '';
+  const name = document.getElementById('partName')?.value.trim() || '';
+  const link = document.getElementById('partLink')?.value.trim() || '';
+  const note = document.getElementById('partNote')?.value.trim() || '';
+  const unitCost = Number.isFinite(Number(document.getElementById('partCost')?.value)) ? Number(document.getElementById('partCost').value) : 0;
+  if(!name){ showToast('Part name is required'); return; }
+  const list = getBasicPartsList();
+  const payload = { id: editId || Date.now(), name, link, unitCost, note };
+  if(editId){
+    const idx = list.findIndex(item=>String(item.id)===String(editId));
+    if(idx>-1) list[idx] = payload;
+    else list.push(payload);
+  }else{
+    list.push(payload);
+  }
+  saveBasicPartsList(list);
+  if(window._pendingPartPhoto){
+    saveBasicPartPhoto(payload.id, window._pendingPartPhoto);
+  }else if(editId && window._pendingPartPhotoRemoved){
+    removeBasicPartPhoto(payload.id);
+  }
+  clearPartForm();
+  togglePartForm(false);
+  renderParts();
+  renderBackup();
+  showToast(editId ? 'Part updated ✓' : 'Part saved ✓');
+}
+function deleteBasicPart(id){
+  if(!confirm('Delete this part from your list?')) return;
+  saveBasicPartsList(getBasicPartsList().filter(item=>String(item.id)!==String(id)));
+  removeBasicPartPhoto(id);
+  if(String(document.getElementById('partEditId')?.value||'') === String(id)) clearPartForm();
+  renderParts();
+  renderBackup();
+  showToast('Part deleted');
+}
+function renderParts(){
+  const listEl = document.getElementById('basicPartsList');
+  const summaryEl = document.getElementById('basicPartsSummary');
+  if(!listEl || !summaryEl) return;
+  const parts = getBasicPartsList().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+  const photoCount = parts.filter(part=>getBasicPartPhoto(part.id)).length;
+  summaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${photoCount} receipt photo${photoCount!==1?'s':''}`;
+  if(!parts.length){
+    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No saved parts yet. Add a part above when you buy something for the Venza.</div></div>`;
+    return;
+  }
+  listEl.innerHTML = parts.map(part=>{
+    const safeLink = safeUrl(part.link);
+    const photo = getBasicPartPhoto(part.id);
+    return `<div class="part-item">
+      <div class="part-row1"><span class="part-name">${escapeHtml(part.name)}</span><span class="part-price">${Number(part.unitCost||0) > 0 ? '$'+Number(part.unitCost||0).toFixed(2) : '—'}</span></div>
+      ${safeLink ? `<a class="part-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeLink))}</a>` : `<div class="part-missing">No purchase link saved</div>`}
+      ${part.note ? `<div class="inv-meta" style="margin-top:8px">${safeText(part.note)}</div>` : ''}
+      ${photo ? `<div style="margin-top:10px;cursor:pointer" onclick="viewBasicPartPhoto(${part.id})"><img src="${photo}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">🧾 Receipt photo · tap to view</div></div>` : `<div class="part-missing" style="margin-top:10px">No receipt photo saved</div>`}
+      <div class="inv-actions" style="margin-top:12px">
+        <button type="button" class="inv-btn" onclick="editBasicPart(${part.id})">Edit</button>
+        <button type="button" class="inv-btn danger" onclick="deleteBasicPart(${part.id})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function resetEntryInventoryUses(){
+  const list = document.getElementById('fItemsList');
+  if(list) list.innerHTML='';
+}
+function renderEntryInventoryUI(){
+  const block = document.getElementById('inventorySuggestBlock');
+  if(block) block.style.display = 'none';
+}
+function syncEntryCostFromItems(){}
+function addItemRow(){ return null; }
+function removeItemRow(){}
+function getFormItems(){ return []; }
+function useInventoryItem(){ showToast('Service entry is now in simple mode'); }
+function removeOneInventoryItem(){}
+function renderLog(){
+  const d=getData().sort((a,b)=>b.mi-a.mi);
+  const el=document.getElementById('logList');
+  if(!el) return;
+  el.innerHTML=d.map(e=>{
+    const dt=new Date(e.date+'T00:00:00');
+    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const safeEntryUrl = safeUrl(e.link);
+    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
+    const del=!e.builtin
+      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
+      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    const photo=getPhoto(e.id);
+    const photoHtml=photo
+      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+        </div>`
+      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+          background:none;cursor:pointer;width:100%;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+          📷 Add Receipt Photo
+        </button>`;
+    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+      ${del}
+      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
+      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-desc">${safeText(e.desc || '')}</div>
+      <div class="log-foot">
+        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
+        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
+      </div>
+      ${photoHtml}
+    </div>`;
+  }).join('');
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  const totalEl = document.getElementById('totalVal');
+  if(totalEl) totalEl.textContent='$'+tot.toFixed(2);
+}
+function getAverageEntryCost(entry, type=getAverageServiceType()){
+  if(!entryMatchesAverageType(entry, type)) return null;
+  const manual = Number(entry.cost || 0);
+  if(Number.isFinite(manual) && manual > 0) return manual;
+  const legacy = getEntryDisplayCost(entry);
+  return Number.isFinite(legacy) && legacy > 0 ? legacy : null;
+}
+function saveEntry(){
+  const date=document.getElementById('fDate')?.value || '';
+  const mi=document.getElementById('fMi')?.value || '';
+  const type=document.getElementById('fType')?.value || 'other';
+  const desc=document.getElementById('fDesc')?.value.trim() || '';
+  const cost=document.getElementById('fCost')?.value || '';
+  const shop=document.getElementById('fShop')?.value.trim() || '';
+  if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
+  const parsedMi = parseInt(mi,10);
+  if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
+  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
+  const newId=Date.now();
+  const d=getData();
+  d.push({id:newId,date,mi:parsedMi,type,desc,cost:manualCost,shop,link:'',items:[],inventoryUses:[],builtin:false});
+  save(d);
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
+  if(parsedMi > getMi()) setMi(parsedMi);
+  renderAll();
+  go('log');
+  ['fMi','fCost','fShop','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
+  clearPhoto();
+  showToast('Entry saved ✓');
+}
+function renderBackup(){
+  const d=getData();
+  const mi=getMi();
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
+  const last=sorted[0];
+  const photoCount=d.filter(e=>getPhoto(e.id)).length;
+  const partCount = getBasicPartsList().length;
+  const partPhotoCount = getBasicPartsList().filter(part=>getBasicPartPhoto(part.id)).length;
+  const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
+  const countEl = document.getElementById('bkCount');
+  const miEl = document.getElementById('bkMi');
+  const totalEl = document.getElementById('bkTotal');
+  const lastEl = document.getElementById('bkLast');
+  if(countEl) countEl.textContent = `${d.length} entries · ${partCount} part${partCount!==1?'s':''} · ${scheduleOverrideCount} custom target${scheduleOverrideCount!==1?'s':''} · ${photoCount} service photo${photoCount!==1?'s':''} · ${partPhotoCount} part photo${partPhotoCount!==1?'s':''}`;
+  if(miEl) miEl.textContent = mi.toLocaleString()+' mi';
+  const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
+  if(totalEl) totalEl.textContent = '$'+tot.toFixed(2);
+  if(last && lastEl){
+    const dt=new Date(last.date+'T00:00:00');
+    lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
+  }
+  renderReminderStrategy();
+}
+function exportData(){
+  const servicePhotos = {};
+  const entries = getData();
+  entries.forEach(e=>{
+    const p = getPhoto(e.id);
+    if(p) servicePhotos[e.id] = p;
+  });
+  const partPhotos = {};
+  const basicParts = getBasicPartsList();
+  basicParts.forEach(part=>{
+    const p = getBasicPartPhoto(part.id);
+    if(p) partPhotos[part.id] = p;
+  });
+  const payload={
+    version: 7,
+    exported: new Date().toISOString(),
+    vin: VIN,
+    vehicle: '2021 Toyota Venza Hybrid AWD',
+    mileage: getMi(),
+    oilAverageResetAt: getOilAverageResetAt(),
+    averageServiceType: getAverageServiceType(),
+    scheduleOverrides: getScheduleOverrides(),
+    servicePartRequirements: getSavedServiceRequirementsMap(),
+    entries: entries,
+    basicParts: basicParts,
+    inventory: getInventory(),
+    masterParts: getMasterParts(),
+    photos: servicePhotos,
+    partPhotos: partPhotos
+  };
+  const photoCount = Object.keys(servicePhotos).length + Object.keys(partPhotos).length;
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().split('T')[0];
+  a.href=url;
+  a.download='venza_backup_'+date+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Backup saved ✓ — ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}`);
+}
+function importData(input){
+  const file=input.files?.[0];
+  if(!file){return;}
+  if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const isLegacyArray = Array.isArray(parsed);
+      const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
+      if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+      const entries=Array.isArray(data.entries)?data.entries:null;
+      const mi=Number(data.mileage||0) || null;
+      const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
+      const partPhotos=(data.partPhotos && typeof data.partPhotos === 'object') ? data.partPhotos : {};
+      const inventory=Array.isArray(data.inventory) ? data.inventory : [];
+      const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
+      const basicParts=Array.isArray(data.basicParts) ? data.basicParts : normalizeBasicParts(inventory.map(item=>({
+        id: item.id,
+        name: item.name,
+        link: item.link,
+        unitCost: item.unitCost,
+        note: [item.partNum && `Part # ${item.partNum}`, item.store, item.note].filter(Boolean).join(' · ')
+      })));
+      const oilAverageResetAt=data.oilAverageResetAt||'';
+      const averageServiceType=data.averageServiceType||'oil_avg';
+      const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
+      const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
+      const photoCount=Object.keys(photos).length + Object.keys(partPhotos).length;
+      const version = Number(data.version || 0);
+      const backupVin = String(data.vin || '').trim();
+      if(!entries){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+      if(version > 7){ showToast('This backup was created by a newer app version'); input.value=''; return; }
+      if(backupVin && backupVin !== VIN){
+        const proceedMismatch = confirm(`This backup VIN does not match this app.
+
+Backup: ${backupVin}
+This app: ${VIN}
+
+Restore anyway?`);
+        if(!proceedMismatch){ input.value=''; return; }
+      }
+      if(!confirm(`Restore ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}?
+
+This replaces all current data. Continue?`)){
+        input.value='';return;
+      }
+      clearStoredPhotos();
+      clearStoredPartPhotos();
+      save(entries);
+      saveBasicPartsList(basicParts);
+      saveInventory(inventory);
+      saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
+      if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+      localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
+      saveScheduleOverrides(scheduleOverrides);
+      if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
+      if(mi&&mi>0)setMi(mi);
+      Object.entries(photos).forEach(([id,imgData])=>{ try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){} });
+      Object.entries(partPhotos).forEach(([id,imgData])=>{ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id, imgData); }catch(err){} });
+      renderAll();
+      renderBackup();
+      input.value='';
+      showToast(`✓ Restored ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}!`);
+    }catch(err){
+      showToast('❌ Could not read backup file');
+      input.value='';
+    }
+  };
+  reader.readAsText(file);
+}
+function resetData(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return;}
+  clearStoredPhotos();
+  clearStoredPartPhotos();
+  save(DEFAULT);
+  saveBasicPartsList([]);
+  saveInventory(DEFAULT_INVENTORY);
+  saveMasterParts(DEFAULT_MASTER_PARTS);
+  localStorage.removeItem(OIL_AVG_RESET_KEY);
+  localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  localStorage.removeItem(BASIC_PARTS_KEY);
+  setMi(64751);
+  renderAll();
+  renderBackup();
+  showToast('Reset to factory data ✓');
+}
 </script>
 </body>
 </html>
