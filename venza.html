@@ -13,7 +13,6 @@
 /* ─── RESET & ROOT ─────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  color-scheme:dark;
   --bg:#1c1e24;
   --bg1:#23262f;
   --bg2:#2a2d38;
@@ -375,7 +374,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   box-shadow:0 0 0 3px rgba(235,10,30,.1);
 }
 .ft{resize:vertical;min-height:76px}
-.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .btn-primary{
   width:100%;padding:14px;
   background:var(--toyota);color:#fff;
@@ -674,10 +673,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   background:#1a1d23;border:1px solid #2d3142;
   border-radius:12px;padding:11px 20px;
   font-size:13px;color:#ffffff;font-weight:500;
-  white-space: normal;
-  max-width: min(90vw, 360px);
-  text-align: center;
-  z-index:600;
+  white-space:nowrap;z-index:600;
   opacity:0;transition:all .3s;pointer-events:none;
   box-shadow:0 4px 20px rgba(0,0,0,.25);
 }
@@ -846,15 +842,15 @@ html.modal-open,body.modal-open{overflow:hidden}
 <!-- NAV -->
 <div class="nav-wrap">
   <nav class="nav">
-    <button class="nav-btn active" data-page="dash" onclick="go('dash')">Dashboard</button>
-    <button class="nav-btn" data-page="log" onclick="go('log')">Service Log</button>
-    <button class="nav-btn" data-page="upcoming" onclick="go('upcoming')">Schedule</button>
-    <button class="nav-btn" data-page="parts" onclick="go('parts')">Parts</button>
-    <button class="nav-btn" data-page="guides" onclick="go('guides')">Guides</button>
-    <button class="nav-btn" data-page="warranty" onclick="go('warranty')">Warranty</button>
-    <button class="nav-btn" data-page="specs" onclick="go('specs')">Specs</button>
-    <button class="nav-btn" data-page="backup" onclick="go('backup')">⚙ Backup</button>
-    <button class="nav-btn" data-page="printlog" onclick="go('printlog')">🖨 Print</button>
+    <button class="nav-btn active" onclick="go('dash')">Dashboard</button>
+    <button class="nav-btn" onclick="go('log')">Service Log</button>
+    <button class="nav-btn" onclick="go('upcoming')">Schedule</button>
+    <button class="nav-btn" onclick="go('parts')">Parts</button>
+    <button class="nav-btn" onclick="go('guides')">Guides</button>
+    <button class="nav-btn" onclick="go('warranty')">Warranty</button>
+    <button class="nav-btn" onclick="go('specs')">Specs</button>
+    <button class="nav-btn" onclick="go('backup')">⚙ Backup</button>
+    <button class="nav-btn" onclick="go('printlog')">🖨 Print</button>
   </nav>
 </div>
 
@@ -872,6 +868,9 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="progress-labels">
       <span id="dLast" style="color:rgba(255,255,255,.4)">Last: Feb 24, 2026 · 64,590 mi</span>
       <span id="dRemain" style="color:rgba(255,255,255,.4)">Status: Future</span>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-ghost hero-mini" id="heroCalendarBtn" onclick="downloadNextDueCalendar()">📅 Add next due to Calendar</button>
     </div>
   </div>
 
@@ -998,7 +997,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
     </div>
     <div class="btn-row">
-      <button class="btn-ghost" id="entryCancelBtn" onclick="clearPhoto();go('log')">Cancel</button>
+      <button class="btn-ghost" id="entryCancelBtn" onclick="go('log')">Cancel</button>
       <button class="btn-primary" id="entrySaveBtn" onclick="saveEntry()">Save Entry</button>
     </div>
   </div>
@@ -1637,6 +1636,7 @@ html.modal-open,body.modal-open{overflow:hidden}
           <div class="reminder-row"><span>Home Screen mode</span><strong id="pushStandaloneLabel">—</strong></div>
         </div>
         <div class="btn-row" style="margin-top:12px">
+          <button class="btn-ghost" onclick="renderReminderStrategy()">Check Support</button>
           <button class="btn-primary" style="background:var(--blue)" onclick="requestReminderPermission()">Allow Notifications</button>
         </div>
       </div>
@@ -1644,6 +1644,7 @@ html.modal-open,body.modal-open{overflow:hidden}
         <div class="reminder-card-title">Backup · Add to Calendar Export</div>
         <div class="reminder-card-copy">Works today with no backend. Export the next due service or all recurring reminders into your Calendar app so iPhone can notify you even if web push is not connected yet.</div>
         <div class="btn-row" style="margin-top:12px">
+          <button class="btn-ghost" onclick="downloadNextDueCalendar()">📅 Next Due</button>
           <button class="btn-primary" style="background:var(--green)" onclick="downloadAllRecurringCalendar()">📆 All Recurring</button>
         </div>
       </div>
@@ -1651,6 +1652,73 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="lock-note">UI baseline preserved for long-term use — reminder features were added without redesigning the existing layout.</div>
   </div>
 
+  <div class="section-label">For ChatGPT — Add Log Entry</div>
+  <div class="form-section" style="background:rgba(59,158,255,.05);border-color:rgba(59,158,255,.2)">
+    <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">📋 ChatGPT Instructions</div>
+
+    <div class="alert blue" style="margin-bottom:12px">
+      <div class="alert-icon">ℹ️</div>
+      <div><strong>Two ways to add entries — pick the right one:</strong><br>
+      <strong>Path A (live device):</strong> Export a backup → give JSON to ChatGPT → import it back.<br>
+      <strong>Path B (source file):</strong> Add to DEFAULT array in venza.html → re-upload to GitHub → affects fresh installs only.
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600">PATH A — Live Device (recommended for your current data)</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.7">
+      1. Tap <strong>Export Backup</strong> above → save the .json file<br>
+      2. Send the .json to ChatGPT and say: <em style="color:var(--text)">"Add this service entry to the entries array in my Venza backup file:"</em><br>
+      3. ChatGPT edits the JSON → download it → tap <strong>Import Backup</strong> to restore
+    </p>
+
+    <p style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600">PATH B — Source File (for updating the app baseline)</p>
+    <div id="chatgptTemplate" role="button" tabindex="0" aria-label="Copy ChatGPT template" style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer" onclick="copyTemplate()">// In venza.html find: "// ADD NEW ENTRIES BELOW THIS LINE"
+// Paste this object before the closing ];
+// Then re-upload the file to GitHub.
+
+{
+  id: Date.now(),           // unique number — use Date.now() or any unique int
+  date: 'YYYY-MM-DD',       // e.g. '2026-05-01'
+  mi: 69590,                // odometer at time of service
+  type: 'oiltires',         // see TYPE LIST below
+  desc: 'Description, parts used, part numbers...',
+  cost: 34.54,              // dollar amount (number, not string)
+  shop: 'DIY or shop name',
+  link: 'https://...',      // purchase link, or empty string ''
+  builtin: true             // true = shows gray delete btn (factory entry)
+},
+
+// TYPE LIST (use exact string):
+// oil, oiltires, tires, cabin, engine_filter,
+// trans, diff, coolant, inv_coolant, alignment,
+// tires_new, brakes, plugs, hvfilter_inspect,
+// hvfilter_clean, valvomax, wipers, other
+
+// NOTE: DEFAULT array only affects fresh installs or after Reset.
+// If localStorage already has data, the app reads that — not DEFAULT.</div>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px">Tap the box above to copy Path B template to clipboard.</p>
+  </div>
+
+  <div class="section-label">Danger Zone</div>
+  <div class="form-section" style="background:rgba(235,10,30,.04);border-color:rgba(235,10,30,.2)">
+    <div class="form-title" style="color:var(--toyota);margin-bottom:8px">Reset Controls</div>
+
+    <div style="background:rgba(212,150,10,.06);border:1px solid rgba(212,150,10,.18);border-radius:12px;padding:12px 12px 14px;margin-bottom:14px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;color:var(--gold2);margin-bottom:8px">🛢 Avg Oil Change Reset</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6">Resets only the <strong>Avg Oil Change</strong> tile on the dashboard so the next oil service starts a fresh average. It does <strong>not</strong> delete service history, inventory, or receipts.</p>
+      <div class="card" style="margin-bottom:10px"><div class="card-body">
+        <div class="row"><span class="row-key">Current Status</span><span class="row-val" id="oilAvgResetStatus">Not reset</span></div>
+      </div></div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="clearOilAverageReset()">Undo Reset</button>
+        <button class="btn-primary" style="background:var(--gold)" onclick="resetOilAverageNow()">Reset Avg Oil Change</button>
+      </div>
+    </div>
+
+    <div class="form-title" style="color:var(--toyota);margin-bottom:8px">Reset to Factory Data</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Wipes all user-added entries and resets to the original 4 service records. Cannot be undone unless you have a backup.</p>
+    <button class="btn-ghost" style="border-color:rgba(235,10,30,.4);color:var(--toyota)" onclick="resetData()">🗑 Reset All Data</button>
+  </div>
 </div>
 
 <!-- ═══ PRINT / GENERATE REPORT PAGE ════════════════════════════ -->
@@ -2982,6 +3050,12 @@ function downloadRuleCalendar(ruleId){
   const filename = `${rule.id}-reminder.ics`;
   downloadICS(filename, event);
 }
+function downloadNextDueCalendar(){
+  const state = getRecurringServicesState(getMi());
+  const bundle = getNextRecurringBundle(state);
+  if(!bundle?.lead){ showToast('No next due service found'); return; }
+  downloadICS('next-service-reminder.ics', buildCalendarEventForRule(bundle.lead));
+}
 function downloadAllRecurringCalendar(){
   const state = getRecurringServicesState(getMi());
   const events = state.rules.filter(r=>!r.watchOnly).map(buildCalendarEventForRule);
@@ -2990,12 +3064,24 @@ function downloadAllRecurringCalendar(){
 function isStandaloneMode(){
   return window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
+function renderReminderStrategy(){
+  const supportEl = document.getElementById('pushSupportLabel');
+  const permissionEl = document.getElementById('pushPermissionLabel');
+  const standaloneEl = document.getElementById('pushStandaloneLabel');
+  if(!supportEl || !permissionEl || !standaloneEl) return;
+  const secure = location.protocol === 'https:' || location.hostname === 'localhost';
+  const pushCapable = secure && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  supportEl.textContent = pushCapable ? 'Ready for backend hookup' : secure ? 'Notifications only / no full push' : 'Needs HTTPS';
+  permissionEl.textContent = ('Notification' in window) ? Notification.permission : 'Not supported';
+  standaloneEl.textContent = isStandaloneMode() ? 'Home Screen app' : 'Browser tab';
+}
 async function requestReminderPermission(){
   if(!('Notification' in window)){ showToast('Notifications are not supported on this device'); return; }
   try{
     const result = await Notification.requestPermission();
     localStorage.setItem('vz_notification_pref', result);
-      showToast(result === 'granted' ? 'Notifications allowed ✓' : result === 'denied' ? 'Notifications denied' : 'Permission dismissed');
+    renderReminderStrategy();
+    showToast(result === 'granted' ? 'Notifications allowed ✓' : result === 'denied' ? 'Notifications denied' : 'Permission dismissed');
   }catch(err){
     showToast('Notification permission failed');
   }
@@ -3172,6 +3258,7 @@ window.onload=()=>{
   setScheduleControlsExpanded(false);
   renderAll();
   resetEntryInventoryUses();
+  renderReminderStrategy();
 };
 
 function renderAll(){
@@ -3994,30 +4081,27 @@ function saveEntry(){
   const newId=Date.now();
   const d=getData();
   const inventoryUses = items.filter(item=>item.inventoryId).map(item=>({inventoryId:item.inventoryId,name:item.name,partNum:item.partNum,store:item.store,link:item.link,unitCost:item.price,qtyUsed:item.qty,countInOilAvg:item.useInOilAvg}));
-  try{
-    d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:false});
-    save(d);
-    if(Object.keys(linkedQty).length){
-      Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
-        const item = inv.find(x=>String(x.id)===String(inventoryId));
-        if(item) item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) - Number(qtyNeeded||0));
-      });
-      saveInventory(inv);
-    }
-    if(window._pendingPhoto){
-      savePhoto(newId, window._pendingPhoto);
-    }
-    if(parseInt(mi,10)>getMi())setMi(parseInt(mi,10));
-    renderAll();go('log');
-    ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('fType').value='';
-    resetEntryInventoryUses();
-    updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
-    showToast('Entry saved ✓');
-  } finally {
-    clearPhoto();
-    window._pendingPhoto = null;
+  d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:false});
+  save(d);
+  if(Object.keys(linkedQty).length){
+    Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
+      const item = inv.find(x=>String(x.id)===String(inventoryId));
+      if(item) item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) - Number(qtyNeeded||0));
+    });
+    saveInventory(inv);
   }
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
+  if(parseInt(mi,10)>getMi())setMi(parseInt(mi,10));
+  renderAll();go('log');
+  ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value='';
+  resetEntryInventoryUses();
+  clearPhoto();
+  updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
+  showToast('Entry saved ✓');
 }
 
 /* ─── MAINTENANCE ENGINE (whichever comes first) ─────────────── */
@@ -4059,7 +4143,7 @@ function renderSmartList(mi){
   document.getElementById('smartPreview').style.display='block';
 }
 
-/* ─── MILEAGE MODAL ──────────────────────────────────────────── */
+/* ─── MILEAGE MODAL/* ─── MILEAGE MODAL ──────────────────────────────────────────── */
 function openMiModal(){
   const cur = getMi();
   document.getElementById('miInput').value = cur;
@@ -4082,12 +4166,13 @@ document.getElementById('miModal').addEventListener('click',function(e){
 });
 
 /* ─── NAV ────────────────────────────────────────────────── */
+/* ─── NAV ────────────────────────────────────────────────── */
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,add:-1};
   document.getElementById('page-'+id).classList.add('active');
-  const activeBtn = document.querySelector(`.nav-btn[data-page="${id}"]`);
-  if (activeBtn) activeBtn.classList.add('active');
+  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
   if(id==='backup')renderBackup();
   if(id==='upcoming')renderUpcoming();
   if(id==='parts')renderParts();
@@ -4191,6 +4276,19 @@ function copyVIN(){
   });
 }
 
+/* ─── COPY CHATGPT TEMPLATE ──────────────────────────────── */
+function copyTemplate(){
+  const t=document.getElementById('chatgptTemplate').textContent;
+  navigator.clipboard.writeText(t).then(()=>showToast('Template copied to clipboard ✓'))
+  .catch(()=>{
+    const el=document.createElement('textarea');
+    el.value=t;document.body.appendChild(el);
+    el.select();document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('Template copied ✓');
+  });
+}
+
 /* ─── BACKUP SUMMARY ─────────────────────────────────────── */
 function renderBackup(){
   const d=getData();
@@ -4212,6 +4310,7 @@ function renderBackup(){
       dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
       ' — '+parseInt(last.mi).toLocaleString()+' mi';
   }
+  renderReminderStrategy();
 }
 
 function resetOilAverageNow(){
@@ -4328,7 +4427,7 @@ This replaces all current data. Continue?`)){
       if(mi&&mi>0)setMi(mi);
 
       Object.entries(photos).forEach(([id,imgData])=>{
-        setPhotoStorageItem('vz_photo_'+id, imgData);
+        try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
       });
 
       renderAll();
@@ -4341,6 +4440,23 @@ This replaces all current data. Continue?`)){
     }
   };
   reader.readAsText(file);
+}
+
+/* ─── RESET DATA ─────────────────────────────────────────── */
+function resetData(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
+  // Clear all photos first
+  clearStoredPhotos();
+  save(DEFAULT);
+  saveInventory(DEFAULT_INVENTORY);
+  saveMasterParts(DEFAULT_MASTER_PARTS);
+  localStorage.removeItem(OIL_AVG_RESET_KEY);
+  localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  setMi(64751);
+  renderAll();
+  renderBackup();
+  showToast('Reset to factory data ✓');
 }
 
 /* ─── TOAST ──────────────────────────────────────────────── */
@@ -4728,16 +4844,7 @@ ${photoSection}
 
 /* Storage: photos kept separate from log data to avoid size issues */
 function getPhoto(id){ return localStorage.getItem('vz_photo_'+id)||null; }
-function setPhotoStorageItem(key,data){
-  try{
-    localStorage.setItem(key,data);
-    return true;
-  }catch(err){
-    showToast('Storage full — photo not saved. Clear space and try again.');
-    return false;
-  }
-}
-function savePhoto(id,data){ return setPhotoStorageItem('vz_photo_'+id,data); }
+function savePhoto(id,data){ try{ localStorage.setItem('vz_photo_'+id,data); }catch(e){ showToast('Photo too large — try a smaller image'); } }
 function removePhoto(id){ localStorage.removeItem('vz_photo_'+id); renderLog(); showToast('Photo removed'); }
 
 /* Compress image to max 800px wide, 70% quality JPEG */
@@ -4761,12 +4868,6 @@ function compressImage(file, cb){
 
 /* Handle photo selected from file input on ADD FORM */
 function handlePhotoSelect(input){
-  window._pendingPhotoContext = {
-    form:'service-entry',
-    date:document.getElementById('fDate')?.value || '',
-    mileage:document.getElementById('fMi')?.value || '',
-    serviceType:document.getElementById('fType')?.value || 'other'
-  };
   if(!input.files[0]) return;
   compressImage(input.files[0], function(data){
     window._pendingPhoto = data;
@@ -4780,12 +4881,6 @@ function handlePhotoSelect(input){
 /* Handle drag-and-drop */
 function handlePhotoDrop(e){
   e.preventDefault();
-  window._pendingPhotoContext = {
-    form:'service-entry',
-    date:document.getElementById('fDate')?.value || '',
-    mileage:document.getElementById('fMi')?.value || '',
-    serviceType:document.getElementById('fType')?.value || 'other'
-  };
   const file = e.dataTransfer.files[0];
   if(file && file.type.startsWith('image/')){
     compressImage(file, function(data){
@@ -4793,7 +4888,6 @@ function handlePhotoDrop(e){
       document.getElementById('fPhotoImg').src = data;
       document.getElementById('fPhotoPreview').style.display = 'block';
       document.getElementById('fPhotoPlaceholder').style.display = 'none';
-      document.getElementById('fPhotoArea').style.borderColor = 'var(--green2)';
     });
   }
 }
@@ -4801,7 +4895,6 @@ function handlePhotoDrop(e){
 /* Clear photo from ADD FORM */
 function clearPhoto(){
   window._pendingPhoto = null;
-  window._pendingPhotoContext = null;
   document.getElementById('fPhotoInput').value = '';
   document.getElementById('fPhotoPreview').style.display = 'none';
   document.getElementById('fPhotoPlaceholder').style.display = 'block';
@@ -4912,7 +5005,7 @@ function saveBasicPartsList(items){
   localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
 }
 function getBasicPartPhoto(id){ return localStorage.getItem(BASIC_PART_PHOTO_PREFIX + id) || null; }
-function saveBasicPartPhoto(id,data){ return setPhotoStorageItem(BASIC_PART_PHOTO_PREFIX + id,data); }
+function saveBasicPartPhoto(id,data){ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id,data); }catch(err){ showToast('Part photo too large — try a smaller image'); } }
 function removeBasicPartPhoto(id){ localStorage.removeItem(BASIC_PART_PHOTO_PREFIX + id); }
 function clearStoredPartPhotos(){
   const keys = [];
@@ -5152,6 +5245,33 @@ function getAverageEntryCost(entry, type=getAverageServiceType()){
   const legacy = getEntryDisplayCost(entry);
   return Number.isFinite(legacy) && legacy > 0 ? legacy : null;
 }
+function saveEntry(){
+  const date=document.getElementById('fDate')?.value || '';
+  const mi=document.getElementById('fMi')?.value || '';
+  const type=document.getElementById('fType')?.value || 'other';
+  const desc=document.getElementById('fDesc')?.value.trim() || '';
+  const cost=document.getElementById('fCost')?.value || '';
+  const shop=document.getElementById('fShop')?.value.trim() || '';
+  if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
+  const parsedMi = parseInt(mi,10);
+  if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
+  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
+  const newId=Date.now();
+  const d=getData();
+  d.push({id:newId,date,mi:parsedMi,type,desc,cost:manualCost,shop,link:'',items:[],inventoryUses:[],builtin:false});
+  save(d);
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
+  if(parsedMi > getMi()) setMi(parsedMi);
+  renderAll();
+  go('log');
+  ['fMi','fCost','fShop','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
+  clearPhoto();
+  showToast('Entry saved ✓');
+}
 function renderBackup(){
   const d=getData();
   const mi=getMi();
@@ -5174,6 +5294,7 @@ function renderBackup(){
     const dt=new Date(last.date+'T00:00:00');
     lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
   }
+  renderReminderStrategy();
 }
 function exportData(){
   const servicePhotos = {};
@@ -5276,8 +5397,8 @@ This replaces all current data. Continue?`)){
       saveScheduleOverrides(scheduleOverrides);
       if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
       if(mi&&mi>0)setMi(mi);
-      Object.entries(photos).forEach(([id,imgData])=>{ setPhotoStorageItem('vz_photo_'+id, imgData); });
-      Object.entries(partPhotos).forEach(([id,imgData])=>{ setPhotoStorageItem(BASIC_PART_PHOTO_PREFIX + id, imgData); });
+      Object.entries(photos).forEach(([id,imgData])=>{ try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){} });
+      Object.entries(partPhotos).forEach(([id,imgData])=>{ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id, imgData); }catch(err){} });
       renderAll();
       renderBackup();
       input.value='';
@@ -5288,6 +5409,23 @@ This replaces all current data. Continue?`)){
     }
   };
   reader.readAsText(file);
+}
+function resetData(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return;}
+  clearStoredPhotos();
+  clearStoredPartPhotos();
+  save(DEFAULT);
+  saveBasicPartsList([]);
+  saveInventory(DEFAULT_INVENTORY);
+  saveMasterParts(DEFAULT_MASTER_PARTS);
+  localStorage.removeItem(OIL_AVG_RESET_KEY);
+  localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  localStorage.removeItem(BASIC_PARTS_KEY);
+  setMi(64751);
+  renderAll();
+  renderBackup();
+  showToast('Reset to factory data ✓');
 }
 </script>
 </body>
