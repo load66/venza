@@ -1096,15 +1096,18 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="section-label">Basic Parts List</div>
   <div class="alert blue">
     <div class="alert-icon">🧩</div>
-    <div><strong>Simple editable parts list.</strong> Save each part with a purchase link, cost per unit, optional note, and optional receipt photo.</div>
+    <div><strong>Simple editable parts list.</strong> Save each part with a part number, purchase link, cost per unit, optional note, and optional receipt photo.</div>
   </div>
 
-  <button class="btn-primary" id="partsFormToggleBtn" onclick="togglePartForm()" style="margin-bottom:10px">＋ Add Part</button>
+  <button class="btn-primary" id="partsFormToggleBtn" onclick="openNewPartForm()" style="margin-bottom:10px">＋ Add Part</button>
 
   <div class="form-section" id="partFormWrap" style="display:none">
     <input type="hidden" id="partEditId">
     <div class="form-title" id="partFormTitle">Add Part</div>
-    <div class="fl"><label>Part Name</label><input type="text" class="fi" id="partName" placeholder="Toyota oil filter 90915-YZZN1"></div>
+    <div class="fg2">
+      <div class="fl"><label>Part Name</label><input type="text" class="fi" id="partName" placeholder="Toyota oil filter"></div>
+      <div class="fl"><label>Part Number</label><input type="text" class="fi" id="partNumber" placeholder="90915-YZZN1"></div>
+    </div>
     <div class="fg2">
       <div class="fl"><label>Cost Per Unit ($)</label><input type="number" class="fi" id="partCost" step="0.01" placeholder="4.99"></div>
       <div class="fl"><label>Purchase Link</label><input type="url" class="fi" id="partLink" placeholder="https://..."></div>
@@ -1133,7 +1136,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       <input type="file" id="partPhotoInput" accept="image/*" style="display:none" onchange="handlePartPhotoSelect(this)">
     </div>
     <div class="btn-row">
-      <button class="btn-ghost" onclick="clearPartForm()">Clear</button>
+      <button class="btn-ghost" onclick="cancelPartForm()">Cancel</button>
       <button class="btn-primary" onclick="saveBasicPart()">Save Part</button>
     </div>
   </div>
@@ -4968,6 +4971,7 @@ function normalizeBasicParts(items){
     id: item.id ?? Date.now()+Math.random(),
     name: String(item.name||'').trim(),
     link: String(item.link||'').trim(),
+    partNum: String(item.partNum||'').trim(),
     unitCost: Number.isFinite(Number(item.unitCost)) ? Number(item.unitCost) : 0,
     note: String(item.note||'').trim()
   })).filter(item=>item.name);
@@ -4980,9 +4984,10 @@ function migrateLegacyBasicParts(){
     seed = normalizeBasicParts(legacyInventory.map(item=>({
       id: item.id,
       name: item.name,
+      partNum: item.partNum,
       link: item.link,
       unitCost: item.unitCost,
-      note: [item.partNum && `Part # ${item.partNum}`, item.store, item.note].filter(Boolean).join(' · ')
+      note: [item.store, item.note].filter(Boolean).join(' · ')
     })));
   }catch(err){ seed = []; }
   if(seed.length) localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(seed));
@@ -5016,9 +5021,20 @@ function togglePartForm(forceOpen){
   if(!wrap || !btn) return;
   const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : wrap.style.display === 'none';
   wrap.style.display = shouldOpen ? 'block' : 'none';
-  btn.textContent = shouldOpen ? '− Hide Part Form' : '＋ Add Part';
+  btn.textContent = shouldOpen ? '＋ New Part' : '＋ Add Part';
   if(shouldOpen) wrap.scrollIntoView({behavior:'smooth', block:'start'});
 }
+function openNewPartForm(){
+  clearPartForm();
+  togglePartForm(true);
+  const firstField = document.getElementById('partName');
+  if(firstField && typeof firstField.focus === 'function') firstField.focus({preventScroll:true});
+}
+function cancelPartForm(){
+  clearPartForm();
+  togglePartForm(false);
+}
+
 function clearPartPhoto(){
   window._pendingPartPhoto = null;
   window._pendingPartPhotoRemoved = true;
@@ -5029,7 +5045,7 @@ function clearPartPhoto(){
   const img = document.getElementById('partPhotoImg'); if(img) img.src='';
 }
 function clearPartForm(){
-  const fields = ['partEditId','partName','partCost','partLink','partNote'];
+  const fields = ['partEditId','partName','partNumber','partCost','partLink','partNote'];
   fields.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const title = document.getElementById('partFormTitle'); if(title) title.textContent = 'Add Part';
   clearPartPhoto();
@@ -5083,6 +5099,7 @@ function editBasicPart(id){
   togglePartForm(true);
   document.getElementById('partEditId').value = part.id;
   document.getElementById('partName').value = part.name || '';
+  document.getElementById('partNumber').value = part.partNum || '';
   document.getElementById('partCost').value = Number(part.unitCost||0) > 0 ? Number(part.unitCost||0) : '';
   document.getElementById('partLink').value = part.link || '';
   document.getElementById('partNote').value = part.note || '';
@@ -5104,12 +5121,13 @@ function editBasicPart(id){
 function saveBasicPart(){
   const editId = document.getElementById('partEditId')?.value || '';
   const name = document.getElementById('partName')?.value.trim() || '';
+  const partNum = document.getElementById('partNumber')?.value.trim() || '';
   const link = document.getElementById('partLink')?.value.trim() || '';
   const note = document.getElementById('partNote')?.value.trim() || '';
   const unitCost = Number.isFinite(Number(document.getElementById('partCost')?.value)) ? Number(document.getElementById('partCost').value) : 0;
   if(!name){ showToast('Part name is required'); return; }
   const list = getBasicPartsList();
-  const payload = { id: editId || Date.now(), name, link, unitCost, note };
+  const payload = { id: editId || Date.now(), name, partNum, link, unitCost, note };
   if(editId){
     const idx = list.findIndex(item=>String(item.id)===String(editId));
     if(idx>-1) list[idx] = payload;
@@ -5154,6 +5172,7 @@ function renderParts(){
     const photo = getBasicPartPhoto(part.id);
     return `<div class="part-item">
       <div class="part-row1"><span class="part-name">${escapeHtml(part.name)}</span><span class="part-price">${Number(part.unitCost||0) > 0 ? '$'+Number(part.unitCost||0).toFixed(2) : '—'}</span></div>
+      ${part.partNum ? `<div class="part-num">Part # ${escapeHtml(part.partNum)}</div>` : `<div class="part-missing">No part number saved</div>`}
       ${safeLink ? `<a class="part-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeLink))}</a>` : `<div class="part-missing">No purchase link saved</div>`}
       ${part.note ? `<div class="inv-meta" style="margin-top:8px">${safeText(part.note)}</div>` : ''}
       ${photo ? `<div style="margin-top:10px;cursor:pointer" onclick="viewBasicPartPhoto(${part.id})"><img src="${photo}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">🧾 Receipt photo · tap to view</div></div>` : `<div class="part-missing" style="margin-top:10px">No receipt photo saved</div>`}
