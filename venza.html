@@ -1225,6 +1225,74 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="card-body" id="masterPartsList"></div>
   </div>
 
+  <div class="section-label">Service-Part Rules</div>
+  <div class="alert blue">
+    <div class="alert-icon">🧩</div>
+    <div><strong>Editable auto-required rules.</strong> These drive the automatic inventory reservation in Add Entry. You can edit service-part IDs, quantities, Toyota/reference part numbers, and linked master parts without touching code.</div>
+  </div>
+
+  <div class="overlay" id="serviceRuleModal" onclick="if(event.target===this)closeServiceRuleEditor()">
+    <div class="modal">
+      <div class="modal-grip"></div>
+      <div class="modal-title" id="srModalTitle">Edit Service-Part Rule</div>
+      <div class="modal-scroll">
+        <div class="form-section" style="margin-bottom:0;background:transparent;border:none;box-shadow:none;padding:0">
+          <input type="hidden" id="srOriginalServiceType">
+          <input type="hidden" id="srOriginalId">
+          <div class="fg2">
+            <div class="fl">
+              <label>Service Type</label>
+              <select class="fs" id="srServiceType">
+                <option value="oil">Oil Change</option>
+                <option value="oiltires">Oil + Rotation + Inspection</option>
+                <option value="tires">Tire Rotation</option>
+                <option value="cabin">Cabin Air Filter</option>
+                <option value="engine_filter">Engine Air Filter</option>
+                <option value="trans">Transmission Fluid D&F</option>
+                <option value="diff">Rear Differential D&F</option>
+                <option value="coolant">Engine Coolant D&F</option>
+                <option value="inv_coolant">Inverter Coolant D&F</option>
+                <option value="alignment">Wheel Alignment</option>
+                <option value="tires_new">New Tires</option>
+                <option value="brakes">Brake Service</option>
+                <option value="plugs">Spark Plugs</option>
+                <option value="hvfilter_inspect">HV Battery Filter — Inspect</option>
+                <option value="hvfilter_clean">HV Battery Filter — Clean</option>
+                <option value="valvomax">ValvoMax Install</option>
+                <option value="wipers">Wiper Blades</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="fl"><label>Required Qty</label><input type="number" class="fi" id="srQty" min="1" step="1" placeholder="1"></div>
+          </div>
+          <div class="fg2">
+            <div class="fl"><label>Service-Part ID</label><input type="text" class="fi" id="srRuleId" placeholder="req_oil_filter_oem"></div>
+            <div class="fl"><label>Toyota / Ref Part #</label><input type="text" class="fi" id="srToyotaPart" placeholder="90915-YZZN1"></div>
+          </div>
+          <div class="fl"><label>Rule Label</label><input type="text" class="fi" id="srLabel" placeholder="Oil filter"></div>
+          <div class="fl"><label>Linked Master Part</label><select class="fs" id="srMasterPart"></select></div>
+          <div class="master-editor-note">Link the rule to a master part so auto-selection stays stable long-term, then keep the Toyota/reference part number as the readable fallback key.</div>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:12px;flex-shrink:0">
+        <button class="btn-ghost" onclick="closeServiceRuleEditor()">Cancel</button>
+        <button class="btn-primary" style="background:var(--blue)" onclick="saveServiceRule()">Save Rule</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Auto-Required Rules</div>
+      <div id="serviceRuleSummary" style="font-size:11px;color:var(--text3)">0 rules</div>
+    </div>
+    <div class="card-body" id="serviceRuleList"></div>
+  </div>
+  <div class="btn-row" style="margin-top:10px;margin-bottom:12px">
+    <button class="btn-ghost" onclick="resetServiceRequirementRules()">Reset Rules to App Default</button>
+    <button class="btn-primary" style="background:var(--blue)" onclick="openServiceRuleEditor()">＋ Add Rule</button>
+  </div>
+
   <div class="section-label">Free Oil Disposal</div>
   <div class="card"><div class="card-body">
     <div class="row"><span class="row-key">AutoZone — Webb City</span><span class="row-val" style="font-size:10px">1024 S Madison St · (417) 673-3290</span></div>
@@ -1982,6 +2050,7 @@ const INVENTORY_KEY = 'vz_inventory';
 const MASTER_PARTS_KEY = 'vz_master_parts';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
+const SERVICE_REQUIREMENTS_KEY = 'vz_service_part_requirements';
 const DEFAULT_MASTER_PARTS = [
   {id:'mp_oil_mobil1_0w16',name:'Mobil 1 0W-16 Full Synthetic 5 qt',serviceType:'oil',category:'fluids_filters',partNum:'B07Y5MG3MX',unitCost:27.97,statusLabel:'Reference part',note:'Need 4.8 qt — leftover is good for top-off.',countInOilAvg:true,sources:[{store:'Walmart',url:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534',label:'walmart.com — verified 03/2026',unitPrice:27.97,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_oil_filter_oem',name:'OEM Oil Filter',serviceType:'oil',category:'fluids_filters',partNum:'90915-YZZN1',unitCost:6.57,statusLabel:'Reference part',note:'Replace with every oil change.',countInOilAvg:true,sources:[{store:'Toyota Parts',url:'https://parts.toyota.com/',label:'parts.toyota.com',unitPrice:6.57,addedAt:'2026-03-01T00:00:00.000Z'}]},
@@ -2035,6 +2104,50 @@ const SERVICE_PART_REQUIREMENTS = {
   ],
   tires:[], alignment:[], tires_new:[], brakes:[], hvfilter_inspect:[], hvfilter_clean:[], wipers:[], other:[]
 };
+function normalizeServiceRequirementRule(rule){
+  if(!rule || typeof rule !== 'object') return null;
+  const id = String(rule.id||'').trim();
+  const label = String(rule.label||'').trim();
+  if(!id || !label) return null;
+  return {
+    id,
+    label,
+    qty: Math.max(1, parseInt(rule.qty||1,10) || 1),
+    masterPartIds: Array.isArray(rule.masterPartIds) ? Array.from(new Set(rule.masterPartIds.map(String).filter(Boolean))) : [],
+    toyotaPartNum: String(rule.toyotaPartNum||'').trim()
+  };
+}
+function normalizeServiceRequirementsMap(map){
+  const cleaned = {};
+  const source = map && typeof map === 'object' && !Array.isArray(map) ? map : {};
+  Object.entries(source).forEach(([serviceType, rules])=>{
+    cleaned[String(serviceType)] = Array.isArray(rules) ? rules.map(normalizeServiceRequirementRule).filter(Boolean) : [];
+  });
+  return cleaned;
+}
+function cloneDefaultServiceRequirements(){
+  return normalizeServiceRequirementsMap(SERVICE_PART_REQUIREMENTS);
+}
+function getSavedServiceRequirementsMap(){
+  try{
+    const raw = localStorage.getItem(SERVICE_REQUIREMENTS_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    const cleaned = normalizeServiceRequirementsMap(parsed);
+    return Object.keys(cleaned).length ? cleaned : null;
+  }catch(err){ return null; }
+}
+function getResolvedServiceRequirementsMap(){
+  return getSavedServiceRequirementsMap() || cloneDefaultServiceRequirements();
+}
+function getResolvedServicePartRequirements(serviceType=''){
+  const map = getResolvedServiceRequirementsMap();
+  return Array.isArray(map[serviceType]) ? map[serviceType] : [];
+}
+function saveResolvedServiceRequirementsMap(map){
+  localStorage.setItem(SERVICE_REQUIREMENTS_KEY, JSON.stringify(normalizeServiceRequirementsMap(map)));
+}
+function clearSavedServiceRequirementsMap(){ localStorage.removeItem(SERVICE_REQUIREMENTS_KEY); }
 function normalizeMasterSourceFingerprint(source){
   const url = (source.url||'').trim().toLowerCase();
   const store = (source.store||'').trim().toLowerCase();
@@ -2417,9 +2530,7 @@ function sumInventoryCountMaps(...maps){
   },{});
 }
 function getServicePartRequirements(serviceType=''){
-  return Array.isArray(SERVICE_PART_REQUIREMENTS[serviceType])
-    ? SERVICE_PART_REQUIREMENTS[serviceType].map(req=>({...req, qty:Math.max(1, parseInt(req.qty||1,10)||1), masterPartIds:Array.isArray(req.masterPartIds)?req.masterPartIds.map(String):[]}))
-    : [];
+  return getResolvedServicePartRequirements(serviceType).map(req=>({...req, qty:Math.max(1, parseInt(req.qty||1,10)||1), masterPartIds:Array.isArray(req.masterPartIds)?req.masterPartIds.map(String):[]}));
 }
 function getEntryPreviewInventory(){
   return normalizeInventory(getInventory()).map(item=>({...item}));
@@ -3367,7 +3478,108 @@ function renderLog(){
 }
 
 /* ─── ADD ENTRY/* ─── ADD ENTRY ──────────────────────────────────────────── */
+function getServiceRuleMasterLabel(masterPartId=''){
+  const part = getMasterParts().find(item=>String(item.id)===String(masterPartId));
+  return part ? `${part.name}${part.partNum ? ` · ${part.partNum}` : ''}` : 'Unlinked master part';
+}
+function buildServiceRuleMasterOptions(selectedId=''){
+  const select = document.getElementById('srMasterPart');
+  if(!select) return;
+  const parts = getMasterParts().slice().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+  select.innerHTML = ['<option value="">— No linked master part —</option>', ...parts.map(part=>`<option value="${escapeHtmlAttr(part.id)}">${escapeHtml(part.name)}${part.partNum ? ` · ${escapeHtml(part.partNum)}` : ''}</option>`)].join('');
+  select.value = selectedId || '';
+}
+function openServiceRuleEditor(rule=null, serviceType='oil'){
+  const modal = document.getElementById('serviceRuleModal');
+  if(!modal) return;
+  buildServiceRuleMasterOptions(rule?.masterPartIds?.[0] || '');
+  document.getElementById('srOriginalServiceType').value = rule ? serviceType : '';
+  document.getElementById('srOriginalId').value = rule?.id || '';
+  document.getElementById('srServiceType').value = serviceType || 'oil';
+  document.getElementById('srQty').value = Number(rule?.qty||1) || 1;
+  document.getElementById('srRuleId').value = rule?.id || '';
+  document.getElementById('srToyotaPart').value = rule?.toyotaPartNum || '';
+  document.getElementById('srLabel').value = rule?.label || '';
+  const titleEl = document.getElementById('srModalTitle'); if(titleEl) titleEl.textContent = rule ? `Edit ${rule.label}` : 'Add Service-Part Rule';
+  modal.classList.add('open');
+  requestAnimationFrame(()=>{ const first=document.getElementById('srLabel'); if(first && typeof first.focus === 'function') first.focus({preventScroll:true}); });
+}
+function closeServiceRuleEditor(){
+  const modal = document.getElementById('serviceRuleModal');
+  if(modal) modal.classList.remove('open');
+  ['srOriginalServiceType','srOriginalId','srRuleId','srToyotaPart','srLabel'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const qtyEl=document.getElementById('srQty'); if(qtyEl) qtyEl.value='1';
+  const serviceEl=document.getElementById('srServiceType'); if(serviceEl) serviceEl.value='oil';
+  buildServiceRuleMasterOptions('');
+}
+function editServiceRule(serviceType, ruleId){
+  const rules = getResolvedServicePartRequirements(serviceType);
+  const rule = rules.find(item=>String(item.id)===String(ruleId));
+  if(!rule) return;
+  openServiceRuleEditor(rule, serviceType);
+}
+function saveServiceRule(){
+  const originalServiceType = document.getElementById('srOriginalServiceType').value || '';
+  const originalId = document.getElementById('srOriginalId').value || '';
+  const serviceType = document.getElementById('srServiceType').value || 'other';
+  const qty = Math.max(1, parseInt(document.getElementById('srQty').value||1,10) || 1);
+  const id = document.getElementById('srRuleId').value.trim();
+  const toyotaPartNum = document.getElementById('srToyotaPart').value.trim();
+  const label = document.getElementById('srLabel').value.trim();
+  const masterPartId = document.getElementById('srMasterPart').value || '';
+  if(!id || !label){ showToast('Rule ID and label are required'); return; }
+  const map = getResolvedServiceRequirementsMap();
+  Object.keys(map).forEach(key=>{ map[key] = Array.isArray(map[key]) ? map[key].map(normalizeServiceRequirementRule).filter(Boolean) : []; });
+  if(originalServiceType && originalId && Array.isArray(map[originalServiceType])) map[originalServiceType] = map[originalServiceType].filter(rule=>String(rule.id)!==String(originalId));
+  map[serviceType] = Array.isArray(map[serviceType]) ? map[serviceType] : [];
+  if(map[serviceType].some(rule=>String(rule.id)===String(id))){ showToast('Rule ID must be unique within that service type'); return; }
+  const saved = normalizeServiceRequirementRule({id,label,qty,masterPartIds:masterPartId ? [masterPartId] : [],toyotaPartNum});
+  if(!saved){ showToast('Rule could not be saved'); return; }
+  map[serviceType].push(saved);
+  map[serviceType].sort((a,b)=>String(a.label||'').localeCompare(String(b.label||'')));
+  saveResolvedServiceRequirementsMap(map);
+  closeServiceRuleEditor();
+  renderParts();
+  renderEntryInventoryUI();
+  showToast('Service-part rule saved ✓');
+}
+function deleteServiceRule(serviceType, ruleId){
+  const rules = getResolvedServicePartRequirements(serviceType);
+  const rule = rules.find(item=>String(item.id)===String(ruleId));
+  if(!rule) return;
+  if(!confirm(`Delete service rule "${rule.label}"?`)) return;
+  const map = getResolvedServiceRequirementsMap();
+  map[serviceType] = Array.isArray(map[serviceType]) ? map[serviceType].filter(item=>String(item.id)!==String(ruleId)) : [];
+  saveResolvedServiceRequirementsMap(map);
+  renderParts();
+  renderEntryInventoryUI();
+  showToast('Service-part rule deleted');
+}
+function resetServiceRequirementRules(){
+  if(!confirm('Reset all service-part rules to the app defaults?')) return;
+  clearSavedServiceRequirementsMap();
+  renderParts();
+  renderEntryInventoryUI();
+  showToast('Service-part rules reset to default ✓');
+}
+function renderServiceRuleList(){
+  const body = document.getElementById('serviceRuleList');
+  const summary = document.getElementById('serviceRuleSummary');
+  if(!body || !summary) return;
+  const map = getResolvedServiceRequirementsMap();
+  const rows = Object.entries(map).flatMap(([serviceType, rules])=>Array.isArray(rules) ? rules.map(rule=>({serviceType, rule})) : []).sort((a,b)=>{
+    const serviceDiff = String(LABELS[a.serviceType]||a.serviceType).localeCompare(String(LABELS[b.serviceType]||b.serviceType));
+    if(serviceDiff!==0) return serviceDiff;
+    return String(a.rule.label||'').localeCompare(String(b.rule.label||''));
+  });
+  const isCustom = !!getSavedServiceRequirementsMap();
+  summary.textContent = `${rows.length} rule${rows.length!==1?'s':''} · ${isCustom ? 'custom active' : 'app default'}`;
+  if(!rows.length){ body.innerHTML = `<div class="master-empty">No service-part rules saved.</div>`; return; }
+  body.innerHTML = rows.map(({serviceType, rule})=>`<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${escapeHtml(rule.label)}</div><div class="inv-meta">${escapeHtml(LABELS[serviceType] || serviceType)} · ID: ${escapeHtml(rule.id)}${rule.toyotaPartNum ? ` · Toyota/ref #: ${escapeHtml(rule.toyotaPartNum)}` : ''}<br>Required qty: ${Number(rule.qty||0)}${rule.masterPartIds?.[0] ? `<br>🔗 ${escapeHtml(getServiceRuleMasterLabel(rule.masterPartIds[0]))}` : '<br>⚠ No linked master part'}</div></div><div class="inv-qty ${rule.masterPartIds?.length ? '' : 'out'}">${rule.masterPartIds?.length ? 'linked' : 'unlinked'}</div></div><div class="inv-actions"><button type="button" class="inv-btn" onclick="editServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Edit</button><button type="button" class="inv-btn danger" onclick="deleteServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Delete</button></div></div>`).join('');
+}
+
 function renderParts(){
+  renderServiceRuleList();
   const inv = getInventory().sort((a,b)=>{
     const stockDiff = Number(b.qtyOnHand||0) - Number(a.qtyOnHand||0);
     if(stockDiff !== 0) return stockDiff;
@@ -4051,13 +4263,14 @@ function exportData(){
   });
 
   const payload={
-    version: 5,
+    version: 6,
     exported: new Date().toISOString(),
     vin: VIN,
     vehicle: '2021 Toyota Venza Hybrid AWD',
     mileage: getMi(),
     oilAverageResetAt: getOilAverageResetAt(),
     scheduleOverrides: getScheduleOverrides(),
+    servicePartRequirements: getSavedServiceRequirementsMap(),
     entries: entries,
     inventory: getInventory(),
     masterParts: getMasterParts(),
@@ -4097,6 +4310,7 @@ function importData(input){
       const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
       const oilAverageResetAt=data.oilAverageResetAt||'';
       const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
+      const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
       const photoCount=Object.keys(photos).length;
       const version = Number(data.version || 0);
       const backupVin = String(data.vin || '').trim();
@@ -4104,7 +4318,7 @@ function importData(input){
       if(!entries){
         showToast('❌ Invalid backup file format'); input.value=''; return;
       }
-      if(version > 5){
+      if(version > 6){
         showToast('This backup was created by a newer app version'); input.value=''; return;
       }
       if(backupVin && backupVin !== VIN){
