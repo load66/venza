@@ -945,8 +945,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       <label>Service Type</label>
       <select class="fs" id="fType" onchange="prefill()">
         <option value="">— Select type —</option>
-        <option value="oiltires">Oil Change + Tire Rotation + Inspection</option>
-        <option value="oil">Oil Change Only</option>
+                <option value="oil">Oil Change</option>
         <option value="tires">Tire Rotation</option>
         <option value="cabin">Cabin Air Filter</option>
         <option value="engine_filter">Engine Air Filter</option>
@@ -1680,7 +1679,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   id: Date.now(),           // unique number — use Date.now() or any unique int
   date: 'YYYY-MM-DD',       // e.g. '2026-05-01'
   mi: 69590,                // odometer at time of service
-  type: 'oiltires',         // see TYPE LIST below
+  type: 'oil',              // see TYPE LIST below
   desc: 'Description, parts used, part numbers...',
   cost: 34.54,              // dollar amount (number, not string)
   shop: 'DIY or shop name',
@@ -1689,7 +1688,7 @@ html.modal-open,body.modal-open{overflow:hidden}
 },
 
 // TYPE LIST (use exact string):
-// oil, oiltires, tires, cabin, engine_filter,
+// oil, tires, cabin, engine_filter,
 // trans, diff, coolant, inv_coolant, alignment,
 // tires_new, brakes, plugs, hvfilter_inspect,
 // hvfilter_clean, valvomax, wipers, other
@@ -1837,7 +1836,7 @@ html.modal-open,body.modal-open{overflow:hidden}
    }
 
    TYPE LIST (use exact string):
-   oil, oiltires, tires, cabin, engine_filter,
+   oil, tires, cabin, engine_filter,
    trans, diff, coolant, inv_coolant, alignment,
    tires_new, brakes, plugs, hvfilter_inspect,
    hvfilter_clean, valvomax, wipers, other
@@ -1856,7 +1855,7 @@ const DEFAULT = [
     id: 1,
     date: '2026-02-24',
     mi: 64590,
-    type: 'oiltires',
+    type: 'oil',
     desc: 'Oil change (Toyota 0W-16 qty 5) + filter 90915-YZZN1, tire rotation, transmission fluid D&F (ATF WS qty 4), rear diff D&F (ATF WS qty 2), multi-point inspection',
     cost: 409.29,
     shop: 'Frank Fletcher Toyota, Joplin MO',
@@ -1904,7 +1903,7 @@ const DEFAULT = [
 ];
 
 const LABELS = {
-  oil:'Oil Change',oiltires:'Oil + Rotation + Inspection',tires:'Tire Rotation',
+  oil:'Oil Change',tires:'Tire Rotation',
   cabin:'Cabin Air Filter',engine_filter:'Engine Air Filter',
   trans:'Transmission Fluid D&F',diff:'Rear Differential D&F',
   coolant:'Engine Coolant D&F',inv_coolant:'Inverter Coolant D&F',
@@ -1915,7 +1914,6 @@ const LABELS = {
 };
 
 const PREFILLS = {
-  oiltires:'Oil change (Mobil 1 0W-16, qty 4.8 qt) + filter 90915-YZZN1, tire rotation, multi-point inspection',
   oil:'Oil change — Mobil 1 0W-16 (qty 4.8 qt) + filter 90915-YZZN1',
   cabin:'Cabin air filter replaced DIY — A-Premium APCA4605',
   engine_filter:'Engine air filter replaced DIY — Part #17801-YZZ16',
@@ -2021,7 +2019,7 @@ function normalizeMasterParts(parts){
   return parts.filter(Boolean).map(part=>({
     id: part.id ?? `mp_${Date.now()}_${Math.random().toString(16).slice(2)}`,
     name:(part.name||'').trim(),
-    serviceType:part.serviceType || 'other',
+    serviceType:(part.serviceType==='oiltires' ? 'oil' : (part.serviceType || 'other')),
     category:part.category || 'other',
     partNum:(part.partNum||'').trim(),
     unitCost:Number.isFinite(Number(part.unitCost)) ? Number(part.unitCost) : 0,
@@ -2099,7 +2097,7 @@ function mergeDuplicateMasterParts(){
   return merged;
 }
 function guessMasterCategory(serviceType='other'){
-  if(['oil','oiltires','cabin','engine_filter','trans','diff','coolant','inv_coolant','wipers','hvfilter_inspect','hvfilter_clean'].includes(serviceType)) return 'fluids_filters';
+  if(['oil','cabin','engine_filter','trans','diff','coolant','inv_coolant','wipers','hvfilter_inspect','hvfilter_clean'].includes(serviceType)) return 'fluids_filters';
   if(serviceType==='valvomax') return 'valvomax';
   return 'other';
 }
@@ -2207,16 +2205,11 @@ function setAverageServiceType(type){
 }
 function entryMatchesAverageType(entry, type=getAverageServiceType()){
   if(type === 'all') return true;
-  if(type === 'oil_avg') return ['oil','oiltires'].includes(entry.type);
+  if(type === 'oil_avg') return entry.type === 'oil';
   return entry.type === type;
 }
 const SIMPLE_SERVICE_NEEDS = {
   oil:[
-    {id:'engine_oil',label:'Engine oil',qtyText:'4.8 qt total',keywords:['0w-16','0w16','engine oil','motor oil','mobil 1'],partNums:[]},
-    {id:'oil_filter',label:'Oil filter',qtyText:'1 filter',keywords:['oil filter','filter'],partNums:['90915-YZZN1','90915YZZN1']},
-    {id:'drain_gasket',label:'Drain plug gasket / crush washer',qtyText:'1 gasket',keywords:['drain plug gasket','crush washer','drain washer','oil drain gasket'],partNums:[]}
-  ],
-  oiltires:[
     {id:'engine_oil',label:'Engine oil',qtyText:'4.8 qt total',keywords:['0w-16','0w16','engine oil','motor oil','mobil 1'],partNums:[]},
     {id:'oil_filter',label:'Oil filter',qtyText:'1 filter',keywords:['oil filter','filter'],partNums:['90915-YZZN1','90915YZZN1']},
     {id:'drain_gasket',label:'Drain plug gasket / crush washer',qtyText:'1 gasket',keywords:['drain plug gasket','crush washer','drain washer','oil drain gasket'],partNums:[]}
@@ -2253,7 +2246,7 @@ function normalizeInventory(items){
   return items.filter(Boolean).map(item=>({
     id: item.id ?? Date.now()+Math.random(),
     name: (item.name||'').trim(),
-    serviceType: item.serviceType || 'other',
+    serviceType: (item.serviceType==='oiltires' ? 'oil' : (item.serviceType || 'other')), 
     qtyOnHand: Math.max(0, parseInt(item.qtyOnHand||0,10) || 0),
     unitCost: Number.isFinite(Number(item.unitCost)) ? Number(item.unitCost) : 0,
     partNum: (item.partNum||'').trim(),
@@ -2316,7 +2309,7 @@ function getOilAverageEntryCost(entry){
   const invOil = getInventoryUseTotal(entry, use=>use.countInOilAvg);
   if(invOil > 0) return invOil;
   const manual = Number(entry.cost||0);
-  if(['oil','oiltires'].includes(entry.type) && Number.isFinite(manual) && manual > 0) return manual;
+  if(entry.type === 'oil' && Number.isFinite(manual) && manual > 0) return manual;
   return null;
 }
 function getAverageEntryCost(entry, type=getAverageServiceType()){
@@ -2412,9 +2405,6 @@ function bindAccessibleClick(selector){
   });
 }
 function getSuggestedTypesForService(type){
-  if(type==='oiltires') return ['oil','oiltires','tires','hvfilter_inspect'];
-  if(type==='oil') return ['oil','oiltires'];
-  if(type==='tires') return ['tires','oiltires'];
   return [type];
 }
 function inventoryMatchesService(item, serviceType){
@@ -2594,7 +2584,7 @@ function normalizeEntries(entries){
   return entries.filter(Boolean).map(e=>({
     ...e,
     id: e.id ?? Date.now()+Math.random(),
-    type: e.type || 'other',
+    type: (e.type==='oiltires' ? 'oil' : (e.type || 'other')), 
     desc: e.desc || '',
     cost: Number.isFinite(Number(e.cost)) ? Number(e.cost) : 0,
     shop: e.shop || '',
@@ -2756,9 +2746,9 @@ const VEHICLE_PROFILE = {
   estimatedInServiceDate: '2021-06-01'
 };
 const RECURRING_RULES = [
-  {id:'oil', name:'Oil Change', icon:'🔧', entryTypes:['oil','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'0W-16 full synthetic · custom 5,000 mi / 6 mo'},
-  {id:'tires', name:'Tire Rotation', icon:'🔄', entryTypes:['tires','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Rotate every 5,000 mi / 6 mo'},
-  {id:'hvfilter_inspect', name:'HV Battery Cooling Filter — Inspect', icon:'🔋', entryTypes:['hvfilter_inspect','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Inspect every 5,000 mi / 6 mo'},
+  {id:'oil', name:'Oil Change', icon:'🔧', entryTypes:['oil'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'0W-16 full synthetic · custom 5,000 mi / 6 mo'},
+  {id:'tires', name:'Tire Rotation', icon:'🔄', entryTypes:['tires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Rotate every 5,000 mi / 6 mo'},
+  {id:'hvfilter_inspect', name:'HV Battery Cooling Filter — Inspect', icon:'🔋', entryTypes:['hvfilter_inspect'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Inspect every 5,000 mi / 6 mo'},
   {id:'cabin', name:'Cabin Air Filter', icon:'💨', entryTypes:['cabin'], milesInterval:15000, monthsInterval:18, soonMiles:1500, upcomingMiles:5000, soonDays:45, upcomingDays:120, note:'Activated carbon filter · custom 15,000 mi / 18 mo'},
   {id:'hvfilter_clean', name:'HV Battery Cooling Filter — Clean', icon:'🧹', entryTypes:['hvfilter_clean'], milesInterval:20000, monthsInterval:24, soonMiles:2000, upcomingMiles:5000, soonDays:60, upcomingDays:180, note:'Toyota manual clean interval', initialAnchor:{date:'2026-02-24', mi:64590, estimated:false}},
   {id:'engine_filter', name:'Engine Air Filter', icon:'🌬️', entryTypes:['engine_filter'], milesInterval:30000, monthsInterval:36, soonMiles:2000, upcomingMiles:7000, soonDays:90, upcomingDays:180, note:'Toyota part #17801-YZZ16'},
@@ -4480,7 +4470,7 @@ function generatePrint(){
 
   // Filter entries
   let entries = getData().sort((a,b)=>a.mi-b.mi);
-  if(filter==='oil') entries = entries.filter(e=>['oil','oiltires'].includes(e.type));
+  if(filter==='oil') entries = entries.filter(e=>e.type==='oil');
   if(filter==='recent'){
     const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear()-1);
     entries = entries.filter(e=>new Date(e.date)>=cutoff);
