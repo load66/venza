@@ -262,8 +262,11 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   color:var(--text);
 }
 .g-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
-.avg-select{width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:11px;outline:none;-webkit-appearance:none;appearance:none}
-.avg-select:focus{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(212,150,10,.1)}
+.avg-gauge{display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.avg-select-wrap{position:relative;margin-top:2px}
+.avg-select-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--gold2);font-size:11px;pointer-events:none}
+.avg-select{width:100%;height:38px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(240,181,48,.2);border-radius:999px;padding:0 34px 0 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;outline:none;-webkit-appearance:none;appearance:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.avg-select:focus{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(212,150,10,.1), inset 0 1px 0 rgba(255,255,255,.03)}
 .cost-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6}
 
 /* ─── ALERT BOX ────────────────────────────────────────────── */
@@ -394,6 +397,22 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .item-check input{accent-color:var(--toyota);width:16px;height:16px}
 .item-builder-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:2px}
 .item-add{width:100%;padding:11px 13px;background:var(--bg3);color:var(--text2);border:1.5px dashed var(--border2);border-radius:10px;font-size:13px;font-weight:600}
+.entry-shell{display:grid;gap:12px}
+.entry-panel{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:14px}
+.entry-panel-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;color:var(--text);margin-bottom:4px}
+.entry-panel-sub{font-size:11px;color:var(--text3);line-height:1.6;margin-bottom:12px}
+.entry-optional{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.entry-optional summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;color:var(--text);font-size:12px;font-weight:600}
+.entry-optional summary::-webkit-details-marker{display:none}
+.entry-optional summary::after{content:'▾';color:var(--text3);font-size:16px;transition:transform .25s cubic-bezier(.25,.46,.45,.94)}
+.entry-optional[open] summary{border-bottom:1px solid var(--border)}
+.entry-optional[open] summary::after{transform:rotate(180deg)}
+.entry-optional-body{padding:14px}
+.entry-meta-copy{font-size:11px;color:var(--text3);line-height:1.6;margin-top:6px}
+.inventory-lane{margin-top:12px}
+.inventory-lane-title{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.inventory-empty{font-size:11px;color:var(--text3);line-height:1.6;background:rgba(255,255,255,.02);border:1px dashed var(--border2);border-radius:10px;padding:10px 12px}
+.entry-actions{margin-top:2px}
 .item-linked{display:inline-block;font-size:9px;padding:2px 7px;border-radius:5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.25)}
 .log-parts{margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;display:flex;flex-direction:column;gap:8px}
 .log-part{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:9px 10px}
@@ -766,7 +785,8 @@ html.modal-open,body.modal-open{overflow:hidden}
   .gauge{padding:12px;border-radius:10px}
   .g-val{font-size:24px}
   .g-label{font-size:8px}
-  .avg-select{margin-top:6px;padding:6px 8px;font-size:10px;border-radius:7px}
+  .avg-select{height:34px;padding:0 30px 0 10px;font-size:11px}
+  .avg-select-wrap::after{right:10px;font-size:10px}
 
   .card{border-radius:12px}
   .card-head{padding:10px 12px 9px}
@@ -782,6 +802,9 @@ html.modal-open,body.modal-open{overflow:hidden}
   .form-title{font-size:15px;letter-spacing:1.5px;margin-bottom:14px}
   .fi,.fs,.ft{padding:10px 12px;font-size:16px}
   .fg2{gap:8px}
+  .entry-panel,.entry-optional-body{padding:12px}
+  .entry-optional summary{padding:12px;font-size:11px}
+  .entry-panel-title{font-size:13px}
 
   .part-item,.inv-row,.svc-item{padding:10px 12px}
   .part-name,.inv-name,.svc-name,.suggest-name{font-size:12px}
@@ -874,10 +897,12 @@ html.modal-open,body.modal-open{overflow:hidden}
       <div class="g-val" style="color:var(--orange)" id="dTotal">$527.57</div>
       <div class="g-label">Total Spent</div>
     </div>
-    <div class="gauge" style="--accent:var(--gold)">
+    <div class="gauge avg-gauge" style="--accent:var(--gold)">
       <div class="g-val" style="color:var(--gold)" id="dAvgCost">$34.54</div>
-      <select id="avgServiceSelect" class="avg-select" onchange="setAverageServiceType(this.value)" aria-label="Average service type"></select>
-      <div class="g-label" id="dAvgLabel">Average Service Cost</div>
+      <div class="g-label">Average Service Cost</div>
+      <div class="avg-select-wrap">
+        <select id="avgServiceSelect" class="avg-select" onchange="setAverageServiceType(this.value)" aria-label="Average service type"></select>
+      </div>
     </div>
     <div class="gauge" style="--accent:var(--blue)">
       <div class="g-val" style="color:var(--blue)" id="dCount">4</div>
@@ -922,88 +947,111 @@ html.modal-open,body.modal-open{overflow:hidden}
 <div id="page-add" class="page">
   <div class="form-section">
     <div class="form-title">New Service Entry</div>
-    <div class="alert blue" style="margin-bottom:16px">
-      <div class="alert-icon">💡</div>
-      <div>Use your live inventory for parts you already bought. When you save this service, stock is deducted automatically.</div>
-    </div>
-    <div class="fg2">
-      <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
-      <div class="fl"><label>Mileage</label><input type="number" class="fi" id="fMi" placeholder="64751"></div>
-    </div>
-    <div class="fl">
-      <label>Service Type</label>
-      <select class="fs" id="fType" onchange="prefill()">
-        <option value="">— Select type —</option>
-        <option value="oiltires">Oil Change + Tire Rotation + Inspection</option>
-        <option value="oil">Oil Change Only</option>
-        <option value="tires">Tire Rotation</option>
-        <option value="cabin">Cabin Air Filter</option>
-        <option value="engine_filter">Engine Air Filter</option>
-        <option value="trans">Transmission Fluid D&F</option>
-        <option value="diff">Rear Differential D&F</option>
-        <option value="coolant">Engine Coolant Drain & Fill</option>
-        <option value="inv_coolant">Inverter Coolant Drain & Fill</option>
-        <option value="alignment">Wheel Alignment</option>
-        <option value="tires_new">New Tires</option>
-        <option value="brakes">Brake Service</option>
-        <option value="plugs">Spark Plugs</option>
-        <option value="hvfilter_inspect">HV Battery Cooling Filter — Inspect</option>
-        <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
-        <option value="valvomax">ValvoMax Drain Valve Install</option>
-        <option value="wipers">Wiper Blades</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-    <div class="fl" id="inventorySuggestBlock" style="display:none">
-      <label>Required Inventory</label>
-      <div id="inventoryRequiredSummary" style="font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.6"></div>
-      <div id="inventorySuggestList"></div>
-      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin:10px 0 8px">Optional matching inventory</div>
-      <div id="inventorySelectedList" style="margin-top:0"></div>
-      <div id="inventoryStockLockNote" style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">The app auto-selects required parts by service-part ID and part number. If required stock is missing, save is locked until inventory is replenished.</div>
-    </div>
-    <div class="fl">
-      <label>Description / Details</label>
-      <textarea class="ft" id="fDesc" placeholder="Parts used, part numbers, shop notes..."></textarea>
-    </div>
-    <div class="fg2">
-      <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"><div class="cost-hint" id="fCostHint">Auto-fills from linked inventory when parts are selected. You can still override it manually.</div></div>
-      <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
-    </div>
-    <div class="fl">
-      <label>Purchased Items / Links (optional)</label>
-      <div class="item-builder" id="fItemsList"></div>
-      <div class="item-builder-actions">
-        <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
+    <div class="entry-shell">
+      <div class="alert blue" style="margin-bottom:0">
+        <div class="alert-icon">💡</div>
+        <div><strong>Cleaner workflow:</strong> pick the service first, confirm the matched inventory, then save. The app deducts linked stock automatically.</div>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Tip: linked inventory rows deduct automatically when saved. You can still edit the row before saving if you need to fix quantity, link, or price.</div>
-    </div>
-    <!-- RECEIPT PHOTO UPLOAD -->
-    <div class="fl">
-      <label>Receipt / Photo (optional)</label>
-      <div id="fPhotoArea" role="button" tabindex="0" aria-label="Add receipt photo" style="border:2px dashed var(--border2);border-radius:10px;
-           padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
-           onclick="document.getElementById('fPhotoInput').click()"
-           ondragover="event.preventDefault();this.style.borderColor='var(--toyota)'"
-           ondragleave="this.style.borderColor='var(--border2)'"
-           ondrop="handlePhotoDrop(event)">
-        <div id="fPhotoPreview" style="display:none">
-          <img id="fPhotoImg" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain">
-          <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
-            <button onclick="event.stopPropagation();clearPhoto()" style="font-size:11px;color:var(--toyota);background:none;border:none;cursor:pointer;padding:4px 8px">✕ Remove</button>
+
+      <div class="entry-panel">
+        <div class="entry-panel-title">1 · Basics</div>
+        <div class="entry-panel-sub">Start here. Once you pick the service, the inventory section below will narrow to the right parts for that job.</div>
+        <div class="fg2">
+          <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
+          <div class="fl"><label>Mileage</label><input type="number" class="fi" id="fMi" placeholder="64751"></div>
+        </div>
+        <div class="fl" style="margin-bottom:0">
+          <label>Service Type</label>
+          <select class="fs" id="fType" onchange="prefill()">
+            <option value="">— Select service —</option>
+            <option value="oiltires">Oil Change + Tire Rotation + Inspection</option>
+            <option value="oil">Oil Change Only</option>
+            <option value="tires">Tire Rotation</option>
+            <option value="cabin">Cabin Air Filter</option>
+            <option value="engine_filter">Engine Air Filter</option>
+            <option value="trans">Transmission Fluid D&F</option>
+            <option value="diff">Rear Differential D&F</option>
+            <option value="coolant">Engine Coolant Drain & Fill</option>
+            <option value="inv_coolant">Inverter Coolant Drain & Fill</option>
+            <option value="alignment">Wheel Alignment</option>
+            <option value="tires_new">New Tires</option>
+            <option value="brakes">Brake Service</option>
+            <option value="plugs">Spark Plugs</option>
+            <option value="hvfilter_inspect">HV Battery Cooling Filter — Inspect</option>
+            <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
+            <option value="valvomax">ValvoMax Drain Valve Install</option>
+            <option value="wipers">Wiper Blades</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="entry-panel" id="inventorySuggestBlock" style="display:none">
+        <div class="entry-panel-title">2 · Inventory Match</div>
+        <div class="entry-panel-sub" id="inventoryRequiredSummary">Choose a service to load matching inventory.</div>
+        <div class="inventory-lane">
+          <div class="inventory-lane-title">Auto-required parts</div>
+          <div id="inventorySuggestList"></div>
+        </div>
+        <div class="inventory-lane">
+          <div class="inventory-lane-title">Matching stock you can add</div>
+          <div id="inventorySelectedList"></div>
+        </div>
+        <div id="inventoryStockLockNote" class="entry-meta-copy">Only parts that fit the selected service should appear here. If required stock is missing, save stays locked until inventory is replenished.</div>
+      </div>
+
+      <div class="entry-panel">
+        <div class="entry-panel-title">3 · Service Notes & Cost</div>
+        <div class="entry-panel-sub">Use notes for what was done. Cost auto-fills from linked inventory, but you can override it if needed.</div>
+        <div class="fl">
+          <label>Description / Details</label>
+          <textarea class="ft" id="fDesc" placeholder="What was done, notes, part numbers, torque notes, shop notes..."></textarea>
+        </div>
+        <div class="fg2">
+          <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"><div class="cost-hint" id="fCostHint">Auto-fills from linked inventory when parts are selected. You can still override it manually.</div></div>
+          <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
+        </div>
+      </div>
+
+      <details class="entry-optional" id="entryItemsOptional">
+        <summary>Optional purchased items / links</summary>
+        <div class="entry-optional-body">
+          <div class="item-builder" id="fItemsList"></div>
+          <div class="item-builder-actions">
+            <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
+          </div>
+          <div class="entry-meta-copy">Use this for extra one-off purchases, corrected prices, or links you want saved with the service. Linked inventory rows still deduct automatically when you save.</div>
+        </div>
+      </details>
+
+      <div class="entry-panel">
+        <div class="entry-panel-title">4 · Receipt / Photo</div>
+        <div class="entry-panel-sub">Optional, but useful for future proof and printable records.</div>
+        <div id="fPhotoArea" role="button" tabindex="0" aria-label="Add receipt photo" style="border:2px dashed var(--border2);border-radius:10px;
+             padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
+             onclick="document.getElementById('fPhotoInput').click()"
+             ondragover="event.preventDefault();this.style.borderColor='var(--toyota)'"
+             ondragleave="this.style.borderColor='var(--border2)'"
+             ondrop="handlePhotoDrop(event)">
+          <div id="fPhotoPreview" style="display:none">
+            <img id="fPhotoImg" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain">
+            <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+              <button onclick="event.stopPropagation();clearPhoto()" style="font-size:11px;color:var(--toyota);background:none;border:none;cursor:pointer;padding:4px 8px">✕ Remove</button>
+            </div>
+          </div>
+          <div id="fPhotoPlaceholder">
+            <div style="font-size:28px;margin-bottom:6px">📷</div>
+            <div style="font-size:13px;color:var(--text2);font-weight:500">Tap to add receipt photo</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">Camera or Photo Library · Stored locally · Included in PDF</div>
           </div>
         </div>
-        <div id="fPhotoPlaceholder">
-          <div style="font-size:28px;margin-bottom:6px">📷</div>
-          <div style="font-size:13px;color:var(--text2);font-weight:500">Tap to add receipt photo</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px">Camera or Photo Library · Stored locally · Included in PDF</div>
-        </div>
+        <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
       </div>
-      <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
-    </div>
-    <div class="btn-row">
-      <button class="btn-ghost" id="entryCancelBtn" onclick="go('log')">Cancel</button>
-      <button class="btn-primary" id="entrySaveBtn" onclick="saveEntry()">Save Entry</button>
+
+      <div class="btn-row entry-actions">
+        <button class="btn-ghost" id="entryCancelBtn" onclick="go('log')">Cancel</button>
+        <button class="btn-primary" id="entrySaveBtn" onclick="saveEntry()">Save Entry</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2382,19 +2430,19 @@ function describeOilAverageReset(){
 }
 function getAverageServiceOptions(){
   return [
-    {id:'oil_avg',label:'Oil Service Avg'},
-    {id:'plugs',label:'Spark Plugs Avg'},
-    {id:'cabin',label:'Cabin Filter Avg'},
-    {id:'engine_filter',label:'Engine Air Filter Avg'},
-    {id:'trans',label:'Transmission Fluid Avg'},
-    {id:'diff',label:'Rear Differential Avg'},
-    {id:'coolant',label:'Engine Coolant Avg'},
-    {id:'inv_coolant',label:'Inverter Coolant Avg'},
-    {id:'tires',label:'Tire Rotation Avg'},
-    {id:'alignment',label:'Alignment Avg'},
-    {id:'brakes',label:'Brake Service Avg'},
-    {id:'wipers',label:'Wiper Avg'},
-    {id:'all',label:'All Services Avg'}
+    {id:'oil_avg',label:'Oil Service'},
+    {id:'plugs',label:'Spark Plugs'},
+    {id:'cabin',label:'Cabin Filter'},
+    {id:'engine_filter',label:'Engine Air Filter'},
+    {id:'trans',label:'Transmission Fluid'},
+    {id:'diff',label:'Rear Differential'},
+    {id:'coolant',label:'Engine Coolant'},
+    {id:'inv_coolant',label:'Inverter Coolant'},
+    {id:'tires',label:'Tire Rotation'},
+    {id:'alignment',label:'Alignment'},
+    {id:'brakes',label:'Brake Service'},
+    {id:'wipers',label:'Wipers'},
+    {id:'all',label:'All Services'}
   ];
 }
 function getAverageServiceType(){
@@ -2408,7 +2456,7 @@ function setAverageServiceType(type){
 }
 function getAverageServiceLabel(type=getAverageServiceType()){
   const match = getAverageServiceOptions().find(opt=>opt.id===type);
-  return match ? match.label : 'Oil Service Avg';
+  return match ? match.label : 'Oil Service';
 }
 function entryMatchesAverageType(entry, type=getAverageServiceType()){
   if(type === 'all') return true;
@@ -2586,13 +2634,34 @@ function bindAccessibleClick(selector){
   });
 }
 function getSuggestedTypesForService(type){
-  if(type==='oiltires') return ['oil','oiltires','tires','hvfilter_inspect'];
+  if(type==='oiltires') return ['oil','oiltires','tires'];
   if(type==='oil') return ['oil','oiltires'];
   if(type==='tires') return ['tires','oiltires'];
   return [type];
 }
+function getMasterPartById(id=''){
+  return getMasterParts().find(part=>String(part.id)===String(id)) || null;
+}
+function getInventoryCanonicalServiceType(item){
+  const master = getMasterPartById(item.masterPartId||'');
+  if(master?.serviceType && master.serviceType!=='other') return master.serviceType;
+  const requirementType = Object.entries(getSavedServiceRequirementsMap()).find(([stype,rules])=>
+    (rules||[]).some(rule=>inventoryMatchesRequirement(item, rule))
+  )?.[0];
+  if(requirementType) return requirementType;
+  return item.serviceType || 'other';
+}
+function isConsumableInventoryItem(item){
+  const master = getMasterPartById(item.masterPartId||'');
+  return master?.category !== 'tools';
+}
 function inventoryMatchesService(item, serviceType){
-  return getSuggestedTypesForService(serviceType).includes(item.serviceType);
+  const suggestedTypes = getSuggestedTypesForService(serviceType);
+  const canonicalType = getInventoryCanonicalServiceType(item);
+  if(suggestedTypes.includes(canonicalType)) return true;
+  if(getServicePartRequirements(serviceType).some(req=>inventoryMatchesRequirement(item, req))) return true;
+  if(!item.masterPartId) return suggestedTypes.includes(item.serviceType);
+  return false;
 }
 function getFormItemRows(){
   return Array.from(document.querySelectorAll('#fItemsList .item-editor'));
@@ -3469,6 +3538,8 @@ window.onload=()=>{
     entryCostEl.addEventListener('input', ()=>markEntryCostManual());
   }
   setInventoryFormOpen(false);
+  const itemsOptional = document.getElementById('entryItemsOptional');
+  if(itemsOptional) itemsOptional.open = false;
   bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
   setScheduleControlsExpanded(false);
   renderAll();
@@ -3507,8 +3578,6 @@ function renderDash(){
     avgSelect.innerHTML = getAverageServiceOptions().map(opt=>`<option value="${opt.id}">${opt.label}</option>`).join('');
     avgSelect.value = avgType;
   }
-  const avgLabelEl = document.getElementById('dAvgLabel');
-  if(avgLabelEl) avgLabelEl.textContent = getAverageServiceLabel(avgType);
   const oilResetDate = getOilAverageResetDate();
   const avgEntries = d.filter(entry=>{
     if(!entryMatchesAverageType(entry, avgType)) return false;
@@ -4190,11 +4259,11 @@ function renderEntryInventoryUI(){
 
   if(summaryEl){
     if(!requirementPlan.requirements.length){
-      summaryEl.textContent = 'No fixed required part set is defined for this service type.';
+      summaryEl.textContent = 'This service does not require any fixed stock in the app. Matching inventory below will stay limited to items that make sense for the selected job.';
     }else if(requirementPlan.missingCount > 0){
-      summaryEl.textContent = `Missing ${requirementPlan.missingCount} required unit${requirementPlan.missingCount!==1?'s':''} — this service cannot be completed until stock is available.`;
+      summaryEl.textContent = `Some required parts are still missing. Add ${requirementPlan.missingCount} more unit${requirementPlan.missingCount!==1?'s':''} so this service can be saved cleanly.`;
     }else{
-      summaryEl.textContent = `All required inventory is auto-reserved by service-part ID (${requirementPlan.autoItems.length} linked line${requirementPlan.autoItems.length!==1?'s':''}).`;
+      summaryEl.textContent = `Required stock is ready. The app auto-reserved ${requirementPlan.autoItems.length} linked line${requirementPlan.autoItems.length!==1?'s':''} for this service.`;
     }
   }
 
@@ -4216,12 +4285,14 @@ function renderEntryInventoryUI(){
         ${req.complete ? '' : `<div class="part-missing" style="margin-top:8px">Add inventory that matches this service-part ID before completing the service.</div>`}
       </div>
     `;
-  }).join('') : `<div class="part-missing">No fixed inventory requirement is enforced for this service type.</div>`;
+  }).join('') : `<div class="inventory-empty">No fixed required stock is set for this service type.</div>`;
 
   const optionalMatches = previewInventory
+    .filter(item=>isConsumableInventoryItem(item))
     .filter(item=>inventoryMatchesService(item, serviceType))
     .map(item=>({
       ...item,
+      canonicalType: getInventoryCanonicalServiceType(item),
       reservedQty: Number(combinedReserved[String(item.id)]||0),
       available: Math.max(0, Number(item.qtyOnHand||0) - Number(combinedReserved[String(item.id)]||0))
     }))
@@ -4236,15 +4307,15 @@ function renderEntryInventoryUI(){
       <div class="selected-use-top">
         <div style="flex:1">
           <div class="suggest-name">${item.name}</div>
-          <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store, LABELS[item.serviceType]||'Other'].filter(Boolean).join(' · ')}</div>
-          ${item.masterPartId ? `<div class="parts-badge">Master ID: ${item.masterPartId}</div>` : ''}
+          <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store, LABELS[item.canonicalType]||LABELS[item.serviceType]||'Other'].filter(Boolean).join(' · ')}</div>
+          ${item.masterPartId ? `<div class="parts-badge">Linked master part</div>` : ''}
         </div>
         <div class="inv-qty ${item.available===0?'out':item.available<=1?'low':''}">${item.available} free</div>
       </div>
       <div class="suggest-meta">Reserved now: ${item.reservedQty} · On hand: ${Number(item.qtyOnHand||0)} · $${Number(item.unitCost||0).toFixed(2)} each${item.countInOilAvg ? ' · counts in oil avg' : ''}</div>
-      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Use 1 extra for this service</button>` : `<div class="part-missing" style="margin-top:8px">No extra stock left after required reservation</div>`}
+      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Add 1 to this service</button>` : `<div class="part-missing" style="margin-top:8px">No extra stock left after required reservation.</div>`}
     </div>
-  `).join('') : `<div class="part-missing">No matching inventory found for this service type yet.</div>`;
+  `).join('') : `<div class="inventory-empty">No matching consumable inventory found for this service. This area now hides unrelated stock and tools.</div>`;
 
   updateEntrySaveLock(serviceType, requirementPlan);
   syncEntryCostFromItems();
@@ -4339,6 +4410,8 @@ function saveEntry(){
   const resetCostEl = document.getElementById('fCost');
   if(resetCostEl) resetCostEl.dataset.autofill = '1';
   document.getElementById('fType').value='';
+  const itemsOptional = document.getElementById('entryItemsOptional');
+  if(itemsOptional) itemsOptional.open = false;
   resetEntryInventoryUses();
   clearPhoto();
   updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
