@@ -316,9 +316,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 }
 .delete-btn:hover{opacity:1;transform:scale(1.1)}
 .delete-btn:active{transform:scale(.95)}
-.edit-btn{position:absolute;top:10px;right:38px;color:#fff;background:var(--blue);border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s;opacity:.82;line-height:1}
-.edit-btn:hover{opacity:1;transform:scale(1.1)}
-.edit-btn:active{transform:scale(.95)}
 .total-row{
   background:var(--bg4);border:1px solid var(--border2);
   border-radius:12px;padding:14px 16px;
@@ -450,12 +447,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .sched-flag.earlier{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
 .sched-flag.later{background:rgba(217,122,0,.12);color:var(--orange2);border:1px solid rgba(217,122,0,.3)}
 .sched-inline-note{font-size:11px;color:var(--text3);line-height:1.6;margin-top:4px}
-.schedule-controls-card .card-head{cursor:pointer;user-select:none}
-.schedule-controls-card .card-head:active{background:var(--bg3)}
-.schedule-controls-card .card-body{display:none}
-.schedule-controls-card.open .card-body{display:block}
-.schedule-controls-chevron{color:var(--text3);font-size:18px;transition:transform .25s ease;line-height:1;flex-shrink:0}
-.schedule-controls-card.open .schedule-controls-chevron{transform:rotate(180deg)}
 
 /* ─── PARTS ────────────────────────────────────────────────── */
 .part-item{
@@ -731,19 +722,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .reminder-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3)}
 .reminder-row strong{color:var(--text2);font-weight:600}
 .lock-note{font-size:11px;color:var(--green2);margin-top:8px;line-height:1.6}
-.dashboard-mini-list{display:flex;flex-direction:column;gap:8px;padding:12px 16px}
-.dashboard-mini-item{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
-.dashboard-mini-name{font-size:12px;color:var(--text);font-weight:600;line-height:1.45}
-.dashboard-mini-meta{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}
-.dashboard-mini-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.toolbar-grid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px}
-.toolbar-grid.two{grid-template-columns:1.4fr 1fr}
-.context-card{background:rgba(34,114,212,.07);border:1px solid rgba(34,114,212,.18);border-radius:12px;padding:12px;margin-bottom:14px}
-.context-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;color:var(--blue2);margin-bottom:6px}
-.context-copy{font-size:12px;color:var(--text2);line-height:1.65}
-.context-list{margin-top:8px;display:grid;gap:6px}
-.context-pill{font-size:11px;color:var(--text2);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
-.snapshot-note{font-size:11px;color:var(--text3);line-height:1.6;margin-top:8px}
 
 html.modal-open,body.modal-open{overflow:hidden}
 #masterPartModal{z-index:750;align-items:center;justify-content:center;padding:16px;background:rgba(7,9,14,.74);backdrop-filter:none;-webkit-backdrop-filter:none}
@@ -818,8 +796,6 @@ html.modal-open,body.modal-open{overflow:hidden}
   #masterPartModal{padding:12px}
   #masterPartModal .modal{width:calc(100vw - 20px);max-height:74vh;border-radius:16px;padding:16px 14px}
   #masterPartModal .modal-scroll{max-height:calc(74vh - 124px)}
-  .toolbar-grid,.toolbar-grid.two{grid-template-columns:1fr}
-  .dashboard-mini-item{flex-direction:column}
 
   #miInput{font-size:26px !important;letter-spacing:2px !important}
 }
@@ -898,33 +874,6 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
   </div>
 
-  <div class="section-label">Action Center</div>
-  <div class="gauges">
-    <div class="gauge" style="--accent:var(--toyota)">
-      <div class="g-val" id="dAttention" style="color:var(--toyota2)">0</div>
-      <div class="g-label">Needs Attention</div>
-    </div>
-    <div class="gauge" style="--accent:var(--orange)">
-      <div class="g-val" id="dOverdueCount" style="color:var(--orange2)">0</div>
-      <div class="g-label">Overdue</div>
-    </div>
-    <div class="gauge" style="--accent:var(--gold)">
-      <div class="g-val" id="dLowStockCount" style="color:var(--gold2)">0</div>
-      <div class="g-label">Low Stock</div>
-    </div>
-    <div class="gauge" style="--accent:var(--blue)">
-      <div class="g-val" id="dYearSpend" style="color:var(--blue2)">$0</div>
-      <div class="g-label">Spent This Year</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">Next 3 Due</div>
-      <div id="dLastServiceMini" style="font-size:11px;color:var(--text3)">Last service: —</div>
-    </div>
-    <div class="card-body" id="dashboardDueList"></div>
-  </div>
-
   <div class="section-label">Quick Specs</div>
   <div class="card">
     <div class="card-body">
@@ -951,14 +900,6 @@ html.modal-open,body.modal-open{overflow:hidden}
 <!-- ═══ SERVICE LOG ══════════════════════════════════════════════ -->
 <div id="page-log" class="page">
   <button class="btn-primary" onclick="go('add')" style="margin-bottom:14px">＋ Add Service Entry</button>
-  <div class="form-section" style="margin-bottom:12px">
-    <div class="form-title" style="margin-bottom:10px">Find Entries Faster</div>
-    <div class="toolbar-grid">
-      <div class="fl" style="margin-bottom:0"><label>Search</label><input type="text" class="fi" id="logSearchInput" placeholder="Search notes, shop, parts..." oninput="renderLog()"></div>
-      <div class="fl" style="margin-bottom:0"><label>Type</label><select class="fs" id="logTypeFilter" onchange="renderLog()"><option value="all">All Types</option></select></div>
-      <div class="fl" style="margin-bottom:0"><label>Sort</label><select class="fs" id="logSortSelect" onchange="renderLog()"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="cost_high">Highest Cost</option><option value="cost_low">Lowest Cost</option></select></div>
-    </div>
-  </div>
   <div id="logList"></div>
   <div class="total-row">
     <span class="total-label">Total Invested</span>
@@ -969,8 +910,7 @@ html.modal-open,body.modal-open{overflow:hidden}
 <!-- ═══ ADD ENTRY ════════════════════════════════════════════════ -->
 <div id="page-add" class="page">
   <div class="form-section">
-    <input type="hidden" id="fEditId">
-    <div class="form-title" id="entryFormTitle">New Service Entry</div>
+    <div class="form-title">New Service Entry</div>
     <div class="alert blue" style="margin-bottom:16px">
       <div class="alert-icon">💡</div>
       <div>Use your live inventory for parts you already bought. When you save this service, stock is deducted automatically.</div>
@@ -1003,19 +943,13 @@ html.modal-open,body.modal-open{overflow:hidden}
         <option value="other">Other</option>
       </select>
     </div>
-    <div id="addContextCard" class="context-card" style="display:none">
-      <div class="context-title" id="addContextTitle">Service Quick Reference</div>
-      <div class="context-copy" id="addContextCopy"></div>
-      <div class="context-list" id="addContextList"></div>
-      <div class="dashboard-mini-actions" style="margin-top:10px">
-        <button type="button" class="mini-btn" id="addContextGuideBtn" style="display:none">Open Guide</button>
-      </div>
-    </div>
     <div class="fl" id="inventorySuggestBlock" style="display:none">
-      <label>Inventory Suggestions</label>
+      <label>Required Inventory</label>
+      <div id="inventoryRequiredSummary" style="font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.6"></div>
       <div id="inventorySuggestList"></div>
-      <div id="inventorySelectedList" style="margin-top:8px"></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Tap any part you already have on hand. Saving this service deducts inventory automatically.</div>
+      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin:10px 0 8px">Optional matching inventory</div>
+      <div id="inventorySelectedList" style="margin-top:0"></div>
+      <div id="inventoryStockLockNote" style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">The app auto-selects required parts by service-part ID and part number. If required stock is missing, save is locked until inventory is replenished.</div>
     </div>
     <div class="fl">
       <label>Description / Details</label>
@@ -1057,7 +991,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
     </div>
     <div class="btn-row">
-      <button class="btn-ghost" id="entryCancelBtn" onclick="cancelEntryEdit()">Cancel</button>
+      <button class="btn-ghost" id="entryCancelBtn" onclick="go('log')">Cancel</button>
       <button class="btn-primary" id="entrySaveBtn" onclick="saveEntry()">Save Entry</button>
     </div>
   </div>
@@ -1071,25 +1005,12 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="alert-icon">🎯</div>
     <div><strong>Your target drives the app.</strong> Toyota guidance stays visible below as the baseline, but your saved target here updates the dashboard, schedule engine, smart mileage preview, print report, and calendar exports.</div>
   </div>
-  <div class="card schedule-controls-card" id="scheduleControlsCard">
-    <div class="card-head" id="scheduleControlsHead" role="button" tabindex="0" aria-expanded="false" onclick="toggleScheduleControls()" onkeydown="handleScheduleControlsKey(event)">
+  <div class="card">
+    <div class="card-head">
       <div class="card-title">Schedule Controls</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div id="scheduleOverrideSummary" style="font-size:11px;color:var(--text3)">0 custom targets</div>
-        <div class="schedule-controls-chevron" id="scheduleControlsChevron">▾</div>
-      </div>
+      <div id="scheduleOverrideSummary" style="font-size:11px;color:var(--text3)">0 custom targets</div>
     </div>
-    <div class="card-body">
-      <div id="scheduleConfigList"></div>
-    </div>
-  </div>
-
-  <div class="form-section" style="margin-bottom:12px">
-    <div class="form-title" style="margin-bottom:10px">Find Schedule Items</div>
-    <div class="toolbar-grid two">
-      <div class="fl" style="margin-bottom:0"><label>Search</label><input type="text" class="fi" id="scheduleSearchInput" placeholder="Search service name..." oninput="renderUpcoming()"></div>
-      <div class="fl" style="margin-bottom:0"><label>Status</label><select class="fs" id="scheduleStatusFilter" onchange="renderUpcoming()"><option value="all">All</option><option value="overdue">Overdue</option><option value="due soon">Due Soon</option><option value="upcoming">Upcoming</option><option value="future">Future</option></select></div>
-    </div>
+    <div class="card-body" id="scheduleConfigList"></div>
   </div>
 
   <div class="section-label">Recurring Schedule</div>
@@ -1220,22 +1141,6 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
   </div>
 
-  <div class="form-section" style="margin-bottom:12px">
-    <div class="form-title" style="margin-bottom:10px">Search Parts</div>
-    <div class="toolbar-grid two">
-      <div class="fl" style="margin-bottom:0"><label>Search</label><input type="text" class="fi" id="partsSearchInput" placeholder="Search part, store, part #..." oninput="renderParts()"></div>
-      <div class="fl" style="margin-bottom:0"><label>Stock View</label><select class="fs" id="partsStockFilter" onchange="renderParts()"><option value="all">All Stock</option><option value="low">Low Stock</option><option value="out">Out of Stock</option><option value="oilavg">Oil Avg Items</option></select></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">Smart Inventory</div>
-      <div id="inventorySmartSummary" style="font-size:11px;color:var(--text3)">—</div>
-    </div>
-    <div class="card-body" id="inventorySmartList"></div>
-  </div>
-
   <div class="card">
     <div class="card-head">
       <div class="card-title">Inventory Database</div>
@@ -1329,11 +1234,6 @@ html.modal-open,body.modal-open{overflow:hidden}
 
 <!-- ═══ GUIDES ════════════════════════════════════════════════════ -->
 <div id="page-guides" class="page">
-
-  <div class="form-section" style="margin-bottom:12px">
-    <div class="form-title" style="margin-bottom:10px">Search Guides</div>
-    <div class="fl" style="margin-bottom:0"><label>Keyword</label><input type="text" class="fi" id="guideSearchInput" placeholder="Search plugs, coolant, torque, filter..." oninput="filterGuides()"></div>
-  </div>
 
   <!-- OIL CHANGE -->
   <div class="guide-item" data-guide-id="oil_change" data-service-type="oil">
@@ -1770,16 +1670,6 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="row"><span class="row-key">Last Service</span><span class="row-val" id="bkLast">—</span></div>
   </div></div>
 
-  <div class="section-label">Safety Snapshot</div>
-  <div class="card"><div class="card-body">
-    <div class="row"><span class="row-key">Latest snapshot</span><span class="row-val" id="backupSnapshotStatus">None yet</span></div>
-  </div></div>
-  <div class="btn-row" style="margin-bottom:12px">
-    <button class="btn-ghost" onclick="saveSafetySnapshot('Manual safety snapshot')">Save Snapshot</button>
-    <button class="btn-primary" style="background:var(--green)" onclick="downloadSafetySnapshot()">Download Snapshot</button>
-  </div>
-  <div class="snapshot-note">The app now keeps an internal safety snapshot before major overwrite actions like restore and factory reset.</div>
-
   <div class="section-label">Long-Term Alert Strategy</div>
   <div class="form-section" style="background:rgba(34,114,212,.04);border-color:rgba(34,114,212,.18)">
     <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">🔔 Home Screen Reminders</div>
@@ -2092,7 +1982,6 @@ const INVENTORY_KEY = 'vz_inventory';
 const MASTER_PARTS_KEY = 'vz_master_parts';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
-const SCHEDULE_UI_STATE_KEY = 'vz_schedule_controls_open';
 const DEFAULT_MASTER_PARTS = [
   {id:'mp_oil_mobil1_0w16',name:'Mobil 1 0W-16 Full Synthetic 5 qt',serviceType:'oil',category:'fluids_filters',partNum:'B07Y5MG3MX',unitCost:27.97,statusLabel:'Reference part',note:'Need 4.8 qt — leftover is good for top-off.',countInOilAvg:true,sources:[{store:'Walmart',url:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534',label:'walmart.com — verified 03/2026',unitPrice:27.97,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_oil_filter_oem',name:'OEM Oil Filter',serviceType:'oil',category:'fluids_filters',partNum:'90915-YZZN1',unitCost:6.57,statusLabel:'Reference part',note:'Replace with every oil change.',countInOilAvg:true,sources:[{store:'Toyota Parts',url:'https://parts.toyota.com/',label:'parts.toyota.com',unitPrice:6.57,addedAt:'2026-03-01T00:00:00.000Z'}]},
@@ -2111,183 +2000,41 @@ const DEFAULT_MASTER_PARTS = [
   {id:'mp_tool_spark_socket',name:'14mm Thin-Wall Spark Plug Socket',serviceType:'plugs',category:'tools',partNum:'14mm · 3/8" drive',unitCost:0,statusLabel:'Recommended',note:'Needed for Toyota 90919-01289 / Denso FC16HR-Q8 plug wells.',countInOilAvg:false,sources:[]}
 ];
 const MASTER_CATEGORY_LABELS = {fluids_filters:'Fluids & Filters',valvomax:'ValvoMax',tools:'Tools',consumables:'Consumables',other:'Other'};
-const BACKUP_SNAPSHOT_KEY = 'vz_safety_snapshot';
-const SCHEDULE_TO_ENTRY_FLOW = {
-  oil:{type:'oil',guideId:'oil_change'},
-  tires:{type:'tires',guideId:'tire_rotation'},
-  hvfilter_inspect:{type:'hvfilter_inspect',guideId:'hv_battery_filter'},
-  hvfilter_clean:{type:'hvfilter_clean',guideId:'hv_battery_filter'},
-  cabin:{type:'cabin',guideId:'cabin_filter'},
-  engine_filter:{type:'engine_filter',guideId:'engine_air_filter'},
-  trans:{type:'trans',guideId:''},
-  diff:{type:'diff',guideId:''},
-  coolant:{type:'coolant',guideId:'engine_coolant'},
-  plugs:{type:'plugs',guideId:'spark_plugs'},
-  inv_coolant:{type:'inv_coolant',guideId:''}
+const SERVICE_PART_REQUIREMENTS = {
+  oil:[
+    {id:'req_oil_main_jug',label:'Engine oil — 0W-16 full synthetic (5 qt jug)',qty:1,masterPartIds:['mp_oil_mobil1_0w16'],toyotaPartNum:'0W-16 spec'},
+    {id:'req_oil_filter_oem',label:'Oil filter',qty:1,masterPartIds:['mp_oil_filter_oem'],toyotaPartNum:'90915-YZZN1'}
+  ],
+  oiltires:[
+    {id:'req_oiltires_main_jug',label:'Engine oil — 0W-16 full synthetic (5 qt jug)',qty:1,masterPartIds:['mp_oil_mobil1_0w16'],toyotaPartNum:'0W-16 spec'},
+    {id:'req_oiltires_filter_oem',label:'Oil filter',qty:1,masterPartIds:['mp_oil_filter_oem'],toyotaPartNum:'90915-YZZN1'}
+  ],
+  cabin:[
+    {id:'req_cabin_filter',label:'Cabin air filter',qty:1,masterPartIds:['mp_cabin_filter_apremium'],toyotaPartNum:'Cabin filter'}
+  ],
+  engine_filter:[
+    {id:'req_engine_air_filter',label:'Engine air filter',qty:1,masterPartIds:['mp_engine_filter_oem'],toyotaPartNum:'17801-YZZ16'}
+  ],
+  trans:[
+    {id:'req_trans_atf_ws',label:'Toyota ATF WS',qty:4,masterPartIds:['mp_atf_ws'],toyotaPartNum:'00289-ATFWS'}
+  ],
+  diff:[
+    {id:'req_diff_atf_ws',label:'Toyota ATF WS',qty:2,masterPartIds:['mp_atf_ws'],toyotaPartNum:'00289-ATFWS'}
+  ],
+  coolant:[
+    {id:'req_engine_coolant_sllc',label:'Toyota Super Long Life Coolant',qty:1,masterPartIds:['mp_sllc'],toyotaPartNum:'00272-SLLC2'}
+  ],
+  inv_coolant:[
+    {id:'req_inverter_coolant_sllc',label:'Toyota Super Long Life Coolant',qty:1,masterPartIds:['mp_sllc'],toyotaPartNum:'00272-SLLC2'}
+  ],
+  plugs:[
+    {id:'req_spark_plugs_set',label:'Spark plugs',qty:4,masterPartIds:['mp_spark_plug_oem'],toyotaPartNum:'90919-01289'}
+  ],
+  valvomax:[
+    {id:'req_valvomax_valve',label:'ValvoMax drain valve',qty:1,masterPartIds:['mp_valvomax_valve'],toyotaPartNum:'M12-1.25'}
+  ],
+  tires:[], alignment:[], tires_new:[], brakes:[], hvfilter_inspect:[], hvfilter_clean:[], wipers:[], other:[]
 };
-const SERVICE_CONTEXT = {
-  oil:{title:'Oil Change Quick Reference',copy:'Use this when you are doing a normal oil-only service.',bullets:['Oil: 0W-16 full synthetic · capacity 4.8 qt','Filter: Toyota 90915-YZZN1','Helpful reminder: reset OIL MAINT REQD after service'],guideId:'oil_change'},
-  oiltires:{title:'Oil + Rotation + Inspection',copy:'Best option for your usual 5,000-mile routine service.',bullets:['Oil: 0W-16 full synthetic · capacity 4.8 qt','Filter: Toyota 90915-YZZN1','Rotation pattern: AWD forward cross · lug nuts 80 ft-lbs','Inspect HV battery intake filter while you are there'],guideId:'oil_change'},
-  cabin:{title:'Cabin Filter Quick Reference',copy:'Fast DIY service with no special tools.',bullets:['Common saved part: A-Premium APCA4605','Replace sooner if airflow drops or windows fog easily'],guideId:'cabin_filter'},
-  engine_filter:{title:'Engine Air Filter Quick Reference',copy:'Simple clip-style service at the air box.',bullets:['Toyota part: 17801-YZZ16','Make sure the filter seats flat with no gaps'],guideId:'engine_air_filter'},
-  coolant:{title:'Engine Coolant Quick Reference',copy:'Engine coolant is separate from inverter coolant on the hybrid.',bullets:['Fluid: Toyota SLLC pink 50/50','Best done on a fully cold engine','Use maintenance mode and bleed carefully'],guideId:'engine_coolant'},
-  inv_coolant:{title:'Inverter Coolant Quick Reference',copy:'Separate hybrid cooling circuit from engine coolant.',bullets:['Fluid: Toyota SLLC pink 50/50','Track this separately from engine coolant service'],guideId:''},
-  trans:{title:'Transmission Fluid Quick Reference',copy:'Custom drain-and-fill interval tracked by your app.',bullets:['Fluid: Toyota ATF WS','Log actual quantity used and any notes about drain/fill cycles'],guideId:''},
-  diff:{title:'Rear Differential Quick Reference',copy:'Custom rear differential interval tracked by your app.',bullets:['Fluid: Toyota ATF WS','Good time to note fill condition and magnet debris if seen'],guideId:''},
-  plugs:{title:'Spark Plugs Quick Reference',copy:'Do this on a fully cooled engine and replace all 4 as a set.',bullets:['OEM plug: Toyota 90919-01289 / Denso FC16HR-Q8','Quantity: 4','Torque: 13 ft-lbs / 17 N·m'],guideId:'spark_plugs'},
-  hvfilter_inspect:{title:'HV Battery Filter Inspect',copy:'Toyota wants a visual check every 5,000 miles.',bullets:['Inspect for lint, dust, or pet hair','Clean if needed — do not wet-wash the filter'],guideId:'hv_battery_filter'},
-  hvfilter_clean:{title:'HV Battery Filter Clean',copy:'Useful service to log separately from a quick inspection.',bullets:['Clean every 20,000 miles if needed','Low-pressure air or gentle brushing only'],guideId:'hv_battery_filter'},
-  tires:{title:'Tire Rotation Quick Reference',copy:'Great time to log tread and pressure.',bullets:['AWD forward cross pattern','Lug nut torque: 80 ft-lbs','Recommended pressure: 33 PSI front / rear'],guideId:'tire_rotation'},
-  valvomax:{title:'ValvoMax Quick Reference',copy:'One-time hardware install, then future oil changes become faster.',bullets:['Valve: M12-1.25','Verify torque at ValvoMax before install'],guideId:'valvomax_install'},
-  wipers:{title:'Wiper Service Quick Reference',copy:'Good quick log item for visibility-related maintenance.',bullets:['Log brand and blade size if you know them'],guideId:''}
-};
-function textIncludes(haystack='', needle=''){
-  return String(haystack).toLowerCase().includes(String(needle).toLowerCase().trim());
-}
-function getCurrentYearLocal(){ return new Date().getFullYear(); }
-function getServiceContext(type=''){ return SERVICE_CONTEXT[type] || null; }
-function openGuideById(guideId=''){
-  if(!guideId) return;
-  go('guides');
-  const item = document.querySelector(`.guide-item[data-guide-id="${guideId}"]`);
-  if(!item) return;
-  item.classList.add('open');
-  updateGuideAccessibility();
-  setTimeout(()=>item.scrollIntoView({behavior:'smooth',block:'start'}), 120);
-}
-function renderServiceContext(){
-  const card = document.getElementById('addContextCard');
-  const titleEl = document.getElementById('addContextTitle');
-  const copyEl = document.getElementById('addContextCopy');
-  const listEl = document.getElementById('addContextList');
-  const guideBtn = document.getElementById('addContextGuideBtn');
-  if(!card || !titleEl || !copyEl || !listEl || !guideBtn) return;
-  const type = document.getElementById('fType')?.value || '';
-  const ctx = getServiceContext(type);
-  if(!ctx){
-    card.style.display='none';
-    return;
-  }
-  card.style.display='block';
-  titleEl.textContent = ctx.title || 'Service Quick Reference';
-  copyEl.textContent = ctx.copy || '';
-  listEl.innerHTML = (ctx.bullets||[]).map(bit=>`<div class="context-pill">${safeText(bit)}</div>`).join('');
-  if(ctx.guideId){
-    guideBtn.style.display='inline-block';
-    guideBtn.onclick = ()=>openGuideById(ctx.guideId);
-  }else{
-    guideBtn.style.display='none';
-    guideBtn.onclick = null;
-  }
-}
-function completeScheduledService(ruleId=''){
-  const flow = SCHEDULE_TO_ENTRY_FLOW[ruleId];
-  if(!flow){ showToast('Quick log is not mapped yet for this service'); return; }
-  document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('fMi').value = getMi();
-  const typeEl = document.getElementById('fType');
-  if(typeEl){ typeEl.value = flow.type; }
-  prefill();
-  renderEntryInventoryUI();
-  renderServiceContext();
-  go('add');
-  setTimeout(()=>document.getElementById('fDesc')?.focus(), 120);
-  showToast(`${LABELS[flow.type] || 'Service'} form ready ✓`);
-}
-function filterGuides(){
-  const input = document.getElementById('guideSearchInput');
-  const query = (input?.value || '').trim().toLowerCase();
-  const items = document.querySelectorAll('#page-guides .guide-item');
-  let visible = 0;
-  items.forEach(item=>{
-    const text = item.textContent.toLowerCase();
-    const show = !query || text.includes(query);
-    item.style.display = show ? '' : 'none';
-    if(show) visible++;
-  });
-  return visible;
-}
-function populateTypeFilters(){
-  const selects = [document.getElementById('logTypeFilter')].filter(Boolean);
-  selects.forEach(select=>{
-    const current = select.value || 'all';
-    const opts = ['<option value="all">All Types</option>'].concat(Object.entries(LABELS).map(([value,label])=>`<option value="${value}">${label}</option>`));
-    select.innerHTML = opts.join('');
-    select.value = current;
-  });
-}
-function getInventoryUsageInfo(item, entries=getData()){
-  const uses = normalizeEntries(entries).filter(entry=>normalizeInventoryUses(entry.inventoryUses).some(use=>String(use.inventoryId||'')===String(item.id)));
-  const lastEntry = uses.sort(compareEntriesLatest)[0] || null;
-  const lastSource = (getMasterParts().find(part=>String(part.id)===String(item.masterPartId||''))?.sources || []).slice().sort((a,b)=>(b.addedAt||'').localeCompare(a.addedAt||''))[0] || null;
-  return {
-    useCount: uses.length,
-    lastUsedDate: lastEntry ? formatDateHuman(lastEntry.date) : 'Never used',
-    lastUsedMileage: lastEntry ? `${Number(lastEntry.mi||0).toLocaleString()} mi` : '—',
-    lastSavedSource: lastSource?.addedAt ? formatDateHuman(String(lastSource.addedAt).slice(0,10)) : '—'
-  };
-}
-function getSmartInventoryRows(inv=getInventory(), entries=getData()){
-  return inv.map(item=>{
-    const usage = getInventoryUsageInfo(item, entries);
-    const qty = Number(item.qtyOnHand||0);
-    const needsRestock = qty===0 && usage.useCount>0;
-    const lowStock = qty>0 && qty<=1;
-    return {...item, ...usage, needsRestock, lowStock};
-  }).filter(item=>item.needsRestock || item.lowStock).sort((a,b)=>{
-    if(Number(b.needsRestock)-Number(a.needsRestock)!==0) return Number(b.needsRestock)-Number(a.needsRestock);
-    if(Number(a.qtyOnHand||0)!==Number(b.qtyOnHand||0)) return Number(a.qtyOnHand||0)-Number(b.qtyOnHand||0);
-    return (a.name||'').localeCompare(b.name||'');
-  });
-}
-function buildBackupPayload(){
-  const photos = {};
-  const entries = getData();
-  entries.forEach(e=>{ const p = getPhoto(e.id); if(p) photos[e.id] = p; });
-  return {
-    version: 5,
-    exported: new Date().toISOString(),
-    vin: VIN,
-    vehicle: '2021 Toyota Venza Hybrid AWD',
-    mileage: getMi(),
-    oilAverageResetAt: getOilAverageResetAt(),
-    scheduleOverrides: getScheduleOverrides(),
-    entries,
-    inventory: getInventory(),
-    masterParts: getMasterParts(),
-    photos
-  };
-}
-function getSafetySnapshot(){
-  try{
-    const raw = localStorage.getItem(BACKUP_SNAPSHOT_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(err){
-    return null;
-  }
-}
-function saveSafetySnapshot(reason='Manual safety snapshot', silent=false){
-  const payload = buildBackupPayload();
-  payload.snapshotReason = reason;
-  localStorage.setItem(BACKUP_SNAPSHOT_KEY, JSON.stringify(payload));
-  renderBackup();
-  if(!silent) showToast('Safety snapshot saved ✓');
-  return payload;
-}
-function downloadSafetySnapshot(){
-  const snap = getSafetySnapshot();
-  if(!snap){ showToast('No safety snapshot saved yet'); return; }
-  const blob=new Blob([JSON.stringify(snap,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=`venza_snapshot_${new Date().toISOString().split('T')[0]}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('Safety snapshot downloaded ✓');
-}
 function normalizeMasterSourceFingerprint(source){
   const url = (source.url||'').trim().toLowerCase();
   const store = (source.store||'').trim().toLowerCase();
@@ -2660,6 +2407,85 @@ function getSelectedInventoryCounts(){
     map[inventoryId] = (map[inventoryId] || 0) + qty;
     return map;
   },{});
+}
+function sumInventoryCountMaps(...maps){
+  return maps.filter(Boolean).reduce((acc,map)=>{
+    Object.entries(map||{}).forEach(([key,value])=>{
+      acc[String(key)] = (acc[String(key)]||0) + Number(value||0);
+    });
+    return acc;
+  },{});
+}
+function getServicePartRequirements(serviceType=''){
+  return Array.isArray(SERVICE_PART_REQUIREMENTS[serviceType])
+    ? SERVICE_PART_REQUIREMENTS[serviceType].map(req=>({...req, qty:Math.max(1, parseInt(req.qty||1,10)||1), masterPartIds:Array.isArray(req.masterPartIds)?req.masterPartIds.map(String):[]}))
+    : [];
+}
+function getEntryPreviewInventory(){
+  return normalizeInventory(getInventory()).map(item=>({...item}));
+}
+function inventoryMatchesRequirement(item, requirement){
+  const masterId = String(item.masterPartId||'');
+  if(requirement.masterPartIds.includes(masterId)) return true;
+  const itemPartKey = normalizeKey(item.partNum||'');
+  const reqPartKey = normalizeKey(requirement.toyotaPartNum||'');
+  return !!(itemPartKey && reqPartKey && itemPartKey.includes(reqPartKey));
+}
+function buildServiceRequirementPlan(serviceType='', inventoryItems=getEntryPreviewInventory()){
+  const requirements = getServicePartRequirements(serviceType);
+  const inventory = normalizeInventory(inventoryItems);
+  const autoItems = [];
+  const reservedMap = {};
+  const states = requirements.map(req=>{
+    const candidates = inventory
+      .filter(item=>inventoryMatchesRequirement(item, req))
+      .sort((a,b)=>{
+        const qtyDiff = Number(b.qtyOnHand||0) - Number(a.qtyOnHand||0);
+        if(qtyDiff!==0) return qtyDiff;
+        const costDiff = Number(a.unitCost||0) - Number(b.unitCost||0);
+        if(costDiff!==0) return costDiff;
+        return String(a.name||'').localeCompare(String(b.name||''));
+      });
+    let remaining = Number(req.qty||0);
+    const allocations = [];
+    candidates.forEach(item=>{
+      if(remaining<=0) return;
+      const available = Math.max(0, Number(item.qtyOnHand||0));
+      if(available<=0) return;
+      const qtyUsed = Math.min(available, remaining);
+      allocations.push({inventoryId:item.id,name:item.name,partNum:item.partNum,store:item.store,link:item.link,price:Number(item.unitCost||0),qty:qtyUsed,useInOilAvg:!!item.countInOilAvg,autoRequired:true,requirementId:req.id});
+      reservedMap[String(item.id)] = (reservedMap[String(item.id)]||0) + qtyUsed;
+      remaining -= qtyUsed;
+    });
+    autoItems.push(...allocations);
+    return {...req, allocations, requiredQty:Number(req.qty||0), matchedQty:Number(req.qty||0)-remaining, missingQty:remaining, complete:remaining<=0};
+  });
+  return {
+    serviceType,
+    requirements:states,
+    autoItems:normalizeEntryItems(autoItems),
+    reservedMap,
+    missingCount:states.reduce((sum,state)=>sum + Math.max(0, Number(state.missingQty||0)),0),
+    complete:states.every(state=>state.complete)
+  };
+}
+function updateEntrySaveLock(serviceType='', requirementPlan=buildServiceRequirementPlan(serviceType)){
+  const saveBtn = document.getElementById('entrySaveBtn');
+  const noteEl = document.getElementById('inventoryStockLockNote');
+  if(!saveBtn) return;
+  const hasRequirements = requirementPlan.requirements.length > 0;
+  const locked = hasRequirements && requirementPlan.missingCount > 0;
+  saveBtn.disabled = locked;
+  saveBtn.style.opacity = locked ? '0.6' : '1';
+  saveBtn.style.cursor = locked ? 'not-allowed' : 'pointer';
+  if(noteEl){
+    noteEl.style.color = locked ? 'var(--toyota2)' : 'var(--text3)';
+    noteEl.textContent = locked
+      ? `Save locked — add the missing required stock first (${requirementPlan.missingCount} unit${requirementPlan.missingCount!==1?'s':''} missing).`
+      : hasRequirements
+        ? 'Required inventory is fully covered. Optional extra purchased items can still be added below.'
+        : 'This service type does not currently have a fixed inventory requirement in the app.';
+  }
 }
 function createItemRow(data={}){
   const wrap = document.createElement('div');
@@ -3269,24 +3095,19 @@ window.onload=()=>{
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   setInventoryFormOpen(false);
   bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick]');
-  populateTypeFilters();
   renderAll();
   resetEntryInventoryUses();
-  renderServiceContext();
   renderReminderStrategy();
 };
 
 function renderAll(){
-  populateTypeFilters();
   renderDash();
   renderLog();
   renderUpcoming();
   renderParts();
   renderBackup();
-  renderServiceContext();
   ensureGuideActions();
   updateGuideAccessibility();
-  filterGuides();
 }
 
 /* ─── DASHBOARD ──────────────────────────────────────────── */
@@ -3295,12 +3116,6 @@ function renderDash(){
   const d = getData();
   const state = getRecurringServicesState(mi);
   const bundle = getNextRecurringBundle(state);
-  const recurring = state.rules.filter(r=>!r.watchOnly).sort(compareRecurring);
-  const attentionItems = recurring.filter(item=>['overdue','due soon'].includes(item.status));
-  const overdueItems = recurring.filter(item=>item.status==='overdue');
-  const lowStockItems = getSmartInventoryRows();
-  const latestEntry = [...d].sort(compareEntriesLatest)[0] || null;
-  const thisYear = getCurrentYearLocal();
 
   document.getElementById('topMi').textContent = mi.toLocaleString();
   document.getElementById('dMi').textContent = mi.toLocaleString();
@@ -3309,17 +3124,13 @@ function renderDash(){
   document.getElementById('dTotal').textContent='$'+tot.toFixed(2);
   document.getElementById('dCount').textContent=d.length;
   document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
-  document.getElementById('dAttention').textContent = attentionItems.length;
-  document.getElementById('dOverdueCount').textContent = overdueItems.length;
-  document.getElementById('dLowStockCount').textContent = lowStockItems.length;
-  const yearSpend = d.filter(entry=>String(entry.date||'').startsWith(String(thisYear))).reduce((sum,entry)=>sum+getEntryDisplayCost(entry),0);
-  document.getElementById('dYearSpend').textContent = '$'+yearSpend.toFixed(2);
-  document.getElementById('dLastServiceMini').textContent = latestEntry ? `Last service: ${LABELS[latestEntry.type] || 'Service'} · ${formatDateHuman(latestEntry.date)}` : 'Last service: —';
 
   const oilResetDate = getOilAverageResetDate();
   const oilEntries = d.filter(e=>['oil','oiltires'].includes(e.type)).filter(e=>{ if(!oilResetDate) return true; const entryDate = parseLocalDate(e.date); return entryDate ? entryDate >= oilResetDate : true; }).sort(compareEntriesLatest);
   const oilValues = oilEntries.map(getOilAverageEntryCost).filter(v=>v!==null);
-  const oilCost = oilValues.length ? (oilValues.reduce((a,v)=>a+v,0)/oilValues.length).toFixed(2) : '34.54';
+  const oilCost = oilValues.length
+    ? (oilValues.reduce((a,v)=>a+v,0)/oilValues.length).toFixed(2)
+    : '34.54';
   document.getElementById('dOilCost').textContent='$'+oilCost;
 
   const heroBtn = document.getElementById('heroCalendarBtn');
@@ -3345,11 +3156,6 @@ function renderDash(){
     if(heroBtn){ heroBtn.disabled = true; heroBtn.style.opacity = '.55'; }
     document.getElementById('dProgress').style.width = '0%';
   }
-
-  const dueListEl = document.getElementById('dashboardDueList');
-  if(dueListEl){
-    dueListEl.innerHTML = recurring.slice(0,3).map(item=>`<div class="dashboard-mini-list"><div class="dashboard-mini-item"><div style="flex:1"><div class="dashboard-mini-name">${item.icon} ${item.name}</div><div class="dashboard-mini-meta">${item.dueLine}</div><div class="dashboard-mini-meta">${item.remainingText} · ${item.triggerText}</div></div><div style="text-align:right"><div class="badge ${getStatusBadgeClass(item.status)}">${item.status === 'due soon' ? 'Due Soon' : item.status.charAt(0).toUpperCase()+item.status.slice(1)}</div><div class="dashboard-mini-actions"><button class="mini-btn" onclick="completeScheduledService('${item.id}')">Log Service</button></div></div></div></div>`).join('') || `<div class="dashboard-mini-list"><div class="dashboard-mini-item"><div class="dashboard-mini-name">No recurring items yet</div><div class="dashboard-mini-meta">Add more service entries to improve schedule tracking.</div></div></div>`;
-  }
 }
 function getScheduleFlag(rule){
   if(!rule.customActive) return {text:'Toyota Guide', cls:'default'};
@@ -3357,37 +3163,12 @@ function getScheduleFlag(rule){
   if(rule.laterThanGuideline && !rule.earlierThanGuideline) return {text:'Later Than Toyota', cls:'later'};
   return {text:'Custom Target', cls:'custom'};
 }
-function areScheduleControlsOpen(){
-  return !!window._scheduleControlsOpen;
-}
-function updateScheduleControlsUI(){
-  const card = document.getElementById('scheduleControlsCard');
-  const head = document.getElementById('scheduleControlsHead');
-  if(!card || !head) return;
-  const isOpen = areScheduleControlsOpen();
-  card.classList.toggle('open', isOpen);
-  head.setAttribute('aria-expanded', String(isOpen));
-}
-function setScheduleControlsOpen(isOpen){
-  window._scheduleControlsOpen = !!isOpen;
-  updateScheduleControlsUI();
-}
-function toggleScheduleControls(){
-  setScheduleControlsOpen(!areScheduleControlsOpen());
-}
-function handleScheduleControlsKey(event){
-  if(event.key === 'Enter' || event.key === ' '){
-    event.preventDefault();
-    toggleScheduleControls();
-  }
-}
 function renderScheduleSettings(){
   const listEl = document.getElementById('scheduleConfigList');
   const summaryEl = document.getElementById('scheduleOverrideSummary');
   const oilGuidanceEl = document.getElementById('scheduleOilGuidanceText');
   const specsOilIntervalEl = document.getElementById('specsOilIntervalText');
   if(!listEl || !summaryEl) return;
-  updateScheduleControlsUI();
   const rules = getResolvedRecurringRules().filter(rule=>!rule.watchOnly);
   const oilRule = rules.find(rule=>rule.id==='oil');
   if(oilGuidanceEl && oilRule){
@@ -3439,22 +3220,10 @@ function renderScheduleSettings(){
 function saveScheduleRule(ruleId){
   const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
   if(!baseRule || baseRule.watchOnly) return;
-  const currentRule = getResolvedRecurringRules().find(rule=>rule.id===ruleId) || baseRule;
   const milesEl = document.getElementById(`schedMiles_${ruleId}`);
   const monthsEl = document.getElementById(`schedMonths_${ruleId}`);
   const milesInterval = parsePositiveInt(milesEl?.value) || parsePositiveInt(baseRule.milesInterval);
   const monthsInterval = parsePositiveInt(monthsEl?.value) || parsePositiveInt(baseRule.monthsInterval);
-  const nextIntervalText = formatIntervalSummary(milesInterval, monthsInterval);
-  const guidelineText = formatIntervalSummary(baseRule.milesInterval, baseRule.monthsInterval);
-  if(currentRule.activeIntervalText === nextIntervalText && currentRule.customActive === (nextIntervalText !== guidelineText)){
-    showToast(`${baseRule.name} already set to ${nextIntervalText}`);
-    return;
-  }
-  const confirmSave = confirm(`Save ${baseRule.name} target?
-
-New target: ${nextIntervalText}
-Toyota guide: ${guidelineText}`);
-  if(!confirmSave) return;
   const overrides = getScheduleOverrides();
   const next = {};
   if(milesInterval && milesInterval !== parsePositiveInt(baseRule.milesInterval)) next.milesInterval = milesInterval;
@@ -3463,20 +3232,13 @@ Toyota guide: ${guidelineText}`);
   saveScheduleOverrides(overrides);
   renderAll();
   const resolved = getResolvedRecurringRules().find(rule=>rule.id===ruleId);
-  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : nextIntervalText} ✓`);
+  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : formatIntervalSummary(milesInterval, monthsInterval)} ✓`);
 }
 function resetScheduleRule(ruleId){
   const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
   if(!baseRule || baseRule.watchOnly) return;
-  const currentRule = getResolvedRecurringRules().find(rule=>rule.id===ruleId) || baseRule;
   const overrides = getScheduleOverrides();
   if(!overrides[ruleId]){ showToast(`${baseRule.name} already matches Toyota guide`); return; }
-  const guidelineText = formatIntervalSummary(baseRule.milesInterval, baseRule.monthsInterval);
-  const confirmReset = confirm(`Reset ${baseRule.name} back to Toyota guide?
-
-Current target: ${currentRule.activeIntervalText || guidelineText}
-Toyota guide: ${guidelineText}`);
-  if(!confirmReset) return;
   delete overrides[ruleId];
   saveScheduleOverrides(overrides);
   renderAll();
@@ -3486,65 +3248,119 @@ function renderUpcoming(){
   renderScheduleSettings();
   const mi = getMi();
   const state = getRecurringServicesState(mi);
-  const search = (document.getElementById('scheduleSearchInput')?.value || '').trim().toLowerCase();
-  const statusFilter = document.getElementById('scheduleStatusFilter')?.value || 'all';
-  let recurring = state.rules.filter(r=>!r.watchOnly).sort(compareRecurring);
-  let watchOnly = state.rules.filter(r=>r.watchOnly);
-  if(search){
-    recurring = recurring.filter(item=>item.name.toLowerCase().includes(search));
-    watchOnly = watchOnly.filter(item=>item.name.toLowerCase().includes(search));
-  }
-  if(statusFilter !== 'all') recurring = recurring.filter(item=>item.status===statusFilter);
+  const recurring = state.rules.filter(r=>!r.watchOnly).sort(compareRecurring);
+  const watchOnly = state.rules.filter(r=>r.watchOnly);
   const recurringEl = document.getElementById('upcomingRecurringList');
   const watchEl = document.getElementById('upcomingWatchList');
   if(recurringEl){
-    recurringEl.innerHTML = recurring.map(item=>`<div class="svc-item"><div class="svc-dot ${getDotClass(item.status)}"></div><div class="svc-info"><div class="svc-name">${item.name}</div><div class="svc-note">${item.dueLine}</div><div class="svc-note">${item.remainingText} · ${item.triggerText}</div><div class="svc-note">Active target: ${item.activeIntervalText || formatIntervalSummary(item.milesInterval, item.monthsInterval)}${item.customActive ? ` · Toyota guide: ${item.guidelineIntervalText || '—'}` : ''}</div><div class="svc-actions"><button class="mini-btn" onclick="completeScheduledService('${item.id}')">Log Service</button><button class="mini-btn" onclick="downloadRuleCalendar('${item.id}')">📅 Add to Calendar</button></div></div><div class="svc-right"><div class="svc-mi">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</div><div class="badge ${getStatusBadgeClass(item.status)}">${item.status === 'due soon' ? 'Due Soon' : item.status.charAt(0).toUpperCase()+item.status.slice(1)}</div></div></div>`).join('') || `<div class="svc-item"><div class="svc-info"><div class="svc-name">No matching schedule items</div><div class="svc-note">Adjust your search or status filter.</div></div></div>`;
+    recurringEl.innerHTML = recurring.map(item=>`
+      <div class="svc-item">
+        <div class="svc-dot ${getDotClass(item.status)}"></div>
+        <div class="svc-info">
+          <div class="svc-name">${item.name}</div>
+          <div class="svc-note">${item.dueLine}</div>
+          <div class="svc-note">${item.remainingText} · ${item.triggerText}</div>
+          <div class="svc-note">Active target: ${item.activeIntervalText || formatIntervalSummary(item.milesInterval, item.monthsInterval)}${item.customActive ? ` · Toyota guide: ${item.guidelineIntervalText || '—'}` : ''}</div>
+          <div class="svc-actions">
+            <button class="mini-btn" onclick="downloadRuleCalendar('${item.id}')">📅 Add to Calendar</button>
+          </div>
+        </div>
+        <div class="svc-right">
+          <div class="svc-mi">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</div>
+          <div class="badge ${getStatusBadgeClass(item.status)}">${item.status === 'due soon' ? 'Due Soon' : item.status.charAt(0).toUpperCase()+item.status.slice(1)}</div>
+        </div>
+      </div>
+    `).join('');
   }
   if(watchEl){
-    watchEl.innerHTML = watchOnly.map(item=>`<div class="svc-item"><div class="svc-dot watch"></div><div class="svc-info"><div class="svc-name">${item.name}</div><div class="svc-note">${item.note || 'Monitor manually'}</div></div><div class="svc-right"><div class="svc-mi">Manual</div><div class="badge orange">Watch</div></div></div>`).join('') || `<div class="svc-item"><div class="svc-info"><div class="svc-name">No watch-only items</div><div class="svc-note">All tracked items are recurring services.</div></div></div>`;
+    watchEl.innerHTML = watchOnly.map(item=>`
+      <div class="svc-item">
+        <div class="svc-dot watch"></div>
+        <div class="svc-info">
+          <div class="svc-name">${item.name}</div>
+          <div class="svc-note">${item.note || 'Monitor manually'}</div>
+        </div>
+        <div class="svc-right">
+          <div class="svc-mi">Manual</div>
+          <div class="badge orange">Watch</div>
+        </div>
+      </div>
+    `).join('') || `<div class="svc-item"><div class="svc-info"><div class="svc-name">No watch-only items</div><div class="svc-note">All tracked items are recurring services.</div></div></div>`;
   }
 }
 
 /* ─── LOG/* ─── LOG ────────────────────────────────────────────────── */
 function renderLog(){
-  const search = (document.getElementById('logSearchInput')?.value || '').trim().toLowerCase();
-  const typeFilter = document.getElementById('logTypeFilter')?.value || 'all';
-  const sortValue = document.getElementById('logSortSelect')?.value || 'newest';
-  let d=getData().slice();
-  if(typeFilter !== 'all') d = d.filter(entry=>entry.type===typeFilter);
-  if(search){
-    d = d.filter(entry=>{
-      const hay = [LABELS[entry.type]||'', entry.desc||'', entry.shop||'', formatEntryInventorySummary(entry)||'', normalizeEntryItems(entry.items).map(item=>[item.name,item.partNum,item.store].join(' ')).join(' ')].join(' ').toLowerCase();
-      return hay.includes(search);
-    });
-  }
-  const sorters = {
-    newest:(a,b)=>compareEntriesLatest(a,b),
-    oldest:(a,b)=>compareEntriesLatest(b,a),
-    cost_high:(a,b)=>getEntryDisplayCost(b)-getEntryDisplayCost(a),
-    cost_low:(a,b)=>getEntryDisplayCost(a)-getEntryDisplayCost(b)
-  };
-  d.sort(sorters[sortValue] || sorters.newest);
+  const d=getData().sort((a,b)=>b.mi-a.mi);
   const el=document.getElementById('logList');
-  if(!d.length){
-    el.innerHTML = `<div class="card"><div class="card-body"><div class="row"><span class="row-key">No matching entries</span><span class="row-val">Adjust your search or filters</span></div></div></div>`;
-    document.getElementById('totalVal').textContent='$0.00';
-    return;
-  }
   el.innerHTML=d.map(e=>{
     const dt=new Date(e.date+'T00:00:00');
     const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const safeEntryUrl = safeUrl(e.link);
     const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
-    const edit=`<button class="edit-btn" onclick="startEditEntry(${e.id})" title="Edit this entry">✎</button>`;
-    const del=!e.builtin ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>` :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    const del=!e.builtin
+      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
+      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
     const items = normalizeEntryItems(e.items);
     const uses = normalizeInventoryUses(e.inventoryUses);
-    const displayParts = items.length ? items.map(item=>({qty:item.qty,name:item.name,partNum:item.partNum,store:item.store,link:item.link,price:Number(item.price||0),oilAvg:!!item.useInOilAvg,fromInventory:!!item.inventoryId})) : uses.map(use=>({qty:use.qtyUsed,name:use.name,partNum:use.partNum,store:use.store,link:use.link,price:Number(use.unitCost||0),oilAvg:!!use.countInOilAvg,fromInventory:!!use.inventoryId}));
-    const partsHtml = displayParts.length ? `<div class="log-parts">${displayParts.map(part=>{ const meta=[part.partNum && `Part # ${part.partNum}`, part.store].filter(Boolean).join(' · '); const safePartUrl=safeUrl(part.link); return `<div class="log-part"><div class="log-part-top"><div class="log-part-name">${part.qty}× ${safeText(part.name)}</div><div class="log-part-price">$${(part.qty * part.price).toFixed(2)}</div></div>${meta ? `<div class="log-part-meta">${safeText(meta)}</div>` : ''}${safePartUrl ? `<a class="log-part-link" href="${safePartUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safePartUrl))}</a>` : ''}${part.oilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}${part.fromInventory ? `<div class="parts-badge" style="background:rgba(34,114,212,.1);color:var(--blue2);border-color:rgba(34,114,212,.25)">From inventory</div>` : ''}</div>`; }).join('')}</div>` : '';
+    const displayParts = items.length ? items.map(item=>({
+      qty: item.qty,
+      name: item.name,
+      partNum: item.partNum,
+      store: item.store,
+      link: item.link,
+      price: Number(item.price||0),
+      oilAvg: !!item.useInOilAvg,
+      fromInventory: !!item.inventoryId
+    })) : uses.map(use=>({
+      qty: use.qtyUsed,
+      name: use.name,
+      partNum: use.partNum,
+      store: use.store,
+      link: use.link,
+      price: Number(use.unitCost||0),
+      oilAvg: !!use.countInOilAvg,
+      fromInventory: !!use.inventoryId
+    }));
+    const partsHtml = displayParts.length ? `<div class="log-parts">${displayParts.map(part=>{
+      const meta = [part.partNum && `Part # ${part.partNum}`, part.store].filter(Boolean).join(' · ');
+      const safePartUrl = safeUrl(part.link);
+      return `<div class="log-part">
+        <div class="log-part-top">
+          <div class="log-part-name">${part.qty}× ${safeText(part.name)}</div>
+          <div class="log-part-price">$${(part.qty * part.price).toFixed(2)}</div>
+        </div>
+        ${meta ? `<div class="log-part-meta">${safeText(meta)}</div>` : ''}
+        ${safePartUrl ? `<a class="log-part-link" href="${safePartUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safePartUrl))}</a>` : ''}
+        ${part.oilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+        ${part.fromInventory ? `<div class="parts-badge" style="background:rgba(34,114,212,.1);color:var(--blue2);border-color:rgba(34,114,212,.25)">From inventory</div>` : ''}
+      </div>`;
+    }).join('')}</div>` : '';
     const photo=getPhoto(e.id);
-    const photoHtml=photo ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})"><img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div></div>` :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;background:none;cursor:pointer;width:100%;transition:all .2s" onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">📷 Add Receipt Photo</button>`;
-    return`<div class="log-item ${!e.builtin?'user-entry':''}">${edit}${del}<div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div><div class="log-type">${LABELS[e.type]||'Service'}</div><div class="log-desc">${safeText(e.desc)}</div>${partsHtml}<div class="log-foot"><div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div><div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div></div>${photoHtml}</div>`;
+    const photoHtml=photo
+      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+        </div>`
+      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+          background:none;cursor:pointer;width:100%;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+          📷 Add Receipt Photo
+        </button>`;
+    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+      ${del}
+      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
+      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-desc">${safeText(e.desc)}</div>
+      ${partsHtml}
+      <div class="log-foot">
+        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
+        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
+      </div>
+      ${photoHtml}
+    </div>`;
   }).join('');
   let tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
   document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
@@ -3552,47 +3368,81 @@ function renderLog(){
 
 /* ─── ADD ENTRY/* ─── ADD ENTRY ──────────────────────────────────────────── */
 function renderParts(){
-  const query = (document.getElementById('partsSearchInput')?.value || '').trim().toLowerCase();
-  const stockFilter = document.getElementById('partsStockFilter')?.value || 'all';
-  const rawInv = getInventory();
-  const entries = getData();
-  const smartRows = getSmartInventoryRows(rawInv, entries);
-  const usageMap = Object.fromEntries(rawInv.map(item=>[String(item.id), getInventoryUsageInfo(item, entries)]));
-  let inv = rawInv.slice().sort((a,b)=>{ const stockDiff = Number(b.qtyOnHand||0) - Number(a.qtyOnHand||0); if(stockDiff !== 0) return stockDiff; return (a.name||'').localeCompare(b.name||''); });
-  let parts = getMasterParts().slice().sort((a,b)=>{ const catA = MASTER_CATEGORY_LABELS[a.category] || 'Other'; const catB = MASTER_CATEGORY_LABELS[b.category] || 'Other'; if(catA !== catB) return catA.localeCompare(catB); return (a.name||'').localeCompare(b.name||''); });
+  const inv = getInventory().sort((a,b)=>{
+    const stockDiff = Number(b.qtyOnHand||0) - Number(a.qtyOnHand||0);
+    if(stockDiff !== 0) return stockDiff;
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  const parts = getMasterParts().sort((a,b)=>{
+    const catA = MASTER_CATEGORY_LABELS[a.category] || 'Other';
+    const catB = MASTER_CATEGORY_LABELS[b.category] || 'Other';
+    if(catA !== catB) return catA.localeCompare(catB);
+    return (a.name||'').localeCompare(b.name||'');
+  });
   const listEl = document.getElementById('inventoryList');
   const summaryEl = document.getElementById('inventorySummary');
-  const smartListEl = document.getElementById('inventorySmartList');
-  const smartSummaryEl = document.getElementById('inventorySmartSummary');
   const masterListEl = document.getElementById('masterPartsList');
   const masterSummaryEl = document.getElementById('masterPartsSummary');
   if(!listEl || !summaryEl) return;
-  if(query){
-    inv = inv.filter(item=>[item.name,item.partNum,item.store,item.note].join(' ').toLowerCase().includes(query));
-    parts = parts.filter(part=>[part.name,part.partNum,part.note].join(' ').toLowerCase().includes(query));
-  }
-  if(stockFilter==='low') inv = inv.filter(item=>Number(item.qtyOnHand||0)<=1);
-  if(stockFilter==='out') inv = inv.filter(item=>Number(item.qtyOnHand||0)===0);
-  if(stockFilter==='oilavg') inv = inv.filter(item=>!!item.countInOilAvg);
   const totalQty = inv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
   const linkedInvCount = inv.filter(item=>item.masterPartId).length;
   summaryEl.textContent = `${inv.length} item${inv.length!==1?'s':''} · ${totalQty} total on hand · ${linkedInvCount} linked`;
-  if(smartListEl && smartSummaryEl){
-    smartSummaryEl.textContent = `${smartRows.length} attention item${smartRows.length!==1?'s':''}`;
-    smartListEl.innerHTML = smartRows.length ? smartRows.slice(0,6).map(item=>`<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${item.name}</div><div class="inv-meta">${item.needsRestock ? 'Needs restock now' : 'Low stock'} · Last used ${item.lastUsedDate} · Last source saved ${item.lastSavedSource}</div></div><div class="inv-qty ${item.needsRestock ? 'out' : 'low'}">${Number(item.qtyOnHand||0)} on hand</div></div><div class="inv-actions"><button type="button" class="inv-btn" data-edit-inventory="${escapeHtmlAttr(item.id)}">Edit</button><button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="1">+1</button></div></div>`).join('') : `<div class="part-item"><div class="part-missing">No urgent inventory issues right now. Low-stock and restock suggestions will appear here automatically.</div></div>`;
-  }
   if(!inv.length){
-    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No inventory matches the current search/filter.</div></div>`;
+    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No inventory saved yet. Add parts above when you buy ahead during a sale.</div></div>`;
   }else{
-    listEl.innerHTML = inv.map(item=>{ const qty = Number(item.qtyOnHand||0); const qtyClass = qty===0 ? 'out' : qty<=1 ? 'low' : ''; const meta=[LABELS[item.serviceType]||'Other', item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · '); const master = parts.find(part=>String(part.id)===String(item.masterPartId||'')); const usage = usageMap[String(item.id)] || {lastUsedDate:'Never used',useCount:0,lastSavedSource:'—'}; return `<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${item.name}</div><div class="inv-meta">${meta || 'No extra details saved yet'}${item.note ? `<br>💡 ${item.note}` : ''}${item.link ? `<br><a class="part-link" href="${item.link}" target="_blank">→ ${getLinkHostLabel(item.link)}</a>` : ''}${master ? `<br>🔗 Master DB: <span style="color:var(--text2)">${master.name}</span>` : ''}<br>🕒 Last used: ${usage.lastUsedDate} · Uses logged: ${usage.useCount} · Source saved: ${usage.lastSavedSource}</div>${item.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}${qty===0 ? `<div class="parts-badge" style="background:rgba(235,10,30,.1);color:var(--toyota2);border-color:rgba(235,10,30,.28)">Restock</div>` : ''}</div><div class="inv-qty ${qtyClass}">${qty} on hand</div></div><div class="inv-actions"><button type="button" class="inv-btn" data-edit-inventory="${escapeHtmlAttr(item.id)}">Edit</button>${master ? `<button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(master.id)}">Master Part</button>` : ''}<button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="1">+1</button><button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="-1">-1</button><button type="button" class="inv-btn danger" data-delete-inventory="${escapeHtmlAttr(item.id)}">Delete</button></div></div>`; }).join('');
+    listEl.innerHTML = inv.map(item=>{
+      const qty = Number(item.qtyOnHand||0);
+      const qtyClass = qty===0 ? 'out' : qty<=1 ? 'low' : '';
+      const meta = [LABELS[item.serviceType]||'Other', item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ');
+      const master = parts.find(part=>String(part.id)===String(item.masterPartId||''));
+      return `<div class="inv-row">
+        <div class="inv-top">
+          <div style="flex:1">
+            <div class="inv-name">${item.name}</div>
+            <div class="inv-meta">${meta || 'No extra details saved yet'}${item.note ? `<br>💡 ${item.note}` : ''}${item.link ? `<br><a class="part-link" href="${item.link}" target="_blank">→ ${getLinkHostLabel(item.link)}</a>` : ''}${master ? `<br>🔗 Master DB: <span style="color:var(--text2)">${master.name}</span>` : ''}</div>
+            ${item.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+          </div>
+          <div class="inv-qty ${qtyClass}">${qty} on hand</div>
+        </div>
+        <div class="inv-actions">
+          <button type="button" class="inv-btn" data-edit-inventory="${escapeHtmlAttr(item.id)}">Edit</button>
+          ${master ? `<button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(master.id)}">Master Part</button>` : ''}
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="1">+1</button>
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="-1">-1</button>
+          <button type="button" class="inv-btn danger" data-delete-inventory="${escapeHtmlAttr(item.id)}">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
   }
   if(masterListEl && masterSummaryEl){
     const totalSources = parts.reduce((sum,part)=>sum + (part.sources||[]).length, 0);
     masterSummaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${totalSources} saved source${totalSources!==1?'s':''}`;
     if(!parts.length){
-      masterListEl.innerHTML = `<div class="master-empty">No master parts match the current search/filter.</div>`;
+      masterListEl.innerHTML = `<div class="master-empty">No master parts yet. Add an inventory item above and the app will automatically create or update your reference part database here.</div>`;
     }else{
-      masterListEl.innerHTML = parts.map(part=>{ const linkedInv = rawInv.filter(item=>String(item.masterPartId||'')===String(part.id)); const linkedQty = linkedInv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0); const serviceLabel = LABELS[part.serviceType] || 'Other'; const categoryLabel = MASTER_CATEGORY_LABELS[part.category] || 'Other'; const defaultPrice = Number(part.unitCost||0) > 0 ? `$${Number(part.unitCost||0).toFixed(2)}` : '—'; const sourcesHtml = (part.sources||[]).length ? `<div class="master-source-list">${part.sources.map(source=>`<div class="master-source"><div class="master-source-top"><div><div class="master-source-name">${source.store || source.label || 'Saved source'}</div><div class="master-source-meta">${[source.label && source.label !== (source.store||'') ? source.label : '', source.addedAt ? `saved ${formatDateHuman(source.addedAt.slice(0,10))}` : ''].filter(Boolean).join(' · ')}${source.url ? `<br><a class="part-link" href="${source.url}" target="_blank">→ ${getLinkHostLabel(source.url)}</a>` : ''}</div></div><div class="master-source-price">${Number(source.unitPrice||0) > 0 ? `$${Number(source.unitPrice||0).toFixed(2)}` : '—'}</div></div></div>`).join('')}</div>` : `<div class="part-missing" style="margin-top:10px">No saved purchase sources yet. Add this part through Inventory and the store/link will stack here automatically.</div>`; return `<div class="part-item"><div class="part-row1"><span class="part-name">${part.name}</span><span class="part-price">${defaultPrice}</span></div><div class="part-num">${[categoryLabel, serviceLabel, part.partNum && `Part # ${part.partNum}`].filter(Boolean).join(' · ')}</div>${part.note ? `<div class="inv-meta" style="margin-top:6px">💡 ${part.note}</div>` : ''}${part.statusLabel ? `<div class="parts-badge">${part.statusLabel}</div>` : ''}${part.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}<div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>${sourcesHtml}<div class="inv-actions" style="margin-top:12px"><button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button><button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button></div></div>`; }).join('');
+      masterListEl.innerHTML = parts.map(part=>{
+        const linkedInv = inv.filter(item=>String(item.masterPartId||'')===String(part.id));
+        const linkedQty = linkedInv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
+        const serviceLabel = LABELS[part.serviceType] || 'Other';
+        const categoryLabel = MASTER_CATEGORY_LABELS[part.category] || 'Other';
+        const defaultPrice = Number(part.unitCost||0) > 0 ? `$${Number(part.unitCost||0).toFixed(2)}` : '—';
+        const sourcesHtml = (part.sources||[]).length
+          ? `<div class="master-source-list">${part.sources.map(source=>`<div class="master-source"><div class="master-source-top"><div><div class="master-source-name">${source.store || source.label || 'Saved source'}</div><div class="master-source-meta">${[source.label && source.label !== (source.store||'') ? source.label : '', source.addedAt ? `saved ${formatDateHuman(source.addedAt.slice(0,10))}` : ''].filter(Boolean).join(' · ')}${source.url ? `<br><a class="part-link" href="${source.url}" target="_blank">→ ${getLinkHostLabel(source.url)}</a>` : ''}</div></div><div class="master-source-price">${Number(source.unitPrice||0) > 0 ? `$${Number(source.unitPrice||0).toFixed(2)}` : '—'}</div></div></div>`).join('')}</div>`
+          : `<div class="part-missing" style="margin-top:10px">No saved purchase sources yet. Add this part through Inventory and the store/link will stack here automatically.</div>`;
+        return `<div class="part-item">
+          <div class="part-row1"><span class="part-name">${part.name}</span><span class="part-price">${defaultPrice}</span></div>
+          <div class="part-num">${[categoryLabel, serviceLabel, part.partNum && `Part # ${part.partNum}`].filter(Boolean).join(' · ')}</div>
+          ${part.note ? `<div class="inv-meta" style="margin-top:6px">💡 ${part.note}</div>` : ''}
+          ${part.statusLabel ? `<div class="parts-badge">${part.statusLabel}</div>` : ''}
+          ${part.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+          <div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>
+          ${sourcesHtml}
+          <div class="inv-actions" style="margin-top:12px">
+            <button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button>
+            <button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button>
+          </div>
+        </div>`;
+      }).join('');
     }
   }
 }
@@ -3792,6 +3642,7 @@ function renderEntryInventoryUI(){
   const block = document.getElementById('inventorySuggestBlock');
   const suggestEl = document.getElementById('inventorySuggestList');
   const selectedEl = document.getElementById('inventorySelectedList');
+  const summaryEl = document.getElementById('inventoryRequiredSummary');
   const typeEl = document.getElementById('fType');
   if(!block || !suggestEl || !selectedEl || !typeEl) return;
   const serviceType = typeEl.value;
@@ -3799,70 +3650,87 @@ function renderEntryInventoryUI(){
     block.style.display='none';
     suggestEl.innerHTML='';
     selectedEl.innerHTML='';
+    if(summaryEl) summaryEl.textContent='';
+    updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
     return;
   }
   block.style.display='block';
-  const selectedMap = getSelectedInventoryCounts();
-  const suggestions = getInventory()
+  const previewInventory = getEntryPreviewInventory();
+  const requirementPlan = buildServiceRequirementPlan(serviceType, previewInventory);
+  const manualSelectedMap = getSelectedInventoryCounts();
+  const combinedReserved = sumInventoryCountMaps(requirementPlan.reservedMap || {}, manualSelectedMap);
+
+  if(summaryEl){
+    if(!requirementPlan.requirements.length){
+      summaryEl.textContent = 'No fixed required part set is defined for this service type.';
+    }else if(requirementPlan.missingCount > 0){
+      summaryEl.textContent = `Missing ${requirementPlan.missingCount} required unit${requirementPlan.missingCount!==1?'s':''} — this service cannot be completed until stock is available.`;
+    }else{
+      summaryEl.textContent = `All required inventory is auto-reserved by service-part ID (${requirementPlan.autoItems.length} linked line${requirementPlan.autoItems.length!==1?'s':''}).`;
+    }
+  }
+
+  suggestEl.innerHTML = requirementPlan.requirements.length ? requirementPlan.requirements.map(req=>{
+    const detail = req.allocations.length
+      ? req.allocations.map(item=>`${item.qty}× ${item.name}`).join(' · ')
+      : 'No linked inventory selected yet';
+    return `
+      <div class="suggest-card" style="border-color:${req.complete ? 'rgba(34,212,110,.18)' : 'rgba(235,10,30,.2)'};background:${req.complete ? 'rgba(34,212,110,.04)' : 'rgba(235,10,30,.04)'}">
+        <div class="suggest-top">
+          <div style="flex:1">
+            <div class="suggest-name">${req.label}</div>
+            <div class="suggest-meta">Service-part ID: ${req.id}${req.toyotaPartNum ? ` · Toyota/ref #: ${req.toyotaPartNum}` : ''}</div>
+          </div>
+          <div class="inv-qty ${req.complete ? '' : 'out'}">${req.complete ? `${req.requiredQty}/${req.requiredQty} ready` : `Need ${req.missingQty}`}</div>
+        </div>
+        <div class="suggest-meta">Required qty: ${req.requiredQty}</div>
+        <div class="suggest-meta" style="margin-top:6px">${detail}</div>
+        ${req.complete ? '' : `<div class="part-missing" style="margin-top:8px">Add inventory that matches this service-part ID before completing the service.</div>`}
+      </div>
+    `;
+  }).join('') : `<div class="part-missing">No fixed inventory requirement is enforced for this service type.</div>`;
+
+  const optionalMatches = previewInventory
     .filter(item=>inventoryMatchesService(item, serviceType))
     .map(item=>({
       ...item,
-      selectedQty: Number(selectedMap[String(item.id)]||0),
-      available: Math.max(0, Number(item.qtyOnHand||0) - Number(selectedMap[String(item.id)]||0))
+      reservedQty: Number(combinedReserved[String(item.id)]||0),
+      available: Math.max(0, Number(item.qtyOnHand||0) - Number(combinedReserved[String(item.id)]||0))
     }))
     .sort((a,b)=>{
       const availDiff = b.available - a.available;
       if(availDiff!==0) return availDiff;
-      return (a.name||'').localeCompare(b.name||'');
+      return String(a.name||'').localeCompare(String(b.name||''));
     });
-  suggestEl.innerHTML = suggestions.length ? suggestions.map(item=>`
-    <div class="suggest-card">
-      <div class="suggest-top">
+
+  selectedEl.innerHTML = optionalMatches.length ? optionalMatches.map(item=>`
+    <div class="selected-use">
+      <div class="selected-use-top">
         <div style="flex:1">
           <div class="suggest-name">${item.name}</div>
           <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store, LABELS[item.serviceType]||'Other'].filter(Boolean).join(' · ')}</div>
+          ${item.masterPartId ? `<div class="parts-badge">Master ID: ${item.masterPartId}</div>` : ''}
         </div>
         <div class="inv-qty ${item.available===0?'out':item.available<=1?'low':''}">${item.available} free</div>
       </div>
-      <div class="suggest-meta">$${Number(item.unitCost||0).toFixed(2)} each${item.countInOilAvg ? ' · counts in oil avg' : ''}</div>
-      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Use 1 for this service</button>` : `<div class="part-missing" style="margin-top:8px">Already fully assigned or out of stock</div>`}
+      <div class="suggest-meta">Reserved now: ${item.reservedQty} · On hand: ${Number(item.qtyOnHand||0)} · $${Number(item.unitCost||0).toFixed(2)} each${item.countInOilAvg ? ' · counts in oil avg' : ''}</div>
+      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Use 1 extra for this service</button>` : `<div class="part-missing" style="margin-top:8px">No extra stock left after required reservation</div>`}
     </div>
   `).join('') : `<div class="part-missing">No matching inventory found for this service type yet.</div>`;
-  const selectedItems = getFormItems().filter(item=>item.inventoryId);
-  const summary = Object.values(selectedItems.reduce((acc,item)=>{
-    const key = String(item.inventoryId);
-    if(!acc[key]) acc[key] = {...item};
-    else acc[key].qty += item.qty;
-    return acc;
-  },{}));
-  selectedEl.innerHTML = summary.length ? `
-    <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Linked inventory in this service</div>
-    ${summary.map(item=>`
-      <div class="selected-use">
-        <div class="selected-use-top">
-          <div style="flex:1">
-            <div class="suggest-name">${item.name}</div>
-            <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ') || 'Inventory item'}</div>
-            ${item.useInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
-          </div>
-          <div class="inv-qty">${item.qty} used</div>
-        </div>
-        <div class="suggest-meta">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)} total</div>
-        <div class="selected-use-actions">
-          <button type="button" class="selected-use-btn" onclick="useInventoryItem(${item.inventoryId})">+1</button>
-          <button type="button" class="selected-use-btn danger" onclick="removeOneInventoryItem(${item.inventoryId})">Remove 1</button>
-        </div>
-      </div>
-    `).join('')}
-  ` : '';
+
+  updateEntrySaveLock(serviceType, requirementPlan);
 }
+
 function useInventoryItem(id){
-  const item = getInventory().find(x=>String(x.id)===String(id));
+  const serviceType = document.getElementById('fType')?.value || '';
+  const previewInventory = getEntryPreviewInventory();
+  const item = previewInventory.find(x=>String(x.id)===String(id));
   if(!item) return;
-  const selectedMap = getSelectedInventoryCounts();
-  const alreadySelected = Number(selectedMap[String(id)]||0);
+  const requirementPlan = buildServiceRequirementPlan(serviceType, previewInventory);
+  const reservedMap = sumInventoryCountMaps(requirementPlan.reservedMap || {}, getSelectedInventoryCounts());
+  const alreadyReserved = Number(reservedMap[String(id)]||0);
   const max = Number(item.qtyOnHand||0);
-  if(alreadySelected >= max){showToast('No more stock left for this part');return;}
+  if(alreadyReserved >= max){showToast('No more free stock left for this part');return;}
   addItemRow({
     inventoryId: item.id,
     name: item.name,
@@ -3887,90 +3755,28 @@ function prefill(){
   const t=document.getElementById('fType').value;
   if(PREFILLS[t])document.getElementById('fDesc').value=PREFILLS[t];
   renderEntryInventoryUI();
-  renderServiceContext();
-}
-function setEntryEditorMode(entry=null){
-  const isEdit = !!entry;
-  const titleEl = document.getElementById('entryFormTitle');
-  const saveBtn = document.getElementById('entrySaveBtn');
-  const cancelBtn = document.getElementById('entryCancelBtn');
-  if(titleEl) titleEl.textContent = isEdit ? 'Edit Service Entry' : 'New Service Entry';
-  if(saveBtn) saveBtn.textContent = isEdit ? 'Update Entry' : 'Save Entry';
-  if(cancelBtn) cancelBtn.textContent = isEdit ? 'Cancel Edit' : 'Cancel';
-}
-function cancelEntryEdit(){
-  document.getElementById('fEditId').value='';
-  document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
-  ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fType').value='';
-  resetEntryInventoryUses();
-  renderServiceContext();
-  clearPhoto();
-  setEntryEditorMode(null);
-  go('log');
-}
-function startEditEntry(id){
-  const entry = getData().find(item=>String(item.id)===String(id));
-  if(!entry){ showToast('Entry not found'); return; }
-  document.getElementById('fEditId').value = entry.id;
-  document.getElementById('fDate').value = entry.date || new Date().toISOString().split('T')[0];
-  document.getElementById('fMi').value = entry.mi || '';
-  document.getElementById('fType').value = entry.type || 'other';
-  document.getElementById('fDesc').value = entry.desc || '';
-  document.getElementById('fCost').value = Number(entry.cost||0) > 0 ? Number(entry.cost||0) : '';
-  document.getElementById('fShop').value = entry.shop || '';
-  const list = document.getElementById('fItemsList');
-  if(list) list.innerHTML='';
-  const items = normalizeEntryItems(entry.items).length ? normalizeEntryItems(entry.items) : normalizeInventoryUses(entry.inventoryUses).map(use=>({inventoryId:use.inventoryId,name:use.name,partNum:use.partNum,store:use.store,link:use.link,price:use.unitCost,qty:use.qtyUsed,useInOilAvg:use.countInOilAvg}));
-  if(items.length) items.forEach(item=>addItemRow(item)); else addItemRow();
-  const existingPhoto = getPhoto(entry.id);
-  if(existingPhoto){
-    window._pendingPhoto = existingPhoto;
-    document.getElementById('fPhotoImg').src = existingPhoto;
-    document.getElementById('fPhotoPreview').style.display = 'block';
-    document.getElementById('fPhotoPlaceholder').style.display = 'none';
-    document.getElementById('fPhotoArea').style.borderColor = 'var(--green2)';
-  }else{
-    clearPhoto();
-  }
-  setEntryEditorMode(entry);
-  renderEntryInventoryUI();
-  renderServiceContext();
-  go('add');
-  setTimeout(()=>document.getElementById('fDesc')?.focus(), 120);
-  showToast('Edit mode ready ✓');
 }
 function saveEntry(){
-  const editId = document.getElementById('fEditId').value;
   const date=document.getElementById('fDate').value;
   const mi=document.getElementById('fMi').value;
   const type=document.getElementById('fType').value||'other';
   const desc=document.getElementById('fDesc').value.trim();
   const cost=document.getElementById('fCost').value;
   const shop=document.getElementById('fShop').value.trim();
-  const items = getFormItems();
+  const manualItems = getFormItems();
   if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
-  const latestLoggedMi = highestMileage(getData());
-  if(parseInt(mi,10) < 0 || !Number.isFinite(parseInt(mi,10))){ showToast('Mileage must be a valid positive number'); return; }
-  if(parseInt(mi,10) + 250 < latestLoggedMi && !confirm(`This mileage (${parseInt(mi,10).toLocaleString()} mi) is much lower than your highest logged mileage (${latestLoggedMi.toLocaleString()} mi). Save anyway?`)) return;
-  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
-  const d=getData();
   const inv = getInventory();
-  const inventoryUses = items.filter(item=>item.inventoryId).map(item=>({inventoryId:item.inventoryId,name:item.name,partNum:item.partNum,store:item.store,link:item.link,unitCost:item.price,qtyUsed:item.qty,countInOilAvg:item.useInOilAvg}));
-  const linkedQty = items.filter(item=>item.inventoryId).reduce((map,item)=>{ map[String(item.inventoryId)] = (map[String(item.inventoryId)]||0) + Number(item.qty||0); return map; },{});
-
-  let entryId = editId ? Number(editId) : Date.now();
-  let existingEntry = null;
-  if(editId){
-    existingEntry = d.find(entry=>String(entry.id)===String(editId)) || null;
-    if(!existingEntry){ showToast('Original entry not found'); return; }
-    const originalUses = normalizeInventoryUses(existingEntry.inventoryUses);
-    originalUses.forEach(use=>{
-      const invItem = inv.find(x=>String(x.id)===String(use.inventoryId));
-      if(invItem) invItem.qtyOnHand = Math.max(0, Number(invItem.qtyOnHand||0) + Number(use.qtyUsed||0));
-    });
+  const requirementPlan = buildServiceRequirementPlan(type, inv);
+  if(requirementPlan.requirements.length && requirementPlan.missingCount > 0){
+    renderEntryInventoryUI();
+    showToast('Required inventory is missing for this service');
+    return;
   }
-
+  const items = [...requirementPlan.autoItems, ...manualItems];
+  const linkedQty = items.filter(item=>item.inventoryId).reduce((map,item)=>{
+    map[String(item.inventoryId)] = (map[String(item.inventoryId)]||0) + Number(item.qty||0);
+    return map;
+  },{});
   for(const [inventoryId, qtyNeeded] of Object.entries(linkedQty)){
     const invItem = inv.find(x=>String(x.id)===String(inventoryId));
     const onHand = Number(invItem?.qtyOnHand || 0);
@@ -3979,37 +3785,31 @@ function saveEntry(){
       return;
     }
   }
-
-  const payload = {id:entryId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:existingEntry ? !!existingEntry.builtin : false,link:existingEntry?.link || ''};
-  if(editId){
-    const idx = d.findIndex(entry=>String(entry.id)===String(editId));
-    if(idx===-1){ showToast('Could not update entry'); return; }
-    d[idx] = payload;
-  }else{
-    d.push(payload);
-  }
+  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
+  const newId=Date.now();
+  const d=getData();
+  const inventoryUses = items.filter(item=>item.inventoryId).map(item=>({inventoryId:item.inventoryId,name:item.name,partNum:item.partNum,store:item.store,link:item.link,unitCost:item.price,qtyUsed:item.qty,countInOilAvg:item.useInOilAvg}));
+  d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:false});
   save(d);
-
-  Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
-    const item = inv.find(x=>String(x.id)===String(inventoryId));
-    if(item) item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) - Number(qtyNeeded||0));
-  });
-  saveInventory(inv);
-
+  if(Object.keys(linkedQty).length){
+    Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
+      const item = inv.find(x=>String(x.id)===String(inventoryId));
+      if(item) item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) - Number(qtyNeeded||0));
+    });
+    saveInventory(inv);
+  }
   if(window._pendingPhoto){
-    savePhoto(entryId, window._pendingPhoto);
+    savePhoto(newId, window._pendingPhoto);
     window._pendingPhoto=null;
   }
   if(parseInt(mi,10)>getMi())setMi(parseInt(mi,10));
   renderAll();go('log');
-  document.getElementById('fEditId').value='';
   ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fType').value='';
   resetEntryInventoryUses();
-  renderServiceContext();
   clearPhoto();
-  setEntryEditorMode(null);
-  showToast(editId ? 'Entry updated ✓' : 'Entry saved ✓');
+  updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
+  showToast('Entry saved ✓');
 }
 
 /* ─── MAINTENANCE ENGINE (whichever comes first) ─────────────── */
@@ -4084,8 +3884,7 @@ function go(id){
   if(id==='backup')renderBackup();
   if(id==='upcoming')renderUpcoming();
   if(id==='parts')renderParts();
-  if(id==='add'){ renderEntryInventoryUI(); renderServiceContext(); }
-  if(id==='guides')filterGuides();
+  if(id==='add')renderEntryInventoryUI();
   if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -4219,9 +4018,6 @@ function renderBackup(){
       dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
       ' — '+parseInt(last.mi).toLocaleString()+' mi';
   }
-  const snap = getSafetySnapshot();
-  const snapEl = document.getElementById('backupSnapshotStatus');
-  if(snapEl){ snapEl.textContent = snap ? `${formatDateHuman(String(snap.exported||'').slice(0,10))} · ${snap.snapshotReason || 'Safety snapshot'}` : 'None yet'; }
   renderReminderStrategy();
 }
 
@@ -4246,8 +4042,29 @@ function clearOilAverageReset(){
 
 /* ─── EXPORT (BACKUP) ────────────────────────────────────── */
 function exportData(){
-  const payload = buildBackupPayload();
-  const photoCount = Object.keys(payload.photos || {}).length;
+  // Collect all receipt photos from localStorage
+  const photos = {};
+  const entries = getData();
+  entries.forEach(e=>{
+    const p = getPhoto(e.id);
+    if(p) photos[e.id] = p;
+  });
+
+  const payload={
+    version: 5,
+    exported: new Date().toISOString(),
+    vin: VIN,
+    vehicle: '2021 Toyota Venza Hybrid AWD',
+    mileage: getMi(),
+    oilAverageResetAt: getOilAverageResetAt(),
+    scheduleOverrides: getScheduleOverrides(),
+    entries: entries,
+    inventory: getInventory(),
+    masterParts: getMasterParts(),
+    photos: photos  // base64 images keyed by entry id
+  };
+
+  const photoCount = Object.keys(photos).length;
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -4258,7 +4075,7 @@ function exportData(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast(`Backup saved ✓ — ${payload.entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}`);
+  showToast(`Backup saved ✓ — ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}`);
 }
 
 /* ─── IMPORT (RESTORE) ───────────────────────────────────── */
@@ -4299,12 +4116,12 @@ This app: ${VIN}
 Restore anyway?`);
         if(!proceedMismatch){ input.value=''; return; }
       }
-      const restoreSummary = `Restore backup?\n\nEntries: ${entries.length}\nInventory: ${inventory.length}\nMaster parts: ${masterParts.length}\nMileage: ${mi ? mi.toLocaleString() + ' mi' : '—'}\nPhotos: ${photoCount}\n\nThis replaces all current data. Continue?`;
-      if(!confirm(restoreSummary)){
+      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?
+
+This replaces all current data. Continue?`)){
         input.value='';return;
       }
 
-      saveSafetySnapshot(`Before restore from ${file.name}`, true);
       clearStoredPhotos();
       save(entries);
       saveInventory(inventory);
@@ -4331,8 +4148,7 @@ Restore anyway?`);
 
 /* ─── RESET DATA ─────────────────────────────────────────── */
 function resetData(){
-  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nThe app will save an internal safety snapshot first, but you should still export a full backup if you want a file copy.')){return}
-  saveSafetySnapshot('Before factory reset', true);
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
   // Clear all photos first
   clearStoredPhotos();
   save(DEFAULT);
