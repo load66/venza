@@ -453,6 +453,14 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .sched-toggle-head[aria-expanded="true"] .sched-toggle-chevron{transform:rotate(180deg)}
 #scheduleConfigList{display:none}
 #scheduleConfigList.expanded{display:block}
+.dev-only{display:none}
+body.dev-mode .dev-only{display:block}
+.entry-toggle-head{cursor:pointer;user-select:none}
+.entry-toggle-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.entry-toggle-chevron{color:var(--text3);font-size:18px;line-height:1;transition:transform .25s cubic-bezier(.25,.46,.45,.94)}
+.entry-toggle-head[aria-expanded=\"true\"] .entry-toggle-chevron{transform:rotate(180deg)}
+.entry-toggle-body{display:none}
+.entry-toggle-body.expanded{display:block}
 
 /* ─── PARTS ────────────────────────────────────────────────── */
 .part-item{
@@ -745,7 +753,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   .mi-num{font-size:14px}
   .mi-label{font-size:8px}
 
-  .nav{gap:5px;padding:8px 8px 10px}
+  .nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:8px 8px 10px}
   .nav-btn{font-size:10px;min-height:40px;padding:8px 5px;border-radius:9px}
 
   .page{padding:12px;padding-bottom:calc(20px + var(--safe-bot))}
@@ -892,12 +900,12 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
   </div>
 
-  <div class="section-label">Recent Inspection (02/24/26)</div>
+  <div class="section-label" id="dashInspectionLabel">Recent Inspection</div>
   <div class="card">
     <div class="card-body">
-      <div class="row"><span class="row-key">Brake Pads (all 4)</span><span class="row-val green">7 mm — Good</span></div>
-      <div class="row"><span class="row-key">Tread LF/RF/LR</span><span class="row-val orange">6/32" — Monitor</span></div>
-      <div class="row"><span class="row-key">Tread RR</span><span class="row-val orange">7/32" — Monitor</span></div>
+      <div class="row"><span class="row-key">Brake Pads</span><span class="row-val green" id="dashBrakeVal">7 mm all 4 corners — Good</span></div>
+      <div class="row"><span class="row-key">Tread LF/RF/LR</span><span class="row-val orange" id="dashTreadMainVal">6/32" — Monitor</span></div>
+      <div class="row"><span class="row-key">Tread RR</span><span class="row-val orange" id="dashTreadRRVal">7/32" — Monitor</span></div>
       <div class="row"><span class="row-key">HV Battery Filter</span><span class="row-val green">OK</span></div>
     </div>
   </div>
@@ -919,7 +927,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="form-title">New Service Entry</div>
     <div class="alert blue" style="margin-bottom:16px">
       <div class="alert-icon">💡</div>
-      <div>Use your live inventory for parts you already bought. When you save this service, stock is deducted automatically.</div>
+      <div><strong>Quick path:</strong> pick the service, enter date + mileage, add a short description, then save. The optional sections stay tucked away unless you need them.</div>
     </div>
     <div class="fg2">
       <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
@@ -959,19 +967,11 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
     <div class="fl">
       <label>Description / Details</label>
-      <textarea class="ft" id="fDesc" placeholder="Parts used, part numbers, shop notes..."></textarea>
+      <textarea class="ft" id="fDesc" placeholder="Short note of what was done..."></textarea>
     </div>
     <div class="fg2">
-      <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"></div>
       <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
-    </div>
-    <div class="fl">
-      <label>Purchased Items / Links (optional)</label>
-      <div class="item-builder" id="fItemsList"></div>
-      <div class="item-builder-actions">
-        <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
-      </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Tip: linked inventory rows deduct automatically when saved. You can still edit the row before saving if you need to fix quantity, link, or price.</div>
+      <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"></div>
     </div>
     <!-- RECEIPT PHOTO UPLOAD -->
     <div class="fl">
@@ -995,6 +995,46 @@ html.modal-open,body.modal-open{overflow:hidden}
         </div>
       </div>
       <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-head entry-toggle-head" id="inspectionToggle" role="button" tabindex="0" aria-expanded="false" onclick="toggleEntryOptionalSection('inspection')">
+        <div class="card-title">Inspection Snapshot (optional)</div>
+        <div class="entry-toggle-right">
+          <div style="font-size:11px;color:var(--text3)">Brake pads + tread depth</div>
+          <div class="entry-toggle-chevron">▾</div>
+        </div>
+      </div>
+      <div class="card-body entry-toggle-body" id="inspectionBody" style="padding:12px 16px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.6">Fill only what you measured. The newest snapshot becomes the live inspection card on the dashboard and specs page.</div>
+        <div class="fg2">
+          <div class="fl"><label>Brake Pad Front (mm)</label><input type="number" class="fi" id="fBrakeFrontMm" min="0" step="0.5" placeholder="7"></div>
+          <div class="fl"><label>Brake Pad Rear (mm)</label><input type="number" class="fi" id="fBrakeRearMm" min="0" step="0.5" placeholder="7"></div>
+        </div>
+        <div class="fg2">
+          <div class="fl"><label>Tread LF (/32")</label><input type="number" class="fi" id="fTreadLF" min="0" step="1" placeholder="6"></div>
+          <div class="fl"><label>Tread RF (/32")</label><input type="number" class="fi" id="fTreadRF" min="0" step="1" placeholder="6"></div>
+        </div>
+        <div class="fg2">
+          <div class="fl"><label>Tread LR (/32")</label><input type="number" class="fi" id="fTreadLR" min="0" step="1" placeholder="6"></div>
+          <div class="fl"><label>Tread RR (/32")</label><input type="number" class="fi" id="fTreadRR" min="0" step="1" placeholder="7"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-head entry-toggle-head" id="purchasedItemsToggle" role="button" tabindex="0" aria-expanded="false" onclick="toggleEntryOptionalSection('purchasedItems')">
+        <div class="card-title">Purchased Items / Links (optional)</div>
+        <div class="entry-toggle-right">
+          <div style="font-size:11px;color:var(--text3)">Advanced</div>
+          <div class="entry-toggle-chevron">▾</div>
+        </div>
+      </div>
+      <div class="card-body entry-toggle-body" id="purchasedItemsBody" style="padding:12px 16px">
+        <div class="item-builder" id="fItemsList"></div>
+        <div class="item-builder-actions">
+          <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Use this only when you want to attach extra parts, links, or inventory beyond the main service entry.</div>
+      </div>
     </div>
     <div class="btn-row">
       <button class="btn-ghost" id="entryCancelBtn" onclick="go('log')">Cancel</button>
@@ -1041,47 +1081,47 @@ html.modal-open,body.modal-open{overflow:hidden}
     <table class="sched-table">
       <tr>
         <th>Service Item</th>
-        <th>5k</th><th>10k</th><th>15k</th><th>20k</th><th>30k</th><th>60k</th><th>90k</th><th>100k</th><th>120k</th>
+        <th>5k</th><th>10k</th><th>15k</th><th>20k</th><th>30k</th><th>60k</th><th>90k</th><th>100k</th><th>120k</th><th>150k</th>
       </tr>
       <tr>
         <td>Engine Oil & Filter <span class="sched-note">(0W-16)</span></td>
-        <td>—</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td>
+        <td>—</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td>
       </tr>
       <tr>
         <td>Tire Rotation</td>
-        <td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td>
+        <td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td><td class="sched-check">✓</td>
       </tr>
       <tr>
         <td>HV Battery Filter — Inspect</td>
-        <td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td>
+        <td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td>
       </tr>
       <tr>
         <td>HV Battery Filter — Clean</td>
-        <td>—</td><td>—</td><td>—</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td>
+        <td>—</td><td>—</td><td>—</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td><td class="sched-replace">C</td>
       </tr>
       <tr>
         <td>Cabin Air Filter</td>
-        <td>—</td><td>—</td><td class="sched-inspect">I</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td>
+        <td>—</td><td>—</td><td class="sched-inspect">I</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td>
       </tr>
       <tr>
         <td>Engine Air Filter</td>
-        <td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td class="sched-replace">R</td><td>—</td><td class="sched-replace">R</td><td class="sched-replace">R</td>
       </tr>
       <tr>
         <td>Brake Inspection</td>
-        <td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td>
+        <td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td><td class="sched-inspect">I</td>
       </tr>
       <tr>
         <td>Engine Coolant</td>
-        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td>—</td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td>—</td><td>—</td>
       </tr>
       <tr>
         <td>Inverter Coolant <span class="sched-note">(first due 150k)</span></td>
-        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td>
       </tr>
       <tr>
         <td>Spark Plugs</td>
-        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td>
+        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="sched-replace">R</td><td>—</td>
       </tr>
     </table>
   </div>
@@ -1719,7 +1759,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="row"><span class="row-key">Bolt Pattern</span><span class="row-val">5 × 114.30 mm</span></div>
     <div class="row"><span class="row-key">Lug Nut Torque</span><span class="row-val orange">80 ft-lbs</span></div>
     <div class="row"><span class="row-key">Tires Installed</span><span class="row-val">~June 2023</span></div>
-    <div class="row"><span class="row-key">Tread (02/24/26)</span><span class="row-val orange">LF/RF/LR 6/32 · RR 7/32</span></div>
+    <div class="row"><span class="row-key">Latest Tread Snapshot</span><span class="row-val orange" id="specsTreadStatus">LF 6/32" · RF 6/32" · LR 6/32" · RR 7/32"</span></div>
   </div></div>
 
   <div class="section-label">Fluids Reference</div>
@@ -1737,7 +1777,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="row"><span class="row-key">Timing Chain</span><span class="row-val green">No service — life of engine</span></div>
     <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val">Toyota 90919-01289 · Denso FC16HR-Q8 · Qty 4</span></div>
     <div class="row"><span class="row-key">Plug Interval</span><span class="row-val">120,000 mi per Toyota manual</span></div>
-    <div class="row"><span class="row-key">Brake Pads (02/24/26)</span><span class="row-val green">7 mm all 4 corners — Good</span></div>
+    <div class="row"><span class="row-key">Latest Brake Snapshot</span><span class="row-val green" id="specsBrakeStatus">7 mm all 4 corners — Good</span></div>
     <div class="row"><span class="row-key">HV Battery Warranty</span><span class="row-val green">10 yr / 150,000 mi</span></div>
     <div class="row"><span class="row-key">Maintenance Mode</span><span class="row-val" style="font-size:10px">Gas pedal 2x→Neutral→2x→Park→2x→Start</span></div>
   </div></div>
@@ -1805,8 +1845,9 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="lock-note">UI baseline preserved for long-term use — reminder features were added without redesigning the existing layout.</div>
   </div>
 
-  <div class="section-label">For ChatGPT — Add Log Entry</div>
-  <div class="form-section" style="background:rgba(59,158,255,.05);border-color:rgba(59,158,255,.2)">
+  <div class="dev-only">
+    <div class="section-label">For ChatGPT — Add Log Entry</div>
+    <div class="form-section" style="background:rgba(59,158,255,.05);border-color:rgba(59,158,255,.2)">
     <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">📋 ChatGPT Instructions</div>
 
     <div class="alert blue" style="margin-bottom:12px">
@@ -1850,6 +1891,7 @@ html.modal-open,body.modal-open{overflow:hidden}
 // NOTE: DEFAULT array only affects fresh installs or after Reset.
 // If localStorage already has data, the app reads that — not DEFAULT.</div>
     <p style="font-size:11px;color:var(--text3);margin-top:8px">Tap the box above to copy Path B template to clipboard.</p>
+    </div>
   </div>
 
   <div class="section-label">Danger Zone</div>
@@ -2098,6 +2140,9 @@ const DEFAULT_MASTER_PARTS = [
   {id:'mp_spark_plug_oem',name:'Spark Plug — Toyota OEM',serviceType:'plugs',category:'fluids_filters',partNum:'90919-01289 / Denso FC16HR-Q8',unitCost:15.07,statusLabel:'Reference part',note:'Iridium OEM plug. Replace all 4 together at 120,000 miles / 144 months.',countInOilAvg:false,sources:[{store:'Toyota Parts',url:'https://toyotaparts.ourismantoyotaofrichmond.com/oem-parts/toyota-spark-plug-9091901289',label:'Toyota / Richmond Toyota Parts',unitPrice:15.07,addedAt:'2026-04-14T00:00:00.000Z'}]},
   {id:'mp_atf_ws',name:'ATF WS — Transmission & Rear Diff',serviceType:'trans',category:'fluids_filters',partNum:'00289-ATFWS',unitCost:0,statusLabel:'Dealer',note:'Same fluid for transmission and rear differential.',countInOilAvg:false,sources:[]},
   {id:'mp_sllc',name:'Toyota Super Long Life Coolant',serviceType:'coolant',category:'fluids_filters',partNum:'00272-SLLC2',unitCost:0,statusLabel:'Reference part',note:'Pink, pre-mixed 50/50.',countInOilAvg:false,sources:[]},
+  {id:'mp_oil_drain_gasket',name:'Oil Drain Plug Gasket',serviceType:'oil',category:'fluids_filters',partNum:'Toyota crush washer reference',unitCost:0,statusLabel:'Reference part',note:'Not needed once the ValvoMax valve is installed.',countInOilAvg:false,sources:[]},
+  {id:'mp_wiper_front_pair',name:'Front Wiper Blade Set',serviceType:'wipers',category:'fluids_filters',partNum:'Driver + passenger set',unitCost:0,statusLabel:'Reference part',note:'Update with the exact OEM part numbers when you buy the next set.',countInOilAvg:false,sources:[]},
+  {id:'mp_wiper_rear',name:'Rear Wiper Blade',serviceType:'wipers',category:'fluids_filters',partNum:'Rear blade',unitCost:0,statusLabel:'Reference part',note:'Update with the exact OEM rear blade part number when replaced.',countInOilAvg:false,sources:[]},
   {id:'mp_valvomax_valve',name:'ValvoMax Drain Valve M12-1.25',serviceType:'valvomax',category:'valvomax',partNum:'M12-1.25 Quick Twist',unitCost:54.99,statusLabel:'Reference part',note:'VITON O-ring seal.',countInOilAvg:false,sources:[{store:'ValvoMax',url:'https://www.valvomax.com/collections/all',label:'valvomax.com — M12-1.25',unitPrice:54.99,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_valvomax_bag',name:'ValvoMax Drain Bag Starter Kit',serviceType:'valvomax',category:'valvomax',partNum:'Starter Kit',unitCost:19.99,statusLabel:'Reference part',note:'Replaces traditional drain pan.',countInOilAvg:false,sources:[{store:'ValvoMax',url:'https://www.valvomax.com/collections/all',label:'valvomax.com — accessories',unitPrice:19.99,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_valvomax_replacement',name:'ValvoMax Replacement Kit',serviceType:'valvomax',category:'valvomax',partNum:'Washers + Tether + Sticker',unitCost:4.99,statusLabel:'Reference part',note:'Accessories and consumables.',countInOilAvg:false,sources:[{store:'ValvoMax',url:'https://www.valvomax.com/collections/all',label:'valvomax.com — accessories',unitPrice:4.99,addedAt:'2026-03-01T00:00:00.000Z'}]},
@@ -2354,6 +2399,13 @@ function upsertMasterPartFromInventoryPayload(payload){
 function ensureMasterPartsReady(){
   const parts = getMasterParts();
   if(!parts.length) saveMasterParts(DEFAULT_MASTER_PARTS);
+}
+function syncDefaultMasterPartsCatalog(){
+  const existing = getMasterParts();
+  if(!existing.length){ saveMasterParts(DEFAULT_MASTER_PARTS); return; }
+  const ids = new Set(existing.map(part=>String(part.id)));
+  const missing = DEFAULT_MASTER_PARTS.filter(part=>!ids.has(String(part.id)));
+  if(missing.length) saveMasterParts([...existing, ...missing]);
 }
 function syncMasterPartsFromInventory(){
   const inv = getInventory();
@@ -2873,6 +2925,39 @@ function compareEntriesLatest(a,b){
 const VEHICLE_PROFILE = {
   estimatedInServiceDate: '2021-06-01'
 };
+function isDeveloperMode(){ return localStorage.getItem('vz_dev_mode') === '1'; }
+function initDeveloperMode(){
+  try{
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('dev') === '1') localStorage.setItem('vz_dev_mode','1');
+    if(params.get('dev') === '0') localStorage.removeItem('vz_dev_mode');
+  }catch(err){}
+  document.body.classList.toggle('dev-mode', isDeveloperMode());
+}
+let entryOptionalSections = {inspection:false,purchasedItems:false};
+function setEntryOptionalSection(name, expanded){
+  entryOptionalSections[name] = !!expanded;
+  const toggle = document.getElementById(name === 'inspection' ? 'inspectionToggle' : 'purchasedItemsToggle');
+  const body = document.getElementById(name === 'inspection' ? 'inspectionBody' : 'purchasedItemsBody');
+  if(toggle) toggle.setAttribute('aria-expanded', entryOptionalSections[name] ? 'true' : 'false');
+  if(body){ body.classList.toggle('expanded', entryOptionalSections[name]); body.style.display = entryOptionalSections[name] ? 'block' : 'none'; }
+}
+function toggleEntryOptionalSection(name){ setEntryOptionalSection(name, !entryOptionalSections[name]); }
+function parseInspectionValue(value, allowDecimal=false){ const n = allowDecimal ? Number(value) : parseInt(value,10); return Number.isFinite(n) && n >= 0 ? n : null; }
+function normalizeInspectionSnapshot(snapshot){ if(!snapshot || typeof snapshot !== 'object') return null; const next = {brakeFrontMm: parseInspectionValue(snapshot.brakeFrontMm, true), brakeRearMm: parseInspectionValue(snapshot.brakeRearMm, true), treadLF: parseInspectionValue(snapshot.treadLF), treadRF: parseInspectionValue(snapshot.treadRF), treadLR: parseInspectionValue(snapshot.treadLR), treadRR: parseInspectionValue(snapshot.treadRR)}; return Object.values(next).some(v=>v!==null) ? next : null; }
+function getInspectionSnapshotFromForm(){ return normalizeInspectionSnapshot({brakeFrontMm: document.getElementById('fBrakeFrontMm')?.value, brakeRearMm: document.getElementById('fBrakeRearMm')?.value, treadLF: document.getElementById('fTreadLF')?.value, treadRF: document.getElementById('fTreadRF')?.value, treadLR: document.getElementById('fTreadLR')?.value, treadRR: document.getElementById('fTreadRR')?.value}); }
+function clearInspectionForm(){ ['fBrakeFrontMm','fBrakeRearMm','fTreadLF','fTreadRF','fTreadLR','fTreadRR'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); }
+function getLatestInspectionEntry(entries=getData()){ return normalizeEntries(entries).filter(entry=>normalizeInspectionSnapshot(entry.inspection)).sort(compareEntriesLatest)[0] || null; }
+function getLatestInspectionSnapshot(entries=getData()){ const entry = getLatestInspectionEntry(entries); const inspection = normalizeInspectionSnapshot(entry?.inspection); return entry && inspection ? {...inspection, date: entry.date, mi: safeNum(entry.mi), type: entry.type || 'other'} : null; }
+function classifyBrakeMm(value){ if(value===null) return 'unknown'; if(value <= 3) return 'replace soon'; if(value <= 5) return 'monitor'; return 'good'; }
+function classifyTreadDepth(value){ if(value===null) return 'unknown'; if(value <= 3) return 'replace soon'; if(value <= 5) return 'monitor'; return 'good'; }
+function inspectionClassName(level){ return level === 'good' ? 'green' : level === 'monitor' ? 'orange' : level === 'replace soon' ? 'red' : ''; }
+function buildBrakeInspectionText(snapshot){ if(!snapshot) return {text:'No inspection snapshot saved yet', cls:''}; const front = snapshot.brakeFrontMm; const rear = snapshot.brakeRearMm; if(front===null && rear===null) return {text:'No brake pad measurements saved yet', cls:''}; const source = [front!==null ? `${front} mm front` : '', rear!==null ? `${rear} mm rear` : ''].filter(Boolean).join(' · '); const basis = front!==null && rear!==null ? Math.min(front,rear) : (front!==null ? front : rear); const level = classifyBrakeMm(basis); return {text:`${source} — ${level === 'replace soon' ? 'Replace Soon' : level === 'monitor' ? 'Monitor' : 'Good'}`, cls:inspectionClassName(level)}; }
+function buildTreadInspectionSummary(snapshot){ if(!snapshot) return {main:'No tread snapshot saved yet', rr:'—', cls:''}; const vals = [snapshot.treadLF,snapshot.treadRF,snapshot.treadLR,snapshot.treadRR].filter(v=>v!==null); if(!vals.length) return {main:'No tread snapshot saved yet', rr:'—', cls:''}; const minTread = Math.min(...vals); const level = classifyTreadDepth(minTread); const mainList = [snapshot.treadLF,snapshot.treadRF,snapshot.treadLR].filter(v=>v!==null).map(v=>`${v}/32"`); return {main: mainList.length ? `${mainList.join(' · ')} — ${level === 'replace soon' ? 'Replace Soon' : level === 'monitor' ? 'Monitor' : 'Good'}` : 'No LF/RF/LR tread saved yet', rr: snapshot.treadRR!==null ? `${snapshot.treadRR}/32" — ${level === 'replace soon' ? 'Replace Soon' : level === 'monitor' ? 'Monitor' : 'Good'}` : '—', cls:inspectionClassName(level)}; }
+function buildInspectionSnapshotLabel(snapshot){ return snapshot?.date ? `Recent Inspection (${formatDateHuman(snapshot.date)})` : 'Recent Inspection'; }
+function buildTireWatchNote(snapshot){ if(!snapshot) return 'Watch tread depth — add a tread snapshot through the service log'; const vals = [snapshot.treadLF,snapshot.treadRF,snapshot.treadLR,snapshot.treadRR].filter(v=>v!==null); if(!vals.length) return 'Watch tread depth — add a tread snapshot through the service log'; const pieces = []; if(snapshot.treadLF!==null || snapshot.treadRF!==null || snapshot.treadLR!==null) pieces.push(`LF/RF/LR ${[snapshot.treadLF,snapshot.treadRF,snapshot.treadLR].map(v=>v!==null ? `${v}/32"` : '—').join(' · ')}`); if(snapshot.treadRR!==null) pieces.push(`RR ${snapshot.treadRR}/32"`); return `Watch tread depth — ${pieces.join(' · ')} as of ${formatDateHuman(snapshot.date)}`; }
+function renderInspectionSnapshot(){ const snapshot = getLatestInspectionSnapshot(); const labelEl = document.getElementById('dashInspectionLabel'); if(labelEl) labelEl.textContent = buildInspectionSnapshotLabel(snapshot); const brake = buildBrakeInspectionText(snapshot); [document.getElementById('dashBrakeVal'), document.getElementById('specsBrakeStatus')].filter(Boolean).forEach(el=>{ el.textContent = brake.text; el.className = `row-val ${brake.cls}`.trim(); }); const tread = buildTreadInspectionSummary(snapshot); const dashMain = document.getElementById('dashTreadMainVal'); if(dashMain){ dashMain.textContent = tread.main; dashMain.className = `row-val ${tread.cls}`.trim(); } const dashRR = document.getElementById('dashTreadRRVal'); if(dashRR){ dashRR.textContent = tread.rr; dashRR.className = `row-val ${tread.cls}`.trim(); } const specsTread = document.getElementById('specsTreadStatus'); if(specsTread){ specsTread.textContent = snapshot ? `LF ${snapshot.treadLF!==null ? snapshot.treadLF+'/32"' : '—'} · RF ${snapshot.treadRF!==null ? snapshot.treadRF+'/32"' : '—'} · LR ${snapshot.treadLR!==null ? snapshot.treadLR+'/32"' : '—'} · RR ${snapshot.treadRR!==null ? snapshot.treadRR+'/32"' : '—'}` : 'No tread snapshot saved yet'; specsTread.className = `row-val ${tread.cls}`.trim(); } }
+function getWatchOnlyRuleNote(ruleId, fallback=''){ return ruleId === 'tires_new' ? buildTireWatchNote(getLatestInspectionSnapshot()) : (fallback || 'Monitor manually'); }
 const RECURRING_RULES = [
   {id:'oil', name:'Oil Change', icon:'🔧', entryTypes:['oil','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'0W-16 full synthetic · custom 5,000 mi / 6 mo'},
   {id:'tires', name:'Tire Rotation', icon:'🔄', entryTypes:['tires','oiltires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Rotate every 5,000 mi / 6 mo'},
@@ -2966,8 +3051,10 @@ function getDotClass(status){
 }
 function computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDay){
   if(rule.watchOnly){
+    const dynamicNote = getWatchOnlyRuleNote(rule.id, rule.note || 'Monitor manually');
     return {
       ...rule,
+      note: dynamicNote,
       watchOnly:true,
       status:'future',
       currentDriver:'watch',
@@ -2979,9 +3066,9 @@ function computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDa
       daysRemaining:null,
       milesRemaining:null,
       etaDaysToMileage:null,
-      remainingText:rule.note || 'Monitor manually',
+      remainingText:dynamicNote,
       triggerText:'Watch only',
-      dueLine:rule.note || 'Monitor manually',
+      dueLine:dynamicNote,
       progressPct:0,
       sortScore:Number.POSITIVE_INFINITY,
       estimatedDate:false,
@@ -3360,16 +3447,22 @@ window.onload=()=>{
   if(!localStorage.getItem('vz_log'))save(DEFAULT);
   if(!localStorage.getItem(INVENTORY_KEY))saveInventory(DEFAULT_INVENTORY);
   if(!localStorage.getItem(MASTER_PARTS_KEY))saveMasterParts(DEFAULT_MASTER_PARTS);
+  initDeveloperMode();
   ensureMasterPartModalPortal();
   ensureMasterPartsReady();
+  syncDefaultMasterPartsCatalog();
   mergeDuplicateMasterParts();
   syncMasterPartsFromInventory();
   mergeDuplicateMasterParts();
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   setInventoryFormOpen(false);
-  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
+  setEntryOptionalSection('inspection', false);
+  setEntryOptionalSection('purchasedItems', false);
+  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle, #inspectionToggle, #purchasedItemsToggle');
   setScheduleControlsExpanded(false);
   renderAll();
+  renderBackup();
+  renderInspectionSnapshot();
   resetEntryInventoryUses();
   renderReminderStrategy();
 };
@@ -3380,6 +3473,7 @@ function renderAll(){
   renderUpcoming();
   renderParts();
   renderBackup();
+  renderInspectionSnapshot();
   ensureGuideActions();
   updateGuideAccessibility();
 }
@@ -3611,7 +3705,7 @@ function renderLog(){
     const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
     const del=!e.builtin
       ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
-      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+      :(isDeveloperMode() ? `<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete factory entry" style="background:var(--text3)">✕</button>` : '');
     const items = normalizeEntryItems(e.items);
     const uses = normalizeInventoryUses(e.inventoryUses);
     const displayParts = items.length ? items.map(item=>({
@@ -4176,6 +4270,7 @@ function saveEntry(){
   const cost=document.getElementById('fCost').value;
   const shop=document.getElementById('fShop').value.trim();
   const manualItems = getFormItems();
+  const inspection = getInspectionSnapshotFromForm();
   if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
   const inv = getInventory();
   const requirementPlan = buildServiceRequirementPlan(type, inv);
@@ -4201,7 +4296,7 @@ function saveEntry(){
   const newId=Date.now();
   const d=getData();
   const inventoryUses = items.filter(item=>item.inventoryId).map(item=>({inventoryId:item.inventoryId,name:item.name,partNum:item.partNum,store:item.store,link:item.link,unitCost:item.price,qtyUsed:item.qty,countInOilAvg:item.useInOilAvg}));
-  d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:false});
+  d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,inspection,builtin:false});
   save(d);
   if(Object.keys(linkedQty).length){
     Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
@@ -4220,6 +4315,9 @@ function saveEntry(){
   document.getElementById('fType').value='';
   resetEntryInventoryUses();
   clearPhoto();
+  clearInspectionForm();
+  setEntryOptionalSection('inspection', false);
+  setEntryOptionalSection('purchasedItems', false);
   updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
   showToast('Entry saved ✓');
 }
@@ -4411,25 +4509,25 @@ function copyTemplate(){
 
 /* ─── BACKUP SUMMARY ─────────────────────────────────────── */
 function renderBackup(){
+  const bkCountEl = document.getElementById('bkCount');
+  const bkMiEl = document.getElementById('bkMi');
+  const bkTotalEl = document.getElementById('bkTotal');
+  const bkLastEl = document.getElementById('bkLast');
+  if(!bkCountEl || !bkMiEl || !bkTotalEl || !bkLastEl) return;
   const d=getData();
   const mi=getMi();
   const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
-  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
+  const sorted=normalizeEntries(d).sort(compareEntriesLatest);
   const last=sorted[0];
   const photoCount=d.filter(e=>getPhoto(e.id)).length;
   const inventoryCount = getInventory().length;
   const masterPartsCount = getMasterParts().length;
   const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
-  document.getElementById('bkCount').textContent=d.length+' entries · '+inventoryCount+' inventory item'+(inventoryCount!==1?'s':'')+' · '+masterPartsCount+' master part'+(masterPartsCount!==1?'s':'')+' · '+scheduleOverrideCount+' custom target'+(scheduleOverrideCount!==1?'s':'')+' · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
-  document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
+  bkCountEl.textContent=d.length+' entries · '+inventoryCount+' inventory item'+(inventoryCount!==1?'s':'')+' · '+masterPartsCount+' master part'+(masterPartsCount!==1?'s':'')+' · '+scheduleOverrideCount+' custom target'+(scheduleOverrideCount!==1?'s':'')+' · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
+  bkMiEl.textContent=mi.toLocaleString()+' mi';
   const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
-  document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
-  if(last){
-    const dt=new Date(last.date+'T00:00:00');
-    document.getElementById('bkLast').textContent=
-      dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
-      ' — '+parseInt(last.mi).toLocaleString()+' mi';
-  }
+  bkTotalEl.textContent='$'+tot.toFixed(2);
+  bkLastEl.textContent = last ? `${formatDateHuman(last.date)} — ${parseInt(last.mi,10).toLocaleString()} mi` : '—';
   renderReminderStrategy();
 }
 
@@ -4544,14 +4642,17 @@ This replaces all current data. Continue?`)){
       saveScheduleOverrides(scheduleOverrides);
       if(mi&&mi>0)setMi(mi);
 
+      let restoredPhotos = 0;
+      let skippedPhotos = 0;
       Object.entries(photos).forEach(([id,imgData])=>{
-        try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
+        if(savePhoto(id, imgData)) restoredPhotos += 1;
+        else skippedPhotos += 1;
       });
 
       renderAll();
       renderBackup();
       input.value='';
-      showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}!`);
+      showToast(`✓ Restored ${entries.length} entries + ${restoredPhotos} photo${restoredPhotos!==1?'s':''}${skippedPhotos ? ` · ${skippedPhotos} skipped` : ''}!`);
     }catch(err){
       showToast('❌ Could not read backup file');
       input.value='';
@@ -4960,26 +5061,33 @@ ${photoSection}
    ════════════════════════════════════════════════════════════════ */
 
 /* Storage: photos kept separate from log data to avoid size issues */
+const PHOTO_MAX_DIMENSION = 1280;
+const PHOTO_TARGET_BYTES = 340000;
 function getPhoto(id){ return localStorage.getItem('vz_photo_'+id)||null; }
-function savePhoto(id,data){ try{ localStorage.setItem('vz_photo_'+id,data); }catch(e){ showToast('Photo too large — try a smaller image'); } }
+function savePhoto(id,data){ try{ localStorage.setItem('vz_photo_'+id,data); return true; }catch(e){ showToast('Receipt photo could not be saved — storage is full or the image is still too large'); return false; } }
 function removePhoto(id){ localStorage.removeItem('vz_photo_'+id); renderLog(); showToast('Photo removed'); }
 
-/* Compress image to max 800px wide, 70% quality JPEG */
+/* Compress image with iterative size control to reduce localStorage overflow */
 function compressImage(file, cb){
   const reader = new FileReader();
   reader.onload = function(e){
     const img = new Image();
     img.onload = function(){
-      const MAX = 900;
       let w = img.width, h = img.height;
-      if(w > MAX){ h = Math.round(h * MAX/w); w = MAX; }
+      const maxSide = Math.max(w,h);
+      if(maxSide > PHOTO_MAX_DIMENSION){ const scale = PHOTO_MAX_DIMENSION / maxSide; w = Math.max(1, Math.round(w*scale)); h = Math.max(1, Math.round(h*scale)); }
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      cb(canvas.toDataURL('image/jpeg', 0.72));
+      const attempts = [0.78,0.68,0.58,0.5,0.42,0.34];
+      let best = '';
+      for(const quality of attempts){ const out = canvas.toDataURL('image/jpeg', quality); best = out; if(out.length <= PHOTO_TARGET_BYTES) break; }
+      cb(best);
     };
+    img.onerror = function(){ showToast('Could not read that image'); };
     img.src = e.target.result;
   };
+  reader.onerror = function(){ showToast('Could not open that image'); };
   reader.readAsDataURL(file);
 }
 
@@ -5027,9 +5135,10 @@ function addPhotoToEntry(id){
   input.onchange = function(){
     if(!input.files[0]) return;
     compressImage(input.files[0], function(data){
-      savePhoto(id, data);
-      renderLog();
-      showToast('Receipt photo saved ✓');
+      if(savePhoto(id, data)){
+        renderLog();
+        showToast('Receipt photo saved ✓');
+      }
     });
   };
   input.click();
@@ -5066,7 +5175,8 @@ function delEntry(id){
 }
 /* For builtin entries — asks extra confirmation */
 function delBuiltin(id){
-  if(!confirm('Delete this original service record?\n\n(This is a factory entry — only delete for testing purposes.)')) return;
+  if(!isDeveloperMode()) return;
+  if(!confirm('Delete this factory service record?\n\nDeveloper mode only — this removes one of the built-in baseline entries.')) return;
   delEntry(id);
 }
 
