@@ -544,6 +544,10 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
   border-radius:8px;padding:10px 12px;margin-top:12px;
   font-size:12px;color:var(--green2);line-height:1.6;
 }
+.guide-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.guide-btn{font-size:11px;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;background:var(--bg3);color:var(--text2);font-weight:600}
+.guide-btn.primary{border-color:rgba(34,114,212,.28);color:var(--blue2);background:rgba(34,114,212,.08)}
+.guide-btn.print{border-color:rgba(212,150,10,.28);color:var(--gold2);background:rgba(212,150,10,.08)}
 .g-gold{
   background:rgba(212,150,10,.08);border:1px solid rgba(212,150,10,.2);
   border-radius:8px;padding:10px 12px;margin-bottom:12px;
@@ -1202,7 +1206,7 @@ html.modal-open,body.modal-open{overflow:hidden}
 <div id="page-guides" class="page">
 
   <!-- OIL CHANGE -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="oil_change" data-service-type="oil">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🔧 Oil Change — ValvoMax</div>
@@ -1231,7 +1235,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 
   <!-- COOLANT -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="engine_coolant" data-service-type="coolant">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🌡️ Engine Coolant Drain & Fill</div>
@@ -1257,7 +1261,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 
   <!-- CABIN FILTER -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="cabin_filter" data-service-type="cabin">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">💨 Cabin Air Filter</div>
@@ -1278,7 +1282,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 
   <!-- ENGINE AIR FILTER -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="engine_air_filter" data-service-type="engine_filter">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🌬️ Engine Air Filter</div>
@@ -1297,8 +1301,36 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
   </div>
 
+
+  <!-- SPARK PLUGS -->
+  <div class="guide-item" data-guide-id="spark_plugs" data-service-type="plugs">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">⚡ Spark Plugs</div>
+        <div class="guide-meta">Toyota interval: 120,000 mi / 144 months · Qty 4 · OEM plug: 90919-01289</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-warn"><strong>⚠ ENGINE COLD ONLY:</strong> Do this on a fully cooled engine. The cylinder head is aluminum, so do not rush plug removal on a hot engine. Do not touch any orange hybrid high-voltage wiring or connectors.</div>
+      <div class="g-info"><strong>OEM plug:</strong> Toyota <code>90919-01289</code> (replaces <code>90919-A1001</code>) · Denso <code>FC16HR-Q8</code> equivalent · quantity <strong>4</strong>.</div>
+      <div class="g-gold"><strong>Tools needed:</strong> 10mm socket for coil bolts · 14mm thin-wall spark plug socket · 3/8" ratchet · 6" extension · small wobble extension helpful · torque wrench that can do <code>13 ft-lbs</code> / <code>17 N·m</code> · compressed air or vacuum · trim tool to remove engine cover clips if needed.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Let the engine cool fully</strong>, open the hood, and remove the plastic engine cover. Keep the key away from the engine bay so the hybrid system cannot wake up while you work.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Locate the 4 ignition coils</strong> on top of the inline-4 engine. Each coil sits directly over one spark plug.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Unplug one coil at a time</strong> so parts do not get mixed up. Press the connector lock tab, then remove the single <code>10mm</code> coil bolt.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Twist and lift the coil straight out</strong>. Check the coil boot for oil, cracking, or carbon tracking before reinstalling.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Blow out the spark plug tube</strong> with compressed air or vacuum it before removing the plug. This keeps dirt from dropping into the cylinder.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Remove the old plug</strong> using a <code>14mm thin-wall spark plug socket</code> with extension. Break it loose gently, then spin it out by hand.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Verify the new plug</strong> matches the old one: Toyota <code>90919-01289</code> / Denso <code>FC16HR-Q8</code>. Install the new plug by hand first so it threads smoothly. If it does not spin in easily, back it out and restart to avoid cross-threading.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Torque the new plug</strong> to <code>13 ft-lbs</code> (<code>17 N·m</code>). A 14mm plug socket and proper torque matter here because overtightening can damage the aluminum head.</div></div>
+      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall the ignition coil</strong>, then snug the coil bolt and reconnect the electrical plug. Repeat the same process for the remaining 3 cylinders.</div></div>
+      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Reinstall the engine cover</strong>, start the vehicle, and confirm smooth idle with no warning lights. If a misfire appears right away, shut it off and recheck the coil connector seating.</div></div>
+      <div class="g-tip">💡 <strong>Best practice:</strong> replace all 4 plugs as a set, one cylinder at a time. Log the service at completion so the app resets your next spark plug interval from the actual mileage and date.</div>
+    </div>
+  </div>
+
   <!-- HV BATTERY FILTER -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="hv_battery_filter" data-service-type="hvfilter_clean">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🔋 HV Battery Cooling Filter</div>
@@ -1317,7 +1349,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 
   <!-- TIRE ROTATION -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="tire_rotation" data-service-type="tires">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🔄 Tire Rotation</div>
@@ -1338,7 +1370,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 
   <!-- VALVOMAX INSTALL -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="valvomax_install" data-service-type="valvomax">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🔩 ValvoMax — First-Time Install</div>
@@ -1361,7 +1393,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 
   <!-- OIL RESET -->
-  <div class="guide-item">
+  <div class="guide-item" data-guide-id="oil_life_reset">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">⚙️ Oil Life Reset</div>
@@ -1567,7 +1599,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="section-label">Hybrid System</div>
   <div class="card"><div class="card-body">
     <div class="row"><span class="row-key">Timing Chain</span><span class="row-val green">No service — life of engine</span></div>
-    <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val">Iridium · NGK or Denso OEM only</span></div>
+    <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val">Toyota 90919-01289 · Denso FC16HR-Q8 · Qty 4</span></div>
     <div class="row"><span class="row-key">Plug Interval</span><span class="row-val">120,000 mi per Toyota manual</span></div>
     <div class="row"><span class="row-key">Brake Pads (02/24/26)</span><span class="row-val green">7 mm all 4 corners — Good</span></div>
     <div class="row"><span class="row-key">HV Battery Warranty</span><span class="row-val green">10 yr / 150,000 mi</span></div>
@@ -1908,7 +1940,7 @@ const PREFILLS = {
   diff:'Rear differential fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 2 qt)',
   coolant:'Engine coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
   inv_coolant:'Inverter coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
-  plugs:'Spark plugs replaced — iridium OEM (NGK or Denso only)',
+  plugs:'Spark plugs replaced — Toyota 90919-01289 / Denso FC16HR-Q8 (qty 4)',
   hvfilter_inspect:'HV battery cooling filter — visual inspection',
   hvfilter_clean:'HV battery cooling filter — removed and cleaned',
   valvomax:'ValvoMax M12-1.25 drain valve installed (permanent) — first oil change with new valve',
@@ -1924,6 +1956,7 @@ const DEFAULT_MASTER_PARTS = [
   {id:'mp_oil_filter_oem',name:'OEM Oil Filter',serviceType:'oil',category:'fluids_filters',partNum:'90915-YZZN1',unitCost:6.57,statusLabel:'Reference part',note:'Replace with every oil change.',countInOilAvg:true,sources:[{store:'Toyota Parts',url:'https://parts.toyota.com/',label:'parts.toyota.com',unitPrice:6.57,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_cabin_filter_apremium',name:'Cabin Air Filter (Activated Carbon)',serviceType:'cabin',category:'fluids_filters',partNum:'APCA4605 / 1004KW2G',unitCost:11.18,statusLabel:'Confirmed fit',note:'A-Premium activated carbon cabin filter.',countInOilAvg:false,sources:[{store:'A-Premium',url:'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid',label:'a-premium.com — confirmed fit',unitPrice:11.18,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_engine_filter_oem',name:'Engine Air Filter',serviceType:'engine_filter',category:'fluids_filters',partNum:'17801-YZZ16 (105A ELEMENT)',unitCost:15.59,statusLabel:'Reference part',note:'Get purchase link next time you buy it.',countInOilAvg:false,sources:[]},
+  {id:'mp_spark_plug_oem',name:'Spark Plug — Toyota OEM',serviceType:'plugs',category:'fluids_filters',partNum:'90919-01289 / Denso FC16HR-Q8',unitCost:15.07,statusLabel:'Reference part',note:'Iridium OEM plug. Replace all 4 together at 120,000 miles / 144 months.',countInOilAvg:false,sources:[{store:'Toyota Parts',url:'https://toyotaparts.ourismantoyotaofrichmond.com/oem-parts/toyota-spark-plug-9091901289',label:'Toyota / Richmond Toyota Parts',unitPrice:15.07,addedAt:'2026-04-14T00:00:00.000Z'}]},
   {id:'mp_atf_ws',name:'ATF WS — Transmission & Rear Diff',serviceType:'trans',category:'fluids_filters',partNum:'00289-ATFWS',unitCost:0,statusLabel:'Dealer',note:'Same fluid for transmission and rear differential.',countInOilAvg:false,sources:[]},
   {id:'mp_sllc',name:'Toyota Super Long Life Coolant',serviceType:'coolant',category:'fluids_filters',partNum:'00272-SLLC2',unitCost:0,statusLabel:'Reference part',note:'Pink, pre-mixed 50/50.',countInOilAvg:false,sources:[]},
   {id:'mp_valvomax_valve',name:'ValvoMax Drain Valve M12-1.25',serviceType:'valvomax',category:'valvomax',partNum:'M12-1.25 Quick Twist',unitCost:54.99,statusLabel:'Reference part',note:'VITON O-ring seal.',countInOilAvg:false,sources:[{store:'ValvoMax',url:'https://www.valvomax.com/collections/all',label:'valvomax.com — M12-1.25',unitPrice:54.99,addedAt:'2026-03-01T00:00:00.000Z'}]},
@@ -1932,7 +1965,8 @@ const DEFAULT_MASTER_PARTS = [
   {id:'mp_tool_smartjerry',name:'Smart Jerry 64mm Oil Filter Wrench',serviceType:'oil',category:'tools',partNum:'B0DPMRNBKH',unitCost:0,statusLabel:'Purchased',note:'14-flute steel — use HEX side only to loosen.',countInOilAvg:false,sources:[{store:'Amazon',url:'https://www.amazon.com/SMART-JERRY-Compatible-Toyotas-Cartridge/dp/B0DPMRNBKH',label:'amazon.com — B0DPMRNBKH',unitPrice:0,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_tool_torque',name:'VEVOR Torque Wrench 1/2" Drive',serviceType:'other',category:'tools',partNum:'10–150 ft-lbs',unitCost:0,statusLabel:'Purchased',note:'One-time tool.',countInOilAvg:false,sources:[]},
   {id:'mp_tool_ramps',name:'Car Ramps — VEVOR High Profile',serviceType:'other',category:'tools',partNum:'13,000 lb GVW',unitCost:0,statusLabel:'Purchased',note:'One-time tool.',countInOilAvg:false,sources:[]},
-  {id:'mp_tool_lisle24680',name:'Lisle 24680 Spill-Free Funnel',serviceType:'coolant',category:'tools',partNum:'Lisle 24680',unitCost:0,statusLabel:'Recommended',note:'Useful for air-free coolant fills.',countInOilAvg:false,sources:[]}
+  {id:'mp_tool_lisle24680',name:'Lisle 24680 Spill-Free Funnel',serviceType:'coolant',category:'tools',partNum:'Lisle 24680',unitCost:0,statusLabel:'Recommended',note:'Useful for air-free coolant fills.',countInOilAvg:false,sources:[]},
+  {id:'mp_tool_spark_socket',name:'14mm Thin-Wall Spark Plug Socket',serviceType:'plugs',category:'tools',partNum:'14mm · 3/8" drive',unitCost:0,statusLabel:'Recommended',note:'Needed for Toyota 90919-01289 / Denso FC16HR-Q8 plug wells.',countInOilAvg:false,sources:[]}
 ];
 const MASTER_CATEGORY_LABELS = {fluids_filters:'Fluids & Filters',valvomax:'ValvoMax',tools:'Tools',consumables:'Consumables',other:'Other'};
 function normalizeMasterSourceFingerprint(source){
@@ -2492,7 +2526,7 @@ const RECURRING_RULES = [
   {id:'trans', name:'Transmission Fluid D&F', icon:'⚙️', entryTypes:['trans'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
   {id:'diff', name:'Rear Differential D&F', icon:'🔩', entryTypes:['diff'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
   {id:'coolant', name:'Engine Coolant Drain & Fill', icon:'🌡️', entryTypes:['coolant'], milesInterval:100000, monthsInterval:120, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota SLLC · 100k mi / 120 mo first interval', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
-  {id:'plugs', name:'Spark Plugs', icon:'⚡', entryTypes:['plugs'], milesInterval:120000, monthsInterval:144, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Iridium OEM only', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
+  {id:'plugs', name:'Spark Plugs', icon:'⚡', entryTypes:['plugs'], milesInterval:120000, monthsInterval:144, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota 90919-01289 · Denso FC16HR-Q8 · qty 4', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
   {id:'inv_coolant', name:'Inverter Coolant Drain & Fill', icon:'🌡️', entryTypes:['inv_coolant'], milesInterval:150000, monthsInterval:180, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota SLLC · 150k mi / 180 mo first interval', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
   {id:'tires_new', name:'New Tires + Alignment', icon:'🛞', watchOnly:true, note:'Watch tread depth — 6/32" to 7/32" as of 02/24/26'}
 ];
@@ -2865,6 +2899,7 @@ function renderAll(){
   renderUpcoming();
   renderParts();
   renderBackup();
+  ensureGuideActions();
   updateGuideAccessibility();
 }
 
@@ -3533,6 +3568,81 @@ function go(id){
 }
 
 /* ─── GUIDES ─────────────────────────────────────────────── */
+function startServiceFromGuide(serviceType='other'){
+  const typeEl = document.getElementById('fType');
+  if(typeEl){
+    typeEl.value = serviceType;
+    prefill();
+    renderEntryInventoryUI();
+  }
+  go('add');
+  setTimeout(()=>document.getElementById('fDate')?.focus(), 140);
+}
+function ensureGuideActions(){
+  document.querySelectorAll('.guide-item').forEach(item=>{
+    const body = item.querySelector('.guide-body');
+    if(!body || body.querySelector('.guide-actions')) return;
+    const guideId = item.dataset.guideId || '';
+    const serviceType = item.dataset.serviceType || '';
+    const actions = document.createElement('div');
+    actions.className = 'guide-actions';
+    actions.innerHTML = `${serviceType ? `<button type="button" class="guide-btn primary" onclick="startServiceFromGuide('${serviceType}')">＋ Add to Service Log</button>` : ''}<button type="button" class="guide-btn print" onclick="printGuide('${guideId}')">🖨 Print Guide</button>`;
+    body.appendChild(actions);
+  });
+}
+function buildGuidePrintHtml(item){
+  const title = item.querySelector('.guide-title')?.textContent?.trim() || 'Guide';
+  const meta = item.querySelector('.guide-meta')?.textContent?.trim() || '';
+  const cloned = item.querySelector('.guide-body')?.cloneNode(true);
+  if(!cloned) return '';
+  cloned.querySelectorAll('.guide-actions').forEach(el=>el.remove());
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escapeHtml(title)} — Printable Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',Arial,sans-serif;background:#fff;color:#1a1d23;padding:28px;line-height:1.65;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .header{border-bottom:2px solid #111827;padding-bottom:14px;margin-bottom:18px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280}
+  .title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1.5px;color:#111827;margin-top:4px}
+  .meta{font-size:12px;color:#4b5563;margin-top:4px}
+  .guide-body{display:block!important;padding:0;border:none}
+  .g-warn,.g-info,.g-tip,.g-gold{border-radius:10px;padding:12px 14px;margin:0 0 12px 0;font-size:12px;line-height:1.7;border:1px solid transparent}
+  .g-warn{background:#fff1f2;border-color:#fecdd3;color:#b91c1c}
+  .g-info{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+  .g-gold{background:#fffbeb;border-color:#fcd34d;color:#b45309}
+  .g-tip{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+  .step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;page-break-inside:avoid}
+  .step-n{width:24px;height:24px;border-radius:50%;background:#eb0a1e;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .step-t{font-size:13px;color:#1f2937}
+  .step-t strong{color:#111827}
+  .step-t code{font-family:'JetBrains Mono',monospace;font-size:11px;background:#f3f4f6;padding:1px 5px;border-radius:4px;color:#c2410c}
+  .print-btn{position:fixed;right:24px;bottom:24px;background:#eb0a1e;color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;box-shadow:0 8px 24px rgba(235,10,30,.25);cursor:pointer}
+  @media print{.print-btn{display:none}body{padding:20px}}
+</style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save PDF</button>
+  <div class="header">
+    <div class="eyebrow">Venza Garage · Printable Service Guide</div>
+    <div class="title">${escapeHtml(title)}</div>
+    <div class="meta">${escapeHtml(meta)}</div>
+  </div>
+  <div class="guide-body">${cloned.innerHTML}</div>
+</body>
+</html>`;
+}
+function printGuide(guideId=''){
+  const item = guideId ? document.querySelector(`.guide-item[data-guide-id="${guideId}"]`) : null;
+  if(!item){ showToast('Guide not found'); return; }
+  const html = buildGuidePrintHtml(item);
+  if(!html){ showToast('Could not build printable guide'); return; }
+  openHtmlInNewTab(html, `venza-guide-${guideId || 'print'}.html`);
+}
 function toggleGuide(head){
   head.closest('.guide-item').classList.toggle('open');
   updateGuideAccessibility();
