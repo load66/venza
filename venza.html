@@ -1412,7 +1412,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="guide-body">
       <div class="g-warn"><strong>⚠ ENGINE COLD ONLY:</strong> Do this on a fully cooled engine. The cylinder head is aluminum, so do not rush plug removal on a hot engine. Do not touch any orange hybrid high-voltage wiring or connectors.</div>
       <div class="g-info"><strong>OEM plug:</strong> Toyota <code>90919-01289</code> (replaces <code>90919-A1001</code>) · Denso <code>FC16HR-Q8</code> equivalent · quantity <strong>4</strong>.</div>
-      <div class="g-gold"><strong>Tools needed:</strong> 10mm socket for coil bolts · 14mm thin-wall spark plug socket · 3/8" ratchet · 6" extension · small wobble extension helpful · torque wrench that can do <code>13 ft-lbs</code> / <code>17 N·m</code> · compressed air or vacuum · trim tool to remove engine cover clips if needed.</div>
+      <div class="g-gold" id="sparkToolsNeeded"><strong>Tools needed:</strong> 10mm socket for coil bolts · 14mm thin-wall spark plug socket · 3/8" ratchet · 6" extension · small wobble extension helpful · torque wrench that can do <code>18 ft-lbs</code> / <code>25 N·m</code> · compressed air or vacuum · trim tool to remove engine cover clips if needed.</div>
       <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Let the engine cool fully</strong>, open the hood, and remove the plastic engine cover. Keep the key away from the engine bay so the hybrid system cannot wake up while you work.</div></div>
       <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Locate the 4 ignition coils</strong> on top of the inline-4 engine. Each coil sits directly over one spark plug.</div></div>
       <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Unplug one coil at a time</strong> so parts do not get mixed up. Press the connector lock tab, then remove the single <code>10mm</code> coil bolt.</div></div>
@@ -1420,7 +1420,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Blow out the spark plug tube</strong> with compressed air or vacuum it before removing the plug. This keeps dirt from dropping into the cylinder.</div></div>
       <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Remove the old plug</strong> using a <code>14mm thin-wall spark plug socket</code> with extension. Break it loose gently, then spin it out by hand.</div></div>
       <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Verify the new plug</strong> matches the old one: Toyota <code>90919-01289</code> / Denso <code>FC16HR-Q8</code>. Install the new plug by hand first so it threads smoothly. If it does not spin in easily, back it out and restart to avoid cross-threading.</div></div>
-      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Torque the new plug</strong> to <code>13 ft-lbs</code> (<code>17 N·m</code>). A 14mm plug socket and proper torque matter here because overtightening can damage the aluminum head.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t" id="sparkTorqueStep"><strong>Torque the new plug</strong> to <code>18 ft-lbs</code> (<code>25 N·m</code>). A 14mm plug socket and proper torque matter here because overtightening can damage the aluminum head.</div></div>
       <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall the ignition coil</strong>, then snug the coil bolt and reconnect the electrical plug. Repeat the same process for the remaining 3 cylinders.</div></div>
       <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Reinstall the engine cover</strong>, start the vehicle, and confirm smooth idle with no warning lights. If a misfire appears right away, shut it off and recheck the coil connector seating.</div></div>
       <div class="g-tip">💡 <strong>Best practice:</strong> replace all 4 plugs as a set, one cylinder at a time. Log the service at completion so the app resets your next spark plug interval from the actual mileage and date.</div>
@@ -1438,7 +1438,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
     <div class="guide-body">
       <div class="g-gold"><strong>Toyota Manual says:</strong> "Visually check the HV battery cooling intake filter for dirt or dust every 5,000 miles and clean if necessary. Clean every 20,000 miles." This is critical for hybrid battery longevity.</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Locate the HV battery cooling intake</strong> — it is typically behind the rear seat area or in the cargo compartment area. Refer to your owner's manual for exact location on your specific Venza.</div></div>
+      <div class="step"><div class="step-n">1</div><div class="step-t" id="hvFilterLocationStep"><strong>Locate the HV battery cooling intake</strong> — locate it using your owner's manual before trim removal. Interior layout references can vary by exact Venza configuration.</div></div>
       <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Every 5,000 mi — Inspect:</strong> Visually check for visible dust buildup, lint, or debris. If lightly dusty, a gentle tap or light vacuum is sufficient.</div></div>
       <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Every 20,000 mi — Clean:</strong> Remove the filter cover, take out the filter element, and clean with low-pressure air or a soft brush. Do not use water or wet cleaning.</div></div>
       <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Reinstall filter and cover</strong>. Ensure no gap that could allow unfiltered air into the battery cooling system.</div></div>
@@ -1477,13 +1477,13 @@ html.modal-open,body.modal-open{overflow:hidden}
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-warn"><strong>⚠ CRITICAL:</strong> ValvoMax official torque spec for M12-1.25 is NOT confirmed from manufacturer documentation. Third-party reference: EZ Oil Drain Valve lists 20 ft-lbs for M12-1.25. Verify directly at valvomax.com before proceeding.</div>
+      <div class="g-warn" id="valvomaxWarnText"><strong>⚠ CRITICAL:</strong> ValvoMax official torque spec for M12-1.25 is NOT confirmed from manufacturer documentation. Third-party reference: EZ Oil Drain Valve lists 20 ft-lbs for M12-1.25. Verify directly at valvomax.com before proceeding.</div>
       <div class="g-info"><strong>What you need:</strong> ValvoMax M12-1.25 · 24mm socket · 1/2" drive torque wrench · Thread-clean rag · Fresh crush washer (included)</div>
       <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Do this during your first oil change</strong> — do steps 1–6 of oil change guide first (drain old oil through OEM plug before installing ValvoMax).</div></div>
       <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Remove OEM drain plug</strong> — <code>14mm socket</code>, <code>30 ft-lbs</code>. Let oil drain completely. Save crush washer only if ValvoMax can't be installed today.</div></div>
       <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Clean drain hole threads</strong> — wipe the oil pan's drain port threads with a clean dry rag. Remove any old gasket material or grit that could prevent O-ring from seating.</div></div>
       <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Install crush washer</strong> on ValvoMax — this is a one-time use washer (not needed on future oil changes).</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Thread ValvoMax by hand</strong> clockwise until snug. Then torque to manufacturer-specified value (<strong>verify at valvomax.com first</strong>) using <code>24mm socket</code>. Do NOT overtorque — can distort O-ring seat and cause weep.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t" id="valvomaxTorqueStep"><strong>Thread ValvoMax by hand</strong> clockwise until snug. Then apply the saved torque guidance using your <code>24mm socket</code>. Do NOT overtorque — can distort O-ring seat and cause weep.</div></div>
       <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Continue oil change</strong> — add oil, start engine, run 2 minutes, shut off. Do a visual inspection under the car — drain valve area should be completely dry.</div></div>
       <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Valve is now permanent</strong> — never remove it. All future oil drains: attach drain bag tube → oil flows. Unscrew tube → oil stops instantly.</div></div>
       <div class="g-tip">💡 No crush washer needed on any future oil change — the VITON O-ring triple seal is the permanent seal. This saves ~$0.50 per change and one less step.</div>
@@ -1609,7 +1609,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
     <div class="wc-body">
       <div class="wc-row"><span class="wc-row-k">Duration</span><span class="wc-row-v">60 Months — Unlimited Miles</span></div>
-      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v">Date-dependent — verify your in-service date</span></div>
+      <div class="wc-row"><span class="wc-row-k">Status</span><span class="wc-row-v" id="corrosionStatusNote">Date-dependent — verify your in-service date</span></div>
       <div class="wc-row"><span class="wc-row-k">How to Check</span><span class="wc-row-v">If in-service before ~Apr 2021 → expired. After Apr 2021 → still active.</span></div>
       <div class="wc-row"><span class="wc-row-k">Confirm At</span><span class="wc-row-v">toyota.com/owners or call (800) 331-4331</span></div>
     </div>
@@ -1668,11 +1668,40 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="card"><div class="card-body">
     <div class="row"><span class="row-key">Oil Filter 90915-YZZN1</span><span class="row-val orange">13 ft-lbs (18 Nm)</span></div>
     <div class="row"><span class="row-key">OEM Drain Plug (14mm)</span><span class="row-val orange">30 ft-lbs</span></div>
-    <div class="row"><span class="row-key">ValvoMax M12-1.25</span><span class="row-val red">⚠ Verify at valvomax.com</span></div>
+    <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val orange" id="specsSparkPlugTorque">18 ft-lbs (25 N·m)</span></div>
+    <div class="row"><span class="row-key">ValvoMax M12-1.25</span><span class="row-val red" id="specsValvomaxTorque">⚠ Verify at valvomax.com before installation</span></div>
     <div class="row"><span class="row-key">Lug Nuts</span><span class="row-val orange">80 ft-lbs</span></div>
     <div class="row"><span class="row-key">Undercover Screws</span><span class="row-val">10mm · Hand-snug only</span></div>
     <div class="row"><span class="row-key">Filter Wrench Note</span><span class="row-val red">HEX side ONLY to loosen</span></div>
   </div></div>
+
+  <div class="section-label">Verification Controls</div>
+  <div class="alert gold">
+    <div class="alert-icon">⚠️</div>
+    <div><strong>User-correctable items.</strong> These are the fields that were flagged as verified later, user-specific, or correction-prone. Edit them only after checking a trusted source. Every save and reset asks for confirmation.</div>
+  </div>
+  <div class="overlay" id="verificationModal" onclick="if(event.target===this)closeVerificationEditor()">
+    <div class="modal">
+      <div class="modal-grip"></div>
+      <div class="modal-title" id="verificationModalTitle">Edit Verification Item</div>
+      <div class="modal-scroll">
+        <input type="hidden" id="verificationEditKey">
+        <div class="alert red" id="verificationModalWarning" style="margin-bottom:14px"></div>
+        <div class="fl"><label>Current / New Value</label><textarea class="ft" id="verificationEditValue" placeholder="Enter corrected value..."></textarea></div>
+      </div>
+      <div class="btn-row" style="margin-top:12px;flex-shrink:0">
+        <button class="btn-ghost" onclick="closeVerificationEditor()">Cancel</button>
+        <button class="btn-primary" style="background:var(--gold)" onclick="saveVerificationItem()">Save Verified Change</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Editable Verification Items</div>
+      <div id="verificationSummary" style="font-size:11px;color:var(--text3)">0 edited</div>
+    </div>
+    <div class="card-body" id="verificationOverridesList"></div>
+  </div>
 
   <div class="section-label">Tires & Wheels</div>
   <div class="card"><div class="card-body">
@@ -2051,6 +2080,7 @@ const MASTER_PARTS_KEY = 'vz_master_parts';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
 const SERVICE_REQUIREMENTS_KEY = 'vz_service_part_requirements';
+const VERIFICATION_OVERRIDES_KEY = 'vz_verification_overrides';
 const DEFAULT_MASTER_PARTS = [
   {id:'mp_oil_mobil1_0w16',name:'Mobil 1 0W-16 Full Synthetic 5 qt',serviceType:'oil',category:'fluids_filters',partNum:'B07Y5MG3MX',unitCost:27.97,statusLabel:'Reference part',note:'Need 4.8 qt — leftover is good for top-off.',countInOilAvg:true,sources:[{store:'Walmart',url:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534',label:'walmart.com — verified 03/2026',unitPrice:27.97,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_oil_filter_oem',name:'OEM Oil Filter',serviceType:'oil',category:'fluids_filters',partNum:'90915-YZZN1',unitCost:6.57,statusLabel:'Reference part',note:'Replace with every oil change.',countInOilAvg:true,sources:[{store:'Toyota Parts',url:'https://parts.toyota.com/',label:'parts.toyota.com',unitPrice:6.57,addedAt:'2026-03-01T00:00:00.000Z'}]},
@@ -3194,6 +3224,129 @@ document.addEventListener('click', (e)=>{
 });
 
 /* ─── INIT ──────────────────────────────────────────────── */
+const VERIFICATION_ITEMS = {
+  spark_plug_torque:{label:'Spark plug torque',scope:'Guides + Specs',defaultValue:'18 ft-lbs (25 N·m)',warning:'Use confirmed A25A-FXS service data only. Incorrect spark plug torque matters on an aluminum cylinder head.'},
+  valvomax_torque_note:{label:'ValvoMax torque guidance',scope:'Guides + Specs',defaultValue:'⚠ Verify at valvomax.com before installation',warning:'Only save a new ValvoMax torque value after confirming it from ValvoMax documentation or direct manufacturer support.'},
+  hv_filter_location_note:{label:'HV battery cooling intake location note',scope:'Guide',defaultValue:'Locate the HV battery cooling intake using your owner’s manual before trim removal. Interior layout references can vary by exact Venza configuration.',warning:'Only change this after confirming the intake location on your exact Venza interior layout.'},
+  corrosion_warranty_note:{label:'Corrosion warranty status note',scope:'Warranty',defaultValue:'Date-dependent — verify your in-service date',warning:'This is user-specific. Only replace this note after confirming your true in-service date through Toyota records.'}
+};
+function getVerificationOverrides(){
+  try{
+    const raw = localStorage.getItem(VERIFICATION_OVERRIDES_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  }catch(err){ return {}; }
+}
+function saveVerificationOverrides(overrides){
+  const clean = {};
+  Object.entries(overrides||{}).forEach(([key,value])=>{
+    const next = String(value||'').trim();
+    if(next) clean[key] = next;
+  });
+  if(Object.keys(clean).length) localStorage.setItem(VERIFICATION_OVERRIDES_KEY, JSON.stringify(clean));
+  else localStorage.removeItem(VERIFICATION_OVERRIDES_KEY);
+}
+function getVerificationValue(key){
+  const item = VERIFICATION_ITEMS[key];
+  const overrides = getVerificationOverrides();
+  return String(overrides[key] || item?.defaultValue || '').trim();
+}
+function isVerificationEdited(key){
+  const item = VERIFICATION_ITEMS[key];
+  if(!item) return false;
+  return getVerificationValue(key) !== String(item.defaultValue||'').trim();
+}
+function openVerificationEditor(key){
+  const item = VERIFICATION_ITEMS[key];
+  if(!item) return;
+  const modal = document.getElementById('verificationModal');
+  const title = document.getElementById('verificationModalTitle');
+  const warn = document.getElementById('verificationModalWarning');
+  const value = document.getElementById('verificationEditValue');
+  document.getElementById('verificationEditKey').value = key;
+  if(title) title.textContent = `Edit ${item.label}`;
+  if(warn) warn.innerHTML = `<div class="alert-icon">⚠️</div><div><strong>Confirm before saving.</strong><br>${escapeHtml(item.warning)}</div>`;
+  if(value) value.value = getVerificationValue(key);
+  if(modal) modal.classList.add('open');
+}
+function closeVerificationEditor(){
+  const modal = document.getElementById('verificationModal');
+  if(modal) modal.classList.remove('open');
+  const keyEl = document.getElementById('verificationEditKey');
+  const valEl = document.getElementById('verificationEditValue');
+  if(keyEl) keyEl.value='';
+  if(valEl) valEl.value='';
+}
+function saveVerificationItem(){
+  const key = document.getElementById('verificationEditKey')?.value || '';
+  const item = VERIFICATION_ITEMS[key];
+  const value = document.getElementById('verificationEditValue')?.value.trim() || '';
+  if(!item || !value){ showToast('Value is required'); return; }
+  if(!confirm(`${item.warning}
+
+Save this new value?
+
+${value}`)) return;
+  const overrides = getVerificationOverrides();
+  overrides[key] = value;
+  saveVerificationOverrides(overrides);
+  closeVerificationEditor();
+  renderVerificationOverridesList();
+  applyVerificationOverrides();
+  showToast('Verification item updated ✓');
+}
+function resetVerificationItem(key){
+  const item = VERIFICATION_ITEMS[key];
+  if(!item) return;
+  if(!confirm(`Reset "${item.label}" back to the app default?
+
+${item.defaultValue}`)) return;
+  const overrides = getVerificationOverrides();
+  delete overrides[key];
+  saveVerificationOverrides(overrides);
+  renderVerificationOverridesList();
+  applyVerificationOverrides();
+  showToast('Verification item reset ✓');
+}
+function renderVerificationOverridesList(){
+  const body = document.getElementById('verificationOverridesList');
+  const summary = document.getElementById('verificationSummary');
+  if(!body || !summary) return;
+  const keys = Object.keys(VERIFICATION_ITEMS);
+  const editedCount = keys.filter(isVerificationEdited).length;
+  summary.textContent = `${editedCount} edited · ${keys.length} tracked`;
+  body.innerHTML = keys.map(key=>{
+    const item = VERIFICATION_ITEMS[key];
+    const current = getVerificationValue(key);
+    const edited = isVerificationEdited(key);
+    return `<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${escapeHtml(item.label)}</div><div class="inv-meta">${escapeHtml(item.scope)} · ${edited ? 'user-edited' : 'app default'}<br>${escapeHtml(current)}<br>⚠ ${escapeHtml(item.warning)}</div></div><div class="inv-qty ${edited ? 'low' : ''}">${edited ? 'edited' : 'default'}</div></div><div class="inv-actions"><button type="button" class="inv-btn" onclick="openVerificationEditor('${escapeHtmlAttr(key)}')">Edit</button><button type="button" class="inv-btn danger" onclick="resetVerificationItem('${escapeHtmlAttr(key)}')">Reset</button></div></div>`;
+  }).join('');
+}
+function applyVerificationOverrides(){
+  const sparkTorque = getVerificationValue('spark_plug_torque');
+  const sparkTools = document.getElementById('sparkToolsNeeded');
+  const sparkStep = document.getElementById('sparkTorqueStep');
+  const sparkSpecs = document.getElementById('specsSparkPlugTorque');
+  if(sparkTools) sparkTools.innerHTML = `<strong>Tools needed:</strong> 10mm socket for coil bolts · 14mm thin-wall spark plug socket · 3/8" ratchet · 6" extension · small wobble extension helpful · torque wrench that can do <code>${escapeHtml(sparkTorque)}</code> · compressed air or vacuum · trim tool to remove engine cover clips if needed.`;
+  if(sparkStep) sparkStep.innerHTML = `<strong>Torque the new plug</strong> to <code>${escapeHtml(sparkTorque)}</code>. A 14mm plug socket and proper torque matter here because overtightening can damage the aluminum head.`;
+  if(sparkSpecs) sparkSpecs.textContent = sparkTorque;
+
+  const valvomaxNote = getVerificationValue('valvomax_torque_note');
+  const valvomaxWarn = document.getElementById('valvomaxWarnText');
+  const valvomaxStep = document.getElementById('valvomaxTorqueStep');
+  const valvomaxSpecs = document.getElementById('specsValvomaxTorque');
+  if(valvomaxWarn) valvomaxWarn.innerHTML = `<strong>⚠ CRITICAL:</strong> ${escapeHtml(valvomaxNote)}`;
+  if(valvomaxStep) valvomaxStep.innerHTML = `<strong>Thread ValvoMax by hand</strong> clockwise until snug. Then apply this saved torque guidance with your <code>24mm socket</code>: <strong>${escapeHtml(valvomaxNote)}</strong>. Do NOT overtorque — can distort the seal and cause weep.`;
+  if(valvomaxSpecs) valvomaxSpecs.textContent = valvomaxNote;
+
+  const hvLocation = getVerificationValue('hv_filter_location_note');
+  const hvStep = document.getElementById('hvFilterLocationStep');
+  if(hvStep) hvStep.innerHTML = `<strong>Locate the HV battery cooling intake</strong> — ${escapeHtml(hvLocation)}`;
+
+  const corrosionNote = getVerificationValue('corrosion_warranty_note');
+  const corrosionStatus = document.getElementById('corrosionStatusNote');
+  if(corrosionStatus) corrosionStatus.textContent = corrosionNote;
+}
 window.onload=()=>{
   if(!localStorage.getItem('vz_log'))save(DEFAULT);
   if(!localStorage.getItem(INVENTORY_KEY))saveInventory(DEFAULT_INVENTORY);
