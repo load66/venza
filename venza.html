@@ -447,6 +447,12 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .sched-flag.earlier{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
 .sched-flag.later{background:rgba(217,122,0,.12);color:var(--orange2);border:1px solid rgba(217,122,0,.3)}
 .sched-inline-note{font-size:11px;color:var(--text3);line-height:1.6;margin-top:4px}
+.sched-toggle-head{cursor:pointer;user-select:none}
+.sched-toggle-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sched-toggle-chevron{color:var(--text3);font-size:18px;line-height:1;transition:transform .25s cubic-bezier(.25,.46,.45,.94)}
+.sched-toggle-head[aria-expanded="true"] .sched-toggle-chevron{transform:rotate(180deg)}
+#scheduleConfigList{display:none}
+#scheduleConfigList.expanded{display:block}
 
 /* ─── PARTS ────────────────────────────────────────────────── */
 .part-item{
@@ -1006,9 +1012,12 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div><strong>Your target drives the app.</strong> Toyota guidance stays visible below as the baseline, but your saved target here updates the dashboard, schedule engine, smart mileage preview, print report, and calendar exports.</div>
   </div>
   <div class="card">
-    <div class="card-head">
+    <div class="card-head sched-toggle-head" id="scheduleControlsToggle" role="button" tabindex="0" aria-expanded="false" onclick="toggleScheduleControls()">
       <div class="card-title">Schedule Controls</div>
-      <div id="scheduleOverrideSummary" style="font-size:11px;color:var(--text3)">0 custom targets</div>
+      <div class="sched-toggle-right">
+        <div id="scheduleOverrideSummary" style="font-size:11px;color:var(--text3)">0 custom targets</div>
+        <div class="sched-toggle-chevron" id="scheduleControlsChevron">▾</div>
+      </div>
     </div>
     <div class="card-body" id="scheduleConfigList"></div>
   </div>
@@ -3358,7 +3367,8 @@ window.onload=()=>{
   mergeDuplicateMasterParts();
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   setInventoryFormOpen(false);
-  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick]');
+  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
+  setScheduleControlsExpanded(false);
   renderAll();
   resetEntryInventoryUses();
   renderReminderStrategy();
@@ -3421,6 +3431,20 @@ function renderDash(){
     document.getElementById('dProgress').style.width = '0%';
   }
 }
+let scheduleControlsExpanded = false;
+function setScheduleControlsExpanded(expanded=false){
+  scheduleControlsExpanded = !!expanded;
+  const toggleEl = document.getElementById('scheduleControlsToggle');
+  const listEl = document.getElementById('scheduleConfigList');
+  if(toggleEl) toggleEl.setAttribute('aria-expanded', scheduleControlsExpanded ? 'true' : 'false');
+  if(listEl){
+    listEl.classList.toggle('expanded', scheduleControlsExpanded);
+    listEl.style.display = scheduleControlsExpanded ? 'block' : 'none';
+  }
+}
+function toggleScheduleControls(force){
+  setScheduleControlsExpanded(typeof force === 'boolean' ? force : !scheduleControlsExpanded);
+}
 function getScheduleFlag(rule){
   if(!rule.customActive) return {text:'Toyota Guide', cls:'default'};
   if(rule.earlierThanGuideline && !rule.laterThanGuideline) return {text:'Earlier Than Toyota', cls:'earlier'};
@@ -3480,29 +3504,52 @@ function renderScheduleSettings(){
       </div>
     </div>`;
   }).join('');
+  setScheduleControlsExpanded(scheduleControlsExpanded);
 }
 function saveScheduleRule(ruleId){
   const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
   if(!baseRule || baseRule.watchOnly) return;
   const milesEl = document.getElementById(`schedMiles_${ruleId}`);
   const monthsEl = document.getElementById(`schedMonths_${ruleId}`);
-  const milesInterval = parsePositiveInt(milesEl?.value) || parsePositiveInt(baseRule.milesInterval);
-  const monthsInterval = parsePositiveInt(monthsEl?.value) || parsePositiveInt(baseRule.monthsInterval);
+  const baseMiles = parsePositiveInt(baseRule.milesInterval);
+  const baseMonths = parsePositiveInt(baseRule.monthsInterval);
+  const milesInterval = parsePositiveInt(milesEl?.value) || baseMiles;
+  const monthsInterval = parsePositiveInt(monthsEl?.value) || baseMonths;
+  const nextText = formatIntervalSummary(milesInterval, monthsInterval);
+  const guideText = formatIntervalSummary(baseMiles, baseMonths);
+  const changingToToyota = milesInterval === baseMiles && monthsInterval === baseMonths;
+  const confirmText = changingToToyota
+    ? `Follow Toyota guide again for ${baseRule.name}?
+
+Toyota guide: ${guideText}
+
+This removes your custom target.`
+    : `Save target for ${baseRule.name}?
+
+New target: ${nextText}
+Toyota guide: ${guideText}`;
+  if(!confirm(confirmText)) return;
   const overrides = getScheduleOverrides();
   const next = {};
-  if(milesInterval && milesInterval !== parsePositiveInt(baseRule.milesInterval)) next.milesInterval = milesInterval;
-  if(monthsInterval && monthsInterval !== parsePositiveInt(baseRule.monthsInterval)) next.monthsInterval = monthsInterval;
+  if(milesInterval && milesInterval !== baseMiles) next.milesInterval = milesInterval;
+  if(monthsInterval && monthsInterval !== baseMonths) next.monthsInterval = monthsInterval;
   if(Object.keys(next).length) overrides[ruleId] = next; else delete overrides[ruleId];
   saveScheduleOverrides(overrides);
   renderAll();
   const resolved = getResolvedRecurringRules().find(rule=>rule.id===ruleId);
-  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : formatIntervalSummary(milesInterval, monthsInterval)} ✓`);
+  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : nextText} ✓`);
 }
 function resetScheduleRule(ruleId){
   const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
   if(!baseRule || baseRule.watchOnly) return;
   const overrides = getScheduleOverrides();
   if(!overrides[ruleId]){ showToast(`${baseRule.name} already matches Toyota guide`); return; }
+  const guideText = formatIntervalSummary(baseRule.milesInterval, baseRule.monthsInterval);
+  if(!confirm(`Reset ${baseRule.name} back to Toyota guide?
+
+Toyota guide: ${guideText}
+
+This removes your custom target.`)) return;
   delete overrides[ruleId];
   saveScheduleOverrides(overrides);
   renderAll();
