@@ -397,22 +397,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .item-check input{accent-color:var(--toyota);width:16px;height:16px}
 .item-builder-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:2px}
 .item-add{width:100%;padding:11px 13px;background:var(--bg3);color:var(--text2);border:1.5px dashed var(--border2);border-radius:10px;font-size:13px;font-weight:600}
-.entry-shell{display:grid;gap:12px}
-.entry-panel{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:14px}
-.entry-panel-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;color:var(--text);margin-bottom:4px}
-.entry-panel-sub{font-size:11px;color:var(--text3);line-height:1.6;margin-bottom:12px}
-.entry-optional{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.entry-optional summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;color:var(--text);font-size:12px;font-weight:600}
-.entry-optional summary::-webkit-details-marker{display:none}
-.entry-optional summary::after{content:'▾';color:var(--text3);font-size:16px;transition:transform .25s cubic-bezier(.25,.46,.45,.94)}
-.entry-optional[open] summary{border-bottom:1px solid var(--border)}
-.entry-optional[open] summary::after{transform:rotate(180deg)}
-.entry-optional-body{padding:14px}
-.entry-meta-copy{font-size:11px;color:var(--text3);line-height:1.6;margin-top:6px}
-.inventory-lane{margin-top:12px}
-.inventory-lane-title{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
-.inventory-empty{font-size:11px;color:var(--text3);line-height:1.6;background:rgba(255,255,255,.02);border:1px dashed var(--border2);border-radius:10px;padding:10px 12px}
-.entry-actions{margin-top:2px}
 .item-linked{display:inline-block;font-size:9px;padding:2px 7px;border-radius:5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.25)}
 .log-parts{margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;display:flex;flex-direction:column;gap:8px}
 .log-part{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:9px 10px}
@@ -522,6 +506,20 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .master-source-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange2);white-space:nowrap}
 .master-editor-note{font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6}
 .master-empty{padding:14px 16px;font-size:12px;color:var(--text3);line-height:1.6}
+.master-section{padding:12px 16px 6px}
+.master-section-title{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.master-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.master-card summary{list-style:none;cursor:pointer;padding:11px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.master-card summary::-webkit-details-marker{display:none}
+.master-card-left{flex:1;min-width:0}
+.master-card-title{font-size:13px;color:var(--text);font-weight:600;line-height:1.45}
+.master-card-meta{font-size:10px;color:var(--text3);margin-top:4px;line-height:1.5}
+.master-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.master-card-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange2);white-space:nowrap}
+.master-card-toggle{color:var(--text3);font-size:16px;line-height:1;transition:transform .25s cubic-bezier(.25,.46,.45,.94)}
+.master-card[open] .master-card-toggle{transform:rotate(180deg)}
+.master-card-body{padding:12px;border-top:1px solid var(--border)}
+.master-pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 
 /* ─── GUIDES ───────────────────────────────────────────────── */
 .guide-item{
@@ -802,13 +800,14 @@ html.modal-open,body.modal-open{overflow:hidden}
   .form-title{font-size:15px;letter-spacing:1.5px;margin-bottom:14px}
   .fi,.fs,.ft{padding:10px 12px;font-size:16px}
   .fg2{gap:8px}
-  .entry-panel,.entry-optional-body{padding:12px}
-  .entry-optional summary{padding:12px;font-size:11px}
-  .entry-panel-title{font-size:13px}
 
   .part-item,.inv-row,.svc-item{padding:10px 12px}
   .part-name,.inv-name,.svc-name,.suggest-name{font-size:12px}
   .part-price,.master-source-price{font-size:12px}
+  .master-card summary{padding:10px 11px}
+  .master-card-title{font-size:12px}
+  .master-card-meta{font-size:9px}
+  .master-card-body{padding:11px}
   .inv-meta,.master-source-meta,.suggest-meta,.svc-note{font-size:9px}
   .inv-actions{gap:6px}
   .inv-btn,.mini-btn,.selected-use-btn,.suggest-btn{font-size:10px;padding:6px 8px}
@@ -947,111 +946,88 @@ html.modal-open,body.modal-open{overflow:hidden}
 <div id="page-add" class="page">
   <div class="form-section">
     <div class="form-title">New Service Entry</div>
-    <div class="entry-shell">
-      <div class="alert blue" style="margin-bottom:0">
-        <div class="alert-icon">💡</div>
-        <div><strong>Cleaner workflow:</strong> pick the service first, confirm the matched inventory, then save. The app deducts linked stock automatically.</div>
+    <div class="alert blue" style="margin-bottom:16px">
+      <div class="alert-icon">💡</div>
+      <div>Use your live inventory for parts you already bought. When you save this service, stock is deducted automatically.</div>
+    </div>
+    <div class="fg2">
+      <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
+      <div class="fl"><label>Mileage</label><input type="number" class="fi" id="fMi" placeholder="64751"></div>
+    </div>
+    <div class="fl">
+      <label>Service Type</label>
+      <select class="fs" id="fType" onchange="prefill()">
+        <option value="">— Select type —</option>
+        <option value="oiltires">Oil Change + Tire Rotation + Inspection</option>
+        <option value="oil">Oil Change Only</option>
+        <option value="tires">Tire Rotation</option>
+        <option value="cabin">Cabin Air Filter</option>
+        <option value="engine_filter">Engine Air Filter</option>
+        <option value="trans">Transmission Fluid D&F</option>
+        <option value="diff">Rear Differential D&F</option>
+        <option value="coolant">Engine Coolant Drain & Fill</option>
+        <option value="inv_coolant">Inverter Coolant Drain & Fill</option>
+        <option value="alignment">Wheel Alignment</option>
+        <option value="tires_new">New Tires</option>
+        <option value="brakes">Brake Service</option>
+        <option value="plugs">Spark Plugs</option>
+        <option value="hvfilter_inspect">HV Battery Cooling Filter — Inspect</option>
+        <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
+        <option value="valvomax">ValvoMax Drain Valve Install</option>
+        <option value="wipers">Wiper Blades</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="fl" id="inventorySuggestBlock" style="display:none">
+      <label>Required Inventory</label>
+      <div id="inventoryRequiredSummary" style="font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.6"></div>
+      <div id="inventorySuggestList"></div>
+      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin:10px 0 8px">Optional matching inventory</div>
+      <div id="inventorySelectedList" style="margin-top:0"></div>
+      <div id="inventoryStockLockNote" style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">The app auto-selects required parts by service-part ID and part number. If required stock is missing, save is locked until inventory is replenished.</div>
+    </div>
+    <div class="fl">
+      <label>Description / Details</label>
+      <textarea class="ft" id="fDesc" placeholder="Parts used, part numbers, shop notes..."></textarea>
+    </div>
+    <div class="fg2">
+      <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"><div class="cost-hint" id="fCostHint">Auto-fills from linked inventory when parts are selected. You can still override it manually.</div></div>
+      <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
+    </div>
+    <div class="fl">
+      <label>Purchased Items / Links (optional)</label>
+      <div class="item-builder" id="fItemsList"></div>
+      <div class="item-builder-actions">
+        <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
       </div>
-
-      <div class="entry-panel">
-        <div class="entry-panel-title">1 · Basics</div>
-        <div class="entry-panel-sub">Start here. Once you pick the service, the inventory section below will narrow to the right parts for that job.</div>
-        <div class="fg2">
-          <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
-          <div class="fl"><label>Mileage</label><input type="number" class="fi" id="fMi" placeholder="64751"></div>
-        </div>
-        <div class="fl" style="margin-bottom:0">
-          <label>Service Type</label>
-          <select class="fs" id="fType" onchange="prefill()">
-            <option value="">— Select service —</option>
-            <option value="oiltires">Oil Change + Tire Rotation + Inspection</option>
-            <option value="oil">Oil Change Only</option>
-            <option value="tires">Tire Rotation</option>
-            <option value="cabin">Cabin Air Filter</option>
-            <option value="engine_filter">Engine Air Filter</option>
-            <option value="trans">Transmission Fluid D&F</option>
-            <option value="diff">Rear Differential D&F</option>
-            <option value="coolant">Engine Coolant Drain & Fill</option>
-            <option value="inv_coolant">Inverter Coolant Drain & Fill</option>
-            <option value="alignment">Wheel Alignment</option>
-            <option value="tires_new">New Tires</option>
-            <option value="brakes">Brake Service</option>
-            <option value="plugs">Spark Plugs</option>
-            <option value="hvfilter_inspect">HV Battery Cooling Filter — Inspect</option>
-            <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
-            <option value="valvomax">ValvoMax Drain Valve Install</option>
-            <option value="wipers">Wiper Blades</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="entry-panel" id="inventorySuggestBlock" style="display:none">
-        <div class="entry-panel-title">2 · Inventory Match</div>
-        <div class="entry-panel-sub" id="inventoryRequiredSummary">Choose a service to load matching inventory.</div>
-        <div class="inventory-lane">
-          <div class="inventory-lane-title">Auto-required parts</div>
-          <div id="inventorySuggestList"></div>
-        </div>
-        <div class="inventory-lane">
-          <div class="inventory-lane-title">Matching stock you can add</div>
-          <div id="inventorySelectedList"></div>
-        </div>
-        <div id="inventoryStockLockNote" class="entry-meta-copy">Only parts that fit the selected service should appear here. If required stock is missing, save stays locked until inventory is replenished.</div>
-      </div>
-
-      <div class="entry-panel">
-        <div class="entry-panel-title">3 · Service Notes & Cost</div>
-        <div class="entry-panel-sub">Use notes for what was done. Cost auto-fills from linked inventory, but you can override it if needed.</div>
-        <div class="fl">
-          <label>Description / Details</label>
-          <textarea class="ft" id="fDesc" placeholder="What was done, notes, part numbers, torque notes, shop notes..."></textarea>
-        </div>
-        <div class="fg2">
-          <div class="fl"><label>Cost ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"><div class="cost-hint" id="fCostHint">Auto-fills from linked inventory when parts are selected. You can still override it manually.</div></div>
-          <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
-        </div>
-      </div>
-
-      <details class="entry-optional" id="entryItemsOptional">
-        <summary>Optional purchased items / links</summary>
-        <div class="entry-optional-body">
-          <div class="item-builder" id="fItemsList"></div>
-          <div class="item-builder-actions">
-            <button type="button" class="item-add" onclick="addItemRow()">＋ Add Purchased Item</button>
-          </div>
-          <div class="entry-meta-copy">Use this for extra one-off purchases, corrected prices, or links you want saved with the service. Linked inventory rows still deduct automatically when you save.</div>
-        </div>
-      </details>
-
-      <div class="entry-panel">
-        <div class="entry-panel-title">4 · Receipt / Photo</div>
-        <div class="entry-panel-sub">Optional, but useful for future proof and printable records.</div>
-        <div id="fPhotoArea" role="button" tabindex="0" aria-label="Add receipt photo" style="border:2px dashed var(--border2);border-radius:10px;
-             padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
-             onclick="document.getElementById('fPhotoInput').click()"
-             ondragover="event.preventDefault();this.style.borderColor='var(--toyota)'"
-             ondragleave="this.style.borderColor='var(--border2)'"
-             ondrop="handlePhotoDrop(event)">
-          <div id="fPhotoPreview" style="display:none">
-            <img id="fPhotoImg" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain">
-            <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
-              <button onclick="event.stopPropagation();clearPhoto()" style="font-size:11px;color:var(--toyota);background:none;border:none;cursor:pointer;padding:4px 8px">✕ Remove</button>
-            </div>
-          </div>
-          <div id="fPhotoPlaceholder">
-            <div style="font-size:28px;margin-bottom:6px">📷</div>
-            <div style="font-size:13px;color:var(--text2);font-weight:500">Tap to add receipt photo</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:3px">Camera or Photo Library · Stored locally · Included in PDF</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Tip: linked inventory rows deduct automatically when saved. You can still edit the row before saving if you need to fix quantity, link, or price.</div>
+    </div>
+    <!-- RECEIPT PHOTO UPLOAD -->
+    <div class="fl">
+      <label>Receipt / Photo (optional)</label>
+      <div id="fPhotoArea" role="button" tabindex="0" aria-label="Add receipt photo" style="border:2px dashed var(--border2);border-radius:10px;
+           padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
+           onclick="document.getElementById('fPhotoInput').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--toyota)'"
+           ondragleave="this.style.borderColor='var(--border2)'"
+           ondrop="handlePhotoDrop(event)">
+        <div id="fPhotoPreview" style="display:none">
+          <img id="fPhotoImg" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain">
+          <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+            <button onclick="event.stopPropagation();clearPhoto()" style="font-size:11px;color:var(--toyota);background:none;border:none;cursor:pointer;padding:4px 8px">✕ Remove</button>
           </div>
         </div>
-        <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
+        <div id="fPhotoPlaceholder">
+          <div style="font-size:28px;margin-bottom:6px">📷</div>
+          <div style="font-size:13px;color:var(--text2);font-weight:500">Tap to add receipt photo</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">Camera or Photo Library · Stored locally · Included in PDF</div>
+        </div>
       </div>
-
-      <div class="btn-row entry-actions">
-        <button class="btn-ghost" id="entryCancelBtn" onclick="go('log')">Cancel</button>
-        <button class="btn-primary" id="entrySaveBtn" onclick="saveEntry()">Save Entry</button>
-      </div>
+      <input type="file" id="fPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" id="entryCancelBtn" onclick="go('log')">Cancel</button>
+      <button class="btn-primary" id="entrySaveBtn" onclick="saveEntry()">Save Entry</button>
     </div>
   </div>
 </div>
@@ -1214,7 +1190,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="section-label">Master Parts Database</div>
   <div class="alert gold">
     <div class="alert-icon">🧠</div>
-    <div><strong>Editable master references.</strong> These are your long-term reference parts. Buying something through Inventory automatically creates or updates the matching master part here, and saved store links stack up over time.</div>
+    <div><strong>Service parts only.</strong> This area now focuses on OEM parts, fluids, filters, spark plugs, and other service consumables. Tools are excluded, and button-heavy controls are tucked into collapsible part cards.</div>
   </div>
 
   <div class="overlay" id="masterPartModal" onclick="if(event.target===this)closeMasterPartEditor()">
@@ -1256,8 +1232,7 @@ html.modal-open,body.modal-open{overflow:hidden}
             <select class="fs" id="mpCategory">
               <option value="fluids_filters">Fluids & Filters</option>
               <option value="valvomax">ValvoMax</option>
-              <option value="tools">Tools</option>
-              <option value="consumables">Consumables</option>
+                            <option value="consumables">Consumables</option>
               <option value="other">Other</option>
             </select>
           </div>
@@ -2155,13 +2130,34 @@ const DEFAULT_MASTER_PARTS = [
   {id:'mp_valvomax_valve',name:'ValvoMax Drain Valve M12-1.25',serviceType:'valvomax',category:'valvomax',partNum:'M12-1.25 Quick Twist',unitCost:54.99,statusLabel:'Reference part',note:'VITON O-ring seal.',countInOilAvg:false,sources:[{store:'ValvoMax',url:'https://www.valvomax.com/collections/all',label:'valvomax.com — M12-1.25',unitPrice:54.99,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_valvomax_bag',name:'ValvoMax Drain Bag Starter Kit',serviceType:'valvomax',category:'valvomax',partNum:'Starter Kit',unitCost:19.99,statusLabel:'Reference part',note:'Replaces traditional drain pan.',countInOilAvg:false,sources:[{store:'ValvoMax',url:'https://www.valvomax.com/collections/all',label:'valvomax.com — accessories',unitPrice:19.99,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_valvomax_replacement',name:'ValvoMax Replacement Kit',serviceType:'valvomax',category:'valvomax',partNum:'Washers + Tether + Sticker',unitCost:4.99,statusLabel:'Reference part',note:'Accessories and consumables.',countInOilAvg:false,sources:[{store:'ValvoMax',url:'https://www.valvomax.com/collections/all',label:'valvomax.com — accessories',unitPrice:4.99,addedAt:'2026-03-01T00:00:00.000Z'}]},
-  {id:'mp_tool_smartjerry',name:'Smart Jerry 64mm Oil Filter Wrench',serviceType:'oil',category:'tools',partNum:'B0DPMRNBKH',unitCost:0,statusLabel:'Purchased',note:'14-flute steel — use HEX side only to loosen.',countInOilAvg:false,sources:[{store:'Amazon',url:'https://www.amazon.com/SMART-JERRY-Compatible-Toyotas-Cartridge/dp/B0DPMRNBKH',label:'amazon.com — B0DPMRNBKH',unitPrice:0,addedAt:'2026-03-01T00:00:00.000Z'}]},
-  {id:'mp_tool_torque',name:'VEVOR Torque Wrench 1/2" Drive',serviceType:'other',category:'tools',partNum:'10–150 ft-lbs',unitCost:0,statusLabel:'Purchased',note:'One-time tool.',countInOilAvg:false,sources:[]},
-  {id:'mp_tool_ramps',name:'Car Ramps — VEVOR High Profile',serviceType:'other',category:'tools',partNum:'13,000 lb GVW',unitCost:0,statusLabel:'Purchased',note:'One-time tool.',countInOilAvg:false,sources:[]},
-  {id:'mp_tool_lisle24680',name:'Lisle 24680 Spill-Free Funnel',serviceType:'coolant',category:'tools',partNum:'Lisle 24680',unitCost:0,statusLabel:'Recommended',note:'Useful for air-free coolant fills.',countInOilAvg:false,sources:[]},
-  {id:'mp_tool_spark_socket',name:'14mm Thin-Wall Spark Plug Socket',serviceType:'plugs',category:'tools',partNum:'14mm · 3/8" drive',unitCost:0,statusLabel:'Recommended',note:'Needed for Toyota 90919-01289 / Denso FC16HR-Q8 plug wells.',countInOilAvg:false,sources:[]}
 ];
-const MASTER_CATEGORY_LABELS = {fluids_filters:'Fluids & Filters',valvomax:'ValvoMax',tools:'Tools',consumables:'Consumables',other:'Other'};
+const MASTER_CATEGORY_LABELS = {fluids_filters:'Service Fluids & Filters',valvomax:'ValvoMax System',consumables:'Service Consumables',other:'Other'};
+const MASTER_PART_ALLOWED_SERVICE_TYPES = new Set(['oil','oiltires','cabin','engine_filter','trans','diff','coolant','inv_coolant','plugs','valvomax','wipers','brakes','tires_new','hvfilter_clean']);
+const MASTER_PART_SECTION_ORDER = ['oil','oiltires','cabin','engine_filter','trans','diff','coolant','inv_coolant','plugs','wipers','valvomax','brakes','tires_new','hvfilter_clean','other'];
+function isToolLikeName(value=''){
+  const v = String(value).toLowerCase();
+  return ['wrench','socket','ratchet','extension','funnel','ramp','ramps','jack stand','jackstand','torque wrench','tool'].some(token=>v.includes(token));
+}
+function shouldKeepMasterPart(part){
+  const serviceType = String(part.serviceType || 'other');
+  const category = String(part.category || 'other');
+  if(category === 'tools') return false;
+  if(isToolLikeName(part.name || '')) return false;
+  return MASTER_PART_ALLOWED_SERVICE_TYPES.has(serviceType);
+}
+function shouldCreateMasterPartFromInventory(payload){
+  const serviceType = String(payload.serviceType || 'other');
+  if(!MASTER_PART_ALLOWED_SERVICE_TYPES.has(serviceType)) return false;
+  if(isToolLikeName(payload.name || '')) return false;
+  return true;
+}
+function getMasterSectionRank(serviceType='other'){
+  const idx = MASTER_PART_SECTION_ORDER.indexOf(serviceType);
+  return idx === -1 ? 999 : idx;
+}
+function getMasterSectionLabel(serviceType='other'){
+  return LABELS[serviceType] || 'Other';
+}
 const SERVICE_PART_REQUIREMENTS = {
   oil:[
     {id:'req_oil_main_jug',label:'Engine oil — 0W-16 full synthetic (5 qt jug)',qty:1,masterPartIds:['mp_oil_mobil1_0w16'],toyotaPartNum:'0W-16 spec'},
@@ -2278,7 +2274,7 @@ function normalizeMasterParts(parts){
     note:(part.note||'').trim(),
     countInOilAvg:!!part.countInOilAvg,
     sources:normalizeMasterPartSources(part.sources)
-  })).filter(part=>part.name);
+  })).filter(part=>part.name).filter(shouldKeepMasterPart);
 }
 function getMasterParts(){
   try{
@@ -2291,6 +2287,13 @@ function getMasterParts(){
 }
 function saveMasterParts(parts){
   localStorage.setItem(MASTER_PARTS_KEY, JSON.stringify(normalizeMasterParts(parts)));
+}
+function purgeUnsupportedMasterParts(){
+  const cleaned = normalizeMasterParts(getMasterParts());
+  const validIds = new Set(cleaned.map(part=>String(part.id)));
+  saveMasterParts(cleaned);
+  const updatedInventory = getInventory().map(item=>validIds.has(String(item.masterPartId||'')) ? item : {...item, masterPartId:''});
+  saveInventory(updatedInventory);
 }
 function normalizeKey(value=''){
   return String(value).toLowerCase().replace(/[^a-z0-9]+/g,'');
@@ -2385,6 +2388,7 @@ function buildMasterSourceFromInventoryPayload(payload){
   return {store,url,label:url ? `${getLinkHostLabel(url)}${store ? ` · ${store}` : ''}` : (store || 'Saved source'),unitPrice:price,addedAt:new Date().toISOString()};
 }
 function upsertMasterPartFromInventoryPayload(payload){
+  if(!shouldCreateMasterPartFromInventory(payload)) return '';
   const parts = getMasterParts();
   const source = buildMasterSourceFromInventoryPayload(payload);
   const existing = findMatchingMasterPart(payload, parts);
@@ -2414,8 +2418,8 @@ function syncMasterPartsFromInventory(){
   let changed = false;
   inv.forEach(item=>{
     const masterPartId = upsertMasterPartFromInventoryPayload(item);
-    if(String(item.masterPartId||'') !== String(masterPartId)){
-      item.masterPartId = masterPartId;
+    if(String(item.masterPartId||'') !== String(masterPartId||'')){
+      item.masterPartId = masterPartId || '';
       changed = true;
     }
   });
@@ -2634,34 +2638,13 @@ function bindAccessibleClick(selector){
   });
 }
 function getSuggestedTypesForService(type){
-  if(type==='oiltires') return ['oil','oiltires','tires'];
+  if(type==='oiltires') return ['oil','oiltires','tires','hvfilter_inspect'];
   if(type==='oil') return ['oil','oiltires'];
   if(type==='tires') return ['tires','oiltires'];
   return [type];
 }
-function getMasterPartById(id=''){
-  return getMasterParts().find(part=>String(part.id)===String(id)) || null;
-}
-function getInventoryCanonicalServiceType(item){
-  const master = getMasterPartById(item.masterPartId||'');
-  if(master?.serviceType && master.serviceType!=='other') return master.serviceType;
-  const requirementType = Object.entries(getSavedServiceRequirementsMap()).find(([stype,rules])=>
-    (rules||[]).some(rule=>inventoryMatchesRequirement(item, rule))
-  )?.[0];
-  if(requirementType) return requirementType;
-  return item.serviceType || 'other';
-}
-function isConsumableInventoryItem(item){
-  const master = getMasterPartById(item.masterPartId||'');
-  return master?.category !== 'tools';
-}
 function inventoryMatchesService(item, serviceType){
-  const suggestedTypes = getSuggestedTypesForService(serviceType);
-  const canonicalType = getInventoryCanonicalServiceType(item);
-  if(suggestedTypes.includes(canonicalType)) return true;
-  if(getServicePartRequirements(serviceType).some(req=>inventoryMatchesRequirement(item, req))) return true;
-  if(!item.masterPartId) return suggestedTypes.includes(item.serviceType);
-  return false;
+  return getSuggestedTypesForService(serviceType).includes(item.serviceType);
 }
 function getFormItemRows(){
   return Array.from(document.querySelectorAll('#fItemsList .item-editor'));
@@ -3527,6 +3510,7 @@ window.onload=()=>{
   if(!localStorage.getItem(MASTER_PARTS_KEY))saveMasterParts(DEFAULT_MASTER_PARTS);
   ensureMasterPartModalPortal();
   ensureMasterPartsReady();
+  purgeUnsupportedMasterParts();
   mergeDuplicateMasterParts();
   syncMasterPartsFromInventory();
   mergeDuplicateMasterParts();
@@ -3538,8 +3522,6 @@ window.onload=()=>{
     entryCostEl.addEventListener('input', ()=>markEntryCostManual());
   }
   setInventoryFormOpen(false);
-  const itemsOptional = document.getElementById('entryItemsOptional');
-  if(itemsOptional) itemsOptional.open = false;
   bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
   setScheduleControlsExpanded(false);
   renderAll();
@@ -3970,9 +3952,8 @@ function renderParts(){
     return (a.name||'').localeCompare(b.name||'');
   });
   const parts = getMasterParts().sort((a,b)=>{
-    const catA = MASTER_CATEGORY_LABELS[a.category] || 'Other';
-    const catB = MASTER_CATEGORY_LABELS[b.category] || 'Other';
-    if(catA !== catB) return catA.localeCompare(catB);
+    const rankDiff = getMasterSectionRank(a.serviceType) - getMasterSectionRank(b.serviceType);
+    if(rankDiff !== 0) return rankDiff;
     return (a.name||'').localeCompare(b.name||'');
   });
   const listEl = document.getElementById('inventoryList');
@@ -4014,31 +3995,29 @@ function renderParts(){
     const totalSources = parts.reduce((sum,part)=>sum + (part.sources||[]).length, 0);
     masterSummaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${totalSources} saved source${totalSources!==1?'s':''}`;
     if(!parts.length){
-      masterListEl.innerHTML = `<div class="master-empty">No master parts yet. Add an inventory item above and the app will automatically create or update your reference part database here.</div>`;
+      masterListEl.innerHTML = `<div class="master-empty">No service master parts yet. Save inventory for oil, filters, fluids, spark plugs, or other service consumables and the app will build this catalog automatically.</div>`;
     }else{
-      masterListEl.innerHTML = parts.map(part=>{
-        const linkedInv = inv.filter(item=>String(item.masterPartId||'')===String(part.id));
-        const linkedQty = linkedInv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
-        const serviceLabel = LABELS[part.serviceType] || 'Other';
-        const categoryLabel = MASTER_CATEGORY_LABELS[part.category] || 'Other';
-        const defaultPrice = Number(part.unitCost||0) > 0 ? `$${Number(part.unitCost||0).toFixed(2)}` : '—';
-        const sourcesHtml = (part.sources||[]).length
-          ? `<div class="master-source-list">${part.sources.map(source=>`<div class="master-source"><div class="master-source-top"><div><div class="master-source-name">${source.store || source.label || 'Saved source'}</div><div class="master-source-meta">${[source.label && source.label !== (source.store||'') ? source.label : '', source.addedAt ? `saved ${formatDateHuman(source.addedAt.slice(0,10))}` : ''].filter(Boolean).join(' · ')}${source.url ? `<br><a class="part-link" href="${source.url}" target="_blank">→ ${getLinkHostLabel(source.url)}</a>` : ''}</div></div><div class="master-source-price">${Number(source.unitPrice||0) > 0 ? `$${Number(source.unitPrice||0).toFixed(2)}` : '—'}</div></div></div>`).join('')}</div>`
-          : `<div class="part-missing" style="margin-top:10px">No saved purchase sources yet. Add this part through Inventory and the store/link will stack here automatically.</div>`;
-        return `<div class="part-item">
-          <div class="part-row1"><span class="part-name">${part.name}</span><span class="part-price">${defaultPrice}</span></div>
-          <div class="part-num">${[categoryLabel, serviceLabel, part.partNum && `Part # ${part.partNum}`].filter(Boolean).join(' · ')}</div>
-          ${part.note ? `<div class="inv-meta" style="margin-top:6px">💡 ${part.note}</div>` : ''}
-          ${part.statusLabel ? `<div class="parts-badge">${part.statusLabel}</div>` : ''}
-          ${part.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
-          <div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>
-          ${sourcesHtml}
-          <div class="inv-actions" style="margin-top:12px">
-            <button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button>
-            <button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button>
-          </div>
-        </div>`;
-      }).join('');
+      const groups = parts.reduce((acc, part)=>{
+        const key = part.serviceType || 'other';
+        (acc[key] = acc[key] || []).push(part);
+        return acc;
+      },{});
+      masterListEl.innerHTML = Object.keys(groups)
+        .sort((a,b)=>getMasterSectionRank(a) - getMasterSectionRank(b))
+        .map(serviceType=>{
+          const serviceLabel = getMasterSectionLabel(serviceType);
+          const cards = groups[serviceType].map(part=>{
+            const linkedInv = inv.filter(item=>String(item.masterPartId||'')===String(part.id));
+            const linkedQty = linkedInv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
+            const categoryLabel = MASTER_CATEGORY_LABELS[part.category] || 'Other';
+            const defaultPrice = Number(part.unitCost||0) > 0 ? `$${Number(part.unitCost||0).toFixed(2)}` : '—';
+            const sourcesHtml = (part.sources||[]).length
+              ? `<div class="master-source-list">${part.sources.map(source=>`<div class="master-source"><div class="master-source-top"><div><div class="master-source-name">${source.store || source.label || 'Saved source'}</div><div class="master-source-meta">${[source.label && source.label !== (source.store||'') ? source.label : '', source.addedAt ? `saved ${formatDateHuman(source.addedAt.slice(0,10))}` : ''].filter(Boolean).join(' · ')}${source.url ? `<br><a class="part-link" href="${source.url}" target="_blank">→ ${getLinkHostLabel(source.url)}</a>` : ''}</div></div><div class="master-source-price">${Number(source.unitPrice||0) > 0 ? `$${Number(source.unitPrice||0).toFixed(2)}` : '—'}</div></div></div>`).join('')}</div>`
+              : `<div class="part-missing" style="margin-top:10px">No saved purchase sources yet. Add this part through Inventory and the store/link will stack here automatically.</div>`;
+            return `<details class="master-card"><summary><div class="master-card-left"><div class="master-card-title">${part.name}</div><div class="master-card-meta">${[categoryLabel, part.partNum && `Part # ${part.partNum}`, linkedInv.length ? `${linkedQty} on hand` : 'No linked stock yet'].filter(Boolean).join(' · ')}</div></div><div class="master-card-right"><div class="master-card-price">${defaultPrice}</div><div class="master-card-toggle">▾</div></div></summary><div class="master-card-body">${part.note ? `<div class="inv-meta">💡 ${part.note}</div>` : ''}<div class="master-pill-row">${part.statusLabel ? `<div class="parts-badge">${part.statusLabel}</div>` : ''}${part.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}</div><div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>${sourcesHtml}<div class="inv-actions" style="margin-top:12px"><button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button><button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button></div></div></details>`;
+          }).join('');
+          return `<div class="master-section"><div class="master-section-title">${serviceLabel}</div>${cards}</div>`;
+        }).join('');
     }
   }
 }
@@ -4202,7 +4181,7 @@ function saveInventoryItem(){
   if(!name){showToast('Inventory item name is required');return;}
   const linkedMasterPartId = upsertMasterPartFromInventoryPayload({masterPartId,name,serviceType,unitCost,partNum,store,link,note,countInOilAvg});
   const inv = getInventory();
-  const payload = {id: editId || Date.now(), name, serviceType, qtyOnHand, unitCost, partNum, store, link, note, countInOilAvg, masterPartId: linkedMasterPartId};
+  const payload = {id: editId || Date.now(), name, serviceType, qtyOnHand, unitCost, partNum, store, link, note, countInOilAvg, masterPartId: linkedMasterPartId || ''};
   if(editId){
     const idx = inv.findIndex(item=>String(item.id)===String(editId));
     if(idx>-1) inv[idx] = payload;
@@ -4259,11 +4238,11 @@ function renderEntryInventoryUI(){
 
   if(summaryEl){
     if(!requirementPlan.requirements.length){
-      summaryEl.textContent = 'This service does not require any fixed stock in the app. Matching inventory below will stay limited to items that make sense for the selected job.';
+      summaryEl.textContent = 'No fixed required part set is defined for this service type.';
     }else if(requirementPlan.missingCount > 0){
-      summaryEl.textContent = `Some required parts are still missing. Add ${requirementPlan.missingCount} more unit${requirementPlan.missingCount!==1?'s':''} so this service can be saved cleanly.`;
+      summaryEl.textContent = `Missing ${requirementPlan.missingCount} required unit${requirementPlan.missingCount!==1?'s':''} — this service cannot be completed until stock is available.`;
     }else{
-      summaryEl.textContent = `Required stock is ready. The app auto-reserved ${requirementPlan.autoItems.length} linked line${requirementPlan.autoItems.length!==1?'s':''} for this service.`;
+      summaryEl.textContent = `All required inventory is auto-reserved by service-part ID (${requirementPlan.autoItems.length} linked line${requirementPlan.autoItems.length!==1?'s':''}).`;
     }
   }
 
@@ -4285,14 +4264,12 @@ function renderEntryInventoryUI(){
         ${req.complete ? '' : `<div class="part-missing" style="margin-top:8px">Add inventory that matches this service-part ID before completing the service.</div>`}
       </div>
     `;
-  }).join('') : `<div class="inventory-empty">No fixed required stock is set for this service type.</div>`;
+  }).join('') : `<div class="part-missing">No fixed inventory requirement is enforced for this service type.</div>`;
 
   const optionalMatches = previewInventory
-    .filter(item=>isConsumableInventoryItem(item))
     .filter(item=>inventoryMatchesService(item, serviceType))
     .map(item=>({
       ...item,
-      canonicalType: getInventoryCanonicalServiceType(item),
       reservedQty: Number(combinedReserved[String(item.id)]||0),
       available: Math.max(0, Number(item.qtyOnHand||0) - Number(combinedReserved[String(item.id)]||0))
     }))
@@ -4307,15 +4284,15 @@ function renderEntryInventoryUI(){
       <div class="selected-use-top">
         <div style="flex:1">
           <div class="suggest-name">${item.name}</div>
-          <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store, LABELS[item.canonicalType]||LABELS[item.serviceType]||'Other'].filter(Boolean).join(' · ')}</div>
-          ${item.masterPartId ? `<div class="parts-badge">Linked master part</div>` : ''}
+          <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store, LABELS[item.serviceType]||'Other'].filter(Boolean).join(' · ')}</div>
+          ${item.masterPartId ? `<div class="parts-badge">Master ID: ${item.masterPartId}</div>` : ''}
         </div>
         <div class="inv-qty ${item.available===0?'out':item.available<=1?'low':''}">${item.available} free</div>
       </div>
       <div class="suggest-meta">Reserved now: ${item.reservedQty} · On hand: ${Number(item.qtyOnHand||0)} · $${Number(item.unitCost||0).toFixed(2)} each${item.countInOilAvg ? ' · counts in oil avg' : ''}</div>
-      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Add 1 to this service</button>` : `<div class="part-missing" style="margin-top:8px">No extra stock left after required reservation.</div>`}
+      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Use 1 extra for this service</button>` : `<div class="part-missing" style="margin-top:8px">No extra stock left after required reservation</div>`}
     </div>
-  `).join('') : `<div class="inventory-empty">No matching consumable inventory found for this service. This area now hides unrelated stock and tools.</div>`;
+  `).join('') : `<div class="part-missing">No matching inventory found for this service type yet.</div>`;
 
   updateEntrySaveLock(serviceType, requirementPlan);
   syncEntryCostFromItems();
@@ -4410,8 +4387,6 @@ function saveEntry(){
   const resetCostEl = document.getElementById('fCost');
   if(resetCostEl) resetCostEl.dataset.autofill = '1';
   document.getElementById('fType').value='';
-  const itemsOptional = document.getElementById('entryItemsOptional');
-  if(itemsOptional) itemsOptional.open = false;
   resetEntryInventoryUses();
   clearPhoto();
   updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
