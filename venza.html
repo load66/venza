@@ -3142,10 +3142,22 @@ function renderScheduleSettings(){
 function saveScheduleRule(ruleId){
   const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
   if(!baseRule || baseRule.watchOnly) return;
+  const currentRule = getResolvedRecurringRules().find(rule=>rule.id===ruleId) || baseRule;
   const milesEl = document.getElementById(`schedMiles_${ruleId}`);
   const monthsEl = document.getElementById(`schedMonths_${ruleId}`);
   const milesInterval = parsePositiveInt(milesEl?.value) || parsePositiveInt(baseRule.milesInterval);
   const monthsInterval = parsePositiveInt(monthsEl?.value) || parsePositiveInt(baseRule.monthsInterval);
+  const nextIntervalText = formatIntervalSummary(milesInterval, monthsInterval);
+  const guidelineText = formatIntervalSummary(baseRule.milesInterval, baseRule.monthsInterval);
+  if(currentRule.activeIntervalText === nextIntervalText && currentRule.customActive === (nextIntervalText !== guidelineText)){
+    showToast(`${baseRule.name} already set to ${nextIntervalText}`);
+    return;
+  }
+  const confirmSave = confirm(`Save ${baseRule.name} target?
+
+New target: ${nextIntervalText}
+Toyota guide: ${guidelineText}`);
+  if(!confirmSave) return;
   const overrides = getScheduleOverrides();
   const next = {};
   if(milesInterval && milesInterval !== parsePositiveInt(baseRule.milesInterval)) next.milesInterval = milesInterval;
@@ -3154,13 +3166,20 @@ function saveScheduleRule(ruleId){
   saveScheduleOverrides(overrides);
   renderAll();
   const resolved = getResolvedRecurringRules().find(rule=>rule.id===ruleId);
-  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : formatIntervalSummary(milesInterval, monthsInterval)} ✓`);
+  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : nextIntervalText} ✓`);
 }
 function resetScheduleRule(ruleId){
   const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
   if(!baseRule || baseRule.watchOnly) return;
+  const currentRule = getResolvedRecurringRules().find(rule=>rule.id===ruleId) || baseRule;
   const overrides = getScheduleOverrides();
   if(!overrides[ruleId]){ showToast(`${baseRule.name} already matches Toyota guide`); return; }
+  const guidelineText = formatIntervalSummary(baseRule.milesInterval, baseRule.monthsInterval);
+  const confirmReset = confirm(`Reset ${baseRule.name} back to Toyota guide?
+
+Current target: ${currentRule.activeIntervalText || guidelineText}
+Toyota guide: ${guidelineText}`);
+  if(!confirmReset) return;
   delete overrides[ruleId];
   saveScheduleOverrides(overrides);
   renderAll();
