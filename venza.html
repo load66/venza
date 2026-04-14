@@ -447,6 +447,12 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .sched-flag.earlier{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
 .sched-flag.later{background:rgba(217,122,0,.12);color:var(--orange2);border:1px solid rgba(217,122,0,.3)}
 .sched-inline-note{font-size:11px;color:var(--text3);line-height:1.6;margin-top:4px}
+.schedule-controls-card .card-head{cursor:pointer;user-select:none}
+.schedule-controls-card .card-head:active{background:var(--bg3)}
+.schedule-controls-card .card-body{display:none}
+.schedule-controls-card.open .card-body{display:block}
+.schedule-controls-chevron{color:var(--text3);font-size:18px;transition:transform .25s ease;line-height:1;flex-shrink:0}
+.schedule-controls-card.open .schedule-controls-chevron{transform:rotate(180deg)}
 
 /* ─── PARTS ────────────────────────────────────────────────── */
 .part-item{
@@ -1003,12 +1009,17 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="alert-icon">🎯</div>
     <div><strong>Your target drives the app.</strong> Toyota guidance stays visible below as the baseline, but your saved target here updates the dashboard, schedule engine, smart mileage preview, print report, and calendar exports.</div>
   </div>
-  <div class="card">
-    <div class="card-head">
+  <div class="card schedule-controls-card" id="scheduleControlsCard">
+    <div class="card-head" id="scheduleControlsHead" role="button" tabindex="0" aria-expanded="false" onclick="toggleScheduleControls()" onkeydown="handleScheduleControlsKey(event)">
       <div class="card-title">Schedule Controls</div>
-      <div id="scheduleOverrideSummary" style="font-size:11px;color:var(--text3)">0 custom targets</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="scheduleOverrideSummary" style="font-size:11px;color:var(--text3)">0 custom targets</div>
+        <div class="schedule-controls-chevron" id="scheduleControlsChevron">▾</div>
+      </div>
     </div>
-    <div class="card-body" id="scheduleConfigList"></div>
+    <div class="card-body">
+      <div id="scheduleConfigList"></div>
+    </div>
   </div>
 
   <div class="section-label">Recurring Schedule</div>
@@ -1980,6 +1991,7 @@ const INVENTORY_KEY = 'vz_inventory';
 const MASTER_PARTS_KEY = 'vz_master_parts';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
+const SCHEDULE_UI_STATE_KEY = 'vz_schedule_controls_open';
 const DEFAULT_MASTER_PARTS = [
   {id:'mp_oil_mobil1_0w16',name:'Mobil 1 0W-16 Full Synthetic 5 qt',serviceType:'oil',category:'fluids_filters',partNum:'B07Y5MG3MX',unitCost:27.97,statusLabel:'Reference part',note:'Need 4.8 qt — leftover is good for top-off.',countInOilAvg:true,sources:[{store:'Walmart',url:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534',label:'walmart.com — verified 03/2026',unitPrice:27.97,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_oil_filter_oem',name:'OEM Oil Filter',serviceType:'oil',category:'fluids_filters',partNum:'90915-YZZN1',unitCost:6.57,statusLabel:'Reference part',note:'Replace with every oil change.',countInOilAvg:true,sources:[{store:'Toyota Parts',url:'https://parts.toyota.com/',label:'parts.toyota.com',unitPrice:6.57,addedAt:'2026-03-01T00:00:00.000Z'}]},
@@ -3047,12 +3059,38 @@ function getScheduleFlag(rule){
   if(rule.laterThanGuideline && !rule.earlierThanGuideline) return {text:'Later Than Toyota', cls:'later'};
   return {text:'Custom Target', cls:'custom'};
 }
+function areScheduleControlsOpen(){
+  return localStorage.getItem(SCHEDULE_UI_STATE_KEY) === '1';
+}
+function updateScheduleControlsUI(){
+  const card = document.getElementById('scheduleControlsCard');
+  const head = document.getElementById('scheduleControlsHead');
+  if(!card || !head) return;
+  const isOpen = areScheduleControlsOpen();
+  card.classList.toggle('open', isOpen);
+  head.setAttribute('aria-expanded', String(isOpen));
+}
+function setScheduleControlsOpen(isOpen){
+  if(isOpen) localStorage.setItem(SCHEDULE_UI_STATE_KEY, '1');
+  else localStorage.removeItem(SCHEDULE_UI_STATE_KEY);
+  updateScheduleControlsUI();
+}
+function toggleScheduleControls(){
+  setScheduleControlsOpen(!areScheduleControlsOpen());
+}
+function handleScheduleControlsKey(event){
+  if(event.key === 'Enter' || event.key === ' '){
+    event.preventDefault();
+    toggleScheduleControls();
+  }
+}
 function renderScheduleSettings(){
   const listEl = document.getElementById('scheduleConfigList');
   const summaryEl = document.getElementById('scheduleOverrideSummary');
   const oilGuidanceEl = document.getElementById('scheduleOilGuidanceText');
   const specsOilIntervalEl = document.getElementById('specsOilIntervalText');
   if(!listEl || !summaryEl) return;
+  updateScheduleControlsUI();
   const rules = getResolvedRecurringRules().filter(rule=>!rule.watchOnly);
   const oilRule = rules.find(rule=>rule.id==='oil');
   if(oilGuidanceEl && oilRule){
