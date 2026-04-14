@@ -433,6 +433,21 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .badge.green{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
 .badge.gray{background:rgba(90,96,128,.2);color:var(--text3);border:1px solid rgba(90,96,128,.3)}
 
+/* ─── SCHEDULE CUSTOMIZER ───────────────────────────────── */
+.sched-config-item{padding:14px 16px;border-bottom:1px solid var(--border)}
+.sched-config-item:last-child{border-bottom:none}
+.sched-config-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.sched-config-name{font-size:13px;color:var(--text);font-weight:600;line-height:1.45}
+.sched-config-meta{font-size:10px;color:var(--text3);line-height:1.6;margin-top:4px}
+.sched-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.sched-config-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sched-flag{display:inline-block;font-size:9px;padding:2px 7px;border-radius:5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.sched-flag.default{background:rgba(90,96,128,.18);color:var(--text3);border:1px solid rgba(90,96,128,.25)}
+.sched-flag.custom{background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.25)}
+.sched-flag.earlier{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.25)}
+.sched-flag.later{background:rgba(217,122,0,.12);color:var(--orange2);border:1px solid rgba(217,122,0,.3)}
+.sched-inline-note{font-size:11px;color:var(--text3);line-height:1.6;margin-top:4px}
+
 /* ─── PARTS ────────────────────────────────────────────────── */
 .part-item{
   padding:12px 16px;border-bottom:1px solid var(--border);
@@ -983,6 +998,19 @@ html.modal-open,body.modal-open{overflow:hidden}
 <!-- ═══ UPCOMING SCHEDULE ════════════════════════════════════════ -->
 <div id="page-upcoming" class="page">
 
+  <div class="section-label">Personal Maintenance Targets</div>
+  <div class="alert blue">
+    <div class="alert-icon">🎯</div>
+    <div><strong>Your target drives the app.</strong> Toyota guidance stays visible below as the baseline, but your saved target here updates the dashboard, schedule engine, smart mileage preview, print report, and calendar exports.</div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Schedule Controls</div>
+      <div id="scheduleOverrideSummary" style="font-size:11px;color:var(--text3)">0 custom targets</div>
+    </div>
+    <div class="card-body" id="scheduleConfigList"></div>
+  </div>
+
   <div class="section-label">Recurring Schedule</div>
   <div class="card">
     <div class="card-body" id="upcomingRecurringList"></div>
@@ -996,7 +1024,7 @@ html.modal-open,body.modal-open{overflow:hidden}
 <div class="section-label">Official Toyota Schedule (from manual)</div>
   <div class="alert gold">
     <div class="alert-icon">📋</div>
-    <div><strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. You've chosen 5,000 mi — more conservative and perfectly valid.</div>
+    <div id="scheduleOilGuidanceText"><strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. Your current target will appear here.</div>
   </div>
   <div class="sched-wrap">
     <table class="sched-table">
@@ -1562,7 +1590,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="row"><span class="row-key">Fill Method</span><span class="row-val">Add 4.5 qt first → check dipstick</span></div>
     <div class="row"><span class="row-key">Dipstick Handle</span><span class="row-val gold">Yellow</span></div>
     <div class="row"><span class="row-key">Toyota Official Interval</span><span class="row-val">10,000 mi / 12 months (0W-16)</span></div>
-    <div class="row"><span class="row-key">Your Custom Interval</span><span class="row-val green">5,000 mi (more conservative)</span></div>
+    <div class="row"><span class="row-key">Your Custom Interval</span><span class="row-val green" id="specsOilIntervalText">5,000 mi / 6 mo</span></div>
     <div class="row"><span class="row-key">Emergency Substitute</span><span class="row-val red">0W-20 once only — replace ASAP</span></div>
   </div></div>
 
@@ -1951,6 +1979,7 @@ const DEFAULT_INVENTORY = [];
 const INVENTORY_KEY = 'vz_inventory';
 const MASTER_PARTS_KEY = 'vz_master_parts';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
+const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
 const DEFAULT_MASTER_PARTS = [
   {id:'mp_oil_mobil1_0w16',name:'Mobil 1 0W-16 Full Synthetic 5 qt',serviceType:'oil',category:'fluids_filters',partNum:'B07Y5MG3MX',unitCost:27.97,statusLabel:'Reference part',note:'Need 4.8 qt — leftover is good for top-off.',countInOilAvg:true,sources:[{store:'Walmart',url:'https://www.walmart.com/ip/Mobil-1-Advanced-Fuel-Economy-Full-Synthetic-Motor-Oil-0W-16-5-Quart/747116534',label:'walmart.com — verified 03/2026',unitPrice:27.97,addedAt:'2026-03-01T00:00:00.000Z'}]},
   {id:'mp_oil_filter_oem',name:'OEM Oil Filter',serviceType:'oil',category:'fluids_filters',partNum:'90915-YZZN1',unitCost:6.57,statusLabel:'Reference part',note:'Replace with every oil change.',countInOilAvg:true,sources:[{store:'Toyota Parts',url:'https://parts.toyota.com/',label:'parts.toyota.com',unitPrice:6.57,addedAt:'2026-03-01T00:00:00.000Z'}]},
@@ -2451,6 +2480,68 @@ function setMi(m){
   const n = parseInt(m,10);
   if(Number.isFinite(n) && n > 0) localStorage.setItem('vz_mi', n);
 }
+function parsePositiveInt(value){
+  const n = parseInt(value,10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function getScheduleOverrides(){
+  try{
+    const raw = localStorage.getItem(SCHEDULE_OVERRIDE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  }catch(err){
+    return {};
+  }
+}
+function saveScheduleOverrides(overrides){
+  const clean = {};
+  Object.entries(overrides||{}).forEach(([ruleId,value])=>{
+    if(!value || typeof value !== 'object') return;
+    const milesInterval = parsePositiveInt(value.milesInterval);
+    const monthsInterval = parsePositiveInt(value.monthsInterval);
+    const next = {};
+    if(milesInterval) next.milesInterval = milesInterval;
+    if(monthsInterval) next.monthsInterval = monthsInterval;
+    if(Object.keys(next).length) clean[ruleId] = next;
+  });
+  if(Object.keys(clean).length){
+    localStorage.setItem(SCHEDULE_OVERRIDE_KEY, JSON.stringify(clean));
+  }else{
+    localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  }
+}
+function formatIntervalSummary(milesInterval, monthsInterval){
+  const bits = [];
+  if(Number.isFinite(Number(milesInterval)) && Number(milesInterval) > 0) bits.push(`${Number(milesInterval).toLocaleString()} mi`);
+  if(Number.isFinite(Number(monthsInterval)) && Number(monthsInterval) > 0) bits.push(`${Number(monthsInterval)} mo`);
+  return bits.length ? bits.join(' / ') : 'Manual';
+}
+function getResolvedRecurringRules(){
+  const overrides = getScheduleOverrides();
+  return RECURRING_RULES.map(rule=>{
+    if(rule.watchOnly) return {...rule};
+    const override = overrides[rule.id] || {};
+    const guidelineMilesInterval = parsePositiveInt(rule.milesInterval);
+    const guidelineMonthsInterval = parsePositiveInt(rule.monthsInterval);
+    const milesInterval = parsePositiveInt(override.milesInterval) || guidelineMilesInterval;
+    const monthsInterval = parsePositiveInt(override.monthsInterval) || guidelineMonthsInterval;
+    const customActive = milesInterval !== guidelineMilesInterval || monthsInterval !== guidelineMonthsInterval;
+    const earlierThanGuideline = (guidelineMilesInterval && milesInterval && milesInterval < guidelineMilesInterval) || (guidelineMonthsInterval && monthsInterval && monthsInterval < guidelineMonthsInterval);
+    const laterThanGuideline = (guidelineMilesInterval && milesInterval && milesInterval > guidelineMilesInterval) || (guidelineMonthsInterval && monthsInterval && monthsInterval > guidelineMonthsInterval);
+    return {
+      ...rule,
+      guidelineMilesInterval,
+      guidelineMonthsInterval,
+      milesInterval,
+      monthsInterval,
+      customActive,
+      earlierThanGuideline: !!earlierThanGuideline,
+      laterThanGuideline: !!laterThanGuideline,
+      activeIntervalText: formatIntervalSummary(milesInterval, monthsInterval),
+      guidelineIntervalText: formatIntervalSummary(guidelineMilesInterval, guidelineMonthsInterval)
+    };
+  });
+}
 function safeNum(v){
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
@@ -2711,7 +2802,7 @@ function computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDa
 function getRecurringServicesState(currentMi=getMi(), referenceDate=todayLocal()){
   const entries = getData();
   const avgMilesPerDay = estimateMilesPerDay(entries, currentMi, referenceDate);
-  const rules = RECURRING_RULES.map(rule=>computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDay));
+  const rules = getResolvedRecurringRules().map(rule=>computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDay));
   return {entries, rules, avgMilesPerDay, referenceDate};
 }
 function compareRecurring(a,b){
@@ -2950,7 +3041,95 @@ function renderDash(){
     document.getElementById('dProgress').style.width = '0%';
   }
 }
+function getScheduleFlag(rule){
+  if(!rule.customActive) return {text:'Toyota Guide', cls:'default'};
+  if(rule.earlierThanGuideline && !rule.laterThanGuideline) return {text:'Earlier Than Toyota', cls:'earlier'};
+  if(rule.laterThanGuideline && !rule.earlierThanGuideline) return {text:'Later Than Toyota', cls:'later'};
+  return {text:'Custom Target', cls:'custom'};
+}
+function renderScheduleSettings(){
+  const listEl = document.getElementById('scheduleConfigList');
+  const summaryEl = document.getElementById('scheduleOverrideSummary');
+  const oilGuidanceEl = document.getElementById('scheduleOilGuidanceText');
+  const specsOilIntervalEl = document.getElementById('specsOilIntervalText');
+  if(!listEl || !summaryEl) return;
+  const rules = getResolvedRecurringRules().filter(rule=>!rule.watchOnly);
+  const oilRule = rules.find(rule=>rule.id==='oil');
+  if(oilGuidanceEl && oilRule){
+    const modeText = oilRule.customActive
+      ? `Your current target: ${oilRule.activeIntervalText}. Toyota guide stays ${oilRule.guidelineIntervalText}.`
+      : `You are currently following Toyota's ${oilRule.guidelineIntervalText} guidance.`;
+    oilGuidanceEl.innerHTML = `<strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. ${modeText}`;
+  }
+  if(specsOilIntervalEl && oilRule){
+    specsOilIntervalEl.textContent = oilRule.customActive
+      ? `${oilRule.activeIntervalText} · personal target`
+      : `${oilRule.activeIntervalText} · Toyota guide`;
+  }
+  const customCount = rules.filter(rule=>rule.customActive).length;
+  summaryEl.textContent = `${customCount} custom target${customCount!==1?'s':''}`;
+  listEl.innerHTML = rules.map(rule=>{
+    const flag = getScheduleFlag(rule);
+    const guideline = rule.guidelineIntervalText || '—';
+    const active = rule.activeIntervalText || guideline;
+    const extraNote = rule.customActive
+      ? `<div class="sched-inline-note">Active target: ${active} · Toyota guide: ${guideline}</div>`
+      : `<div class="sched-inline-note">Using Toyota guide: ${guideline}</div>`;
+    return `<div class="sched-config-item">
+      <div class="sched-config-top">
+        <div style="flex:1">
+          <div class="sched-config-name">${rule.icon} ${rule.name}</div>
+          <div class="sched-config-meta">${safeText(rule.note || 'Schedule managed by recurring maintenance engine')}</div>
+          ${extraNote}
+        </div>
+        <span class="sched-flag ${flag.cls}">${flag.text}</span>
+      </div>
+      <div class="sched-config-grid">
+        <div class="fl" style="margin-bottom:0">
+          <label>Mileage Target</label>
+          <input type="number" class="fi" id="schedMiles_${rule.id}" value="${rule.milesInterval || ''}" min="1" step="1" placeholder="${rule.guidelineMilesInterval || ''}">
+        </div>
+        <div class="fl" style="margin-bottom:0">
+          <label>Month Target</label>
+          <input type="number" class="fi" id="schedMonths_${rule.id}" value="${rule.monthsInterval || ''}" min="1" step="1" placeholder="${rule.guidelineMonthsInterval || ''}">
+        </div>
+      </div>
+      <div class="sched-config-actions">
+        <button type="button" class="mini-btn" onclick="saveScheduleRule('${rule.id}')">Save Target</button>
+        <button type="button" class="mini-btn" onclick="resetScheduleRule('${rule.id}')">Reset to Toyota</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function saveScheduleRule(ruleId){
+  const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
+  if(!baseRule || baseRule.watchOnly) return;
+  const milesEl = document.getElementById(`schedMiles_${ruleId}`);
+  const monthsEl = document.getElementById(`schedMonths_${ruleId}`);
+  const milesInterval = parsePositiveInt(milesEl?.value) || parsePositiveInt(baseRule.milesInterval);
+  const monthsInterval = parsePositiveInt(monthsEl?.value) || parsePositiveInt(baseRule.monthsInterval);
+  const overrides = getScheduleOverrides();
+  const next = {};
+  if(milesInterval && milesInterval !== parsePositiveInt(baseRule.milesInterval)) next.milesInterval = milesInterval;
+  if(monthsInterval && monthsInterval !== parsePositiveInt(baseRule.monthsInterval)) next.monthsInterval = monthsInterval;
+  if(Object.keys(next).length) overrides[ruleId] = next; else delete overrides[ruleId];
+  saveScheduleOverrides(overrides);
+  renderAll();
+  const resolved = getResolvedRecurringRules().find(rule=>rule.id===ruleId);
+  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : formatIntervalSummary(milesInterval, monthsInterval)} ✓`);
+}
+function resetScheduleRule(ruleId){
+  const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
+  if(!baseRule || baseRule.watchOnly) return;
+  const overrides = getScheduleOverrides();
+  if(!overrides[ruleId]){ showToast(`${baseRule.name} already matches Toyota guide`); return; }
+  delete overrides[ruleId];
+  saveScheduleOverrides(overrides);
+  renderAll();
+  showToast(`${baseRule.name} reset to Toyota guide ✓`);
+}
 function renderUpcoming(){
+  renderScheduleSettings();
   const mi = getMi();
   const state = getRecurringServicesState(mi);
   const recurring = state.rules.filter(r=>!r.watchOnly).sort(compareRecurring);
@@ -2965,6 +3144,7 @@ function renderUpcoming(){
           <div class="svc-name">${item.name}</div>
           <div class="svc-note">${item.dueLine}</div>
           <div class="svc-note">${item.remainingText} · ${item.triggerText}</div>
+          <div class="svc-note">Active target: ${item.activeIntervalText || formatIntervalSummary(item.milesInterval, item.monthsInterval)}${item.customActive ? ` · Toyota guide: ${item.guidelineIntervalText || '—'}` : ''}</div>
           <div class="svc-actions">
             <button class="mini-btn" onclick="downloadRuleCalendar('${item.id}')">📅 Add to Calendar</button>
           </div>
@@ -3685,7 +3865,8 @@ function renderBackup(){
   const photoCount=d.filter(e=>getPhoto(e.id)).length;
   const inventoryCount = getInventory().length;
   const masterPartsCount = getMasterParts().length;
-  document.getElementById('bkCount').textContent=d.length+' entries · '+inventoryCount+' inventory item'+(inventoryCount!==1?'s':'')+' · '+masterPartsCount+' master part'+(masterPartsCount!==1?'s':'')+' · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
+  const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
+  document.getElementById('bkCount').textContent=d.length+' entries · '+inventoryCount+' inventory item'+(inventoryCount!==1?'s':'')+' · '+masterPartsCount+' master part'+(masterPartsCount!==1?'s':'')+' · '+scheduleOverrideCount+' custom target'+(scheduleOverrideCount!==1?'s':'')+' · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
   document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
   const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
   document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
@@ -3728,12 +3909,13 @@ function exportData(){
   });
 
   const payload={
-    version: 4,
+    version: 5,
     exported: new Date().toISOString(),
     vin: VIN,
     vehicle: '2021 Toyota Venza Hybrid AWD',
     mileage: getMi(),
     oilAverageResetAt: getOilAverageResetAt(),
+    scheduleOverrides: getScheduleOverrides(),
     entries: entries,
     inventory: getInventory(),
     masterParts: getMasterParts(),
@@ -3772,6 +3954,7 @@ function importData(input){
       const inventory=Array.isArray(data.inventory) ? data.inventory : [];
       const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
       const oilAverageResetAt=data.oilAverageResetAt||'';
+      const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
       const photoCount=Object.keys(photos).length;
       const version = Number(data.version || 0);
       const backupVin = String(data.vin || '').trim();
@@ -3779,7 +3962,7 @@ function importData(input){
       if(!entries){
         showToast('❌ Invalid backup file format'); input.value=''; return;
       }
-      if(version > 4){
+      if(version > 5){
         showToast('This backup was created by a newer app version'); input.value=''; return;
       }
       if(backupVin && backupVin !== VIN){
@@ -3802,6 +3985,7 @@ This replaces all current data. Continue?`)){
       saveInventory(inventory);
       saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
       if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+      saveScheduleOverrides(scheduleOverrides);
       if(mi&&mi>0)setMi(mi);
 
       Object.entries(photos).forEach(([id,imgData])=>{
@@ -3829,6 +4013,7 @@ function resetData(){
   saveInventory(DEFAULT_INVENTORY);
   saveMasterParts(DEFAULT_MASTER_PARTS);
   localStorage.removeItem(OIL_AVG_RESET_KEY);
+  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
   setMi(64751);
   renderAll();
   renderBackup();
@@ -3867,6 +4052,9 @@ function generatePrint(){
   const maintenanceState = getRecurringServicesState(curMi);
   const upcoming = maintenanceState.rules.filter(i=>!i.watchOnly).sort(compareRecurring).slice(0,6);
   const heroBundle = getNextRecurringBundle(maintenanceState);
+  const oilRule = maintenanceState.rules.find(item=>item.id==='oil') || null;
+  const oilIntervalLine = oilRule ? formatIntervalSummary(oilRule.milesInterval, oilRule.monthsInterval) : 'Every 5,000 Miles';
+  const oilGuidelineLine = oilRule ? (oilRule.guidelineIntervalText || '10,000 mi / 12 mo') : '10,000 mi / 12 mo';
 
   // Build rows
   const rows = entries.map((e,i)=>{
@@ -3889,7 +4077,7 @@ function generatePrint(){
     const badge = item.status === 'due soon' ? 'DUE SOON' : item.status.toUpperCase();
     return `<tr>
       <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px">${escapeHtml(item.icon + " " + item.name)}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(item.dueLine.replace('Next due: ',''))}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(item.dueLine.replace('Next due: ',''))}${item.customActive ? `<br><span style='color:#8b90a7'>Target: ${escapeHtml(item.activeIntervalText)} · Toyota: ${escapeHtml(item.guidelineIntervalText || '—')}</span>` : ''}</td>
       <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</td>
       <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${badge} · ${item.remainingText}</td>
     </tr>`;
@@ -4102,8 +4290,8 @@ function generatePrint(){
       </div>
       <div class="info-box">
         <div class="info-label">Service Interval (Custom)</div>
-        <div class="info-val">Every 5,000 Miles</div>
-        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Toyota spec: 10,000 mi / 12 months with 0W-16</div>
+        <div class="info-val">${escapeHtml(oilIntervalLine)}</div>
+        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Toyota guideline: ${escapeHtml(oilGuidelineLine)} with 0W-16</div>
       </div>
       <div class="info-box">
         <div class="info-label">Toyota Warranty Contact</div>
