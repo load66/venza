@@ -1985,6 +1985,7 @@ const DEFAULT_INVENTORY = [];
 const INVENTORY_KEY = 'vz_inventory';
 const MASTER_PARTS_KEY = 'vz_master_parts';
 const MI_STATE_KEY = 'vz_mi_state_v1';
+const MI_HISTORY_KEY = 'vz_mi_history_v1';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const AVG_SERVICE_TYPE_KEY = 'vz_avg_service_type';
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
@@ -2668,10 +2669,53 @@ function highestMileage(entries){
 function getMi(){
   const stored = parseInt(localStorage.getItem('vz_mi')||'',10);
   if(Number.isFinite(stored) && stored > 0) return stored;
+  const state = getMiState();
+  if(Number.isFinite(Number(state.value)) && Number(state.value) > 0) return Number(state.value);
+  const historyValue = getLatestMileageHistoryCandidate()?.value;
+  if(Number.isFinite(Number(historyValue)) && Number(historyValue) > 0) return Number(historyValue);
   return highestMileage(getData()) || 64751;
 }
+function normalizeMileageHistory(items){
+  if(!Array.isArray(items)) return [];
+  return items.filter(Boolean).map(item=>({
+    value: Number.isFinite(Number(item.value)) ? Number(item.value) : 0,
+    source: item.source === 'entry' ? 'entry' : item.source === 'manual' ? 'manual' : 'legacy',
+    entryId: item.entryId != null && item.entryId !== '' ? String(item.entryId) : null,
+    updatedAt: item.updatedAt || new Date().toISOString()
+  })).filter(item=>item.value > 0);
+}
+function getMiHistory(){
+  try{
+    return normalizeMileageHistory(JSON.parse(localStorage.getItem(MI_HISTORY_KEY)||'[]'));
+  }catch(err){
+    return [];
+  }
+}
+function saveMiHistory(items){
+  localStorage.setItem(MI_HISTORY_KEY, JSON.stringify(normalizeMileageHistory(items)));
+}
+function appendMiHistory(item){
+  const history = getMiHistory();
+  const next = normalizeMileageHistory([item])[0];
+  if(!next) return history;
+  const prev = history[history.length-1];
+  if(prev && prev.value === next.value && prev.source === next.source && String(prev.entryId||'') === String(next.entryId||'')) return history;
+  history.push(next);
+  saveMiHistory(history);
+  return history;
+}
+function getLatestMileageHistoryCandidate(options={}){
+  const excludedEntryIds = new Set((options.excludeEntryIds || []).map(id=>String(id)));
+  const history = getMiHistory();
+  for(let i=history.length-1; i>=0; i--){
+    const item = history[i];
+    if(item.source === 'entry' && item.entryId && excludedEntryIds.has(String(item.entryId))) continue;
+    if(Number.isFinite(Number(item.value)) && Number(item.value) > 0) return item;
+  }
+  return null;
+}
 function getMiState(){
-  const current = getMi();
+  const current = parseInt(localStorage.getItem('vz_mi')||'',10);
   try{
     const parsed = JSON.parse(localStorage.getItem(MI_STATE_KEY)||'null');
     if(parsed && typeof parsed === 'object'){
@@ -2683,7 +2727,13 @@ function getMiState(){
       };
     }
   }catch(err){}
-  return {value:current, source:'legacy', entryId:null, updatedAt:''};
+  const fallback = getLatestMileageHistoryCandidate();
+  return {
+    value: fallback?.value || current || 0,
+    source: fallback?.source || 'legacy',
+    entryId: fallback?.entryId || null,
+    updatedAt: fallback?.updatedAt || ''
+  };
 }
 function setMi(m, meta={}){
   const n = parseInt(m,10);
@@ -2692,13 +2742,22 @@ function setMi(m, meta={}){
   const source = meta.source === 'entry' ? 'entry' : 'manual';
   const allowLower = !!meta.allowLower || source === 'manual';
   if(!allowLower && Number.isFinite(current) && current > 0 && n < current) return false;
+  const updatedAt = meta.updatedAt || new Date().toISOString();
   localStorage.setItem('vz_mi', n);
   localStorage.setItem(MI_STATE_KEY, JSON.stringify({
     value:n,
     source,
     entryId: source === 'entry' && meta.entryId != null ? String(meta.entryId) : null,
-    updatedAt:new Date().toISOString()
+    updatedAt
   }));
+  if(!meta.skipHistory){
+    appendMiHistory({
+      value:n,
+      source,
+      entryId: source === 'entry' && meta.entryId != null ? String(meta.entryId) : null,
+      updatedAt
+    });
+  }
   return true;
 }
 function getHighestMileageEntry(entries=getData()){
@@ -2720,19 +2779,33 @@ function recalcMileageFromEntries(entries=getData()){
   setMi(fallback, {source:'manual', allowLower:true});
   return fallback;
 }
-function shouldRollbackMileageAfterDelete(deletedEntry, remainingEntries){
-  const deletedMi = Number(deletedEntry?.mi||0);
-  if(!(Number.isFinite(deletedMi) && deletedMi > 0)) return false;
-  const currentMi = getMi();
-  const state = getMiState();
-  const maxRemaining = highestMileage(remainingEntries);
-  const wasAutoRaisedByThisEntry = state.source === 'entry' && String(state.entryId||'') === String(deletedEntry.id) && currentMi === deletedMi;
-  const legacyLikelyRaisedByThisEntry = currentMi === deletedMi && deletedMi > maxRemaining;
-  return wasAutoRaisedByThisEntry || legacyLikelyRaisedByThisEntry;
-}
 function reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries){
-  if(!shouldRollbackMileageAfterDelete(deletedEntry, remainingEntries)) return false;
-  recalcMileageFromEntries(remainingEntries);
+  const deletedId = String(deletedEntry?.id ?? '');
+  if(!deletedId) return false;
+  const state = getMiState();
+  const usingDeletedEntry = state.source === 'entry' && String(state.entryId||'') === deletedId;
+  if(!usingDeletedEntry) return false;
+
+  const prior = getLatestMileageHistoryCandidate({excludeEntryIds:[deletedId]});
+  if(prior){
+    setMi(prior.value, {
+      source: prior.source === 'entry' ? 'entry' : 'manual',
+      entryId: prior.entryId,
+      allowLower: true,
+      skipHistory: true,
+      updatedAt: new Date().toISOString()
+    });
+    return true;
+  }
+
+  const highestEntry = getHighestMileageEntry(remainingEntries);
+  if(highestEntry){
+    setMi(highestEntry.mi, {source:'entry', entryId:highestEntry.id, allowLower:true, skipHistory:true});
+    return true;
+  }
+
+  const fallback = highestMileage(DEFAULT) || 64751;
+  setMi(fallback, {source:'manual', allowLower:true, skipHistory:true});
   return true;
 }
 function parsePositiveInt(value){
@@ -3365,6 +3438,9 @@ window.onload=()=>{
   setInventoryFormOpen(false);
   bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
   setScheduleControlsExpanded(false);
+  if(!localStorage.getItem(MI_HISTORY_KEY)){
+    appendMiHistory({value:getMi(),source:'manual',entryId:null,updatedAt:new Date().toISOString()});
+  }
   if(!localStorage.getItem(MI_STATE_KEY)) localStorage.setItem(MI_STATE_KEY, JSON.stringify({value:getMi(),source:'legacy',entryId:null,updatedAt:new Date().toISOString()}));
   renderAll();
   resetEntryInventoryUses();
@@ -4463,6 +4539,7 @@ function exportData(){
     averageServiceType: getAverageServiceType(),
     scheduleOverrides: getScheduleOverrides(),
     servicePartRequirements: getSavedServiceRequirementsMap(),
+    mileageHistory: getMiHistory(),
     entries: entries,
     inventory: getInventory(),
     masterParts: getMasterParts(),
@@ -5778,6 +5855,7 @@ function importData(input){
       const averageServiceType=data.averageServiceType||'oil_avg';
       const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
       const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
+      const mileageHistory=Array.isArray(data.mileageHistory) ? normalizeMileageHistory(data.mileageHistory) : [];
       const photoCount=Object.keys(photos).length + Object.keys(partPhotos).length;
       const version = Number(data.version || 0);
       const backupVin = String(data.vin || '').trim();
@@ -5807,8 +5885,16 @@ This replaces all current data. Continue?`)){
       localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
       saveScheduleOverrides(scheduleOverrides);
       if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
-      if(mi&&mi>0)setMi(mi,{source:'manual',allowLower:true});
-      else recalcMileageFromEntries(entries);
+      if(mileageHistory.length) saveMiHistory(mileageHistory); else localStorage.removeItem(MI_HISTORY_KEY);
+      if(mi&&mi>0)setMi(mi,{source:'manual',allowLower:true,skipHistory:!!mileageHistory.length});
+      else if(mileageHistory.length){
+        const restoredMileage = getLatestMileageHistoryCandidate();
+        if(restoredMileage){
+          setMi(restoredMileage.value,{source:restoredMileage.source,entryId:restoredMileage.entryId,allowLower:true,skipHistory:true});
+        }else{
+          recalcMileageFromEntries(entries);
+        }
+      }else recalcMileageFromEntries(entries);
       Object.entries(photos).forEach(([id,imgData])=>{ try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){} });
       Object.entries(partPhotos).forEach(([id,imgData])=>{ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id, imgData); }catch(err){} });
       renderAll();
@@ -5835,6 +5921,7 @@ function resetData(){
   localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
   localStorage.removeItem(BASIC_PARTS_KEY);
   localStorage.removeItem(MI_STATE_KEY);
+  localStorage.removeItem(MI_HISTORY_KEY);
   setMi(64751,{source:'manual',allowLower:true});
   renderAll();
   renderBackup();
