@@ -1014,7 +1014,7 @@ html.modal-open,body.modal-open{overflow:hidden}
         </div>
         <div id="fItemsList" class="item-builder"></div>
         <div class="item-builder-actions">
-          <button type="button" class="item-add" onclick="addItemRow()">＋ Add Another Part</button>
+          <button type="button" class="item-add" id="servicePartsAddBtn" onclick="addItemRow()">＋ Add Part</button>
         </div>
       </div>
     </div>
@@ -5410,6 +5410,21 @@ function renderParts(){
     </div>
   `).join('');
 }
+function updateServicePartAddButton(){
+  const btn = document.getElementById('servicePartsAddBtn');
+  if(!btn) return;
+  const count = document.querySelectorAll('#fItemsList .item-editor').length;
+  btn.textContent = count ? '＋ Add Another Part' : '＋ Add Part';
+}
+function ensureAtLeastOneServicePartRow(){
+  const list = document.getElementById('fItemsList');
+  if(!list) return null;
+  const existing = list.querySelector('.item-editor');
+  if(existing) return existing;
+  const row = buildServicePartRow();
+  updateServicePartAddButton();
+  return row;
+}
 function toggleServicePartsBuilder(force){
   const wrap = document.getElementById('servicePartsWrap');
   const btn = document.getElementById('servicePartsToggle');
@@ -5417,6 +5432,11 @@ function toggleServicePartsBuilder(force){
   const shouldOpen = typeof force === 'boolean' ? force : !wrap.classList.contains('open');
   wrap.classList.toggle('open', shouldOpen);
   btn.classList.toggle('open', shouldOpen);
+  if(shouldOpen){
+    const row = ensureAtLeastOneServicePartRow();
+    const firstInput = row?.querySelector('.item-name');
+    if(firstInput && !firstInput.value) setTimeout(()=>firstInput.focus(), 0);
+  }
 }
 function normalizeServiceEntryItems(items){
   return (Array.isArray(items) ? items : []).filter(Boolean).map(item=>({
@@ -5467,12 +5487,16 @@ function addItemRow(data={}){
   toggleServicePartsBuilder(true);
   const row = buildServicePartRow(data);
   syncEntryCostFromItems();
+  updateServicePartAddButton();
+  const firstInput = row?.querySelector('.item-name');
+  if(firstInput) setTimeout(()=>firstInput.focus(), 0);
   return row;
 }
 function removeItemRow(btn){
   const row = btn?.closest('.item-editor');
   if(row) row.remove();
   syncEntryCostFromItems();
+  updateServicePartAddButton();
 }
 function getFormItems(){
   return normalizeServiceEntryItems(Array.from(document.querySelectorAll('#fItemsList .item-editor')).map(row=>({
@@ -5497,6 +5521,7 @@ function resetEntryInventoryUses(){
   if(list) list.innerHTML = '';
   toggleServicePartsBuilder(false);
   syncEntryCostFromItems();
+  updateServicePartAddButton();
 }
 function renderEntryInventoryUI(){
   syncEntryCostFromItems();
