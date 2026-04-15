@@ -47,7 +47,7 @@ body{
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
-button{cursor:pointer;border:none;background:none;font-family:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;touch-action:manipulation}
 
 /* ─── STATUS BAR SPACER ────────────────────────────────────── */
 .status-bar{
@@ -363,8 +363,9 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .fi,.fs,.ft{
   width:100%;background:var(--bg3);
   border:1.5px solid var(--border2);border-radius:8px;
-  padding:11px 13px;color:var(--text);
-  font-family:'Outfit',sans-serif;font-size:14px;
+  padding:12px 13px;color:var(--text);
+  font-family:'Outfit',sans-serif;
+  font-size:16px; /* 16px minimum prevents Safari auto-zoom on focus */
   outline:none;transition:border-color .2s,box-shadow .2s;
   -webkit-appearance:none;
   color-scheme:dark;
@@ -375,6 +376,49 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 }
 .ft{resize:vertical;min-height:76px}
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* ─── MILEAGE FIELD HINTS ───────────────────────────────────── */
+.mi-hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5;
+  font-family:'JetBrains Mono',monospace;}
+.mi-warn{display:none;margin-top:6px;padding:8px 11px;border-radius:7px;
+  background:rgba(217,122,0,.1);border:1px solid rgba(217,122,0,.3);
+  font-size:12px;color:var(--orange2);line-height:1.5;}
+.mi-warn.visible{display:block}
+/* ─── PART ROW IMPROVEMENTS ─────────────────────────────────── */
+.item-editor-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.item-editor-title{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.5px;
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.item-editor-title.named{color:var(--text);font-size:12px}
+.item-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.item-grid .span2{grid-column:1/-1}
+.item-price-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
+.item-subtotal{
+  grid-column:1/-1;
+  display:none;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--orange2);font-weight:600;
+  text-align:right;padding:4px 2px 0;
+}
+.item-subtotal.visible{display:block}
+/* ─── PARTS AUTOCOMPLETE ─────────────────────────────────────── */
+.part-ac-wrap{position:relative;grid-column:1/-1}
+.part-ac{
+  display:none;position:absolute;left:0;right:0;top:100%;z-index:300;
+  background:var(--bg1);border:1.5px solid var(--toyota);
+  border-top:none;border-radius:0 0 8px 8px;
+  max-height:200px;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.part-ac.open{display:block}
+.part-ac-item{
+  padding:11px 13px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .15s;
+}
+.part-ac-item:last-child{border-bottom:none}
+.part-ac-item:active,.part-ac-item:hover{background:rgba(235,10,30,.08)}
+.part-ac-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
+.part-ac-meta{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+.part-ac-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange2)}
 .btn-primary{
   width:100%;padding:14px;
   background:var(--toyota);color:#fff;
@@ -976,7 +1020,13 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
     <div class="fg2">
       <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
-      <div class="fl"><label>Mileage</label><input type="number" class="fi" id="fMi" placeholder="64751"></div>
+      <div class="fl">
+        <label>Mileage</label>
+        <input type="number" class="fi" id="fMi" inputmode="numeric" autocomplete="off"
+               placeholder="—" oninput="onMileageInput(this.value)">
+        <div class="mi-hint" id="fMiHint"></div>
+        <div class="mi-warn" id="fMiWarn"></div>
+      </div>
     </div>
     <div class="fl">
       <label>Service Type</label>
@@ -4289,6 +4339,155 @@ function removeOneInventoryItem(id){
   renderEntryInventoryUI();
 }
 
+/* ─── MILEAGE FIELD — dynamic placeholder, hint, validation ─── */
+function initAddForm(){
+  const input    = document.getElementById('fMi');
+  const hintEl   = document.getElementById('fMiHint');
+  const warnEl   = document.getElementById('fMiWarn');
+  if(!input) return;
+  const cur = getMi();
+  input.placeholder = cur.toLocaleString();
+  if(hintEl) hintEl.textContent = 'Last recorded: ' + cur.toLocaleString() + ' mi';
+  if(warnEl) warnEl.classList.remove('visible');
+  // re-validate if a value already exists (e.g. navigating back)
+  if(input.value) onMileageInput(input.value);
+}
+function onMileageInput(val){
+  const warnEl = document.getElementById('fMiWarn');
+  if(!warnEl) return;
+  const entered = parseInt(val, 10);
+  if(!val || !Number.isFinite(entered) || entered <= 0){
+    warnEl.classList.remove('visible');
+    return;
+  }
+  // Find the highest mileage among existing entries (not the dashboard value)
+  const lastEntryMi = getData().reduce((max, e)=>{
+    const m = Number(e.mi||0);
+    return Number.isFinite(m) ? Math.max(max, m) : max;
+  }, 0);
+  if(lastEntryMi > 0 && entered < lastEntryMi){
+    warnEl.textContent = '⚠ Lower than last logged entry (' + lastEntryMi.toLocaleString() + ' mi) — double-check before saving.';
+    warnEl.classList.add('visible');
+  } else {
+    warnEl.classList.remove('visible');
+  }
+}
+
+/* ─── PARTS AUTOCOMPLETE — suggest from saved Parts tab ─────── */
+let _acActiveRow = null; // track which row has the open dropdown
+
+function getPartSuggestionsFor(query){
+  if(!query || query.length < 1) return [];
+  const q = query.toLowerCase();
+  return getBasicPartsList()
+    .filter(p => p.name && (
+      p.name.toLowerCase().includes(q) ||
+      (p.partNum && p.partNum.toLowerCase().includes(q))
+    ))
+    .slice(0, 6);
+}
+
+function buildPartAcDropdown(row){
+  const existing = row.querySelector('.part-ac');
+  if(existing) return existing;
+  const wrap = row.querySelector('.part-ac-wrap');
+  if(!wrap) return null;
+  const ac = document.createElement('div');
+  ac.className = 'part-ac';
+  wrap.appendChild(ac);
+  return ac;
+}
+
+function showPartSuggestions(nameInput){
+  const row = nameInput.closest('.item-editor');
+  if(!row) return;
+  const ac = buildPartAcDropdown(row);
+  if(!ac) return;
+  const suggestions = getPartSuggestionsFor(nameInput.value);
+  if(!suggestions.length){ ac.classList.remove('open'); return; }
+  _acActiveRow = row;
+  ac.innerHTML = suggestions.map((p, i) => {
+    const meta = [p.partNum, p.store].filter(Boolean).join(' · ');
+    const price = Number(p.unitCost||0) > 0 ? ' · $' + Number(p.unitCost).toFixed(2) : '';
+    return `<div class="part-ac-item" ontouchend="event.preventDefault();selectPartSuggestion(this,${i})" onclick="selectPartSuggestion(this,${i})">
+      <div class="part-ac-name">${escapeHtml(p.name)}</div>
+      ${meta || price ? `<div class="part-ac-meta">${escapeHtml(meta)}<span class="part-ac-price">${escapeHtml(price)}</span></div>` : ''}
+    </div>`;
+  }).join('');
+  // Store suggestion data on the element for retrieval
+  ac._suggestions = suggestions;
+  ac.classList.add('open');
+}
+
+function selectPartSuggestion(itemEl, index){
+  const ac   = itemEl.closest('.part-ac');
+  const row  = itemEl.closest('.item-editor');
+  if(!ac || !row) return;
+  const part = ac._suggestions?.[index];
+  if(!part) return;
+  const nameInput  = row.querySelector('.item-name');
+  const partInput  = row.querySelector('.item-part');
+  const storeInput = row.querySelector('.item-store');
+  const linkInput  = row.querySelector('.item-link');
+  const priceInput = row.querySelector('.item-price');
+  const catSelect  = row.querySelector('.item-category');
+  if(nameInput)  nameInput.value  = part.name;
+  if(partInput)  partInput.value  = part.partNum || '';
+  if(storeInput) storeInput.value = part.store || '';
+  if(linkInput)  linkInput.value  = part.link || '';
+  if(priceInput && Number(part.unitCost||0) > 0) priceInput.value = Number(part.unitCost).toFixed(2);
+  if(catSelect && part.category)  catSelect.value  = part.category;
+  ac.classList.remove('open');
+  _acActiveRow = null;
+  updateRowDisplay(row);
+  syncEntryCostFromItems();
+}
+
+function dismissAllAutocomplete(exceptRow){
+  document.querySelectorAll('#fItemsList .part-ac.open').forEach(ac => {
+    if(!exceptRow || !exceptRow.contains(ac)) ac.classList.remove('open');
+  });
+}
+
+// Dismiss autocomplete on outside tap/click
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.part-ac-wrap') && !e.target.closest('.item-name')){
+    dismissAllAutocomplete();
+  }
+});
+
+/* ─── ROW DISPLAY — live header title + per-row subtotal ────── */
+function updateRowDisplay(row){
+  if(!row) return;
+  const titleEl    = row.querySelector('.item-editor-title');
+  const subtotalEl = row.querySelector('.item-subtotal');
+  const nameVal    = row.querySelector('.item-name')?.value?.trim() || '';
+  const price      = parseFloat(row.querySelector('.item-price')?.value || 0) || 0;
+  const qty        = Math.max(1, parseInt(row.querySelector('.item-qty')?.value || 1, 10) || 1);
+  const subtotal   = price * qty;
+  // Header: show part name if filled, else generic label
+  if(titleEl){
+    if(nameVal){
+      const priceStr = price > 0 ? ' · $' + subtotal.toFixed(2) : '';
+      titleEl.textContent = nameVal + priceStr;
+      titleEl.classList.add('named');
+    } else {
+      titleEl.textContent = 'Purchased part';
+      titleEl.classList.remove('named');
+    }
+  }
+  // Subtotal line
+  if(subtotalEl){
+    if(price > 0){
+      const qtyLabel = qty > 1 ? qty + ' × $' + price.toFixed(2) + ' = ' : '';
+      subtotalEl.textContent = qtyLabel + '$' + subtotal.toFixed(2);
+      subtotalEl.classList.add('visible');
+    } else {
+      subtotalEl.classList.remove('visible');
+    }
+  }
+}
+
 /* ─── REUSE LAST PARTS ──────────────────────────────────────── */
 /* Find the most recent entry for a given service type that has parts recorded. */
 function getLastPartsForServiceType(serviceType){
@@ -4459,7 +4658,7 @@ function go(id){
   if(id==='backup')renderBackup();
   if(id==='upcoming')renderUpcoming();
   if(id==='parts')renderParts();
-  if(id==='add')renderEntryInventoryUI();
+  if(id==='add'){ renderEntryInventoryUI(); initAddForm(); }
   if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -4473,7 +4672,7 @@ function startServiceFromGuide(serviceType='other'){
     renderEntryInventoryUI();
   }
   go('add');
-  setTimeout(()=>document.getElementById('fDate')?.focus(), 140);
+  setTimeout(()=>{ initAddForm(); document.getElementById('fDate')?.focus(); }, 140);
 }
 function ensureGuideActions(){
   document.querySelectorAll('.guide-item').forEach(item=>{
@@ -5797,14 +5996,56 @@ function buildServicePartRow(data={}){
       <button type="button" class="item-remove" onclick="removeItemRow(this)">Remove</button>
     </div>
     <div class="item-grid">
-      <div class="fl" style="margin-bottom:0"><label>Part name</label><input type="text" class="fi item-name" placeholder="Mobil 1 0W-16" value="${escapeHtmlAttr(data.name||'')}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Parts section</label><select class="fs item-category"></select></div>
-      <div class="fl" style="margin-bottom:0"><label>Part #</label><input type="text" class="fi item-part" placeholder="90915-YZZN1" value="${escapeHtmlAttr(data.partNum||'')}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Purchased from</label><input type="text" class="fi item-store" placeholder="Toyota / Walmart / Amazon" value="${escapeHtmlAttr(data.store||'')}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Purchase link</label><input type="url" class="fi item-link" placeholder="https://..." value="${escapeHtmlAttr(data.link||'')}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Unit price ($)</label><input type="number" class="fi item-price" placeholder="0.00" step="0.01" value="${Number(data.price||0) > 0 ? Number(data.price||0) : ''}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Qty</label><input type="number" min="1" step="1" class="fi item-qty" value="${Math.max(1, parseInt(data.qty||1,10) || 1)}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Quick note (optional)</label><input type="text" class="fi item-note" placeholder="OEM / sale / bought as a set" value="${escapeHtmlAttr(data.note||'')}"></div>
+      <div class="fl span2 part-ac-wrap" style="margin-bottom:0;position:relative">
+        <label>Part name</label>
+        <input type="text" class="fi item-name" placeholder="Mobil 1 0W-16"
+               autocomplete="off" autocorrect="off" autocapitalize="words"
+               value="${escapeHtmlAttr(data.name||'')}"
+               oninput="showPartSuggestions(this);updateRowDisplay(this.closest('.item-editor'))">
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Parts section</label>
+        <select class="fs item-category"></select>
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Part #</label>
+        <input type="text" class="fi item-part" placeholder="90915-YZZN1"
+               autocomplete="off" autocorrect="off" autocapitalize="characters"
+               value="${escapeHtmlAttr(data.partNum||'')}">
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Purchased from</label>
+        <input type="text" class="fi item-store" placeholder="Toyota / Walmart / Amazon"
+               autocomplete="off" autocorrect="off" autocapitalize="words"
+               value="${escapeHtmlAttr(data.store||'')}">
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Purchase link</label>
+        <input type="url" class="fi item-link" placeholder="https://..."
+               inputmode="url" autocomplete="off"
+               value="${escapeHtmlAttr(data.link||'')}">
+      </div>
+      <div class="fl" style="margin-bottom:0">
+        <label>Unit price ($)</label>
+        <input type="number" class="fi item-price" placeholder="0.00"
+               step="0.01" inputmode="decimal" min="0"
+               value="${Number(data.price||0) > 0 ? Number(data.price||0) : ''}"
+               oninput="updateRowDisplay(this.closest('.item-editor'))">
+      </div>
+      <div class="fl" style="margin-bottom:0">
+        <label>Qty</label>
+        <input type="number" min="1" step="1" class="fi item-qty"
+               inputmode="numeric"
+               value="${Math.max(1, parseInt(data.qty||1,10) || 1)}"
+               oninput="updateRowDisplay(this.closest('.item-editor'))">
+      </div>
+      <div class="item-subtotal"></div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Quick note (optional)</label>
+        <input type="text" class="fi item-note" placeholder="OEM / sale / bought as a set"
+               autocorrect="off" autocapitalize="sentences"
+               value="${escapeHtmlAttr(data.note||'')}">
+      </div>
     </div>
     <label class="item-check"><input type="checkbox" class="item-save-parts" ${data.saveToParts ? 'checked' : ''}> Save this item to the Parts tab</label>
   `;
@@ -5815,10 +6056,13 @@ function buildServicePartRow(data={}){
     categorySelect.innerHTML = PART_CATEGORY_OPTIONS.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');
     categorySelect.value = PART_CATEGORY_MAP[data.category] ? data.category : guessPartCategoryForService(type);
   }
+  // Wire all inputs to cost sync
   row.querySelectorAll('input, select').forEach(field=>{
     field.addEventListener('input', syncEntryCostFromItems);
     field.addEventListener('change', syncEntryCostFromItems);
   });
+  // Initial display if pre-filled (e.g. from reuse)
+  if(data.name || data.price) updateRowDisplay(row);
   return row;
 }
 function addItemRow(data={}){
@@ -5850,6 +6094,8 @@ function syncEntryCostFromItems(){
   const total = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
   const costEl = document.getElementById('fCost');
   if(costEl) costEl.value = total > 0 ? total.toFixed(2) : '';
+  // Keep each row's header and subtotal in sync
+  document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
 }
 function resetEntryInventoryUses(){
   const list = document.getElementById('fItemsList');
