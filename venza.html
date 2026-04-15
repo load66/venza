@@ -289,7 +289,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
 .alert.blue{background:rgba(34,114,212,.1);border:1px solid rgba(34,114,212,.25);color:var(--blue2)}
 
 /* ─── SERVICE LOG ──────────────────────────────────────────── */
-.log-item{\n  background:var(--bg2);border:1px solid var(--border);\n  border-left:3px solid var(--green);\n  border-radius:10px;padding:14px 40px 14px 14px;margin-bottom:8px;\n  position:relative;\n  box-shadow:var(--shadow-sm);\n}\n.log-item.user-entry{border-left-color:var(--blue)}\n.log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}\n.log-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}\n.log-mi-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}\n.log-mi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green2);white-space:nowrap;font-weight:600}\n.log-mi-delta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}\n.log-type{\n  font-family:'Bebas Neue',sans-serif;\n  font-size:14px;letter-spacing:1px;\n  color:var(--text);margin-bottom:4px;\n}\n.log-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}\n.log-foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}\n.log-foot-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap}\n.log-shop-badge{\n  display:inline-flex;align-items:center;\n  font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;\n  padding:2px 8px;border-radius:999px;\n}\n.log-shop-badge.diy{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.2)}\n.log-shop-badge.shop{background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.2)}\n.log-cost{\n  font-family:'JetBrains Mono',monospace;\n  font-size:14px;font-weight:700;color:var(--orange2);\n}\n.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
+.log-item{background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .2s}\n.log-item:active{box-shadow:none}\n.log-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 10px;border-bottom:1px solid var(--border);gap:10px}\n.log-header-left{display:flex;align-items:center;gap:9px;min-width:0;flex:1}\n.log-type-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}\n.log-type-label{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.2px;color:var(--text);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.log-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}\n.log-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}\n.log-mi-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}\n.log-mi{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green2);font-weight:700;white-space:nowrap}\n.log-mi-delta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:1px 6px;white-space:nowrap}\n.log-body{padding:11px 14px}\n.log-desc{font-size:13px;color:var(--text2);line-height:1.6}\n.log-parts-wrap{margin:10px 14px 0;border:1px solid var(--border);border-radius:9px;overflow:hidden}\n.log-parts-head{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,.025);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3)}\n.log-parts-total{font-family:'JetBrains Mono',monospace;color:var(--orange2);font-size:11px;font-weight:700}\n.log-parts-grid{display:flex;flex-direction:column}\n.log-part{padding:8px 10px;border-top:1px solid var(--border)}\n.log-part-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}\n.log-part-name{font-size:13px;color:var(--text);font-weight:600;line-height:1.4}\n.log-part-price{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange2);white-space:nowrap;font-weight:600}\n.log-part-meta{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}\n.log-part-link{font-size:10px;color:var(--blue2);text-decoration:none;display:inline-block;margin-top:4px}\n.log-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid var(--border);margin-top:10px;gap:8px}\n.log-footer-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}\n.log-shop-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap}\n.log-shop-badge.diy{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.2)}\n.log-shop-badge.shop{background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.2)}\n.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}\n.log-footer-right{display:flex;align-items:center;gap:8px;flex-shrink:0}\n.log-cost{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--orange2)}\n.log-actions{display:flex;gap:6px}\n.log-btn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;border:1px solid var(--border2);background:var(--bg3);transition:all .18s;touch-action:manipulation;cursor:pointer}\n.log-btn:active{transform:scale(.93);opacity:.7}\n.log-btn.edit{color:var(--blue2);border-color:rgba(34,114,212,.3)}\n.log-btn.edit:hover{background:rgba(34,114,212,.1)}\n.log-btn.del{color:var(--toyota2);border-color:rgba(235,10,30,.3)}\n.log-btn.del:hover{background:rgba(235,10,30,.1)}\n.delete-btn{display:none}\n.log-cost-zero{color:var(--text3)}\n.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
 .delete-btn{
   position:absolute;top:10px;right:10px;
   color:#ffffff;
@@ -996,6 +996,76 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="total-row">
     <span class="total-label">Total Invested</span>
     <span class="total-val" id="totalVal">$527.57</span>
+  </div>
+</div>
+
+<!-- ═══ EDIT ENTRY MODAL ══════════════════════════════════════════ -->
+<div class="overlay" id="editEntryModal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal">
+    <div class="modal-grip"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0">
+      <div class="modal-title" style="margin-bottom:0">Edit Entry</div>
+      <button onclick="closeEditModal()" style="font-size:20px;color:var(--text3);padding:4px 8px;touch-action:manipulation">✕</button>
+    </div>
+    <div class="modal-scroll">
+      <input type="hidden" id="editEntryId">
+      <div class="fl">
+        <label>Service Type</label>
+        <select class="fs" id="editType">
+          <option value="oil">Oil Change</option>
+          <option value="tires">Tire Rotation</option>
+          <option value="cabin">Cabin Air Filter</option>
+          <option value="engine_filter">Engine Air Filter</option>
+          <option value="trans">Transmission Fluid D&F</option>
+          <option value="diff">Rear Differential D&F</option>
+          <option value="coolant">Engine Coolant Drain & Fill</option>
+          <option value="inv_coolant">Inverter Coolant Drain & Fill</option>
+          <option value="alignment">Wheel Alignment</option>
+          <option value="tires_new">New Tires</option>
+          <option value="brakes">Brake Service</option>
+          <option value="plugs">Spark Plugs</option>
+          <option value="hvfilter_inspect">HV Battery Cooling Filter — Inspect</option>
+          <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
+          <option value="valvomax">ValvoMax Drain Valve Install</option>
+          <option value="wipers">Wiper Blades</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fg2">
+        <div class="fl"><label>Date</label><input type="date" class="fi" id="editDate"></div>
+        <div class="fl">
+          <label>Mileage</label>
+          <input type="number" class="fi" id="editMi" inputmode="numeric" autocomplete="off">
+        </div>
+      </div>
+      <div class="fl">
+        <label>Notes</label>
+        <textarea class="ft" id="editDesc" style="min-height:80px"></textarea>
+      </div>
+      <div class="fg2">
+        <div class="fl">
+          <label id="editCostLabel">Total Cost ($)</label>
+          <input type="number" class="fi" id="editCost" inputmode="decimal" step="0.01" min="0">
+          <div class="auto-cost-note" id="editCostNote">Enter total cost manually.</div>
+        </div>
+        <div class="fl">
+          <label>Where</label>
+          <select class="fs" id="editShop">
+            <option value="DIY">DIY</option>
+            <option value="SHOP">SHOP</option>
+          </select>
+        </div>
+      </div>
+      <!-- Purchased Parts -->
+      <div class="section-label" style="margin-top:16px">Purchased Parts</div>
+      <div id="editPartsList" class="edit-parts-list"></div>
+      <button type="button" class="item-add" style="margin-top:8px" onclick="addEditPartRow()">＋ Add Part</button>
+      <div style="height:16px"></div>
+    </div>
+    <div class="btn-row" style="flex-shrink:0;margin-top:12px">
+      <button class="btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditEntry()">Save Changes</button>
+    </div>
   </div>
 </div>
 
@@ -5675,8 +5745,238 @@ function renderEntryInventoryUI(){
 }
 function useInventoryItem(){ showToast('This form now uses the new purchased parts builder'); }
 function removeOneInventoryItem(){}
+/* ─── SERVICE TYPE ICONS & COLORS ───────────────────────────── */
+const SERVICE_ICONS = {
+  oil:             {icon:'🛢️', bg:'rgba(217,122,0,.15)',  color:'var(--orange2)'},
+  tires:           {icon:'🔄', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
+  cabin:           {icon:'💨', bg:'rgba(34,114,212,.12)', color:'var(--blue2)'},
+  engine_filter:   {icon:'🌬️', bg:'rgba(34,114,212,.12)', color:'var(--blue2)'},
+  trans:           {icon:'⚙️', bg:'rgba(212,150,10,.15)', color:'var(--gold2)'},
+  diff:            {icon:'⚙️', bg:'rgba(212,150,10,.15)', color:'var(--gold2)'},
+  coolant:         {icon:'🌡️', bg:'rgba(34,114,212,.15)', color:'var(--blue2)'},
+  inv_coolant:     {icon:'⚡', bg:'rgba(77,158,255,.15)', color:'var(--blue2)'},
+  alignment:       {icon:'🎯', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
+  tires_new:       {icon:'🔧', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
+  brakes:          {icon:'🛑', bg:'rgba(235,10,30,.12)',  color:'var(--toyota2)'},
+  plugs:           {icon:'⚡', bg:'rgba(212,150,10,.15)', color:'var(--gold2)'},
+  hvfilter_inspect:{icon:'🔍', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
+  hvfilter_clean:  {icon:'🧹', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
+  valvomax:        {icon:'🔩', bg:'rgba(217,122,0,.15)',  color:'var(--orange2)'},
+  wipers:          {icon:'🌧️', bg:'rgba(34,114,212,.12)', color:'var(--blue2)'},
+  other:           {icon:'🔧', bg:'rgba(90,96,128,.2)',   color:'var(--text2)'},
+};
+
+/* ─── EDIT ENTRY MODAL ──────────────────────────────────────── */
+function openEditModal(id){
+  const entry = getData().find(e => String(e.id) === String(id));
+  if(!entry){ showToast('Entry not found'); return; }
+  document.getElementById('editEntryId').value = String(id);
+  document.getElementById('editType').value    = entry.type || 'other';
+  document.getElementById('editDate').value    = entry.date || '';
+  document.getElementById('editMi').value      = entry.mi   || '';
+  document.getElementById('editDesc').value    = entry.desc || '';
+  document.getElementById('editShop').value    = entry.shop || 'DIY';
+  // Cost — always editable in edit mode
+  const cost = getEntryDisplayCost(entry);
+  document.getElementById('editCost').value    = cost > 0 ? cost.toFixed(2) : '';
+  // Parts
+  const partsList = document.getElementById('editPartsList');
+  partsList.innerHTML = '';
+  const parts = normalizeServiceEntryItems(entry.items || []);
+  if(parts.length){
+    parts.forEach(p => addEditPartRow(p));
+  }
+  document.getElementById('editEntryModal').classList.add('open');
+}
+function closeEditModal(){
+  document.getElementById('editEntryModal').classList.remove('open');
+}
+function addEditPartRow(data={}){
+  const list = document.getElementById('editPartsList');
+  const idx  = list.children.length;
+  const row  = document.createElement('div');
+  row.className = 'edit-part-row';
+  row.innerHTML = `
+    <div class="edit-part-row-top">
+      <span class="edit-part-row-label">Part ${idx + 1}</span>
+      <button type="button" class="edit-part-remove" onclick="this.closest('.edit-part-row').remove();renumberEditParts()" touch-action="manipulation">Remove</button>
+    </div>
+    <div class="edit-part-grid">
+      <div class="fl span2" style="margin-bottom:0"><label>Part name</label><input type="text" class="fi ep-name" autocomplete="off" autocorrect="off" value="${escapeHtmlAttr(data.name||'')}"></div>
+      <div class="fl span2" style="margin-bottom:0"><label>Part #</label><input type="text" class="fi ep-part" autocomplete="off" autocorrect="off" autocapitalize="characters" value="${escapeHtmlAttr(data.partNum||'')}"></div>
+      <div class="fl span2" style="margin-bottom:0"><label>Store</label><input type="text" class="fi ep-store" autocorrect="off" value="${escapeHtmlAttr(data.store||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Unit price ($)</label><input type="number" class="fi ep-price" inputmode="decimal" step="0.01" min="0" value="${Number(data.price||0)>0 ? Number(data.price).toFixed(2) : ''}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Qty</label><input type="number" class="fi ep-qty" inputmode="numeric" min="1" step="1" value="${Math.max(1,parseInt(data.qty||1,10)||1)}"></div>
+    </div>`;
+  list.appendChild(row);
+}
+function renumberEditParts(){
+  document.querySelectorAll('#editPartsList .edit-part-row-label').forEach((el,i) => {
+    el.textContent = `Part ${i+1}`;
+  });
+}
+function saveEditEntry(){
+  const id      = document.getElementById('editEntryId').value;
+  const type    = document.getElementById('editType').value   || 'other';
+  const date    = document.getElementById('editDate').value;
+  const mi      = document.getElementById('editMi').value;
+  const desc    = document.getElementById('editDesc').value.trim();
+  const shop    = document.getElementById('editShop').value   || 'DIY';
+  const costRaw = parseFloat(document.getElementById('editCost').value) || 0;
+  if(!date){ showToast('Date is required'); return; }
+  const parsedMi = parseInt(mi, 10);
+  if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
+  const finalDesc = desc || `${LABELS[type]||'Service'} — ${shop}`;
+  // Collect edited parts
+  const parts = Array.from(document.querySelectorAll('#editPartsList .edit-part-row')).map(row => ({
+    name:    row.querySelector('.ep-name')?.value.trim()  || '',
+    partNum: row.querySelector('.ep-part')?.value.trim()  || '',
+    store:   row.querySelector('.ep-store')?.value.trim() || '',
+    price:   parseFloat(row.querySelector('.ep-price')?.value||0) || 0,
+    qty:     Math.max(1, parseInt(row.querySelector('.ep-qty')?.value||1,10)||1),
+    saveToParts: false
+  })).filter(p => p.name || p.price > 0);
+  // Recalculate cost: if parts exist use parts total, otherwise use manual cost field
+  const partsCost = parts.reduce((s,p) => s + p.price * p.qty, 0);
+  const finalCost = partsCost > 0 ? partsCost : costRaw;
+  const d = getData();
+  const idx = d.findIndex(e => String(e.id) === String(id));
+  if(idx === -1){ showToast('Entry not found'); return; }
+  const original = d[idx];
+  d[idx] = {...original, type, date, mi:parsedMi, desc:finalDesc, shop, cost:finalCost, items:normalizeServiceEntryItems(parts)};
+  save(d);
+  // Reconcile mileage if the mileage number changed
+  const prevHighest = getData().reduce((max,e,i) => i!==idx ? Math.max(max,Number(e.mi||0)) : max, 0);
+  if(parsedMi >= getMi() || String(getMiState().entryId) === String(id)){
+    setMi(parsedMi, {source:'entry', entryId:id, allowLower:true});
+  }
+  closeEditModal();
+  renderAll();
+  showToast('Entry updated ✓');
+}
+/* ─── SERVICE LOG ─────────────────────────────────────────────── */
 function renderLog(){
   const d = getData().sort((a,b) => Number(b.mi) - Number(a.mi));
+  const el = document.getElementById('logList');
+  if(!el) return;
+
+  if(!d.length){
+    el.innerHTML = `
+      <div class="log-empty">
+        <div class="log-empty-icon">🔧</div>
+        <div class="log-empty-title">No service entries yet</div>
+        <div class="log-empty-sub">Every oil change, tire rotation, and repair you log here builds your vehicle's complete service history.</div>
+        <button class="btn-primary" onclick="go('add')" style="max-width:220px;margin:0 auto;display:block">＋ Add First Service Entry</button>
+      </div>`;
+    const totalEl = document.getElementById('totalVal');
+    if(totalEl) totalEl.textContent = '$0.00';
+    return;
+  }
+
+  el.innerHTML = d.map((e, idx) => {
+    const dt     = new Date(e.date+'T00:00:00');
+    const ds     = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const currMi = parseInt(e.mi, 10);
+    const prevMi = Number(d[idx+1]?.mi || 0);
+    const delta  = prevMi > 0 ? currMi - prevMi : 0;
+    const svc    = SERVICE_ICONS[e.type] || SERVICE_ICONS.other;
+    const cost   = getEntryDisplayCost(e);
+
+    const deltaChip = delta > 0
+      ? `<span class="log-mi-delta">+${delta.toLocaleString()} mi</span>` : '';
+
+    const shopVal   = String(e.shop||'DIY').toUpperCase();
+    const shopClass = shopVal === 'SHOP' ? 'shop' : 'diy';
+
+    const safeEntryUrl = safeUrl(e.link);
+    const linkHtml = safeEntryUrl
+      ? `<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>` : '';
+
+    // Parts
+    const parts = normalizeServiceEntryItems(e.items);
+    const partsTotal = parts.reduce((s,p) => s + Number(p.price||0)*Number(p.qty||0), 0);
+    const partsHtml = parts.length ? `
+      <div class="log-parts-wrap">
+        <div class="log-parts-head">
+          <span>Purchased Parts</span>
+          <span class="log-parts-total">$${partsTotal.toFixed(2)}</span>
+        </div>
+        <div class="log-parts-grid">
+          ${parts.map(item => {
+            const sub  = (Number(item.price||0)*Number(item.qty||0)).toFixed(2);
+            const meta = [
+              item.qty > 1 ? `Qty ${item.qty}` : null,
+              item.partNum ? `Part # ${escapeHtml(item.partNum)}` : null,
+              item.store   ? escapeHtml(item.store) : null,
+              item.note    ? escapeHtml(item.note)  : null
+            ].filter(Boolean).join(' · ');
+            const pLink = safeUrl(item.link)
+              ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : '';
+            return `<div class="log-part">
+              <div class="log-part-top">
+                <div class="log-part-name">${item.qty>1?`${item.qty}× `:''}${escapeHtml(item.name||'Part')}</div>
+                <div class="log-part-price">$${sub}</div>
+              </div>
+              ${meta ? `<div class="log-part-meta">${meta}</div>` : ''}
+              ${pLink}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : '';
+
+    // Photo
+    const photo = getPhoto(e.id);
+    const photoHtml = photo
+      ? `<div style="margin:10px 14px 0;cursor:pointer" onclick="viewPhoto(${e.id})">
+           <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:9px;border:1px solid var(--border)">
+           <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">
+             📷 Receipt · tap to view · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span>
+           </div>
+         </div>`
+      : `<button onclick="addPhotoToEntry(${e.id})" style="display:block;width:calc(100% - 28px);margin:10px 14px 0;padding:8px 12px;font-size:11px;color:var(--text3);border:1px dashed var(--border2);border-radius:8px;background:none;cursor:pointer;text-align:center;touch-action:manipulation">
+           📷 Add Receipt Photo
+         </button>`;
+
+    const editBtn = !e.builtin
+      ? `<button class="log-btn edit" onclick="openEditModal(${e.id})" title="Edit entry">✏️</button>` : '';
+    const delBtn  = !e.builtin
+      ? `<button class="log-btn del" onclick="delEntry(${e.id})" title="Delete entry">🗑️</button>`
+      : `<button class="log-btn del" onclick="delBuiltin(${e.id})" title="Delete" style="opacity:.5">🗑️</button>`;
+
+    return `<div class="log-item">
+      <div class="log-header">
+        <div class="log-header-left">
+          <div class="log-type-icon" style="background:${svc.bg}">${svc.icon}</div>
+          <div class="log-type-label">${LABELS[e.type]||'Service'}</div>
+        </div>
+        <div class="log-header-right">
+          <span class="log-date">${ds}</span>
+          <div class="log-mi-wrap">
+            <span class="log-mi">${currMi.toLocaleString()} mi</span>
+            ${deltaChip}
+          </div>
+        </div>
+      </div>
+      ${e.desc ? `<div class="log-body"><div class="log-desc">${safeText(e.desc)}</div></div>` : ''}
+      ${partsHtml}
+      ${photoHtml}
+      <div class="log-footer">
+        <div class="log-footer-left">
+          <span class="log-shop-badge ${shopClass}">${shopVal}</span>
+          ${linkHtml}
+        </div>
+        <div class="log-footer-right">
+          <span class="log-cost${cost===0?' log-cost-zero':''}">$${cost.toFixed(2)}</span>
+          <div class="log-actions">${editBtn}${delBtn}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const tot = d.reduce((a,e) => a + getEntryDisplayCost(e), 0);
+  const totalEl = document.getElementById('totalVal');
+  if(totalEl) totalEl.textContent = '$' + tot.toFixed(2);
+}
   const el = document.getElementById('logList');
   if(!el) return;
 
