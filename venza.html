@@ -1091,6 +1091,11 @@ html.modal-open,body.modal-open{overflow:hidden}
           </select>
         </div>
       </div>
+      <label class="item-check" style="margin-bottom:4px">
+        <input type="checkbox" id="editExcludeFromAvg">
+        Exclude this entry from Average Service Cost
+        <span style="font-size:10px;color:var(--text3);display:block;margin-left:24px;margin-top:2px">Use for bundled bills that cover multiple services</span>
+      </label>
       <!-- Purchased Parts -->
       <div class="section-label" style="margin-top:16px">Purchased Parts</div>
       <div id="editPartsList" class="edit-parts-list"></div>
@@ -2036,7 +2041,8 @@ const DEFAULT = [
     cost: 409.29,
     shop: 'Frank Fletcher Toyota, Joplin MO',
     link: '',
-    builtin: true
+    builtin: true,
+    excludeFromAvg: true  // bundled dealer bill — cost covers 4 services, not a true oil-only cost
   },
   // ── Entry 2: Engine air filter DIY ───────────────────────────
   {
@@ -2760,7 +2766,8 @@ function normalizeEntries(entries){
     link: e.link || '',
     items: normalizeEntryItems(e.items),
     inventoryUses: normalizeInventoryUses(e.inventoryUses),
-    builtin: !!e.builtin
+    builtin: !!e.builtin,
+    excludeFromAvg: !!e.excludeFromAvg
   }));
 }
 function getData(){
@@ -5763,6 +5770,8 @@ function openEditModal(id){
   document.getElementById('editMi').value      = entry.mi   || '';
   document.getElementById('editDesc').value    = entry.desc || '';
   document.getElementById('editShop').value    = entry.shop || 'DIY';
+  const excludeEl = document.getElementById('editExcludeFromAvg');
+  if(excludeEl) excludeEl.checked = !!entry.excludeFromAvg;
   // Cost — always editable in edit mode
   const cost = getEntryDisplayCost(entry);
   document.getElementById('editCost').value    = cost > 0 ? cost.toFixed(2) : '';
@@ -5809,6 +5818,7 @@ function saveEditEntry(){
   const mi      = document.getElementById('editMi').value;
   const desc    = document.getElementById('editDesc').value.trim();
   const shop    = document.getElementById('editShop').value   || 'DIY';
+  const excludeFromAvg = !!(document.getElementById('editExcludeFromAvg')?.checked);
   const costRaw = parseFloat(document.getElementById('editCost').value) || 0;
   if(!date){ showToast('Date is required'); return; }
   const parsedMi = parseInt(mi, 10);
@@ -5830,7 +5840,7 @@ function saveEditEntry(){
   const idx = d.findIndex(e => String(e.id) === String(id));
   if(idx === -1){ showToast('Entry not found'); return; }
   const original = d[idx];
-  d[idx] = {...original, type, date, mi:parsedMi, desc:finalDesc, shop, cost:finalCost, items:normalizeServiceEntryItems(parts)};
+  d[idx] = {...original, type, date, mi:parsedMi, desc:finalDesc, shop, cost:finalCost, items:normalizeServiceEntryItems(parts), excludeFromAvg};
   save(d);
   // Reconcile mileage if the mileage number changed
   const prevHighest = getData().reduce((max,e,i) => i!==idx ? Math.max(max,Number(e.mi||0)) : max, 0);
@@ -5950,6 +5960,7 @@ function renderLog(){
       <div class="log-footer">
         <div class="log-footer-left">
           <span class="log-shop-badge ${shopClass}">${shopVal}</span>
+          ${e.excludeFromAvg ? `<span style="font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:2px 7px;white-space:nowrap">avg excluded</span>` : ''}
           ${linkHtml}
         </div>
         <div class="log-footer-right">
@@ -5965,6 +5976,7 @@ function renderLog(){
   if(totalEl) totalEl.textContent = '$' + tot.toFixed(2);
 }
 function getAverageEntryCost(entry, type=getAverageServiceType()){
+  if(entry.excludeFromAvg) return null;
   if(!entryMatchesAverageType(entry, type)) return null;
   const manual = Number(entry.cost || 0);
   if(Number.isFinite(manual) && manual > 0) return manual;
