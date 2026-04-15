@@ -2779,12 +2779,36 @@ function recalcMileageFromEntries(entries=getData()){
   setMi(fallback, {source:'manual', allowLower:true});
   return fallback;
 }
+function getEntryOdometerRestoreState(entry){
+  const restore = entry?.odometerRestoreState;
+  if(!restore || typeof restore !== 'object') return null;
+  const value = parseInt(restore.value, 10);
+  if(!(Number.isFinite(value) && value > 0)) return null;
+  return {
+    value,
+    source: restore.source === 'entry' ? 'entry' : 'manual',
+    entryId: restore.entryId != null && restore.entryId !== '' ? String(restore.entryId) : null,
+    updatedAt: restore.updatedAt || new Date().toISOString()
+  };
+}
 function reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries){
   const deletedId = String(deletedEntry?.id ?? '');
   if(!deletedId) return false;
   const state = getMiState();
   const usingDeletedEntry = state.source === 'entry' && String(state.entryId||'') === deletedId;
   if(!usingDeletedEntry) return false;
+
+  const restore = getEntryOdometerRestoreState(deletedEntry);
+  if(restore){
+    setMi(restore.value, {
+      source: restore.source,
+      entryId: restore.entryId,
+      allowLower: true,
+      skipHistory: true,
+      updatedAt: new Date().toISOString()
+    });
+    return true;
+  }
 
   const prior = getLatestMileageHistoryCandidate({excludeEntryIds:[deletedId]});
   if(prior){
@@ -5312,16 +5336,22 @@ function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
   const existingKeys = new Set(parts.map(item=>buildBasicPartMergeKey(item)));
   const batchKeys = new Set();
   let added = 0;
-  let skipped = 0;
+  let skippedDuplicate = 0;
+  let skippedNoLink = 0;
   normalizeEntryItems(items).forEach(item=>{
     if(!item.name) return;
+    const safeLink = safeUrl(item.link || '');
+    if(!safeLink){
+      skippedNoLink++;
+      return;
+    }
     const payload = {
       id:Date.now()+Math.random(),
       name:item.name,
       category:item.category || guessPartCategoryForService(serviceType),
       serviceType,
       store:item.store || '',
-      link:item.link || '',
+      link:safeLink,
       partNum:item.partNum || '',
       unitCost:Number(item.price||0) || 0,
       note:item.note || ''
@@ -5330,7 +5360,7 @@ function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
     if(!normalized) return;
     const key = buildBasicPartMergeKey(normalized);
     if(existingKeys.has(key) || batchKeys.has(key)){
-      skipped++;
+      skippedDuplicate++;
       return;
     }
     upsertBasicPart(normalized);
@@ -5338,7 +5368,7 @@ function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
     batchKeys.add(key);
     added++;
   });
-  return {added, skipped};
+  return {added, skippedDuplicate, skippedNoLink, skipped: skippedDuplicate + skippedNoLink};
 }
 function populatePartCategoryOptions(selectId, selected='other'){
   const el = document.getElementById(selectId);
@@ -5733,15 +5763,27 @@ function saveEntry(){
   if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
   const autoCost = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
   const newId=Date.now();
+  const currentMi = getMi();
+  const priorMiState = getMiState();
+  const shouldRaiseOdometer = parsedMi > currentMi;
   const d=getData();
-  d.push({id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false});
+  const entryPayload = {id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false};
+  if(shouldRaiseOdometer){
+    entryPayload.odometerRestoreState = {
+      value: Number.isFinite(Number(priorMiState.value)) && Number(priorMiState.value) > 0 ? Number(priorMiState.value) : currentMi,
+      source: priorMiState.source === 'entry' ? 'entry' : 'manual',
+      entryId: priorMiState.entryId != null && priorMiState.entryId !== '' ? String(priorMiState.entryId) : null,
+      updatedAt: priorMiState.updatedAt || new Date().toISOString()
+    };
+  }
+  d.push(entryPayload);
   save(d);
-  const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
+  const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0, skippedDuplicate:0, skippedNoLink:0};
   if(window._pendingPhoto){
     savePhoto(newId, window._pendingPhoto);
     window._pendingPhoto=null;
   }
-  if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
+  if(shouldRaiseOdometer) setMi(parsedMi,{source:'entry',entryId:newId});
   renderAll();
   go('log');
   ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -5751,9 +5793,11 @@ function saveEntry(){
   resetEntryInventoryUses();
   clearPhoto();
   if(!items.length) showToast('Entry saved ✓');
-  else if(partSyncResult.skipped && !partSyncResult.added) showToast('Entry saved ✓ Duplicate part already exists in Parts');
-  else if(partSyncResult.skipped) showToast(`Entry saved ✓ ${partSyncResult.added} part${partSyncResult.added!==1?'s':''} added · duplicate skipped`);
-  else showToast('Entry + parts saved ✓');
+  else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry + linked parts saved ✓');
+  else if(!partSyncResult.added && partSyncResult.skippedNoLink && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ Parts without links were not added to Parts');
+  else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedNoLink) showToast('Entry saved ✓ Duplicate linked part already exists in Parts');
+  else if(!partSyncResult.added) showToast('Entry saved ✓ No new linked parts were added to Parts');
+  else showToast(`Entry saved ✓ ${partSyncResult.added} linked part${partSyncResult.added!==1?'s':''} added to Parts`);
 }
 
 function renderBackup(){
