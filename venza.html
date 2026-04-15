@@ -1014,7 +1014,7 @@ html.modal-open,body.modal-open{overflow:hidden}
         </div>
         <div id="fItemsList" class="item-builder"></div>
         <div class="item-builder-actions">
-          <button type="button" class="item-add" id="servicePartsAddBtn" onclick="addItemRow()">＋ Add Part</button>
+          <button type="button" class="item-add" onclick="addItemRow()">＋ Add Another Part</button>
         </div>
       </div>
     </div>
@@ -5164,9 +5164,14 @@ function upsertBasicPart(payload={}){
   return normalized;
 }
 function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
+  const parts = getBasicPartsList();
+  const existingKeys = new Set(parts.map(item=>buildBasicPartMergeKey(item)));
+  const batchKeys = new Set();
+  let added = 0;
+  let skipped = 0;
   normalizeEntryItems(items).forEach(item=>{
     if(!item.name) return;
-    upsertBasicPart({
+    const payload = {
       id:Date.now()+Math.random(),
       name:item.name,
       category:item.category || guessPartCategoryForService(serviceType),
@@ -5176,8 +5181,20 @@ function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
       partNum:item.partNum || '',
       unitCost:Number(item.price||0) || 0,
       note:item.note || ''
-    });
+    };
+    const normalized = normalizeBasicParts([payload])[0];
+    if(!normalized) return;
+    const key = buildBasicPartMergeKey(normalized);
+    if(existingKeys.has(key) || batchKeys.has(key)){
+      skipped++;
+      return;
+    }
+    upsertBasicPart(normalized);
+    existingKeys.add(key);
+    batchKeys.add(key);
+    added++;
   });
+  return {added, skipped};
 }
 function populatePartCategoryOptions(selectId, selected='other'){
   const el = document.getElementById(selectId);
@@ -5410,21 +5427,6 @@ function renderParts(){
     </div>
   `).join('');
 }
-function updateServicePartAddButton(){
-  const btn = document.getElementById('servicePartsAddBtn');
-  if(!btn) return;
-  const count = document.querySelectorAll('#fItemsList .item-editor').length;
-  btn.textContent = count ? '＋ Add Another Part' : '＋ Add Part';
-}
-function ensureAtLeastOneServicePartRow(){
-  const list = document.getElementById('fItemsList');
-  if(!list) return null;
-  const existing = list.querySelector('.item-editor');
-  if(existing) return existing;
-  const row = buildServicePartRow();
-  updateServicePartAddButton();
-  return row;
-}
 function toggleServicePartsBuilder(force){
   const wrap = document.getElementById('servicePartsWrap');
   const btn = document.getElementById('servicePartsToggle');
@@ -5432,11 +5434,6 @@ function toggleServicePartsBuilder(force){
   const shouldOpen = typeof force === 'boolean' ? force : !wrap.classList.contains('open');
   wrap.classList.toggle('open', shouldOpen);
   btn.classList.toggle('open', shouldOpen);
-  if(shouldOpen){
-    const row = ensureAtLeastOneServicePartRow();
-    const firstInput = row?.querySelector('.item-name');
-    if(firstInput && !firstInput.value) setTimeout(()=>firstInput.focus(), 0);
-  }
 }
 function normalizeServiceEntryItems(items){
   return (Array.isArray(items) ? items : []).filter(Boolean).map(item=>({
@@ -5487,16 +5484,12 @@ function addItemRow(data={}){
   toggleServicePartsBuilder(true);
   const row = buildServicePartRow(data);
   syncEntryCostFromItems();
-  updateServicePartAddButton();
-  const firstInput = row?.querySelector('.item-name');
-  if(firstInput) setTimeout(()=>firstInput.focus(), 0);
   return row;
 }
 function removeItemRow(btn){
   const row = btn?.closest('.item-editor');
   if(row) row.remove();
   syncEntryCostFromItems();
-  updateServicePartAddButton();
 }
 function getFormItems(){
   return normalizeServiceEntryItems(Array.from(document.querySelectorAll('#fItemsList .item-editor')).map(row=>({
@@ -5521,7 +5514,6 @@ function resetEntryInventoryUses(){
   if(list) list.innerHTML = '';
   toggleServicePartsBuilder(false);
   syncEntryCostFromItems();
-  updateServicePartAddButton();
 }
 function renderEntryInventoryUI(){
   syncEntryCostFromItems();
@@ -5593,7 +5585,7 @@ function saveEntry(){
   const d=getData();
   d.push({id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false});
   save(d);
-  if(items.length) upsertBasicPartsFromServiceItems(items, type);
+  const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
   if(window._pendingPhoto){
     savePhoto(newId, window._pendingPhoto);
     window._pendingPhoto=null;
@@ -5607,7 +5599,10 @@ function saveEntry(){
   const costEl = document.getElementById('fCost'); if(costEl) costEl.value='';
   resetEntryInventoryUses();
   clearPhoto();
-  showToast(items.length ? 'Entry + parts saved ✓' : 'Entry saved ✓');
+  if(!items.length) showToast('Entry saved ✓');
+  else if(partSyncResult.skipped && !partSyncResult.added) showToast('Entry saved ✓ Duplicate part already exists in Parts');
+  else if(partSyncResult.skipped) showToast(`Entry saved ✓ ${partSyncResult.added} part${partSyncResult.added!==1?'s':''} added · duplicate skipped`);
+  else showToast('Entry + parts saved ✓');
 }
 function renderBackup(){
   const d=getData();
