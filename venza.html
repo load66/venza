@@ -1003,14 +1003,14 @@ html.modal-open,body.modal-open{overflow:hidden}
       <button type="button" class="service-parts-toggle" id="servicePartsToggle" onclick="toggleServicePartsBuilder()">
         <span>
           Add purchased parts for this service
-          <small>Optional · Add multiple parts · Auto-fills the Parts tab and organizes them by section</small>
+          <small>Optional · Add multiple parts · Check only the ones you want saved into the Parts tab</small>
         </span>
         <span class="chev">▾</span>
       </button>
       <div class="service-parts-wrap" id="servicePartsWrap">
         <div class="alert blue" style="margin-bottom:12px">
           <div class="alert-icon">🧩</div>
-          <div><strong>Hideable parts builder.</strong> Each part added here updates the service total automatically and also gets saved into the Parts tab under the section you choose.</div>
+          <div><strong>Hideable parts builder.</strong> Each part added here updates the service total automatically. Use the checkbox on each part only if you also want that item saved into the Parts tab.</div>
         </div>
         <div id="fItemsList" class="item-builder"></div>
         <div class="item-builder-actions">
@@ -1141,7 +1141,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="section-label">Basic Parts List</div>
   <div class="alert blue">
     <div class="alert-icon">🧩</div>
-    <div><strong>Organized parts library.</strong> Parts can be added manually here or automatically from the Add Service form. The list is grouped by section and also saves where you bought each part.</div>
+    <div><strong>Organized parts library.</strong> Parts can be added manually here or saved from the Add Service form only when you check the save box on that item. The list is grouped by section and also saves where you bought each part.</div>
   </div>
 
   <button class="btn-primary" id="partsFormToggleBtn" onclick="openNewPartForm()" style="margin-bottom:10px">＋ Add Part</button>
@@ -2779,36 +2779,12 @@ function recalcMileageFromEntries(entries=getData()){
   setMi(fallback, {source:'manual', allowLower:true});
   return fallback;
 }
-function getEntryOdometerRestoreState(entry){
-  const restore = entry?.odometerRestoreState;
-  if(!restore || typeof restore !== 'object') return null;
-  const value = parseInt(restore.value, 10);
-  if(!(Number.isFinite(value) && value > 0)) return null;
-  return {
-    value,
-    source: restore.source === 'entry' ? 'entry' : 'manual',
-    entryId: restore.entryId != null && restore.entryId !== '' ? String(restore.entryId) : null,
-    updatedAt: restore.updatedAt || new Date().toISOString()
-  };
-}
 function reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries){
   const deletedId = String(deletedEntry?.id ?? '');
   if(!deletedId) return false;
   const state = getMiState();
   const usingDeletedEntry = state.source === 'entry' && String(state.entryId||'') === deletedId;
   if(!usingDeletedEntry) return false;
-
-  const restore = getEntryOdometerRestoreState(deletedEntry);
-  if(restore){
-    setMi(restore.value, {
-      source: restore.source,
-      entryId: restore.entryId,
-      allowLower: true,
-      skipHistory: true,
-      updatedAt: new Date().toISOString()
-    });
-    return true;
-  }
 
   const prior = getLatestMileageHistoryCandidate({excludeEntryIds:[deletedId]});
   if(prior){
@@ -5337,12 +5313,11 @@ function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
   const batchKeys = new Set();
   let added = 0;
   let skippedDuplicate = 0;
-  let skippedNoLink = 0;
-  normalizeEntryItems(items).forEach(item=>{
+  let skippedUnchecked = 0;
+  normalizeServiceEntryItems(items).forEach(item=>{
     if(!item.name) return;
-    const safeLink = safeUrl(item.link || '');
-    if(!safeLink){
-      skippedNoLink++;
+    if(!item.saveToParts){
+      skippedUnchecked++;
       return;
     }
     const payload = {
@@ -5351,7 +5326,7 @@ function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
       category:item.category || guessPartCategoryForService(serviceType),
       serviceType,
       store:item.store || '',
-      link:safeLink,
+      link:safeUrl(item.link || ''),
       partNum:item.partNum || '',
       unitCost:Number(item.price||0) || 0,
       note:item.note || ''
@@ -5368,7 +5343,7 @@ function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
     batchKeys.add(key);
     added++;
   });
-  return {added, skippedDuplicate, skippedNoLink, skipped: skippedDuplicate + skippedNoLink};
+  return {added, skippedDuplicate, skippedUnchecked, skipped: skippedDuplicate + skippedUnchecked};
 }
 function populatePartCategoryOptions(selectId, selected='other'){
   const el = document.getElementById(selectId);
@@ -5560,7 +5535,7 @@ function renderParts(){
   const sourceCount = parts.reduce((sum,part)=>sum + normalizeBasicPartSources(part.sources, part).length, 0);
   summaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${categoryCount} section${categoryCount!==1?'s':''} · ${sourceCount} saved source${sourceCount!==1?'s':''} · ${photoCount} receipt photo${photoCount!==1?'s':''}`;
   if(!parts.length){
-    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No saved parts yet. Add parts from the service entry form or manually here.</div></div>`;
+    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No saved parts yet. Add parts manually here or check the save box on service-entry parts you want stored in this library.</div></div>`;
     return;
   }
   const groups = PART_CATEGORY_OPTIONS.map(option=>({
@@ -5625,7 +5600,8 @@ function normalizeServiceEntryItems(items){
     link:String(item.link||'').trim(),
     price:Number.isFinite(Number(item.price)) ? Number(item.price) : 0,
     qty:Math.max(1, parseInt(item.qty||1,10) || 1),
-    note:String(item.note||'').trim()
+    note:String(item.note||'').trim(),
+    saveToParts:!!item.saveToParts
   })).filter(item=>item.name || item.partNum || item.store || item.link || item.price > 0);
 }
 function buildServicePartRow(data={}){
@@ -5647,6 +5623,7 @@ function buildServicePartRow(data={}){
       <div class="fl" style="margin-bottom:0"><label>Qty</label><input type="number" min="1" step="1" class="fi item-qty" value="${Math.max(1, parseInt(data.qty||1,10) || 1)}"></div>
       <div class="fl" style="margin-bottom:0"><label>Quick note (optional)</label><input type="text" class="fi item-note" placeholder="OEM / sale / bought as a set" value="${escapeHtmlAttr(data.note||'')}"></div>
     </div>
+    <label class="item-check"><input type="checkbox" class="item-save-parts" ${data.saveToParts ? 'checked' : ''}> Save this item to the Parts tab</label>
   `;
   const list = document.getElementById('fItemsList');
   if(list) list.appendChild(row);
@@ -5681,7 +5658,8 @@ function getFormItems(){
     link:row.querySelector('.item-link')?.value || '',
     price:row.querySelector('.item-price')?.value || 0,
     qty:row.querySelector('.item-qty')?.value || 1,
-    note:row.querySelector('.item-note')?.value || ''
+    note:row.querySelector('.item-note')?.value || '',
+    saveToParts:!!row.querySelector('.item-save-parts')?.checked
   })));
 }
 function syncEntryCostFromItems(){
@@ -5763,27 +5741,15 @@ function saveEntry(){
   if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
   const autoCost = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
   const newId=Date.now();
-  const currentMi = getMi();
-  const priorMiState = getMiState();
-  const shouldRaiseOdometer = parsedMi > currentMi;
   const d=getData();
-  const entryPayload = {id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false};
-  if(shouldRaiseOdometer){
-    entryPayload.odometerRestoreState = {
-      value: Number.isFinite(Number(priorMiState.value)) && Number(priorMiState.value) > 0 ? Number(priorMiState.value) : currentMi,
-      source: priorMiState.source === 'entry' ? 'entry' : 'manual',
-      entryId: priorMiState.entryId != null && priorMiState.entryId !== '' ? String(priorMiState.entryId) : null,
-      updatedAt: priorMiState.updatedAt || new Date().toISOString()
-    };
-  }
-  d.push(entryPayload);
+  d.push({id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false});
   save(d);
-  const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0, skippedDuplicate:0, skippedNoLink:0};
+  const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
   if(window._pendingPhoto){
     savePhoto(newId, window._pendingPhoto);
     window._pendingPhoto=null;
   }
-  if(shouldRaiseOdometer) setMi(parsedMi,{source:'entry',entryId:newId});
+  if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
   renderAll();
   go('log');
   ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -5793,11 +5759,11 @@ function saveEntry(){
   resetEntryInventoryUses();
   clearPhoto();
   if(!items.length) showToast('Entry saved ✓');
-  else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry + linked parts saved ✓');
-  else if(!partSyncResult.added && partSyncResult.skippedNoLink && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ Parts without links were not added to Parts');
-  else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedNoLink) showToast('Entry saved ✓ Duplicate linked part already exists in Parts');
-  else if(!partSyncResult.added) showToast('Entry saved ✓ No new linked parts were added to Parts');
-  else showToast(`Entry saved ✓ ${partSyncResult.added} linked part${partSyncResult.added!==1?'s':''} added to Parts`);
+  else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry saved ✓ Checked parts were added to Parts');
+  else if(!partSyncResult.added && partSyncResult.skippedUnchecked && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ No parts were checked for the Parts tab');
+  else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedUnchecked) showToast('Entry saved ✓ Checked part already exists in Parts');
+  else if(!partSyncResult.added) showToast('Entry saved ✓ No new checked parts were added to Parts');
+  else showToast(`Entry saved ✓ ${partSyncResult.added} checked part${partSyncResult.added!==1?'s':''} added to Parts`);
 }
 
 function renderBackup(){
