@@ -410,6 +410,23 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .log-part-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange2);white-space:nowrap}
 .log-part-meta{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}
 .log-part-link{font-size:10px;color:var(--blue2);text-decoration:none;display:inline-block;margin-top:4px}
+.service-parts-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;background:var(--bg3);color:var(--text);border:1.5px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600}
+.service-parts-toggle small{display:block;font-size:10px;color:var(--text3);font-weight:500;margin-top:3px}
+.service-parts-toggle .chev{font-size:18px;color:var(--text3);transition:transform .2s}
+.service-parts-toggle.open .chev{transform:rotate(180deg)}
+.service-parts-wrap{display:none;margin-top:12px}
+.service-parts-wrap.open{display:block}
+.auto-cost-note{font-size:10px;color:var(--text3);line-height:1.6;margin-top:6px}
+.parts-group-head{padding:12px 16px 10px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.4px;color:var(--gold2)}
+.parts-source-row{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.parts-source-chip{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+.parts-source-left{min-width:0}
+.parts-source-store{font-size:11px;color:var(--text);font-weight:600;line-height:1.45}
+.parts-source-meta{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.5}
+.parts-source-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange2);white-space:nowrap}
+.parts-mini-tag{display:inline-block;font-size:9px;padding:2px 7px;border-radius:5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.25);margin-top:6px}
+.log-parts-summary{font-size:11px;color:var(--text2);margin-top:10px;border-top:1px dashed var(--border);padding-top:10px}
+.log-parts-grid{margin-top:8px;display:flex;flex-direction:column;gap:8px}
 
 /* ─── UPCOMING ─────────────────────────────────────────────── */
 .svc-item{
@@ -969,8 +986,37 @@ html.modal-open,body.modal-open{overflow:hidden}
       <textarea class="ft" id="fDesc" placeholder="Quick notes about what was done..."></textarea>
     </div>
     <div class="fg2">
-      <div class="fl"><label>Total Cost for This Service ($)</label><input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01"></div>
-      <div class="fl"><label>Shop / DIY</label><input type="text" class="fi" id="fShop" placeholder="DIY or shop name"></div>
+      <div class="fl">
+        <label>Total Cost for This Service ($)</label>
+        <input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01" readonly>
+        <div class="auto-cost-note">Auto-calculated from the purchased parts added below.</div>
+      </div>
+      <div class="fl">
+        <label>Shop / DIY</label>
+        <select class="fs" id="fShop">
+          <option value="DIY">DIY</option>
+          <option value="SHOP">SHOP</option>
+        </select>
+      </div>
+    </div>
+    <div class="fl">
+      <button type="button" class="service-parts-toggle" id="servicePartsToggle" onclick="toggleServicePartsBuilder()">
+        <span>
+          Add purchased parts for this service
+          <small>Optional · Add multiple parts · Auto-fills the Parts tab and organizes them by section</small>
+        </span>
+        <span class="chev">▾</span>
+      </button>
+      <div class="service-parts-wrap" id="servicePartsWrap">
+        <div class="alert blue" style="margin-bottom:12px">
+          <div class="alert-icon">🧩</div>
+          <div><strong>Hideable parts builder.</strong> Each part added here updates the service total automatically and also gets saved into the Parts tab under the section you choose.</div>
+        </div>
+        <div id="fItemsList" class="item-builder"></div>
+        <div class="item-builder-actions">
+          <button type="button" class="item-add" onclick="addItemRow()">＋ Add Another Part</button>
+        </div>
+      </div>
     </div>
     <!-- RECEIPT PHOTO UPLOAD -->
     <div class="fl">
@@ -1095,7 +1141,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   <div class="section-label">Basic Parts List</div>
   <div class="alert blue">
     <div class="alert-icon">🧩</div>
-    <div><strong>Simple editable parts list.</strong> Save each part with a part number, purchase link, cost per unit, optional note, and optional receipt photo.</div>
+    <div><strong>Organized parts library.</strong> Parts can be added manually here or automatically from the Add Service form. The list is grouped by section and also saves where you bought each part.</div>
   </div>
 
   <button class="btn-primary" id="partsFormToggleBtn" onclick="openNewPartForm()" style="margin-bottom:10px">＋ Add Part</button>
@@ -1106,6 +1152,13 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="fg2">
       <div class="fl"><label>Part Name</label><input type="text" class="fi" id="partName" placeholder="Toyota oil filter"></div>
       <div class="fl"><label>Part Number</label><input type="text" class="fi" id="partNumber" placeholder="90915-YZZN1"></div>
+    </div>
+    <div class="fg2">
+      <div class="fl">
+        <label>Parts Section</label>
+        <select class="fs" id="partCategory"></select>
+      </div>
+      <div class="fl"><label>Purchased From</label><input type="text" class="fi" id="partStore" placeholder="Toyota / Walmart / Amazon"></div>
     </div>
     <div class="fg2">
       <div class="fl"><label>Cost Per Unit ($)</label><input type="number" class="fi" id="partCost" step="0.01" placeholder="4.99"></div>
@@ -2280,11 +2333,13 @@ function normalizeEntryItems(items){
   return items.filter(Boolean).map(item=>({
     inventoryId: item.inventoryId ?? '',
     name: (item.name||'').trim(),
+    category: normalizeBasicPartCategory(item.category),
     partNum: (item.partNum||'').trim(),
     store: (item.store||'').trim(),
     link: (item.link||'').trim(),
     price: Number.isFinite(Number(item.price)) ? Number(item.price) : 0,
     qty: Math.max(1, parseInt(item.qty||1,10) || 1),
+    note: (item.note||'').trim(),
     useInOilAvg: !!(item.useInOilAvg ?? item.countInOilAvg)
   })).filter(item=>item.name || item.partNum || item.store || item.link || Number(item.price||0)>0);
 }
@@ -3243,6 +3298,8 @@ window.onload=()=>{
     mergeDuplicateMasterParts();
   }
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
+  const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value = 'DIY';
+  populatePartCategoryOptions('partCategory','other');
   setInventoryFormOpen(false);
   bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
   setScheduleControlsExpanded(false);
@@ -3558,6 +3615,7 @@ function renderLog(){
         <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
         <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
       </div>
+      ${normalizeServiceEntryItems(e.items).length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${normalizeServiceEntryItems(e.items).map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
       ${photoHtml}
     </div>`;
   }).join('');
@@ -4954,17 +5012,97 @@ function delBuiltin(id){
    ════════════════════════════════════════════════════════════════ */
 const BASIC_PARTS_KEY = 'vz_basic_parts';
 const BASIC_PART_PHOTO_PREFIX = 'vz_part_photo_';
-
+const PART_CATEGORY_OPTIONS = [
+  {value:'engine_oil',label:'Engine Oil'},
+  {value:'oil_filter',label:'Oil Filter'},
+  {value:'drain_gasket',label:'Drain Plug Gasket'},
+  {value:'cabin_air_filter',label:'Cabin Air Filter'},
+  {value:'engine_air_filter',label:'Engine Air Filter'},
+  {value:'spark_plugs',label:'Spark Plugs'},
+  {value:'transmission_fluid',label:'Transmission Fluid'},
+  {value:'rear_differential_fluid',label:'Rear Differential Fluid'},
+  {value:'engine_coolant',label:'Engine Coolant'},
+  {value:'inverter_coolant',label:'Inverter Coolant'},
+  {value:'hv_battery_filter',label:'HV Battery Filter'},
+  {value:'valvomax',label:'ValvoMax'},
+  {value:'brake_parts',label:'Brake Parts'},
+  {value:'tires',label:'Tires'},
+  {value:'wipers',label:'Wipers'},
+  {value:'other',label:'Other'}
+];
+const PART_CATEGORY_MAP = Object.fromEntries(PART_CATEGORY_OPTIONS.map(item=>[item.value,item.label]));
+function getPartCategoryLabel(value='other'){
+  return PART_CATEGORY_MAP[value] || PART_CATEGORY_MAP.other;
+}
+function normalizeBasicPartCategory(value='other'){
+  return PART_CATEGORY_MAP[String(value||'').trim()] ? String(value).trim() : 'other';
+}
+function normalizeBasicPartSources(sources, fallback={}){
+  const seed = Array.isArray(sources) ? sources : [];
+  const maybePrimary = (fallback.store || fallback.link || Number(fallback.unitCost||0) > 0) ? [{
+    store:String(fallback.store||'').trim(),
+    link:String(fallback.link||'').trim(),
+    unitCost:Number.isFinite(Number(fallback.unitCost)) ? Number(fallback.unitCost) : 0,
+    note:String(fallback.sourceNote||'').trim()
+  }] : [];
+  const merged = [...seed, ...maybePrimary].filter(Boolean).map(source=>({
+    store:String(source.store||'').trim(),
+    link:String(source.link||'').trim(),
+    unitCost:Number.isFinite(Number(source.unitCost)) ? Number(source.unitCost) : 0,
+    note:String(source.note||'').trim()
+  })).filter(source=>source.store || source.link || source.unitCost > 0 || source.note);
+  const seen = new Set();
+  return merged.filter(source=>{
+    const key = [String(source.store||'').toLowerCase(), String(source.link||'').toLowerCase(), Number(source.unitCost||0).toFixed(2), String(source.note||'').toLowerCase()].join('|');
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 function normalizeBasicParts(items){
   if(!Array.isArray(items)) return [];
-  return items.filter(Boolean).map(item=>({
-    id: item.id ?? Date.now()+Math.random(),
-    name: String(item.name||'').trim(),
-    link: String(item.link||'').trim(),
-    partNum: String(item.partNum||'').trim(),
-    unitCost: Number.isFinite(Number(item.unitCost)) ? Number(item.unitCost) : 0,
-    note: String(item.note||'').trim()
-  })).filter(item=>item.name);
+  return items.filter(Boolean).map(item=>{
+    const store = String(item.store||'').trim();
+    const link = String(item.link||'').trim();
+    const unitCost = Number.isFinite(Number(item.unitCost)) ? Number(item.unitCost) : 0;
+    return {
+      id:item.id ?? Date.now()+Math.random(),
+      name:String(item.name||'').trim(),
+      category:normalizeBasicPartCategory(item.category),
+      serviceType:String(item.serviceType||'').trim(),
+      store,
+      link,
+      partNum:String(item.partNum||'').trim(),
+      unitCost,
+      note:String(item.note||'').trim(),
+      sources:normalizeBasicPartSources(item.sources, {store,link,unitCost})
+    };
+  }).filter(item=>item.name);
+}
+function guessPartCategoryForService(serviceType='other'){
+  const map = {
+    oil:'engine_oil',
+    cabin:'cabin_air_filter',
+    engine_filter:'engine_air_filter',
+    trans:'transmission_fluid',
+    diff:'rear_differential_fluid',
+    coolant:'engine_coolant',
+    inv_coolant:'inverter_coolant',
+    plugs:'spark_plugs',
+    hvfilter_inspect:'hv_battery_filter',
+    hvfilter_clean:'hv_battery_filter',
+    valvomax:'valvomax',
+    brakes:'brake_parts',
+    tires:'tires',
+    tires_new:'tires',
+    wipers:'wipers'
+  };
+  return map[serviceType] || 'other';
+}
+function buildBasicPartMergeKey(item){
+  const pn = normalizeKey(item.partNum||'');
+  if(pn) return `pn:${pn}`;
+  return `nm:${normalizeKey(item.name||'')}|${normalizeBasicPartCategory(item.category)}`;
 }
 function migrateLegacyBasicParts(){
   if(localStorage.getItem(BASIC_PARTS_KEY)) return;
@@ -4972,12 +5110,15 @@ function migrateLegacyBasicParts(){
   try{
     const legacyInventory = typeof getInventory === 'function' ? getInventory() : [];
     seed = normalizeBasicParts(legacyInventory.map(item=>({
-      id: item.id,
-      name: item.name,
-      partNum: item.partNum,
-      link: item.link,
-      unitCost: item.unitCost,
-      note: [item.store, item.note].filter(Boolean).join(' · ')
+      id:item.id,
+      name:item.name,
+      category:guessPartCategoryForService(item.serviceType),
+      serviceType:item.serviceType||'',
+      store:item.store,
+      partNum:item.partNum,
+      link:item.link,
+      unitCost:item.unitCost,
+      note:item.note||''
     })));
   }catch(err){ seed = []; }
   if(seed.length) localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(seed));
@@ -4993,6 +5134,56 @@ function getBasicPartsList(){
 }
 function saveBasicPartsList(items){
   localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
+}
+function upsertBasicPart(payload={}){
+  const parts = getBasicPartsList();
+  const normalized = normalizeBasicParts([payload])[0];
+  if(!normalized) return null;
+  const key = buildBasicPartMergeKey(normalized);
+  const idx = parts.findIndex(item=>buildBasicPartMergeKey(item)===key);
+  if(idx > -1){
+    const current = parts[idx];
+    const merged = {
+      ...current,
+      name:normalized.name || current.name,
+      category:normalized.category || current.category,
+      serviceType:normalized.serviceType || current.serviceType,
+      store:normalized.store || current.store,
+      link:normalized.link || current.link,
+      partNum:normalized.partNum || current.partNum,
+      unitCost:Number(normalized.unitCost||0) > 0 ? Number(normalized.unitCost||0) : Number(current.unitCost||0),
+      note:[current.note, normalized.note].filter(Boolean).filter((value,index,arr)=>arr.indexOf(value)===index).join(' · '),
+      sources:normalizeBasicPartSources([...(current.sources||[]), ...(normalized.sources||[])])
+    };
+    parts[idx] = merged;
+    saveBasicPartsList(parts);
+    return merged;
+  }
+  parts.push(normalized);
+  saveBasicPartsList(parts);
+  return normalized;
+}
+function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
+  normalizeEntryItems(items).forEach(item=>{
+    if(!item.name) return;
+    upsertBasicPart({
+      id:Date.now()+Math.random(),
+      name:item.name,
+      category:item.category || guessPartCategoryForService(serviceType),
+      serviceType,
+      store:item.store || '',
+      link:item.link || '',
+      partNum:item.partNum || '',
+      unitCost:Number(item.price||0) || 0,
+      note:item.note || ''
+    });
+  });
+}
+function populatePartCategoryOptions(selectId, selected='other'){
+  const el = document.getElementById(selectId);
+  if(!el) return;
+  el.innerHTML = PART_CATEGORY_OPTIONS.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');
+  el.value = PART_CATEGORY_MAP[selected] ? selected : 'other';
 }
 function getBasicPartPhoto(id){ return localStorage.getItem(BASIC_PART_PHOTO_PREFIX + id) || null; }
 function saveBasicPartPhoto(id,data){ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id,data); }catch(err){ showToast('Part photo too large — try a smaller image'); } }
@@ -5035,8 +5226,9 @@ function clearPartPhoto(){
   const img = document.getElementById('partPhotoImg'); if(img) img.src='';
 }
 function clearPartForm(){
-  const fields = ['partEditId','partName','partNumber','partCost','partLink','partNote'];
+  const fields = ['partEditId','partName','partNumber','partStore','partCost','partLink','partNote'];
   fields.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  populatePartCategoryOptions('partCategory','other');
   const title = document.getElementById('partFormTitle'); if(title) title.textContent = 'Add Part';
   clearPartPhoto();
   window._pendingPartPhotoRemoved = false;
@@ -5090,6 +5282,8 @@ function editBasicPart(id){
   document.getElementById('partEditId').value = part.id;
   document.getElementById('partName').value = part.name || '';
   document.getElementById('partNumber').value = part.partNum || '';
+  populatePartCategoryOptions('partCategory', part.category || 'other');
+  document.getElementById('partStore').value = part.store || '';
   document.getElementById('partCost').value = Number(part.unitCost||0) > 0 ? Number(part.unitCost||0) : '';
   document.getElementById('partLink').value = part.link || '';
   document.getElementById('partNote').value = part.note || '';
@@ -5111,25 +5305,40 @@ function editBasicPart(id){
 function saveBasicPart(){
   const editId = document.getElementById('partEditId')?.value || '';
   const name = document.getElementById('partName')?.value.trim() || '';
+  const category = document.getElementById('partCategory')?.value || 'other';
+  const store = document.getElementById('partStore')?.value.trim() || '';
   const partNum = document.getElementById('partNumber')?.value.trim() || '';
   const link = document.getElementById('partLink')?.value.trim() || '';
   const note = document.getElementById('partNote')?.value.trim() || '';
   const unitCost = Number.isFinite(Number(document.getElementById('partCost')?.value)) ? Number(document.getElementById('partCost').value) : 0;
   if(!name){ showToast('Part name is required'); return; }
   const list = getBasicPartsList();
-  const payload = { id: editId || Date.now(), name, partNum, link, unitCost, note };
+  const existing = editId ? list.find(item=>String(item.id)===String(editId)) : null;
+  const payload = {
+    id: editId || Date.now(),
+    name,
+    category,
+    serviceType: existing?.serviceType || '',
+    store,
+    partNum,
+    link,
+    unitCost,
+    note,
+    sources: normalizeBasicPartSources([...(existing?.sources||[]), {store,link,unitCost}])
+  };
+  let savedPart = payload;
   if(editId){
     const idx = list.findIndex(item=>String(item.id)===String(editId));
     if(idx>-1) list[idx] = payload;
     else list.push(payload);
+    saveBasicPartsList(list);
   }else{
-    list.push(payload);
+    savedPart = upsertBasicPart(payload) || payload;
   }
-  saveBasicPartsList(list);
   if(window._pendingPartPhoto){
-    saveBasicPartPhoto(payload.id, window._pendingPartPhoto);
+    saveBasicPartPhoto(savedPart.id, window._pendingPartPhoto);
   }else if(editId && window._pendingPartPhotoRemoved){
-    removeBasicPartPhoto(payload.id);
+    removeBasicPartPhoto(savedPart.id);
   }
   clearPartForm();
   togglePartForm(false);
@@ -5150,42 +5359,149 @@ function renderParts(){
   const listEl = document.getElementById('basicPartsList');
   const summaryEl = document.getElementById('basicPartsSummary');
   if(!listEl || !summaryEl) return;
-  const parts = getBasicPartsList().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+  const parts = getBasicPartsList().sort((a,b)=>{
+    const categoryCompare = getPartCategoryLabel(a.category).localeCompare(getPartCategoryLabel(b.category));
+    if(categoryCompare !== 0) return categoryCompare;
+    return String(a.name||'').localeCompare(String(b.name||''));
+  });
   const photoCount = parts.filter(part=>getBasicPartPhoto(part.id)).length;
-  summaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${photoCount} receipt photo${photoCount!==1?'s':''}`;
+  const categoryCount = Object.keys(parts.reduce((map, part)=>{ map[part.category || 'other'] = true; return map; }, {})).length;
+  const sourceCount = parts.reduce((sum,part)=>sum + normalizeBasicPartSources(part.sources, part).length, 0);
+  summaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${categoryCount} section${categoryCount!==1?'s':''} · ${sourceCount} saved source${sourceCount!==1?'s':''} · ${photoCount} receipt photo${photoCount!==1?'s':''}`;
   if(!parts.length){
-    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No saved parts yet. Add a part above when you buy something for the Venza.</div></div>`;
+    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No saved parts yet. Add parts from the service entry form or manually here.</div></div>`;
     return;
   }
-  listEl.innerHTML = parts.map(part=>{
-    const safeLink = safeUrl(part.link);
-    const photo = getBasicPartPhoto(part.id);
-    return `<div class="part-item">
-      <div class="part-row1"><span class="part-name">${escapeHtml(part.name)}</span><span class="part-price">${Number(part.unitCost||0) > 0 ? '$'+Number(part.unitCost||0).toFixed(2) : '—'}</span></div>
-      ${part.partNum ? `<div class="part-num">Part # ${escapeHtml(part.partNum)}</div>` : `<div class="part-missing">No part number saved</div>`}
-      ${safeLink ? `<a class="part-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeLink))}</a>` : `<div class="part-missing">No purchase link saved</div>`}
-      ${part.note ? `<div class="inv-meta" style="margin-top:8px">${safeText(part.note)}</div>` : ''}
-      ${photo ? `<div style="margin-top:10px;cursor:pointer" onclick="viewBasicPartPhoto(${part.id})"><img src="${photo}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">🧾 Receipt photo · tap to view</div></div>` : `<div class="part-missing" style="margin-top:10px">No receipt photo saved</div>`}
-      <div class="inv-actions" style="margin-top:12px">
-        <button type="button" class="inv-btn" onclick="editBasicPart(${part.id})">Edit</button>
-        <button type="button" class="inv-btn danger" onclick="deleteBasicPart(${part.id})">Delete</button>
-      </div>
-    </div>`;
-  }).join('');
+  const groups = PART_CATEGORY_OPTIONS.map(option=>({
+    ...option,
+    parts: parts.filter(part=>(part.category || 'other') === option.value)
+  })).filter(group=>group.parts.length);
+  listEl.innerHTML = groups.map(group=>`
+    <div>
+      <div class="parts-group-head">${escapeHtml(group.label)}</div>
+      ${group.parts.map(part=>{
+        const photo = getBasicPartPhoto(part.id);
+        const sources = normalizeBasicPartSources(part.sources, part);
+        return `<div class="part-item">
+          <div class="part-row1"><span class="part-name">${escapeHtml(part.name)}</span><span class="part-price">${Number(part.unitCost||0) > 0 ? '$'+Number(part.unitCost||0).toFixed(2) : '—'}</span></div>
+          ${part.partNum ? `<div class="part-num">Part # ${escapeHtml(part.partNum)}</div>` : `<div class="part-missing">No part number saved</div>`}
+          ${part.serviceType ? `<div class="parts-mini-tag">Linked to ${escapeHtml(LABELS[part.serviceType] || part.serviceType)}</div>` : ''}
+          ${part.note ? `<div class="inv-meta" style="margin-top:8px">${safeText(part.note)}</div>` : ''}
+          ${sources.length ? `<div class="parts-source-row">${sources.map(source=>{
+            const safeLink = safeUrl(source.link);
+            return `<div class="parts-source-chip">
+              <div class="parts-source-left">
+                <div class="parts-source-store">${escapeHtml(source.store || (safeLink ? getLinkHostLabel(safeLink) : 'Saved source'))}</div>
+                <div class="parts-source-meta">
+                  ${safeLink ? `<a class="part-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeLink))}</a>` : 'No purchase link saved'}
+                  ${source.note ? `<br>${safeText(source.note)}` : ''}
+                </div>
+              </div>
+              <div class="parts-source-price">${Number(source.unitCost||0) > 0 ? '$'+Number(source.unitCost||0).toFixed(2) : '—'}</div>
+            </div>`;
+          }).join('')}</div>` : `<div class="part-missing" style="margin-top:8px">No saved purchase source yet</div>`}
+          ${photo ? `<div style="margin-top:10px;cursor:pointer" onclick="viewBasicPartPhoto(${part.id})"><img src="${photo}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">🧾 Receipt photo · tap to view</div></div>` : `<div class="part-missing" style="margin-top:10px">No receipt photo saved</div>`}
+          <div class="inv-actions" style="margin-top:12px">
+            <button type="button" class="inv-btn" onclick="editBasicPart(${part.id})">Edit</button>
+            <button type="button" class="inv-btn danger" onclick="deleteBasicPart(${part.id})">Delete</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+function toggleServicePartsBuilder(force){
+  const wrap = document.getElementById('servicePartsWrap');
+  const btn = document.getElementById('servicePartsToggle');
+  if(!wrap || !btn) return;
+  const shouldOpen = typeof force === 'boolean' ? force : !wrap.classList.contains('open');
+  wrap.classList.toggle('open', shouldOpen);
+  btn.classList.toggle('open', shouldOpen);
+}
+function normalizeServiceEntryItems(items){
+  return (Array.isArray(items) ? items : []).filter(Boolean).map(item=>({
+    name:String(item.name||'').trim(),
+    category:normalizeBasicPartCategory(item.category),
+    partNum:String(item.partNum||'').trim(),
+    store:String(item.store||'').trim(),
+    link:String(item.link||'').trim(),
+    price:Number.isFinite(Number(item.price)) ? Number(item.price) : 0,
+    qty:Math.max(1, parseInt(item.qty||1,10) || 1),
+    note:String(item.note||'').trim()
+  })).filter(item=>item.name || item.partNum || item.store || item.link || item.price > 0);
+}
+function buildServicePartRow(data={}){
+  const type = document.getElementById('fType')?.value || 'other';
+  const row = document.createElement('div');
+  row.className = 'item-editor';
+  row.innerHTML = `
+    <div class="item-editor-top">
+      <div class="item-editor-title">Purchased part</div>
+      <button type="button" class="item-remove" onclick="removeItemRow(this)">Remove</button>
+    </div>
+    <div class="item-grid">
+      <div class="fl" style="margin-bottom:0"><label>Part name</label><input type="text" class="fi item-name" placeholder="Mobil 1 0W-16" value="${escapeHtmlAttr(data.name||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Parts section</label><select class="fs item-category"></select></div>
+      <div class="fl" style="margin-bottom:0"><label>Part #</label><input type="text" class="fi item-part" placeholder="90915-YZZN1" value="${escapeHtmlAttr(data.partNum||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Purchased from</label><input type="text" class="fi item-store" placeholder="Toyota / Walmart / Amazon" value="${escapeHtmlAttr(data.store||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Purchase link</label><input type="url" class="fi item-link" placeholder="https://..." value="${escapeHtmlAttr(data.link||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Unit price ($)</label><input type="number" class="fi item-price" placeholder="0.00" step="0.01" value="${Number(data.price||0) > 0 ? Number(data.price||0) : ''}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Qty</label><input type="number" min="1" step="1" class="fi item-qty" value="${Math.max(1, parseInt(data.qty||1,10) || 1)}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Quick note (optional)</label><input type="text" class="fi item-note" placeholder="OEM / sale / bought as a set" value="${escapeHtmlAttr(data.note||'')}"></div>
+    </div>
+  `;
+  const list = document.getElementById('fItemsList');
+  if(list) list.appendChild(row);
+  const categorySelect = row.querySelector('.item-category');
+  if(categorySelect){
+    categorySelect.innerHTML = PART_CATEGORY_OPTIONS.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');
+    categorySelect.value = PART_CATEGORY_MAP[data.category] ? data.category : guessPartCategoryForService(type);
+  }
+  row.querySelectorAll('input, select').forEach(field=>{
+    field.addEventListener('input', syncEntryCostFromItems);
+    field.addEventListener('change', syncEntryCostFromItems);
+  });
+  return row;
+}
+function addItemRow(data={}){
+  toggleServicePartsBuilder(true);
+  const row = buildServicePartRow(data);
+  syncEntryCostFromItems();
+  return row;
+}
+function removeItemRow(btn){
+  const row = btn?.closest('.item-editor');
+  if(row) row.remove();
+  syncEntryCostFromItems();
+}
+function getFormItems(){
+  return normalizeServiceEntryItems(Array.from(document.querySelectorAll('#fItemsList .item-editor')).map(row=>({
+    name:row.querySelector('.item-name')?.value || '',
+    category:row.querySelector('.item-category')?.value || guessPartCategoryForService(document.getElementById('fType')?.value || 'other'),
+    partNum:row.querySelector('.item-part')?.value || '',
+    store:row.querySelector('.item-store')?.value || '',
+    link:row.querySelector('.item-link')?.value || '',
+    price:row.querySelector('.item-price')?.value || 0,
+    qty:row.querySelector('.item-qty')?.value || 1,
+    note:row.querySelector('.item-note')?.value || ''
+  })));
+}
+function syncEntryCostFromItems(){
+  const items = getFormItems();
+  const total = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+  const costEl = document.getElementById('fCost');
+  if(costEl) costEl.value = total > 0 ? total.toFixed(2) : '';
 }
 function resetEntryInventoryUses(){
   const list = document.getElementById('fItemsList');
-  if(list) list.innerHTML='';
+  if(list) list.innerHTML = '';
+  toggleServicePartsBuilder(false);
+  syncEntryCostFromItems();
 }
 function renderEntryInventoryUI(){
-  const block = document.getElementById('inventorySuggestBlock');
-  if(block) block.style.display = 'none';
+  syncEntryCostFromItems();
 }
-function syncEntryCostFromItems(){}
-function addItemRow(){ return null; }
-function removeItemRow(){}
-function getFormItems(){ return []; }
-function useInventoryItem(){ showToast('Service entry is now in simple mode'); }
+function useInventoryItem(){ showToast('This form now uses the new purchased parts builder'); }
 function removeOneInventoryItem(){}
 function renderLog(){
   const d=getData().sort((a,b)=>b.mi-a.mi);
@@ -5200,6 +5516,7 @@ function renderLog(){
       ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
       :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
     const photo=getPhoto(e.id);
+    const parts = normalizeServiceEntryItems(e.items);
     const photoHtml=photo
       ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
           <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
@@ -5221,6 +5538,7 @@ function renderLog(){
         <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
         <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
       </div>
+      ${parts.length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${parts.map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
       ${photoHtml}
     </div>`;
   }).join('');
@@ -5240,16 +5558,17 @@ function saveEntry(){
   const mi=document.getElementById('fMi')?.value || '';
   const type=document.getElementById('fType')?.value || 'other';
   const desc=document.getElementById('fDesc')?.value.trim() || '';
-  const cost=document.getElementById('fCost')?.value || '';
-  const shop=document.getElementById('fShop')?.value.trim() || '';
+  const shop=document.getElementById('fShop')?.value || 'DIY';
+  const items=getFormItems();
   if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
   const parsedMi = parseInt(mi,10);
   if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
-  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
+  const autoCost = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
   const newId=Date.now();
   const d=getData();
-  d.push({id:newId,date,mi:parsedMi,type,desc,cost:manualCost,shop,link:'',items:[],inventoryUses:[],builtin:false});
+  d.push({id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false});
   save(d);
+  if(items.length) upsertBasicPartsFromServiceItems(items, type);
   if(window._pendingPhoto){
     savePhoto(newId, window._pendingPhoto);
     window._pendingPhoto=null;
@@ -5257,10 +5576,13 @@ function saveEntry(){
   if(parsedMi > getMi()) setMi(parsedMi);
   renderAll();
   go('log');
-  ['fMi','fCost','fShop','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
+  const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value='DIY';
+  const costEl = document.getElementById('fCost'); if(costEl) costEl.value='';
+  resetEntryInventoryUses();
   clearPhoto();
-  showToast('Entry saved ✓');
+  showToast(items.length ? 'Entry + parts saved ✓' : 'Entry saved ✓');
 }
 function renderBackup(){
   const d=getData();
@@ -5300,7 +5622,7 @@ function exportData(){
     if(p) partPhotos[part.id] = p;
   });
   const payload={
-    version: 7,
+    version: 8,
     exported: new Date().toISOString(),
     vin: VIN,
     vehicle: '2021 Toyota Venza Hybrid AWD',
@@ -5347,11 +5669,15 @@ function importData(input){
       const inventory=Array.isArray(data.inventory) ? data.inventory : [];
       const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
       const basicParts=Array.isArray(data.basicParts) ? data.basicParts : normalizeBasicParts(inventory.map(item=>({
-        id: item.id,
-        name: item.name,
-        link: item.link,
-        unitCost: item.unitCost,
-        note: [item.partNum && `Part # ${item.partNum}`, item.store, item.note].filter(Boolean).join(' · ')
+        id:item.id,
+        name:item.name,
+        category:guessPartCategoryForService(item.serviceType),
+        serviceType:item.serviceType || '',
+        store:item.store,
+        partNum:item.partNum,
+        link:item.link,
+        unitCost:item.unitCost,
+        note:item.note || ''
       })));
       const oilAverageResetAt=data.oilAverageResetAt||'';
       const averageServiceType=data.averageServiceType||'oil_avg';
@@ -5361,7 +5687,7 @@ function importData(input){
       const version = Number(data.version || 0);
       const backupVin = String(data.vin || '').trim();
       if(!entries){ showToast('❌ Invalid backup file format'); input.value=''; return; }
-      if(version > 7){ showToast('This backup was created by a newer app version'); input.value=''; return; }
+      if(version > 8){ showToast('This backup was created by a newer app version'); input.value=''; return; }
       if(backupVin && backupVin !== VIN){
         const proceedMismatch = confirm(`This backup VIN does not match this app.
 
