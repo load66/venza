@@ -2673,7 +2673,7 @@ function getMi(){
   if(Number.isFinite(Number(state.value)) && Number(state.value) > 0) return Number(state.value);
   const historyValue = getLatestMileageHistoryCandidate()?.value;
   if(Number.isFinite(Number(historyValue)) && Number(historyValue) > 0) return Number(historyValue);
-  return highestMileage(getData()) || 64751;
+  return highestMileage(getData()) || getManualMileageBaseline();
 }
 function normalizeMileageHistory(items){
   if(!Array.isArray(items)) return [];
@@ -2704,6 +2704,15 @@ function appendMiHistory(item){
   saveMiHistory(history);
   return history;
 }
+/* Permanently removes all history records tied to a deleted entry's ID.
+   Called on every entry delete so stale mileage values can never resurface. */
+function purgeMiHistoryForEntry(entryId){
+  if(entryId == null || entryId === '') return;
+  const id = String(entryId);
+  const history = getMiHistory();
+  const cleaned = history.filter(item=>!(item.source==='entry' && String(item.entryId||'')===id));
+  saveMiHistory(cleaned);
+}
 function getLatestMileageHistoryCandidate(options={}){
   const excludedEntryIds = new Set((options.excludeEntryIds || []).map(id=>String(id)));
   const history = getMiHistory();
@@ -2713,6 +2722,16 @@ function getLatestMileageHistoryCandidate(options={}){
     if(Number.isFinite(Number(item.value)) && Number(item.value) > 0) return item;
   }
   return null;
+}
+/* Returns the most recent manual mileage from history, or the app baseline.
+   This is the floor value when all service entries have been removed. */
+function getManualMileageBaseline(){
+  const history = getMiHistory();
+  for(let i=history.length-1; i>=0; i--){
+    const item = history[i];
+    if(item.source==='manual' && Number.isFinite(Number(item.value)) && Number(item.value)>0) return Number(item.value);
+  }
+  return 66377; // app starting point
 }
 function getMiState(){
   const current = parseInt(localStorage.getItem('vz_mi')||'',10);
@@ -2775,18 +2794,24 @@ function recalcMileageFromEntries(entries=getData()){
     setMi(highestEntry.mi, {source:'entry', entryId:highestEntry.id, allowLower:true});
     return Number(highestEntry.mi||0);
   }
-  const fallback = highestMileage(DEFAULT) || 64751;
+  const fallback = getManualMileageBaseline();
   setMi(fallback, {source:'manual', allowLower:true});
   return fallback;
 }
 function reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries){
   const deletedId = String(deletedEntry?.id ?? '');
   if(!deletedId) return false;
+
+  // Purge this entry's mileage records from history FIRST so they can never
+  // resurface after deletion (root cause of the stale-mileage bug).
+  purgeMiHistoryForEntry(deletedId);
+
   const state = getMiState();
   const usingDeletedEntry = state.source === 'entry' && String(state.entryId||'') === deletedId;
   if(!usingDeletedEntry) return false;
 
-  const prior = getLatestMileageHistoryCandidate({excludeEntryIds:[deletedId]});
+  // History is already clean — plain lookup, no exclusion needed.
+  const prior = getLatestMileageHistoryCandidate();
   if(prior){
     setMi(prior.value, {
       source: prior.source === 'entry' ? 'entry' : 'manual',
@@ -2798,14 +2823,14 @@ function reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries){
     return true;
   }
 
+  // Fallback: highest remaining entry, or the stored manual baseline.
   const highestEntry = getHighestMileageEntry(remainingEntries);
   if(highestEntry){
     setMi(highestEntry.mi, {source:'entry', entryId:highestEntry.id, allowLower:true, skipHistory:true});
     return true;
   }
 
-  const fallback = highestMileage(DEFAULT) || 64751;
-  setMi(fallback, {source:'manual', allowLower:true, skipHistory:true});
+  setMi(getManualMileageBaseline(), {source:'manual', allowLower:true, skipHistory:true});
   return true;
 }
 function parsePositiveInt(value){
@@ -5130,9 +5155,20 @@ function viewPhoto(id){
    ════════════════════════════════════════════════════════════════ */
 /* ─── DELETE INDIVIDUAL ENTRY ────────────────────────────────── */
 function delEntry(id){
-  if(!confirm('Delete this service entry?\n\nThis cannot be undone.')) return;
   const currentEntries = getData();
   const deletedEntry = currentEntries.find(e=>String(e.id)===String(id));
+
+  // Only the highest-mileage entry may be deleted to keep mileage history reliable.
+  const sortedByMi = [...currentEntries]
+    .filter(e=>Number.isFinite(Number(e.mi)) && Number(e.mi)>0)
+    .sort((a,b)=>Number(b.mi)-Number(a.mi));
+  const latestEntry = sortedByMi[0];
+  if(latestEntry && String(latestEntry.id)!==String(id)){
+    showToast(`Delete the latest entry first (${Number(latestEntry.mi).toLocaleString()} mi) — entries must be removed newest-first to keep mileage accurate.`);
+    return;
+  }
+
+  if(!confirm('Delete this service entry?\n\nThis cannot be undone.')) return;
   const remainingEntries = currentEntries.filter(e=>String(e.id)!==String(id));
   save(remainingEntries);
   localStorage.removeItem('vz_photo_'+id);
@@ -6008,7 +6044,7 @@ function resetData(){
   localStorage.removeItem(BASIC_PARTS_KEY);
   localStorage.removeItem(MI_STATE_KEY);
   localStorage.removeItem(MI_HISTORY_KEY);
-  setMi(64751,{source:'manual',allowLower:true});
+  setMi(66377,{source:'manual',allowLower:true});
   renderAll();
   renderBackup();
   showToast('Reset to factory data ✓');
