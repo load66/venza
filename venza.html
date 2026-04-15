@@ -417,6 +417,26 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .service-parts-wrap{display:none;margin-top:12px}
 .service-parts-wrap.open{display:block}
 .auto-cost-note{font-size:10px;color:var(--text3);line-height:1.6;margin-top:6px}
+/* ─── REUSE LAST PARTS BAR ──────────────────────────────────── */
+.reuse-bar{
+  display:none;align-items:flex-start;gap:10px;
+  background:rgba(34,212,110,.06);
+  border:1px solid rgba(34,212,110,.22);
+  border-radius:10px;padding:10px 13px;
+  margin-top:10px;animation:fadeUp .2s ease both;
+}
+.reuse-bar.visible{display:flex}
+.reuse-bar-info{flex:1;min-width:0}
+.reuse-bar-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--green2);margin-bottom:3px}
+.reuse-bar-meta{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reuse-bar-parts{font-size:11px;color:var(--text2);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reuse-bar-btn{
+  flex-shrink:0;background:var(--green);color:#fff;
+  border-radius:8px;padding:8px 14px;
+  font-size:12px;font-weight:700;letter-spacing:.3px;
+  border:none;cursor:pointer;transition:all .2s;align-self:center;
+}
+.reuse-bar-btn:active{opacity:.75;transform:scale(.96)}
 .parts-group-head{padding:12px 16px 10px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.4px;color:var(--gold2)}
 .parts-source-row{margin-top:8px;display:flex;flex-direction:column;gap:6px}
 .parts-source-chip{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
@@ -1007,6 +1027,15 @@ html.modal-open,body.modal-open{overflow:hidden}
         </span>
         <span class="chev">▾</span>
       </button>
+      <!-- REUSE LAST PARTS BAR — appears automatically when a type with prior parts is selected -->
+      <div class="reuse-bar" id="reusePartsBar">
+        <div class="reuse-bar-info">
+          <div class="reuse-bar-label">↩ Same parts on record</div>
+          <div class="reuse-bar-meta" id="reuseBarMeta"></div>
+          <div class="reuse-bar-parts" id="reuseBarParts"></div>
+        </div>
+        <button type="button" class="reuse-bar-btn" onclick="applyLastParts()">Reuse</button>
+      </div>
       <div class="service-parts-wrap" id="servicePartsWrap">
         <div class="alert blue" style="margin-bottom:12px">
           <div class="alert-icon">🧩</div>
@@ -4260,11 +4289,53 @@ function removeOneInventoryItem(id){
   renderEntryInventoryUI();
 }
 
+/* ─── REUSE LAST PARTS ──────────────────────────────────────── */
+/* Find the most recent entry for a given service type that has parts recorded. */
+function getLastPartsForServiceType(serviceType){
+  if(!serviceType) return null;
+  return getData()
+    .filter(e => e.type === serviceType && Array.isArray(e.items) && normalizeServiceEntryItems(e.items).length > 0)
+    .sort((a,b) => Number(b.mi) - Number(a.mi) || (Number(b.id) - Number(a.id)))
+    [0] || null;
+}
+/* Show/hide the reuse bar based on whether the selected service type has prior parts. */
+function updateReusePartsBar(){
+  const bar  = document.getElementById('reusePartsBar');
+  const meta = document.getElementById('reuseBarMeta');
+  const prt  = document.getElementById('reuseBarParts');
+  if(!bar) return;
+  const serviceType = document.getElementById('fType')?.value;
+  if(!serviceType){ bar.classList.remove('visible'); return; }
+  const lastEntry = getLastPartsForServiceType(serviceType);
+  if(!lastEntry){ bar.classList.remove('visible'); return; }
+  const items = normalizeServiceEntryItems(lastEntry.items);
+  const total = items.reduce((s,i) => s + Number(i.price||0) * Number(i.qty||0), 0);
+  const dt = new Date(lastEntry.date+'T00:00:00');
+  const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  meta.textContent = `Last ${LABELS[serviceType]||'service'} · ${ds} · $${total.toFixed(2)}`;
+  prt.textContent  = items.map(i => `${i.qty}× ${i.name}${Number(i.price)>0 ? ` ($${Number(i.price).toFixed(2)})` : ''}`).join(' · ');
+  bar.classList.add('visible');
+}
+/* Fill the parts builder with items from the last matching entry.
+   Prices/quantities are pre-filled but remain fully editable. */
+function applyLastParts(){
+  const serviceType = document.getElementById('fType')?.value;
+  const lastEntry = getLastPartsForServiceType(serviceType);
+  if(!lastEntry) return;
+  const items = normalizeServiceEntryItems(lastEntry.items);
+  const list = document.getElementById('fItemsList');
+  if(list) list.innerHTML = '';
+  items.forEach(item => buildServicePartRow({...item, saveToParts:false}));
+  toggleServicePartsBuilder(true);
+  syncEntryCostFromItems();
+  showToast(`↩ Parts loaded · edit prices or qty if anything changed`);
+}
 function prefill(){
   const t=document.getElementById('fType').value;
   const descEl = document.getElementById('fDesc');
   if(PREFILLS[t] && descEl && !descEl.value.trim()) descEl.value=PREFILLS[t];
   renderEntryInventoryUI();
+  updateReusePartsBar();
 }
 function saveEntry(){
   const date=document.getElementById('fDate').value;
@@ -5785,6 +5856,8 @@ function resetEntryInventoryUses(){
   if(list) list.innerHTML = '';
   toggleServicePartsBuilder(false);
   syncEntryCostFromItems();
+  const bar = document.getElementById('reusePartsBar');
+  if(bar) bar.classList.remove('visible');
 }
 function renderEntryInventoryUI(){
   syncEntryCostFromItems();
