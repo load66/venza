@@ -289,30 +289,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
 .alert.blue{background:rgba(34,114,212,.1);border:1px solid rgba(34,114,212,.25);color:var(--blue2)}
 
 /* ─── SERVICE LOG ──────────────────────────────────────────── */
-.log-item{
-  background:var(--bg2);border:1px solid var(--border);
-  border-left:3px solid var(--green);
-  border-radius:10px;padding:14px 40px 14px 14px;margin-bottom:8px;
-  position:relative;
-  box-shadow:var(--shadow-sm);
-}
-.log-item.user-entry{border-left-color:var(--blue)}
-.log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}
-.log-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}
-.log-mi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green2);white-space:nowrap;font-weight:600}
-.log-type{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:14px;letter-spacing:1px;
-  color:var(--text);margin-bottom:4px;
-}
-.log-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}
-.log-foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
-.log-shop{font-size:11px;color:var(--text3)}
-.log-cost{
-  font-family:'JetBrains Mono',monospace;
-  font-size:14px;font-weight:700;color:var(--orange2);
-}
-.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
+.log-item{\n  background:var(--bg2);border:1px solid var(--border);\n  border-left:3px solid var(--green);\n  border-radius:10px;padding:14px 40px 14px 14px;margin-bottom:8px;\n  position:relative;\n  box-shadow:var(--shadow-sm);\n}\n.log-item.user-entry{border-left-color:var(--blue)}\n.log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}\n.log-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}\n.log-mi-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}\n.log-mi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green2);white-space:nowrap;font-weight:600}\n.log-mi-delta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}\n.log-type{\n  font-family:'Bebas Neue',sans-serif;\n  font-size:14px;letter-spacing:1px;\n  color:var(--text);margin-bottom:4px;\n}\n.log-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}\n.log-foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}\n.log-foot-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap}\n.log-shop-badge{\n  display:inline-flex;align-items:center;\n  font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;\n  padding:2px 8px;border-radius:999px;\n}\n.log-shop-badge.diy{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.2)}\n.log-shop-badge.shop{background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.2)}\n.log-cost{\n  font-family:'JetBrains Mono',monospace;\n  font-size:14px;font-weight:700;color:var(--orange2);\n}\n.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
 .delete-btn{
   position:absolute;top:10px;right:10px;
   color:#ffffff;
@@ -754,11 +731,23 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
   background:#1a1d23;border:1px solid #2d3142;
   border-radius:12px;padding:11px 20px;
   font-size:13px;color:#ffffff;font-weight:500;
-  white-space:nowrap;z-index:600;
-  opacity:0;transition:all .3s;pointer-events:none;
+  z-index:600;opacity:0;transition:all .3s;pointer-events:none;
   box-shadow:0 4px 20px rgba(0,0,0,.25);
+  max-width:calc(100vw - 32px);white-space:normal;text-align:center;line-height:1.5;
 }
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;cursor:pointer}
+/* ─── EMPTY LOG STATE ─────────────────────────────────────── */
+.log-empty{
+  text-align:center;padding:48px 24px;
+  background:var(--bg2);border:1px dashed var(--border2);
+  border-radius:14px;
+}
+.log-empty-icon{font-size:36px;margin-bottom:12px}
+.log-empty-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text);margin-bottom:6px}
+.log-empty-sub{font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:20px}
+/* ─── SHOP COST EDITABLE ─────────────────────────────────── */
+.fi.cost-manual{border-color:var(--blue2);background:rgba(34,114,212,.06)}
+.fi.cost-manual:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(34,114,212,.12)}
 
 /* ─── SCROLLBAR ────────────────────────────────────────────── */
 ::-webkit-scrollbar{width:0;height:0}
@@ -1018,16 +1007,6 @@ html.modal-open,body.modal-open{overflow:hidden}
       <div class="alert-icon">💡</div>
       <div><strong>Super basic entry mode.</strong> Save only the date, mileage, service type, total cost, shop/DIY, optional notes, and an optional receipt photo.</div>
     </div>
-    <div class="fg2">
-      <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
-      <div class="fl">
-        <label>Mileage</label>
-        <input type="number" class="fi" id="fMi" inputmode="numeric" autocomplete="off"
-               placeholder="—" oninput="onMileageInput(this.value)">
-        <div class="mi-hint" id="fMiHint"></div>
-        <div class="mi-warn" id="fMiWarn"></div>
-      </div>
-    </div>
     <div class="fl">
       <label>Service Type</label>
       <select class="fs" id="fType" onchange="prefill()">
@@ -1051,19 +1030,29 @@ html.modal-open,body.modal-open{overflow:hidden}
         <option value="other">Other</option>
       </select>
     </div>
+    <div class="fg2">
+      <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
+      <div class="fl">
+        <label>Mileage</label>
+        <input type="number" class="fi" id="fMi" inputmode="numeric" autocomplete="off"
+               placeholder="—" oninput="onMileageInput(this.value)">
+        <div class="mi-hint" id="fMiHint"></div>
+        <div class="mi-warn" id="fMiWarn"></div>
+      </div>
+    </div>
     <div class="fl">
-      <label>Notes / Details</label>
-      <textarea class="ft" id="fDesc" placeholder="Quick notes about what was done..."></textarea>
+      <label>Notes <span style="font-weight:400;color:var(--text3)">(optional)</span></label>
+      <textarea class="ft" id="fDesc" placeholder="Quick notes about what was done — or leave blank and we'll fill it in for you"></textarea>
     </div>
     <div class="fg2">
       <div class="fl">
-        <label>Total Cost for This Service ($)</label>
-        <input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01" readonly>
-        <div class="auto-cost-note">Auto-calculated from the purchased parts added below.</div>
+        <label id="fCostLabel">Total Cost ($)</label>
+        <input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01" min="0" readonly inputmode="decimal">
+        <div class="auto-cost-note" id="fCostNote">Auto-calculated from parts added below.</div>
       </div>
       <div class="fl">
-        <label>Shop / DIY</label>
-        <select class="fs" id="fShop">
+        <label>Where</label>
+        <select class="fs" id="fShop" onchange="onShopChange(this.value)">
           <option value="DIY">DIY</option>
           <option value="SHOP">SHOP</option>
         </select>
@@ -4349,8 +4338,31 @@ function initAddForm(){
   input.placeholder = cur.toLocaleString();
   if(hintEl) hintEl.textContent = 'Last recorded: ' + cur.toLocaleString() + ' mi';
   if(warnEl) warnEl.classList.remove('visible');
-  // re-validate if a value already exists (e.g. navigating back)
+  // Reset shop mode to DIY on fresh open (unless already set)
+  const shopEl = document.getElementById('fShop');
+  if(shopEl) onShopChange(shopEl.value);
   if(input.value) onMileageInput(input.value);
+}
+/* ─── SHOP / DIY COST MODE ──────────────────────────────────── */
+function onShopChange(val){
+  const costEl   = document.getElementById('fCost');
+  const labelEl  = document.getElementById('fCostLabel');
+  const noteEl   = document.getElementById('fCostNote');
+  if(!costEl) return;
+  if(val === 'SHOP'){
+    costEl.removeAttribute('readonly');
+    costEl.classList.add('cost-manual');
+    if(labelEl) labelEl.textContent = 'Total Shop Cost ($)';
+    if(noteEl)  noteEl.textContent  = 'Enter the total amount charged by the shop.';
+    // Clear auto-calc value so shop can enter their own
+    costEl.value = '';
+  } else {
+    costEl.setAttribute('readonly','');
+    costEl.classList.remove('cost-manual');
+    if(labelEl) labelEl.textContent = 'Total Cost ($)';
+    if(noteEl)  noteEl.textContent  = 'Auto-calculated from parts added below.';
+    syncEntryCostFromItems();
+  }
 }
 function onMileageInput(val){
   const warnEl = document.getElementById('fMiWarn');
@@ -4511,7 +4523,9 @@ function updateReusePartsBar(){
   const total = items.reduce((s,i) => s + Number(i.price||0) * Number(i.qty||0), 0);
   const dt = new Date(lastEntry.date+'T00:00:00');
   const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  meta.textContent = `Last ${LABELS[serviceType]||'service'} · ${ds} · $${total.toFixed(2)}`;
+  const miAgo = getMi() - Number(lastEntry.mi||0);
+  const miAgoStr = miAgo > 0 ? ` · ${miAgo.toLocaleString()} mi ago` : '';
+  meta.textContent = `${ds}${miAgoStr} · $${total.toFixed(2)}`;
   prt.textContent  = items.map(i => `${i.qty}× ${i.name}${Number(i.price)>0 ? ` ($${Number(i.price).toFixed(2)})` : ''}`).join(' · ');
   bar.classList.add('visible');
 }
@@ -4943,11 +4957,18 @@ function resetData(){
 }
 
 /* ─── TOAST ──────────────────────────────────────────────── */
-function showToast(msg){
+function showToast(msg, duration=4000){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+  if(!t) return;
+  clearTimeout(t._toastTimer);
+  t.textContent=msg;
+  t.classList.add('show');
+  t._toastTimer=setTimeout(()=>t.classList.remove('show'), duration);
 }
+document.addEventListener('DOMContentLoaded',()=>{
+  const t=document.getElementById('toast');
+  if(t) t.addEventListener('click',()=>{ clearTimeout(t._toastTimer); t.classList.remove('show'); });
+});
 /* ─── GENERATE PRINT REPORT ──────────────────────────────────── */
 function generatePrint(){
   // Pre-fill mileage if empty
@@ -6090,18 +6111,30 @@ function getFormItems(){
   })));
 }
 function syncEntryCostFromItems(){
+  const shopEl = document.getElementById('fShop');
+  if(shopEl && shopEl.value === 'SHOP'){
+    // SHOP mode — cost is manually entered, only update row displays
+    document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
+    return;
+  }
   const items = getFormItems();
   const total = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
   const costEl = document.getElementById('fCost');
   if(costEl) costEl.value = total > 0 ? total.toFixed(2) : '';
-  // Keep each row's header and subtotal in sync
   document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
 }
+function resetEntryInventoryUses(){
 function resetEntryInventoryUses(){
   const list = document.getElementById('fItemsList');
   if(list) list.innerHTML = '';
   toggleServicePartsBuilder(false);
-  syncEntryCostFromItems();
+  // Reset cost field to DIY auto-calc state
+  const costEl = document.getElementById('fCost');
+  if(costEl){ costEl.value=''; costEl.setAttribute('readonly',''); costEl.classList.remove('cost-manual'); }
+  const labelEl = document.getElementById('fCostLabel');
+  const noteEl  = document.getElementById('fCostNote');
+  if(labelEl) labelEl.textContent = 'Total Cost ($)';
+  if(noteEl)  noteEl.textContent  = 'Auto-calculated from parts added below.';
   const bar = document.getElementById('reusePartsBar');
   if(bar) bar.classList.remove('visible');
 }
@@ -6111,47 +6144,113 @@ function renderEntryInventoryUI(){
 function useInventoryItem(){ showToast('This form now uses the new purchased parts builder'); }
 function removeOneInventoryItem(){}
 function renderLog(){
-  const d=getData().sort((a,b)=>b.mi-a.mi);
-  const el=document.getElementById('logList');
+  const d = getData().sort((a,b) => Number(b.mi) - Number(a.mi));
+  const el = document.getElementById('logList');
   if(!el) return;
-  el.innerHTML=d.map(e=>{
-    const dt=new Date(e.date+'T00:00:00');
-    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  // ── Empty state ──────────────────────────────────────────────
+  if(!d.length){
+    el.innerHTML = `
+      <div class="log-empty">
+        <div class="log-empty-icon">🔧</div>
+        <div class="log-empty-title">No service entries yet</div>
+        <div class="log-empty-sub">Every oil change, tire rotation, and repair you log here builds your vehicle's complete service history.</div>
+        <button class="btn-primary" onclick="go('add')" style="max-width:220px;margin:0 auto;display:block">＋ Add First Service Entry</button>
+      </div>`;
+    const totalEl = document.getElementById('totalVal');
+    if(totalEl) totalEl.textContent = '$0.00';
+    return;
+  }
+
+  el.innerHTML = d.map((e, idx) => {
+    const dt  = new Date(e.date+'T00:00:00');
+    const ds  = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const safeEntryUrl = safeUrl(e.link);
-    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
-    const del=!e.builtin
-      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
-      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
-    const photo=getPhoto(e.id);
+    const lnk = safeEntryUrl
+      ? `<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`
+      : '';
+
+    // Miles since previous entry (next item in descending-mileage array)
+    const prevMi   = Number(d[idx+1]?.mi || 0);
+    const currMi   = parseInt(e.mi, 10);
+    const miDelta  = prevMi > 0 ? currMi - prevMi : 0;
+    const deltaHtml = miDelta > 0
+      ? `<span class="log-mi-delta">+${miDelta.toLocaleString()} mi</span>`
+      : '';
+
+    // DIY / SHOP badge
+    const shopVal    = String(e.shop || 'DIY').toUpperCase();
+    const shopClass  = shopVal === 'SHOP' ? 'shop' : 'diy';
+    const shopBadge  = `<span class="log-shop-badge ${shopClass}">${shopVal}</span>`;
+
+    const del = !e.builtin
+      ? `<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete entry">✕</button>`
+      : `<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+
+    const photo = getPhoto(e.id);
+    const photoHtml = photo
+      ? `<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+           <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+           <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+         </div>`
+      : `<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+           border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+           background:none;cursor:pointer;width:100%;transition:all .2s"
+           onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+           onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+           📷 Add Receipt Photo
+         </button>`;
+
     const parts = normalizeServiceEntryItems(e.items);
-    const photoHtml=photo
-      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
-          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
-          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
-        </div>`
-      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
-          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
-          background:none;cursor:pointer;width:100%;transition:all .2s"
-          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
-          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
-          📷 Add Receipt Photo
-        </button>`;
-    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+    const partsHtml = parts.length
+      ? `<div class="log-parts-summary" style="margin-top:10px;border-top:1px dashed var(--border);padding-top:10px">
+           <div style="font-size:10px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;font-weight:700;margin-bottom:7px">Purchased Parts</div>
+           <div class="log-parts-grid">${parts.map(item => {
+             const subtotal = (Number(item.price||0) * Number(item.qty||0)).toFixed(2);
+             const meta = [
+               item.qty > 1 ? `Qty ${item.qty}` : null,
+               item.partNum ? `Part # ${escapeHtml(item.partNum)}` : null,
+               item.store   ? escapeHtml(item.store) : null,
+               item.note    ? escapeHtml(item.note)  : null
+             ].filter(Boolean).join(' · ');
+             const partLink = safeUrl(item.link)
+               ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>`
+               : '';
+             return `<div class="log-part">
+               <div class="log-part-top">
+                 <div class="log-part-name">${item.qty > 1 ? `${item.qty}× ` : ''}${escapeHtml(item.name || 'Part')}</div>
+                 <div class="log-part-price">$${subtotal}</div>
+               </div>
+               ${meta ? `<div class="log-part-meta">${meta}</div>` : ''}
+               ${partLink}
+             </div>`;
+           }).join('')}</div>
+         </div>`
+      : '';
+
+    return `<div class="log-item ${!e.builtin ? 'user-entry' : ''}">
       ${del}
-      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
-      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-top">
+        <span class="log-date">${ds}</span>
+        <div class="log-mi-wrap">
+          <span class="log-mi">${currMi.toLocaleString()} mi</span>
+          ${deltaHtml}
+        </div>
+      </div>
+      <div class="log-type">${LABELS[e.type] || 'Service'}</div>
       <div class="log-desc">${safeText(e.desc || '')}</div>
-      <div class="log-foot">
-        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
+      ${partsHtml}
+      <div class="log-foot" style="margin-top:10px">
+        <div class="log-foot-left">${shopBadge}${lnk}</div>
         <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
       </div>
-      ${parts.length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${parts.map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
       ${photoHtml}
     </div>`;
   }).join('');
-  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+
+  const tot = d.reduce((a,e) => a + getEntryDisplayCost(e), 0);
   const totalEl = document.getElementById('totalVal');
-  if(totalEl) totalEl.textContent='$'+tot.toFixed(2);
+  if(totalEl) totalEl.textContent = '$' + tot.toFixed(2);
 }
 function getAverageEntryCost(entry, type=getAverageServiceType()){
   if(!entryMatchesAverageType(entry, type)) return null;
@@ -6161,40 +6260,46 @@ function getAverageEntryCost(entry, type=getAverageServiceType()){
   return Number.isFinite(legacy) && legacy > 0 ? legacy : null;
 }
 function saveEntry(){
-  const date=document.getElementById('fDate')?.value || '';
-  const mi=document.getElementById('fMi')?.value || '';
-  const type=document.getElementById('fType')?.value || 'other';
-  const desc=document.getElementById('fDesc')?.value.trim() || '';
-  const shop=document.getElementById('fShop')?.value || 'DIY';
-  const items=getFormItems();
-  if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
-  const parsedMi = parseInt(mi,10);
+  const date = document.getElementById('fDate')?.value || '';
+  const mi   = document.getElementById('fMi')?.value || '';
+  const type = document.getElementById('fType')?.value || '';
+  const shop = document.getElementById('fShop')?.value || 'DIY';
+  const items = getFormItems();
+
+  if(!type){ showToast('Select a service type first'); return; }
+  if(!date){ showToast('Please fill in the date'); return; }
+  if(!mi){   showToast('Please fill in the mileage'); return; }
+  const parsedMi = parseInt(mi, 10);
   if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
-  const autoCost = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
-  const newId=Date.now();
-  const d=getData();
-  d.push({id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false});
+
+  // Auto-generate description if left blank
+  const rawDesc = document.getElementById('fDesc')?.value.trim() || '';
+  const finalDesc = rawDesc || `${LABELS[type] || 'Service'} — ${shop}`;
+
+  // Cost: SHOP entries use manual input, DIY entries auto-calc from parts
+  const autoCost = items.reduce((sum,item) => sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+  const costEl   = document.getElementById('fCost');
+  const manualCost = parseFloat(costEl?.value || 0) || 0;
+  const finalCost  = shop === 'SHOP' ? manualCost : autoCost;
+
+  const newId = Date.now();
+  const d = getData();
+  d.push({id:newId, date, mi:parsedMi, type, desc:finalDesc, cost:finalCost, shop, link:'', items, inventoryUses:[], builtin:false});
   save(d);
   const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
-  if(window._pendingPhoto){
-    savePhoto(newId, window._pendingPhoto);
-    window._pendingPhoto=null;
-  }
-  if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
+  if(window._pendingPhoto){ savePhoto(newId, window._pendingPhoto); window._pendingPhoto=null; }
+  if(parsedMi > getMi()) setMi(parsedMi, {source:'entry', entryId:newId});
   renderAll();
   go('log');
   ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
   const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value='DIY';
-  const costEl = document.getElementById('fCost'); if(costEl) costEl.value='';
   resetEntryInventoryUses();
   clearPhoto();
-  if(!items.length) showToast('Entry saved ✓');
-  else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry saved ✓ Checked parts were added to Parts');
-  else if(!partSyncResult.added && partSyncResult.skippedUnchecked && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ No parts were checked for the Parts tab');
-  else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedUnchecked) showToast('Entry saved ✓ Checked part already exists in Parts');
-  else if(!partSyncResult.added) showToast('Entry saved ✓ No new checked parts were added to Parts');
-  else showToast(`Entry saved ✓ ${partSyncResult.added} checked part${partSyncResult.added!==1?'s':''} added to Parts`);
+  const wasAutoDesc = !rawDesc;
+  if(!items.length) showToast(wasAutoDesc ? `Entry saved ✓ — description auto-filled` : 'Entry saved ✓');
+  else if(partSyncResult.added) showToast(`Entry saved ✓ · ${partSyncResult.added} part${partSyncResult.added!==1?'s':''} added to Parts`);
+  else showToast('Entry saved ✓');
 }
 
 function renderBackup(){
