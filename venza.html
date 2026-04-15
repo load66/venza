@@ -5494,6 +5494,11 @@ function renderParts(){
     </div>
   `).join('');
 }
+function ensureServicePartBuilderRow(){
+  const list = document.getElementById('fItemsList');
+  if(!list) return;
+  if(!list.querySelector('.item-editor')) buildServicePartRow();
+}
 function toggleServicePartsBuilder(force){
   const wrap = document.getElementById('servicePartsWrap');
   const btn = document.getElementById('servicePartsToggle');
@@ -5501,6 +5506,8 @@ function toggleServicePartsBuilder(force){
   const shouldOpen = typeof force === 'boolean' ? force : !wrap.classList.contains('open');
   wrap.classList.toggle('open', shouldOpen);
   btn.classList.toggle('open', shouldOpen);
+  if(shouldOpen) ensureServicePartBuilderRow();
+  syncEntryCostFromItems();
 }
 function normalizeServiceEntryItems(items){
   return (Array.isArray(items) ? items : []).filter(Boolean).map(item=>({
