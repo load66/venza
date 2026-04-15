@@ -1984,6 +1984,7 @@ const PREFILLS = {
 const DEFAULT_INVENTORY = [];
 const INVENTORY_KEY = 'vz_inventory';
 const MASTER_PARTS_KEY = 'vz_master_parts';
+const MI_STATE_KEY = 'vz_mi_state_v1';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const AVG_SERVICE_TYPE_KEY = 'vz_avg_service_type';
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
@@ -2669,9 +2670,70 @@ function getMi(){
   if(Number.isFinite(stored) && stored > 0) return stored;
   return highestMileage(getData()) || 64751;
 }
-function setMi(m){
+function getMiState(){
+  const current = getMi();
+  try{
+    const parsed = JSON.parse(localStorage.getItem(MI_STATE_KEY)||'null');
+    if(parsed && typeof parsed === 'object'){
+      return {
+        value: Number.isFinite(Number(parsed.value)) ? Number(parsed.value) : current,
+        source: parsed.source === 'entry' ? 'entry' : parsed.source === 'manual' ? 'manual' : 'legacy',
+        entryId: parsed.entryId != null ? String(parsed.entryId) : null,
+        updatedAt: parsed.updatedAt || ''
+      };
+    }
+  }catch(err){}
+  return {value:current, source:'legacy', entryId:null, updatedAt:''};
+}
+function setMi(m, meta={}){
   const n = parseInt(m,10);
-  if(Number.isFinite(n) && n > 0) localStorage.setItem('vz_mi', n);
+  if(!(Number.isFinite(n) && n > 0)) return false;
+  const current = parseInt(localStorage.getItem('vz_mi')||'',10);
+  const source = meta.source === 'entry' ? 'entry' : 'manual';
+  const allowLower = !!meta.allowLower || source === 'manual';
+  if(!allowLower && Number.isFinite(current) && current > 0 && n < current) return false;
+  localStorage.setItem('vz_mi', n);
+  localStorage.setItem(MI_STATE_KEY, JSON.stringify({
+    value:n,
+    source,
+    entryId: source === 'entry' && meta.entryId != null ? String(meta.entryId) : null,
+    updatedAt:new Date().toISOString()
+  }));
+  return true;
+}
+function getHighestMileageEntry(entries=getData()){
+  return normalizeEntries(entries)
+    .filter(entry=>Number.isFinite(Number(entry.mi)) && Number(entry.mi) > 0)
+    .sort((a,b)=>{
+      const diff = Number(b.mi||0) - Number(a.mi||0);
+      if(diff) return diff;
+      return compareEntriesLatest(a,b);
+    })[0] || null;
+}
+function recalcMileageFromEntries(entries=getData()){
+  const highestEntry = getHighestMileageEntry(entries);
+  if(highestEntry){
+    setMi(highestEntry.mi, {source:'entry', entryId:highestEntry.id, allowLower:true});
+    return Number(highestEntry.mi||0);
+  }
+  const fallback = highestMileage(DEFAULT) || 64751;
+  setMi(fallback, {source:'manual', allowLower:true});
+  return fallback;
+}
+function shouldRollbackMileageAfterDelete(deletedEntry, remainingEntries){
+  const deletedMi = Number(deletedEntry?.mi||0);
+  if(!(Number.isFinite(deletedMi) && deletedMi > 0)) return false;
+  const currentMi = getMi();
+  const state = getMiState();
+  const maxRemaining = highestMileage(remainingEntries);
+  const wasAutoRaisedByThisEntry = state.source === 'entry' && String(state.entryId||'') === String(deletedEntry.id) && currentMi === deletedMi;
+  const legacyLikelyRaisedByThisEntry = currentMi === deletedMi && deletedMi > maxRemaining;
+  return wasAutoRaisedByThisEntry || legacyLikelyRaisedByThisEntry;
+}
+function reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries){
+  if(!shouldRollbackMileageAfterDelete(deletedEntry, remainingEntries)) return false;
+  recalcMileageFromEntries(remainingEntries);
+  return true;
 }
 function parsePositiveInt(value){
   const n = parseInt(value,10);
@@ -3303,6 +3365,7 @@ window.onload=()=>{
   setInventoryFormOpen(false);
   bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
   setScheduleControlsExpanded(false);
+  if(!localStorage.getItem(MI_STATE_KEY)) localStorage.setItem(MI_STATE_KEY, JSON.stringify({value:getMi(),source:'legacy',entryId:null,updatedAt:new Date().toISOString()}));
   renderAll();
   resetEntryInventoryUses();
   renderReminderStrategy();
@@ -4206,7 +4269,7 @@ function openMiModal(){
 function closeMiModal(){ document.getElementById('miModal').classList.remove('open'); }
 function saveMi(){
   const v = parseInt(document.getElementById('miInput').value);
-  if(v && v > 0){ setMi(v); renderAll(); showToast('Mileage updated to '+v.toLocaleString()+' mi ✓'); }
+  if(v && v > 0){ setMi(v,{source:'manual',allowLower:true}); renderAll(); showToast('Mileage updated to '+v.toLocaleString()+' mi ✓'); }
   closeMiModal();
 }
 document.getElementById('miModal').addEventListener('click',function(e){
@@ -4991,10 +5054,14 @@ function viewPhoto(id){
 /* ─── DELETE INDIVIDUAL ENTRY ────────────────────────────────── */
 function delEntry(id){
   if(!confirm('Delete this service entry?\n\nThis cannot be undone.')) return;
-  save(getData().filter(e=>e.id!==id));
+  const currentEntries = getData();
+  const deletedEntry = currentEntries.find(e=>String(e.id)===String(id));
+  const remainingEntries = currentEntries.filter(e=>String(e.id)!==String(id));
+  save(remainingEntries);
   localStorage.removeItem('vz_photo_'+id);
+  const mileageAdjusted = deletedEntry ? reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries) : false;
   renderAll();
-  showToast('Entry deleted');
+  showToast(mileageAdjusted ? 'Entry deleted · mileage recalculated ✓' : 'Entry deleted');
 }
 /* For builtin entries — asks extra confirmation */
 function delBuiltin(id){
@@ -5590,7 +5657,7 @@ function saveEntry(){
     savePhoto(newId, window._pendingPhoto);
     window._pendingPhoto=null;
   }
-  if(parsedMi > getMi()) setMi(parsedMi);
+  if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
   renderAll();
   go('log');
   ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -5604,6 +5671,7 @@ function saveEntry(){
   else if(partSyncResult.skipped) showToast(`Entry saved ✓ ${partSyncResult.added} part${partSyncResult.added!==1?'s':''} added · duplicate skipped`);
   else showToast('Entry + parts saved ✓');
 }
+
 function renderBackup(){
   const d=getData();
   const mi=getMi();
@@ -5732,7 +5800,8 @@ This replaces all current data. Continue?`)){
       localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
       saveScheduleOverrides(scheduleOverrides);
       if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
-      if(mi&&mi>0)setMi(mi);
+      if(mi&&mi>0)setMi(mi,{source:'manual',allowLower:true});
+      else recalcMileageFromEntries(entries);
       Object.entries(photos).forEach(([id,imgData])=>{ try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){} });
       Object.entries(partPhotos).forEach(([id,imgData])=>{ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id, imgData); }catch(err){} });
       renderAll();
@@ -5758,7 +5827,8 @@ function resetData(){
   localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
   localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
   localStorage.removeItem(BASIC_PARTS_KEY);
-  setMi(64751);
+  localStorage.removeItem(MI_STATE_KEY);
+  setMi(64751,{source:'manual',allowLower:true});
   renderAll();
   renderBackup();
   showToast('Reset to factory data ✓');
