@@ -289,21 +289,56 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
 .alert.blue{background:rgba(34,114,212,.1);border:1px solid rgba(34,114,212,.25);color:var(--blue2)}
 
 /* ─── SERVICE LOG ──────────────────────────────────────────── */
-.log-item{background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .2s}\n.log-item:active{box-shadow:none}\n.log-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 10px;border-bottom:1px solid var(--border);gap:10px}\n.log-header-left{display:flex;align-items:center;gap:9px;min-width:0;flex:1}\n.log-type-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}\n.log-type-label{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.2px;color:var(--text);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.log-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}\n.log-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}\n.log-mi-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}\n.log-mi{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green2);font-weight:700;white-space:nowrap}\n.log-mi-delta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:1px 6px;white-space:nowrap}\n.log-body{padding:11px 14px}\n.log-desc{font-size:13px;color:var(--text2);line-height:1.6}\n.log-parts-wrap{margin:10px 14px 0;border:1px solid var(--border);border-radius:9px;overflow:hidden}\n.log-parts-head{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,.025);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3)}\n.log-parts-total{font-family:'JetBrains Mono',monospace;color:var(--orange2);font-size:11px;font-weight:700}\n.log-parts-grid{display:flex;flex-direction:column}\n.log-part{padding:8px 10px;border-top:1px solid var(--border)}\n.log-part-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}\n.log-part-name{font-size:13px;color:var(--text);font-weight:600;line-height:1.4}\n.log-part-price{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange2);white-space:nowrap;font-weight:600}\n.log-part-meta{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}\n.log-part-link{font-size:10px;color:var(--blue2);text-decoration:none;display:inline-block;margin-top:4px}\n.log-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid var(--border);margin-top:10px;gap:8px}\n.log-footer-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}\n.log-shop-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap}\n.log-shop-badge.diy{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.2)}\n.log-shop-badge.shop{background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.2)}\n.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}\n.log-footer-right{display:flex;align-items:center;gap:8px;flex-shrink:0}\n.log-cost{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--orange2)}\n.log-actions{display:flex;gap:6px}\n.log-btn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;border:1px solid var(--border2);background:var(--bg3);transition:all .18s;touch-action:manipulation;cursor:pointer}\n.log-btn:active{transform:scale(.93);opacity:.7}\n.log-btn.edit{color:var(--blue2);border-color:rgba(34,114,212,.3)}\n.log-btn.edit:hover{background:rgba(34,114,212,.1)}\n.log-btn.del{color:var(--toyota2);border-color:rgba(235,10,30,.3)}\n.log-btn.del:hover{background:rgba(235,10,30,.1)}\n.delete-btn{display:none}\n.log-cost-zero{color:var(--text3)}\n.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
-.delete-btn{
-  position:absolute;top:10px;right:10px;
-  color:#ffffff;
-  background:var(--toyota);
-  border-radius:50%;
-  width:22px;height:22px;
-  font-size:11px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .2s;
-  opacity:0.7;
-  line-height:1;
-}
-.delete-btn:hover{opacity:1;transform:scale(1.1)}
-.delete-btn:active{transform:scale(.95)}
+/* ─── SERVICE LOG CARDS ─────────────────────────────────────── */
+.log-item{background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
+.log-item:active{box-shadow:none}
+.log-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 10px;border-bottom:1px solid var(--border);gap:10px}
+.log-header-left{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.log-type-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.log-type-label{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.2px;color:var(--text);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.log-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.log-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}
+.log-mi-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.log-mi{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green2);font-weight:700;white-space:nowrap}
+.log-mi-delta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:1px 6px;white-space:nowrap}
+.log-body{padding:11px 14px}
+.log-desc{font-size:13px;color:var(--text2);line-height:1.6}
+.log-parts-wrap{margin:10px 14px 0;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.log-parts-head{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,.025);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3)}
+.log-parts-total{font-family:'JetBrains Mono',monospace;color:var(--orange2);font-size:11px;font-weight:700}
+.log-parts-grid{display:flex;flex-direction:column}
+.log-part{padding:8px 10px;border-top:1px solid var(--border)}
+.log-part-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.log-part-name{font-size:13px;color:var(--text);font-weight:600;line-height:1.4}
+.log-part-price{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange2);white-space:nowrap;font-weight:600}
+.log-part-meta{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}
+.log-part-link{font-size:10px;color:var(--blue2);text-decoration:none;display:inline-block;margin-top:4px}
+.log-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid var(--border);margin-top:10px;gap:8px}
+.log-footer-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+.log-shop-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.log-shop-badge.diy{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.2)}
+.log-shop-badge.shop{background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.2)}
+.log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
+.log-footer-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.log-cost{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--orange2)}
+.log-cost-zero{color:var(--text3)}
+.log-actions{display:flex;gap:6px}
+.log-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;font-size:16px;border:1px solid var(--border2);background:var(--bg3);transition:all .18s;touch-action:manipulation;cursor:pointer}
+.log-btn:active{transform:scale(.92);opacity:.7}
+.log-btn.edit{color:var(--blue2);border-color:rgba(34,114,212,.3)}
+.log-btn.edit:active{background:rgba(34,114,212,.15)}
+.log-btn.del{color:var(--toyota2);border-color:rgba(235,10,30,.3)}
+.log-btn.del:active{background:rgba(235,10,30,.12)}
+.delete-btn{display:none}
+/* ─── EDIT ENTRY MODAL ─────────────────────────────────────── */
+#editEntryModal{z-index:550}
+.edit-parts-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.edit-part-row{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px}
+.edit-part-row-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.edit-part-row-label{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.5px}
+.edit-part-remove{font-size:11px;color:var(--toyota);font-weight:700;padding:3px 8px;border:1px solid rgba(235,10,30,.25);border-radius:999px;touch-action:manipulation;cursor:pointer}
+.edit-part-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.edit-part-grid .span2{grid-column:1/-1}
 .total-row{
   background:var(--bg4);border:1px solid var(--border2);
   border-radius:12px;padding:14px 16px;
@@ -5937,11 +5972,11 @@ function renderLog(){
            📷 Add Receipt Photo
          </button>`;
 
-    const editBtn = !e.builtin
-      ? `<button class="log-btn edit" onclick="openEditModal(${e.id})" title="Edit entry">✏️</button>` : '';
+    // All entries are editable. Built-in entries just use a different delete handler.
+    const editBtn = `<button class="log-btn edit" onclick="openEditModal(${e.id})" title="Edit entry">✏️</button>`;
     const delBtn  = !e.builtin
       ? `<button class="log-btn del" onclick="delEntry(${e.id})" title="Delete entry">🗑️</button>`
-      : `<button class="log-btn del" onclick="delBuiltin(${e.id})" title="Delete" style="opacity:.5">🗑️</button>`;
+      : `<button class="log-btn del" onclick="delBuiltin(${e.id})" title="Delete factory entry" style="opacity:.5">🗑️</button>`;
 
     return `<div class="log-item">
       <div class="log-header">
