@@ -5181,9 +5181,30 @@ function getPartCategoryLabel(value='other'){
 function normalizeBasicPartCategory(value='other'){
   return PART_CATEGORY_MAP[String(value||'').trim()] ? String(value).trim() : 'other';
 }
+function buildBasicSourceIdentity(source={}){
+  const safeLink = safeUrl(String(source.link||'').trim());
+  if(safeLink) return `link:${safeLink.toLowerCase()}`;
+  const store = String(source.store||'').trim().toLowerCase();
+  const note = String(source.note||'').trim().toLowerCase();
+  const price = Number.isFinite(Number(source.unitCost)) ? Number(source.unitCost).toFixed(2) : '0.00';
+  return `manual:${store}|${note}|${price}`;
+}
+function looksLikeDomainLabel(value=''){
+  return /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(String(value||'').trim());
+}
+function pickBetterBasicSourceStore(current='', incoming=''){
+  const curr = String(current||'').trim();
+  const next = String(incoming||'').trim();
+  if(!next) return curr;
+  if(!curr) return next;
+  const currLooksDomain = looksLikeDomainLabel(curr);
+  const nextLooksDomain = looksLikeDomainLabel(next);
+  if(currLooksDomain && !nextLooksDomain) return next;
+  return next;
+}
 function normalizeBasicPartSources(sources, fallback={}){
   const seed = Array.isArray(sources) ? sources : [];
-  const maybePrimary = (fallback.store || fallback.link || Number(fallback.unitCost||0) > 0) ? [{
+  const maybePrimary = (fallback.store || fallback.link || Number(fallback.unitCost||0) > 0 || fallback.sourceNote) ? [{
     store:String(fallback.store||'').trim(),
     link:String(fallback.link||'').trim(),
     unitCost:Number.isFinite(Number(fallback.unitCost)) ? Number(fallback.unitCost) : 0,
@@ -5191,17 +5212,38 @@ function normalizeBasicPartSources(sources, fallback={}){
   }] : [];
   const merged = [...seed, ...maybePrimary].filter(Boolean).map(source=>({
     store:String(source.store||'').trim(),
-    link:String(source.link||'').trim(),
+    link:safeUrl(String(source.link||'').trim()) || String(source.link||'').trim(),
     unitCost:Number.isFinite(Number(source.unitCost)) ? Number(source.unitCost) : 0,
     note:String(source.note||'').trim()
   })).filter(source=>source.store || source.link || source.unitCost > 0 || source.note);
-  const seen = new Set();
-  return merged.filter(source=>{
-    const key = [String(source.store||'').toLowerCase(), String(source.link||'').toLowerCase(), Number(source.unitCost||0).toFixed(2), String(source.note||'').toLowerCase()].join('|');
-    if(seen.has(key)) return false;
-    seen.add(key);
-    return true;
+  const bucket = new Map();
+  merged.forEach(source=>{
+    const key = buildBasicSourceIdentity(source);
+    if(!bucket.has(key)){
+      bucket.set(key, {...source});
+      return;
+    }
+    const current = bucket.get(key);
+    bucket.set(key, {
+      store: pickBetterBasicSourceStore(current.store, source.store),
+      link: safeUrl(source.link) || current.link || source.link || '',
+      unitCost: Number(source.unitCost||0) > 0 ? Number(source.unitCost||0) : Number(current.unitCost||0),
+      note: String(source.note||'').trim() || String(current.note||'').trim()
+    });
   });
+  return Array.from(bucket.values());
+}
+function buildBasicPartPrimarySource(existingPart={}, source={}){
+  const currentSources = normalizeBasicPartSources(existingPart.sources, existingPart);
+  const oldPrimary = normalizeBasicPartSources([{
+    store:String(existingPart.store||'').trim(),
+    link:String(existingPart.link||'').trim(),
+    unitCost:Number(existingPart.unitCost||0) || 0,
+    note:String(existingPart.sourceNote||'').trim()
+  }])[0];
+  const stripped = oldPrimary ? currentSources.filter(item=>buildBasicSourceIdentity(item)!==buildBasicSourceIdentity(oldPrimary)) : currentSources.slice();
+  const nextPrimary = normalizeBasicPartSources([source])[0];
+  return nextPrimary ? normalizeBasicPartSources([...stripped, nextPrimary]) : normalizeBasicPartSources(stripped);
 }
 function normalizeBasicParts(items){
   if(!Array.isArray(items)) return [];
@@ -5490,7 +5532,7 @@ function saveBasicPart(){
     link,
     unitCost,
     note,
-    sources: normalizeBasicPartSources([...(existing?.sources||[]), {store,link,unitCost}])
+    sources: buildBasicPartPrimarySource(existing || {}, {store,link,unitCost})
   };
   let savedPart = payload;
   if(editId){
@@ -5520,6 +5562,36 @@ function deleteBasicPart(id){
   renderParts();
   renderBackup();
   showToast('Part deleted');
+}
+function deleteBasicPartSource(partId, encodedSourceKey){
+  const sourceKey = decodeURIComponent(String(encodedSourceKey||''));
+  if(!sourceKey) return;
+  const list = getBasicPartsList();
+  const idx = list.findIndex(item=>String(item.id)===String(partId));
+  if(idx < 0) return;
+  const part = {...list[idx]};
+  const currentSources = normalizeBasicPartSources(part.sources, part);
+  const nextSources = currentSources.filter(source=>buildBasicSourceIdentity(source)!==sourceKey);
+  if(nextSources.length === currentSources.length){
+    showToast('Source not found');
+    return;
+  }
+  const primaryIdentity = buildBasicSourceIdentity({store:part.store, link:part.link, unitCost:part.unitCost});
+  if(primaryIdentity === sourceKey){
+    const fallback = nextSources[0] || null;
+    part.store = fallback?.store || '';
+    part.link = fallback?.link || '';
+    part.unitCost = fallback ? (Number(fallback.unitCost||0) || 0) : 0;
+  }
+  part.sources = nextSources;
+  list[idx] = part;
+  saveBasicPartsList(list);
+  if(String(document.getElementById('partEditId')?.value||'') === String(partId)){
+    editBasicPart(partId);
+  }
+  renderParts();
+  renderBackup();
+  showToast('Saved source removed');
 }
 function renderParts(){
   const listEl = document.getElementById('basicPartsList');
@@ -5555,6 +5627,7 @@ function renderParts(){
           ${part.note ? `<div class="inv-meta" style="margin-top:8px">${safeText(part.note)}</div>` : ''}
           ${sources.length ? `<div class="parts-source-row">${sources.map(source=>{
             const safeLink = safeUrl(source.link);
+            const sourceKey = encodeURIComponent(buildBasicSourceIdentity(source));
             return `<div class="parts-source-chip">
               <div class="parts-source-left">
                 <div class="parts-source-store">${escapeHtml(source.store || (safeLink ? getLinkHostLabel(safeLink) : 'Saved source'))}</div>
@@ -5563,7 +5636,10 @@ function renderParts(){
                   ${source.note ? `<br>${safeText(source.note)}` : ''}
                 </div>
               </div>
-              <div class="parts-source-price">${Number(source.unitCost||0) > 0 ? '$'+Number(source.unitCost||0).toFixed(2) : '—'}</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+                <div class="parts-source-price">${Number(source.unitCost||0) > 0 ? '$'+Number(source.unitCost||0).toFixed(2) : '—'}</div>
+                <button type="button" class="inv-btn danger" style="padding:5px 8px" onclick="deleteBasicPartSource(${part.id}, '${sourceKey}')">Delete link</button>
+              </div>
             </div>`;
           }).join('')}</div>` : `<div class="part-missing" style="margin-top:8px">No saved purchase source yet</div>`}
           ${photo ? `<div style="margin-top:10px;cursor:pointer" onclick="viewBasicPartPhoto(${part.id})"><img src="${photo}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">🧾 Receipt photo · tap to view</div></div>` : `<div class="part-missing" style="margin-top:10px">No receipt photo saved</div>`}
