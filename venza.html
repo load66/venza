@@ -2056,6 +2056,28 @@ const MI_STATE_KEY = 'vz_mi_state_v1';
 const MI_HISTORY_KEY = 'vz_mi_history_v1';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const AVG_SERVICE_TYPE_KEY = 'vz_avg_service_type';
+/* ─── SAFE STORAGE WRITER ───────────────────────────────────────
+   All localStorage writes go through here. On QuotaExceededError
+   we notify the user immediately rather than silently failing.   */
+function safeStore(key, value){
+  try{
+    localStorage.setItem(key, value);
+    return true;
+  } catch(err){
+    const isQuota = err && (
+      err.name === 'QuotaExceededError' ||
+      err.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+      String(err).includes('quota')
+    );
+    if(isQuota){
+      // Defer toast so it doesn't fire inside tight loops
+      setTimeout(()=>showToast('⚠ Storage full — export a backup then remove some receipt photos to free space'), 0);
+    } else {
+      console.error('safeStore error ['+key+']:', err);
+    }
+    return false;
+  }
+}
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
 const SERVICE_REQUIREMENTS_KEY = 'vz_service_part_requirements';
 const MASTER_PARTS_INVENTORY_ONLY_KEY = 'vz_master_parts_inventory_only_v1';
@@ -2104,7 +2126,7 @@ function getResolvedServicePartRequirements(serviceType=''){
   return Array.isArray(map[serviceType]) ? map[serviceType] : [];
 }
 function saveResolvedServiceRequirementsMap(map){
-  localStorage.setItem(SERVICE_REQUIREMENTS_KEY, JSON.stringify(normalizeServiceRequirementsMap(map)));
+  safeStore(SERVICE_REQUIREMENTS_KEY, JSON.stringify(normalizeServiceRequirementsMap(map)));
 }
 function clearSavedServiceRequirementsMap(){ localStorage.removeItem(SERVICE_REQUIREMENTS_KEY); }
 function rebuildMasterPartsFromInventory(){
@@ -2162,7 +2184,7 @@ function getMasterParts(){
   }
 }
 function saveMasterParts(parts){
-  localStorage.setItem(MASTER_PARTS_KEY, JSON.stringify(normalizeMasterParts(parts)));
+  safeStore(MASTER_PARTS_KEY, JSON.stringify(normalizeMasterParts(parts)));
 }
 function normalizeKey(value=''){
   return String(value).toLowerCase().replace(/[^a-z0-9]+/g,'');
@@ -2322,7 +2344,7 @@ function getAverageServiceType(){
 }
 function setAverageServiceType(type){
   const next = getAverageServiceOptions().some(opt=>opt.id===type) ? type : 'oil_avg';
-  localStorage.setItem(AVG_SERVICE_TYPE_KEY, next);
+  safeStore(AVG_SERVICE_TYPE_KEY, next);
   renderDash();
   renderBackup();
 }
@@ -2389,7 +2411,7 @@ function getInventory(){
   }
 }
 function saveInventory(items){
-  localStorage.setItem(INVENTORY_KEY, JSON.stringify(normalizeInventory(items)));
+  safeStore(INVENTORY_KEY, JSON.stringify(normalizeInventory(items)));
 }
 function getInventoryUseTotal(entry, predicate=()=>true){
   return normalizeInventoryUses(entry.inventoryUses).reduce((sum,use)=>{
@@ -2436,12 +2458,6 @@ function getOilAverageEntryCost(entry){
   const manual = Number(entry.cost||0);
   if(entry.type === 'oil' && Number.isFinite(manual) && manual > 0) return manual;
   return null;
-}
-function getAverageEntryCost(entry, type=getAverageServiceType()){
-  if(!entryMatchesAverageType(entry, type)) return null;
-  if(type === 'oil_avg') return getOilAverageEntryCost(entry);
-  const display = getEntryDisplayCost(entry);
-  return Number.isFinite(display) && display > 0 ? display : null;
 }
 function getLinkHostLabel(url){
   try{return new URL(url).hostname;}catch(err){return 'Open link';}
@@ -2671,33 +2687,6 @@ function createItemRow(data={}){
   renderEntryInventoryUI();
   return wrap;
 }
-function addItemRow(data={}){
-  return createItemRow(data);
-}
-function removeItemRow(btn){
-  const row = btn?.closest('.item-editor');
-  if(row) row.remove();
-  if(!getFormItemRows().length) addItemRow();
-  renderEntryInventoryUI();
-}
-function getFormItems(){
-  return normalizeEntryItems(getFormItemRows().map(row=>({
-    inventoryId: row.dataset.inventoryId || '',
-    name: row.querySelector('.item-name')?.value || '',
-    partNum: row.querySelector('.item-part')?.value || '',
-    store: row.querySelector('.item-store')?.value || '',
-    link: row.querySelector('.item-link')?.value || '',
-    price: row.querySelector('.item-price')?.value || 0,
-    qty: row.querySelector('.item-qty')?.value || 1,
-    useInOilAvg: !!row.querySelector('.item-oilavg')?.checked
-  })));
-}
-function resetEntryInventoryUses(){
-  const list = document.getElementById('fItemsList');
-  if(list) list.innerHTML='';
-  addItemRow();
-  renderEntryInventoryUI();
-}
 function formatEntryInventorySummary(entry){
   const items = normalizeEntryItems(entry.items);
   if(items.length) return items.map(item=>`${item.qty}× ${item.name}`).join(' · ');
@@ -2727,7 +2716,9 @@ function getData(){
     return normalizeEntries(DEFAULT);
   }
 }
-function save(d){localStorage.setItem('vz_log',JSON.stringify(normalizeEntries(d)))}
+function save(d){
+  safeStore('vz_log', JSON.stringify(normalizeEntries(d)));
+}
 function highestMileage(entries){
   return normalizeEntries(entries).reduce((max,e)=>{
     const mi = Number(e.mi);
@@ -2760,7 +2751,7 @@ function getMiHistory(){
   }
 }
 function saveMiHistory(items){
-  localStorage.setItem(MI_HISTORY_KEY, JSON.stringify(normalizeMileageHistory(items)));
+  safeStore(MI_HISTORY_KEY, JSON.stringify(normalizeMileageHistory(items)));
 }
 function appendMiHistory(item){
   const history = getMiHistory();
@@ -2830,8 +2821,8 @@ function setMi(m, meta={}){
   const allowLower = !!meta.allowLower || source === 'manual';
   if(!allowLower && Number.isFinite(current) && current > 0 && n < current) return false;
   const updatedAt = meta.updatedAt || new Date().toISOString();
-  localStorage.setItem('vz_mi', n);
-  localStorage.setItem(MI_STATE_KEY, JSON.stringify({
+  safeStore('vz_mi', n);
+  safeStore(MI_STATE_KEY, JSON.stringify({
     value:n,
     source,
     entryId: source === 'entry' && meta.entryId != null ? String(meta.entryId) : null,
@@ -2926,7 +2917,7 @@ function saveScheduleOverrides(overrides){
     if(Object.keys(next).length) clean[ruleId] = next;
   });
   if(Object.keys(clean).length){
-    localStorage.setItem(SCHEDULE_OVERRIDE_KEY, JSON.stringify(clean));
+    safeStore(SCHEDULE_OVERRIDE_KEY, JSON.stringify(clean));
   }else{
     localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
   }
@@ -3352,7 +3343,7 @@ async function requestReminderPermission(){
   if(!('Notification' in window)){ showToast('Notifications are not supported on this device'); return; }
   try{
     const result = await Notification.requestPermission();
-    localStorage.setItem('vz_notification_pref', result);
+    safeStore('vz_notification_pref', result);
     renderReminderStrategy();
     showToast(result === 'granted' ? 'Notifications allowed ✓' : result === 'denied' ? 'Notifications denied' : 'Permission dismissed');
   }catch(err){
@@ -3407,7 +3398,7 @@ function saveVerificationOverrides(overrides){
     const next = String(value||'').trim();
     if(next) clean[key] = next;
   });
-  if(Object.keys(clean).length) localStorage.setItem(VERIFICATION_OVERRIDES_KEY, JSON.stringify(clean));
+  if(Object.keys(clean).length) safeStore(VERIFICATION_OVERRIDES_KEY, JSON.stringify(clean));
   else localStorage.removeItem(VERIFICATION_OVERRIDES_KEY);
 }
 function getVerificationValue(key){
@@ -3520,7 +3511,7 @@ window.onload=()=>{
   if(!localStorage.getItem(MASTER_PARTS_INVENTORY_ONLY_KEY)){
     clearSavedServiceRequirementsMap();
     rebuildMasterPartsFromInventory();
-    localStorage.setItem(MASTER_PARTS_INVENTORY_ONLY_KEY, '1');
+    safeStore(MASTER_PARTS_INVENTORY_ONLY_KEY, '1');
   }else{
     syncMasterPartsFromInventory();
     mergeDuplicateMasterParts();
@@ -3534,20 +3525,18 @@ window.onload=()=>{
   if(!localStorage.getItem(MI_HISTORY_KEY)){
     appendMiHistory({value:getMi(),source:'manual',entryId:null,updatedAt:new Date().toISOString()});
   }
-  if(!localStorage.getItem(MI_STATE_KEY)) localStorage.setItem(MI_STATE_KEY, JSON.stringify({value:getMi(),source:'legacy',entryId:null,updatedAt:new Date().toISOString()}));
+  if(!localStorage.getItem(MI_STATE_KEY)) safeStore(MI_STATE_KEY, JSON.stringify({value:getMi(),source:'legacy',entryId:null,updatedAt:new Date().toISOString()}));
   renderAll();
   resetEntryInventoryUses();
   renderReminderStrategy();
 };
 
 function renderAll(){
-  renderDash();
-  renderLog();
-  renderUpcoming();
-  renderParts();
-  renderBackup();
-  ensureGuideActions();
-  updateGuideAccessibility();
+  const renderers = [renderDash, renderLog, renderUpcoming, renderParts, renderBackup, ensureGuideActions, updateGuideAccessibility];
+  renderers.forEach(fn => {
+    try{ fn(); }
+    catch(err){ console.error('Renderer error in ' + (fn.name||'unknown') + ':', err); }
+  });
 }
 
 /* ─── DASHBOARD ──────────────────────────────────────────── */
@@ -3778,84 +3767,6 @@ function renderUpcoming(){
 }
 
 /* ─── LOG/* ─── LOG ────────────────────────────────────────────────── */
-function renderLog(){
-  const d=getData().sort((a,b)=>b.mi-a.mi);
-  const el=document.getElementById('logList');
-  el.innerHTML=d.map(e=>{
-    const dt=new Date(e.date+'T00:00:00');
-    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const safeEntryUrl = safeUrl(e.link);
-    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
-    const del=!e.builtin
-      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
-      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
-    const items = normalizeEntryItems(e.items);
-    const uses = normalizeInventoryUses(e.inventoryUses);
-    const displayParts = items.length ? items.map(item=>({
-      qty: item.qty,
-      name: item.name,
-      partNum: item.partNum,
-      store: item.store,
-      link: item.link,
-      price: Number(item.price||0),
-      oilAvg: !!item.useInOilAvg,
-      fromInventory: !!item.inventoryId
-    })) : uses.map(use=>({
-      qty: use.qtyUsed,
-      name: use.name,
-      partNum: use.partNum,
-      store: use.store,
-      link: use.link,
-      price: Number(use.unitCost||0),
-      oilAvg: !!use.countInOilAvg,
-      fromInventory: !!use.inventoryId
-    }));
-    const partsHtml = displayParts.length ? `<div class="log-parts">${displayParts.map(part=>{
-      const meta = [part.partNum && `Part # ${part.partNum}`, part.store].filter(Boolean).join(' · ');
-      const safePartUrl = safeUrl(part.link);
-      return `<div class="log-part">
-        <div class="log-part-top">
-          <div class="log-part-name">${part.qty}× ${safeText(part.name)}</div>
-          <div class="log-part-price">$${(part.qty * part.price).toFixed(2)}</div>
-        </div>
-        ${meta ? `<div class="log-part-meta">${safeText(meta)}</div>` : ''}
-        ${safePartUrl ? `<a class="log-part-link" href="${safePartUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safePartUrl))}</a>` : ''}
-        ${part.oilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
-        ${part.fromInventory ? `<div class="parts-badge" style="background:rgba(34,114,212,.1);color:var(--blue2);border-color:rgba(34,114,212,.25)">From inventory</div>` : ''}
-      </div>`;
-    }).join('')}</div>` : '';
-    const photo=getPhoto(e.id);
-    const photoHtml=photo
-      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
-          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
-          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
-        </div>`
-      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
-          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
-          background:none;cursor:pointer;width:100%;transition:all .2s"
-          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
-          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
-          📷 Add Receipt Photo
-        </button>`;
-    return`<div class="log-item ${!e.builtin?'user-entry':''}">
-      ${del}
-      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
-      <div class="log-type">${LABELS[e.type]||'Service'}</div>
-      <div class="log-desc">${safeText(e.desc)}</div>
-      ${partsHtml}
-      <div class="log-foot">
-        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
-        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
-      </div>
-      ${normalizeServiceEntryItems(e.items).length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${normalizeServiceEntryItems(e.items).map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
-      ${photoHtml}
-    </div>`;
-  }).join('');
-  let tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
-  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
-}
-
-/* ─── ADD ENTRY/* ─── ADD ENTRY ──────────────────────────────────────────── */
 function getServiceRuleMasterLabel(masterPartId=''){
   const part = getMasterParts().find(item=>String(item.id)===String(masterPartId));
   return part ? `${part.name}${part.partNum ? ` · ${part.partNum}` : ''}` : 'Unlinked master part';
@@ -3956,86 +3867,6 @@ function renderServiceRuleList(){
   body.innerHTML = rows.map(({serviceType, rule})=>`<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${escapeHtml(rule.label)}</div><div class="inv-meta">${escapeHtml(LABELS[serviceType] || serviceType)} · ID: ${escapeHtml(rule.id)}${rule.toyotaPartNum ? ` · Toyota/ref #: ${escapeHtml(rule.toyotaPartNum)}` : ''}<br>Required qty: ${Number(rule.qty||0)}${rule.masterPartIds?.[0] ? `<br>🔗 ${escapeHtml(getServiceRuleMasterLabel(rule.masterPartIds[0]))}` : '<br>⚠ No linked master part'}</div></div><div class="inv-qty ${rule.masterPartIds?.length ? '' : 'out'}">${rule.masterPartIds?.length ? 'linked' : 'unlinked'}</div></div><div class="inv-actions"><button type="button" class="inv-btn" onclick="editServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Edit</button><button type="button" class="inv-btn danger" onclick="deleteServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Delete</button></div></div>`).join('');
 }
 
-function renderParts(){
-  renderServiceRuleList();
-  const inv = getInventory().sort((a,b)=>{
-    const stockDiff = Number(b.qtyOnHand||0) - Number(a.qtyOnHand||0);
-    if(stockDiff !== 0) return stockDiff;
-    return (a.name||'').localeCompare(b.name||'');
-  });
-  const parts = getMasterParts().sort((a,b)=>{
-    const catA = MASTER_CATEGORY_LABELS[a.category] || 'Other';
-    const catB = MASTER_CATEGORY_LABELS[b.category] || 'Other';
-    if(catA !== catB) return catA.localeCompare(catB);
-    return (a.name||'').localeCompare(b.name||'');
-  });
-  const listEl = document.getElementById('inventoryList');
-  const summaryEl = document.getElementById('inventorySummary');
-  const masterListEl = document.getElementById('masterPartsList');
-  const masterSummaryEl = document.getElementById('masterPartsSummary');
-  if(!listEl || !summaryEl) return;
-  const totalQty = inv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
-  const linkedInvCount = inv.filter(item=>item.masterPartId).length;
-  summaryEl.textContent = `${inv.length} item${inv.length!==1?'s':''} · ${totalQty} total on hand · ${linkedInvCount} linked`;
-  if(!inv.length){
-    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No inventory saved yet. Add parts above when you buy ahead during a sale.</div></div>`;
-  }else{
-    listEl.innerHTML = inv.map(item=>{
-      const qty = Number(item.qtyOnHand||0);
-      const qtyClass = qty===0 ? 'out' : qty<=1 ? 'low' : '';
-      const meta = [LABELS[item.serviceType]||'Other', item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ');
-      const master = parts.find(part=>String(part.id)===String(item.masterPartId||''));
-      return `<div class="inv-row">
-        <div class="inv-top">
-          <div style="flex:1">
-            <div class="inv-name">${item.name}</div>
-            <div class="inv-meta">${meta || 'No extra details saved yet'}${item.note ? `<br>💡 ${item.note}` : ''}${item.link ? `<br><a class="part-link" href="${item.link}" target="_blank">→ ${getLinkHostLabel(item.link)}</a>` : ''}${master ? `<br>🔗 Master DB: <span style="color:var(--text2)">${master.name}</span>` : ''}</div>
-            ${item.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
-          </div>
-          <div class="inv-qty ${qtyClass}">${qty} on hand</div>
-        </div>
-        <div class="inv-actions">
-          <button type="button" class="inv-btn" data-edit-inventory="${escapeHtmlAttr(item.id)}">Edit</button>
-          ${master ? `<button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(master.id)}">Master Part</button>` : ''}
-          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="1">+1</button>
-          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="-1">-1</button>
-          <button type="button" class="inv-btn danger" data-delete-inventory="${escapeHtmlAttr(item.id)}">Delete</button>
-        </div>
-      </div>`;
-    }).join('');
-  }
-  if(masterListEl && masterSummaryEl){
-    const totalSources = parts.reduce((sum,part)=>sum + (part.sources||[]).length, 0);
-    masterSummaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${totalSources} saved source${totalSources!==1?'s':''}`;
-    if(!parts.length){
-      masterListEl.innerHTML = `<div class="master-empty">No master parts yet. Add an inventory item above and the app will automatically create or update your reference part database here.</div>`;
-    }else{
-      masterListEl.innerHTML = parts.map(part=>{
-        const linkedInv = inv.filter(item=>String(item.masterPartId||'')===String(part.id));
-        const linkedQty = linkedInv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
-        const serviceLabel = LABELS[part.serviceType] || 'Other';
-        const categoryLabel = MASTER_CATEGORY_LABELS[part.category] || 'Other';
-        const defaultPrice = Number(part.unitCost||0) > 0 ? `$${Number(part.unitCost||0).toFixed(2)}` : '—';
-        const sourcesHtml = (part.sources||[]).length
-          ? `<div class="master-source-list">${part.sources.map(source=>`<div class="master-source"><div class="master-source-top"><div><div class="master-source-name">${source.store || source.label || 'Saved source'}</div><div class="master-source-meta">${[source.label && source.label !== (source.store||'') ? source.label : '', source.addedAt ? `saved ${formatDateHuman(source.addedAt.slice(0,10))}` : ''].filter(Boolean).join(' · ')}${source.url ? `<br><a class="part-link" href="${source.url}" target="_blank">→ ${getLinkHostLabel(source.url)}</a>` : ''}</div></div><div class="master-source-price">${Number(source.unitPrice||0) > 0 ? `$${Number(source.unitPrice||0).toFixed(2)}` : '—'}</div></div></div>`).join('')}</div>`
-          : `<div class="part-missing" style="margin-top:10px">No saved purchase sources yet. Add this part through Inventory and the store/link will stack here automatically.</div>`;
-        return `<div class="part-item">
-          <div class="part-row1"><span class="part-name">${part.name}</span><span class="part-price">${defaultPrice}</span></div>
-          <div class="part-num">${[categoryLabel, serviceLabel, part.partNum && `Part # ${part.partNum}`].filter(Boolean).join(' · ')}</div>
-          ${part.note ? `<div class="inv-meta" style="margin-top:6px">💡 ${part.note}</div>` : ''}
-          ${part.statusLabel ? `<div class="parts-badge">${part.statusLabel}</div>` : ''}
-          ${part.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
-          <div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>
-          ${sourcesHtml}
-          <div class="inv-actions" style="margin-top:12px">
-            <button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button>
-            <button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  }
-}
 function setInventoryFormOpen(isOpen){
   const wrap = document.getElementById('inventoryFormWrap');
   const btn = document.getElementById('inventoryFormToggleBtn');
@@ -4228,107 +4059,6 @@ function deleteInventoryItem(id){
   clearInventoryForm();
   showToast('Inventory item deleted');
 }
-function renderEntryInventoryUI(){
-  const block = document.getElementById('inventorySuggestBlock');
-  const needEl = document.getElementById('inventorySuggestList');
-  const inventoryEl = document.getElementById('inventorySelectedList');
-  const summaryEl = document.getElementById('inventoryRequiredSummary');
-  const typeEl = document.getElementById('fType');
-  if(!block || !needEl || !inventoryEl || !typeEl) return;
-  const serviceType = typeEl.value;
-  if(!serviceType){
-    block.style.display='none';
-    needEl.innerHTML='';
-    inventoryEl.innerHTML='';
-    if(summaryEl) summaryEl.textContent='';
-    updateEntrySaveLock();
-    syncEntryCostFromItems();
-    return;
-  }
-  block.style.display='block';
-  const needs = getSimpleServiceNeeds(serviceType);
-  const previewInventory = getEntryPreviewInventory();
-  const selectedCounts = getSelectedInventoryCounts();
-  const matches = getServiceInventoryMatches(serviceType, previewInventory)
-    .map(item=>({
-      ...item,
-      selectedQty:Number(selectedCounts[String(item.id)]||0),
-      available:Math.max(0, Number(item.qtyOnHand||0) - Number(selectedCounts[String(item.id)]||0))
-    }))
-    .sort((a,b)=>{
-      const availDiff = b.available - a.available;
-      if(availDiff !== 0) return availDiff;
-      return String(a.name||'').localeCompare(String(b.name||''));
-    });
-
-  if(summaryEl){
-    summaryEl.textContent = needs.length
-      ? `This ${LABELS[serviceType] || 'service'} usually needs ${needs.length} part${needs.length!==1?'s':''}. Start with the simple checklist below, then tap a saved inventory item if you already bought it.`
-      : `No starter parts list is saved for this service yet. You can still use matching inventory below or enter the service manually.`;
-  }
-
-  needEl.innerHTML = needs.length ? needs.map(need=>{
-    const matched = matches.filter(item=>inventoryMatchesNeed(item, need));
-    const savedQty = matched.reduce((sum,item)=>sum + Number(item.available||0), 0);
-    const sources = getNeedSavedSources(need, matches);
-    return `<div class="need-card">
-      <div class="need-top">
-        <div style="flex:1">
-          <div class="need-name">${need.label}</div>
-          <div class="need-meta">Need: ${need.qtyText}${savedQty>0 ? ` · Saved in inventory: ${savedQty}` : ' · No saved stock yet'}</div>
-        </div>
-        <div class="need-qty">${need.qtyText}</div>
-      </div>
-      ${sources.length ? `<div class="need-links"><select class="fs" onchange="openSavedSourceLink(this)"><option value="">Open saved purchase link…</option>${sources.map(source=>`<option value="${escapeHtmlAttr(source.url)}">${escapeHtml(source.label + (Number(source.unitPrice||0)>0 ? ` — $${Number(source.unitPrice||0).toFixed(2)}` : ''))}</option>`).join('')}</select></div>` : `<div class="need-meta" style="margin-top:8px">No saved purchase links yet for this part.</div>`}
-    </div>`;
-  }).join('') : `<div class="part-missing">No starter parts checklist yet for this service.</div>`;
-
-  inventoryEl.innerHTML = matches.length ? matches.map(item=>`
-    <div class="selected-use">
-      <div class="selected-use-top">
-        <div style="flex:1">
-          <div class="suggest-name">${item.name}</div>
-          <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ') || 'Saved inventory item'}</div>
-        </div>
-        <div class="inv-qty ${item.available===0?'out':item.available<=1?'low':''}">${item.available} free</div>
-      </div>
-      <div class="suggest-meta">On hand: ${Number(item.qtyOnHand||0)} · Selected now: ${item.selectedQty} · $${Number(item.unitCost||0).toFixed(2)} each${item.countInOilAvg ? ' · counts in oil avg' : ''}</div>
-      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Use this part</button>` : `<div class="part-missing" style="margin-top:8px">No more stock left for this item.</div>`}
-    </div>
-  `).join('') : `<div class="part-missing">No saved inventory matches yet for this service. Add the part in Inventory first and it will show here next time.</div>`;
-
-  updateEntrySaveLock();
-  syncEntryCostFromItems();
-}
-
-function useInventoryItem(id){
-  const previewInventory = getEntryPreviewInventory();
-  const item = previewInventory.find(x=>String(x.id)===String(id));
-  if(!item) return;
-  const alreadySelected = Number(getSelectedInventoryCounts()[String(id)]||0);
-  const max = Number(item.qtyOnHand||0);
-  if(alreadySelected >= max){showToast('No more free stock left for this part');return;}
-  addItemRow({
-    inventoryId: item.id,
-    name: item.name,
-    partNum: item.partNum,
-    store: item.store,
-    link: item.link,
-    price: Number(item.unitCost||0),
-    qty: 1,
-    useInOilAvg: !!item.countInOilAvg
-  });
-}
-function removeOneInventoryItem(id){
-  const rows = getFormItemRows().filter(row=>String(row.dataset.inventoryId||'')===String(id));
-  const row = rows[rows.length-1];
-  if(!row) return;
-  row.remove();
-  if(!getFormItemRows().length) addItemRow();
-  renderEntryInventoryUI();
-}
-
-/* ─── MILEAGE FIELD — dynamic placeholder, hint, validation ─── */
 function initAddForm(){
   const input    = document.getElementById('fMi');
   const hintEl   = document.getElementById('fMiHint');
@@ -4550,57 +4280,6 @@ function prefill(){
   renderEntryInventoryUI();
   updateReusePartsBar();
 }
-function saveEntry(){
-  const date=document.getElementById('fDate').value;
-  const mi=document.getElementById('fMi').value;
-  const type=document.getElementById('fType').value||'other';
-  const desc=document.getElementById('fDesc').value.trim();
-  const cost=document.getElementById('fCost').value;
-  const shop=document.getElementById('fShop').value.trim();
-  const manualItems = getFormItems();
-  if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
-  const inv = getInventory();
-  const items = [...manualItems];
-  const linkedQty = items.filter(item=>item.inventoryId).reduce((map,item)=>{
-    map[String(item.inventoryId)] = (map[String(item.inventoryId)]||0) + Number(item.qty||0);
-    return map;
-  },{});
-  for(const [inventoryId, qtyNeeded] of Object.entries(linkedQty)){
-    const invItem = inv.find(x=>String(x.id)===String(inventoryId));
-    const onHand = Number(invItem?.qtyOnHand || 0);
-    if(qtyNeeded > onHand){
-      showToast(`Not enough stock for ${invItem?.name || 'linked inventory item'}`);
-      return;
-    }
-  }
-  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
-  const newId=Date.now();
-  const d=getData();
-  const inventoryUses = items.filter(item=>item.inventoryId).map(item=>({inventoryId:item.inventoryId,name:item.name,partNum:item.partNum,store:item.store,link:item.link,unitCost:item.price,qtyUsed:item.qty,countInOilAvg:item.useInOilAvg}));
-  d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:false});
-  save(d);
-  if(Object.keys(linkedQty).length){
-    Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
-      const item = inv.find(x=>String(x.id)===String(inventoryId));
-      if(item) item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) - Number(qtyNeeded||0));
-    });
-    saveInventory(inv);
-  }
-  if(window._pendingPhoto){
-    savePhoto(newId, window._pendingPhoto);
-    window._pendingPhoto=null;
-  }
-  if(parseInt(mi,10)>getMi())setMi(parseInt(mi,10));
-  renderAll();go('log');
-  ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fType').value='';
-  resetEntryInventoryUses();
-  clearPhoto();
-  updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
-  showToast('Entry saved ✓');
-}
-
-/* ─── MAINTENANCE ENGINE (whichever comes first) ─────────────── */
 function getSmartStatus(mi=getMi(), referenceDate=todayLocal()){
   return getRecurringServicesState(mi, referenceDate).rules.sort(compareRecurring);
 }
@@ -4647,13 +4326,13 @@ function openMiModal(){
   document.getElementById('miModal').classList.add('open');
   setTimeout(()=>{ renderSmartList(cur); document.getElementById('miInput').focus(); }, 200);
   document.getElementById('miInput').oninput = function(){
-    const v = parseInt(this.value);
+    const v = parseInt(this.value, 10);
     if(v && v > 50000 && v < 300000) renderSmartList(v);
   };
 }
 function closeMiModal(){ document.getElementById('miModal').classList.remove('open'); }
 function saveMi(){
-  const v = parseInt(document.getElementById('miInput').value);
+  const v = parseInt(document.getElementById('miInput').value, 10);
   if(v && v > 0){ setMi(v,{source:'manual',allowLower:true}); renderAll(); showToast('Mileage updated to '+v.toLocaleString()+' mi ✓'); }
   closeMiModal();
 }
@@ -4786,32 +4465,9 @@ function copyTemplate(){
 }
 
 /* ─── BACKUP SUMMARY ─────────────────────────────────────── */
-function renderBackup(){
-  const d=getData();
-  const mi=getMi();
-  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
-  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
-  const last=sorted[0];
-  const photoCount=d.filter(e=>getPhoto(e.id)).length;
-  const inventoryCount = getInventory().length;
-  const masterPartsCount = getMasterParts().length;
-  const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
-  document.getElementById('bkCount').textContent=d.length+' entries · '+inventoryCount+' inventory item'+(inventoryCount!==1?'s':'')+' · '+masterPartsCount+' master part'+(masterPartsCount!==1?'s':'')+' · '+scheduleOverrideCount+' custom target'+(scheduleOverrideCount!==1?'s':'')+' · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
-  document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
-  const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
-  document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
-  if(last){
-    const dt=new Date(last.date+'T00:00:00');
-    document.getElementById('bkLast').textContent=
-      dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
-      ' — '+parseInt(last.mi).toLocaleString()+' mi';
-  }
-  renderReminderStrategy();
-}
-
 function resetOilAverageNow(){
   if(!confirm('Reset Avg Oil Change now? This keeps your full history but starts a fresh oil average from today forward.')) return;
-  localStorage.setItem(OIL_AVG_RESET_KEY, new Date().toISOString());
+  safeStore(OIL_AVG_RESET_KEY, new Date().toISOString());
   renderDash();
   renderBackup();
   showToast('Avg Oil Change reset ✓');
@@ -4829,134 +4485,6 @@ function clearOilAverageReset(){
 }
 
 /* ─── EXPORT (BACKUP) ────────────────────────────────────── */
-function exportData(){
-  // Collect all receipt photos from localStorage
-  const photos = {};
-  const entries = getData();
-  entries.forEach(e=>{
-    const p = getPhoto(e.id);
-    if(p) photos[e.id] = p;
-  });
-
-  const payload={
-    version: 6,
-    exported: new Date().toISOString(),
-    vin: VIN,
-    vehicle: '2021 Toyota Venza Hybrid AWD',
-    mileage: getMi(),
-    oilAverageResetAt: getOilAverageResetAt(),
-    averageServiceType: getAverageServiceType(),
-    scheduleOverrides: getScheduleOverrides(),
-    servicePartRequirements: getSavedServiceRequirementsMap(),
-    mileageHistory: getMiHistory(),
-    entries: entries,
-    inventory: getInventory(),
-    masterParts: getMasterParts(),
-    photos: photos  // base64 images keyed by entry id
-  };
-
-  const photoCount = Object.keys(photos).length;
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  const date=new Date().toISOString().split('T')[0];
-  a.href=url;
-  a.download='venza_backup_'+date+'.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast(`Backup saved ✓ — ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}`);
-}
-
-/* ─── IMPORT (RESTORE) ───────────────────────────────────── */
-function importData(input){
-  const file=input.files[0];
-  if(!file){return}
-  if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return}
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const parsed=JSON.parse(e.target.result);
-      const isLegacyArray = Array.isArray(parsed);
-      const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
-      if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
-      const entries=Array.isArray(data.entries)?data.entries:null;
-      const mi=Number(data.mileage||0) || null;
-      const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
-      const inventory=Array.isArray(data.inventory) ? data.inventory : [];
-      const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
-      const oilAverageResetAt=data.oilAverageResetAt||'';
-      const averageServiceType=data.averageServiceType||'oil_avg';
-      const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
-      const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
-      const photoCount=Object.keys(photos).length;
-      const version = Number(data.version || 0);
-      const backupVin = String(data.vin || '').trim();
-
-      if(!entries){
-        showToast('❌ Invalid backup file format'); input.value=''; return;
-      }
-      if(version > 6){
-        showToast('This backup was created by a newer app version'); input.value=''; return;
-      }
-      if(backupVin && backupVin !== VIN){
-        const proceedMismatch = confirm(`This backup VIN does not match this app.
-
-Backup: ${backupVin}
-This app: ${VIN}
-
-Restore anyway?`);
-        if(!proceedMismatch){ input.value=''; return; }
-      }
-      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?
-
-This replaces all current data. Continue?`)){
-        input.value='';return;
-      }
-
-      clearStoredPhotos();
-      save(entries);
-      saveInventory(inventory);
-      saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
-      if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
-      saveScheduleOverrides(scheduleOverrides);
-      if(mi&&mi>0)setMi(mi);
-
-      Object.entries(photos).forEach(([id,imgData])=>{
-        try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
-      });
-
-      renderAll();
-      renderBackup();
-      input.value='';
-      showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}!`);
-    }catch(err){
-      showToast('❌ Could not read backup file');
-      input.value='';
-    }
-  };
-  reader.readAsText(file);
-}
-
-/* ─── RESET DATA ─────────────────────────────────────────── */
-function resetData(){
-  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
-  // Clear all photos first
-  clearStoredPhotos();
-  save(DEFAULT);
-  saveInventory(DEFAULT_INVENTORY);
-  saveMasterParts(DEFAULT_MASTER_PARTS);
-  localStorage.removeItem(OIL_AVG_RESET_KEY);
-  localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
-  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
-  setMi(64751);
-  renderAll();
-  renderBackup();
-  showToast('Reset to factory data ✓');
-}
-
-/* ─── TOAST ──────────────────────────────────────────────── */
 function showToast(msg, duration=4000){
   const t=document.getElementById('toast');
   if(!t) return;
@@ -4977,7 +4505,7 @@ function generatePrint(){
 
   const owner   = document.getElementById('prOwner').value.trim() || 'Vehicle Owner';
   const model   = document.getElementById('prModel').value.trim();
-  const curMi   = parseInt(miEl.value) || getMi();
+  const curMi   = parseInt(miEl.value, 10) || getMi();
   const filter  = document.getElementById('prFilter').value;
   const today   = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   const todayISO = new Date().toISOString().split('T')[0];
@@ -5007,7 +4535,7 @@ function generatePrint(){
     const bg = i%2===0?'#ffffff':'#f8f9fb';
     return `<tr style="background:${bg}">
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${ds}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi).toLocaleString()} mi</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi, 10).toLocaleString()} mi</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${escapeHtml(typeLabel)}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${safeText(e.desc)}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(e.shop||'—')}</td>
@@ -5042,7 +4570,7 @@ function generatePrint(){
         return `<div style="border:1px solid #e2e4e8;border-radius:10px;overflow:hidden">
           <div style="background:#1a1d23;padding:8px 12px;display:flex;justify-content:space-between">
             <span style="color:#fff;font-size:11px;font-weight:600">${escapeHtml(LABELS[e.type]||'Service')}</span>
-            <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi).toLocaleString()} mi</span>
+            <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi, 10).toLocaleString()} mi</span>
           </div>
           <img src="${getPhoto(e.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
           <div style="padding:8px 12px;font-size:11px;color:#555">${escapeHtml(e.shop||'DIY')} · $${getEntryDisplayCost(e).toFixed(2)}</div>
@@ -5450,9 +4978,14 @@ function delEntry(id){
   const deletedEntry = currentEntries.find(e=>String(e.id)===String(id));
 
   // Only the highest-mileage entry may be deleted to keep mileage history reliable.
+  // Tie-break on entry id (timestamp) so two same-mileage entries have a stable order.
   const sortedByMi = [...currentEntries]
     .filter(e=>Number.isFinite(Number(e.mi)) && Number(e.mi)>0)
-    .sort((a,b)=>Number(b.mi)-Number(a.mi));
+    .sort((a,b)=>{
+      const miDiff = Number(b.mi) - Number(a.mi);
+      if(miDiff !== 0) return miDiff;
+      return Number(b.id) - Number(a.id); // newer id = more recent entry
+    });
   const latestEntry = sortedByMi[0];
   if(latestEntry && String(latestEntry.id)!==String(id)){
     showToast(`Delete the latest entry first (${Number(latestEntry.mi).toLocaleString()} mi) — entries must be removed newest-first to keep mileage accurate.`);
@@ -5634,7 +5167,7 @@ function migrateLegacyBasicParts(){
       note:item.note||''
     })));
   }catch(err){ seed = []; }
-  if(seed.length) localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(seed));
+  if(seed.length) safeStore(BASIC_PARTS_KEY, JSON.stringify(seed));
 }
 function getBasicPartsList(){
   migrateLegacyBasicParts();
@@ -5646,7 +5179,7 @@ function getBasicPartsList(){
   }
 }
 function saveBasicPartsList(items){
-  localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
+  safeStore(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
 }
 function upsertBasicPart(payload={}){
   const parts = getBasicPartsList();
@@ -6124,7 +5657,6 @@ function syncEntryCostFromItems(){
   document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
 }
 function resetEntryInventoryUses(){
-function resetEntryInventoryUses(){
   const list = document.getElementById('fItemsList');
   if(list) list.innerHTML = '';
   toggleServicePartsBuilder(false);
@@ -6322,7 +5854,7 @@ function renderBackup(){
   if(totalEl) totalEl.textContent = '$'+tot.toFixed(2);
   if(last && lastEl){
     const dt=new Date(last.date+'T00:00:00');
-    lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
+    lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi, 10).toLocaleString() + ' mi';
   }
   renderReminderStrategy();
 }
@@ -6340,11 +5872,13 @@ function exportData(){
     if(p) partPhotos[part.id] = p;
   });
   const payload={
-    version: 8,
+    version: 9,
     exported: new Date().toISOString(),
     vin: VIN,
     vehicle: '2021 Toyota Venza Hybrid AWD',
     mileage: getMi(),
+    miState: getMiState(),
+    mileageHistory: getMiHistory(),
     oilAverageResetAt: getOilAverageResetAt(),
     averageServiceType: getAverageServiceType(),
     scheduleOverrides: getScheduleOverrides(),
@@ -6406,7 +5940,7 @@ function importData(input){
       const version = Number(data.version || 0);
       const backupVin = String(data.vin || '').trim();
       if(!entries){ showToast('❌ Invalid backup file format'); input.value=''; return; }
-      if(version > 8){ showToast('This backup was created by a newer app version'); input.value=''; return; }
+      if(version > 9){ showToast('This backup was created by a newer app version'); input.value=''; return; }
       if(backupVin && backupVin !== VIN){
         const proceedMismatch = confirm(`This backup VIN does not match this app.
 
@@ -6427,8 +5961,8 @@ This replaces all current data. Continue?`)){
       saveBasicPartsList(basicParts);
       saveInventory(inventory);
       saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
-      if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
-      localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
+      if(oilAverageResetAt){ safeStore(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+      safeStore(AVG_SERVICE_TYPE_KEY, averageServiceType);
       saveScheduleOverrides(scheduleOverrides);
       if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
       if(mileageHistory.length) saveMiHistory(mileageHistory); else localStorage.removeItem(MI_HISTORY_KEY);
