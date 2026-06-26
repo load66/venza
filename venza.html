@@ -926,7 +926,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       VENZA GARAGE
     </div>
     <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN" role="button" tabindex="0" aria-label="Copy VIN">VIN ··· 062382 · tap to copy</div>
-    <div class="header-version" id="appVersionBadge" title="Current app version">APP v1.2.0 · Jun 26, 2026</div>
+    <div class="header-version" id="appVersionBadge" title="Current app version">APP v1.4.0 · Jun 26, 2026</div>
   </div>
   <div class="mileage-pill" onclick="openMiModal()" role="button" tabindex="0" aria-label="Edit odometer mileage">
     <div class="mi-num" id="topMi">64,751</div>
@@ -1067,6 +1067,7 @@ html.modal-open,body.modal-open{overflow:hidden}
         <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
         <option value="valvomax">ValvoMax Drain Valve Install</option>
         <option value="wipers">Wiper Blades</option>
+        <option value="battery">12V Battery</option>
         <option value="other">Other</option>
       </select>
     </div>
@@ -1452,6 +1453,39 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
   </div>
 
+
+  <!-- 12V BATTERY -->
+  <div class="guide-item" data-guide-id="battery_12v" data-service-type="battery">
+    <div class="guide-head" onclick="toggleGuide(this)">
+      <div class="guide-head-left">
+        <div class="guide-title">🔋 12V Battery Replacement</div>
+        <div class="guide-meta">Installed Jun 26, 2026 @ 67,820 mi · Next target Jun 26, 2031</div>
+      </div>
+      <div class="guide-chevron">▾</div>
+    </div>
+    <div class="guide-body">
+      <div class="g-info"><strong>Your battery:</strong> Toyota TrueStart Battery Group H5 (LN2) · Part #00544-H5061-540 · Installed Jun 26, 2026 at 67,820 mi · Grand total $150.60 · 84-month warranty.</div>
+      <div class="g-gold"><strong>Replacement timer:</strong> App target is <strong>60 months / 5 years</strong>. Next proactive replacement target: <strong>Jun 26, 2031</strong>. Warranty coverage runs <strong>84 months</strong>, through <strong>Jun 26, 2033</strong>. Test yearly after year 3 and replace sooner if voltage/load test is weak.</div>
+      <div class="g-warn"><strong>⚠ Before disconnecting:</strong> Make sure the vehicle is fully OFF, key is away from the car, doors are unlocked, and the cargo hatch is already open. Once the 12V battery is disconnected, powered locks/hatch functions may not work normally.</div>
+      <div class="g-info"><strong>Tools:</strong> 10mm wrench/socket for terminals, socket/ratchet for hold-down bracket, gloves, rag, battery terminal brush, battery memory is optional, and a NOCO charger/tester can be used after install if needed.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Park safe and power down</strong> — park on level ground, shift to Park, parking brake ON, headlights/accessories OFF, and make sure the dash is fully off. Keep the key fob away from the vehicle while working.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Open the cargo hatch first</strong> and remove the rear cargo floor/cover to access the 12V battery area. Keep the hatch open while the battery is disconnected so you do not get locked out of the cargo area.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Confirm battery orientation</strong> — take a quick photo before removal. Note where the positive cable, negative cable, hold-down bracket, vent/drain tube if equipped, and battery position sit.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Disconnect negative first</strong> — loosen the negative <code>-</code> terminal, remove it from the post, and tuck it aside so it cannot spring back and touch the battery post.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Disconnect positive second</strong> — loosen the positive <code>+</code> terminal. Be careful not to let your tool touch the positive terminal and body metal at the same time.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Remove hold-down bracket</strong> — remove the bracket/clamp that secures the battery. Keep all hardware together so nothing falls into the cargo well.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Lift old battery straight up</strong> — batteries are heavy. Keep it upright and do not tip it. Clean the tray area and inspect for corrosion or moisture before installing the new one.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Install the new H5 / LN2 battery</strong> — set the Toyota TrueStart battery in the same orientation as the original. Make sure it sits flat and fully seated in the tray.</div></div>
+      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall hold-down bracket</strong> — tighten it enough that the battery cannot slide or tip, but do not crush the case. Reconnect the vent/drain tube if your battery setup uses one.</div></div>
+      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Connect positive first</strong> — install the positive <code>+</code> cable on the positive post and tighten snugly. The terminal should not rotate by hand when tightened.</div></div>
+      <div class="step"><div class="step-n">11</div><div class="step-t"><strong>Connect negative last</strong> — install the negative <code>-</code> cable and tighten snugly. This order reduces short-circuit risk.</div></div>
+      <div class="step"><div class="step-n">12</div><div class="step-t"><strong>Initial check</strong> — verify interior lights power on, then start the Venza in <strong>READY</strong> mode. A meter reading around <code>14V</code> while READY is normal because the hybrid DC-DC converter is charging the 12V system.</div></div>
+      <div class="step"><div class="step-n">13</div><div class="step-t"><strong>Reset/relearn items if needed</strong> — clock, window auto-up/down, liftgate behavior, and infotainment settings may need to relearn after power loss. Drive normally for a short trip and recheck for warning lights.</div></div>
+      <div class="step"><div class="step-n">14</div><div class="step-t"><strong>Keep receipt + warranty info</strong> — Toyota TrueStart warranty is 84 months. Keep the receipt total and part number in this app: <code>00544-H5061-540</code>.</div></div>
+      <div class="g-tip">💡 <strong>After install:</strong> Your service log is saved at <strong>67,820 mi</strong>. The app will count down to the next battery replacement at <strong>Jun 26, 2031</strong>. If testing shows weak voltage before then, replace sooner.</div>
+    </div>
+  </div>
+
   <!-- TIRE ROTATION -->
   <div class="guide-item" data-guide-id="tire_rotation" data-service-type="tires">
     <div class="guide-head" onclick="toggleGuide(this)">
@@ -1525,6 +1559,24 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 
   <div class="section-label">Coverage Summary</div>
+
+  <div class="warranty-card">
+    <div class="wc-head">
+      <div class="wc-icon">🔋</div>
+      <div>
+        <div class="wc-title">12V Battery — Toyota TrueStart</div>
+        <div class="wc-sub">Replaced original battery at 67,820 mi</div>
+      </div>
+      <div class="wc-badge active">84 mo</div>
+    </div>
+    <div class="wc-body">
+      <div class="wc-row"><span class="wc-row-k">Part</span><span class="wc-row-v">Group H5 (LN2) · #00544-H5061-540</span></div>
+      <div class="wc-row"><span class="wc-row-k">Installed / Purchased</span><span class="wc-row-v">Jun 26, 2026</span></div>
+      <div class="wc-row"><span class="wc-row-k">Your Replace Target</span><span class="wc-row-v">5 years · Jun 26, 2031</span></div>
+      <div class="wc-row"><span class="wc-row-k">Warranty Length</span><span class="wc-row-v">84 months · through Jun 26, 2033</span></div>
+      <div class="wc-row"><span class="wc-row-k">Receipt Total</span><span class="wc-row-v">$150.60 · includes $11 core charge</span></div>
+    </div>
+  </div>
 
   <div class="warranty-card">
     <div class="wc-head">
@@ -1734,6 +1786,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="row"><span class="row-key">Timing Chain</span><span class="row-val green">No service — life of engine</span></div>
     <div class="row"><span class="row-key">Spark Plugs</span><span class="row-val">Toyota 90919-01289 · Denso FC16HR-Q8 · Qty 4</span></div>
     <div class="row"><span class="row-key">Plug Interval</span><span class="row-val">120,000 mi per Toyota manual</span></div>
+    <div class="row"><span class="row-key">12V Battery</span><span class="row-val">Toyota TrueStart H5 (LN2) · #00544-H5061-540 · target 5 yr</span></div>
     <div class="row"><span class="row-key">Brake Pads (02/24/26)</span><span class="row-val green">7 mm all 4 corners — Good</span></div>
     <div class="row"><span class="row-key">HV Battery Warranty</span><span class="row-val green">10 yr / 150,000 mi</span></div>
     <div class="row"><span class="row-key">Maintenance Mode</span><span class="row-val" style="font-size:10px">Gas pedal 2x→Neutral→2x→Park→2x→Start</span></div>
@@ -1845,7 +1898,7 @@ html.modal-open,body.modal-open{overflow:hidden}
 // oil, tires, cabin, engine_filter,
 // trans, diff, coolant, inv_coolant, alignment,
 // tires_new, brakes, plugs, hvfilter_inspect,
-// hvfilter_clean, valvomax, wipers, other
+// hvfilter_clean, valvomax, wipers, battery, other
 
 // NOTE: DEFAULT array only affects fresh installs or after Reset.
 // If localStorage already has data, the app reads that — not DEFAULT.</div>
@@ -1993,14 +2046,14 @@ html.modal-open,body.modal-open{overflow:hidden}
    oil, tires, cabin, engine_filter,
    trans, diff, coolant, inv_coolant, alignment,
    tires_new, brakes, plugs, hvfilter_inspect,
-   hvfilter_clean, valvomax, wipers, other
+   hvfilter_clean, valvomax, wipers, battery, other
 
    VEHICLE CONSTANTS (easy to update):
    ────────────────────────────────────
 */
 const VIN         = 'JTEAAAAAH8MJ062382';
-const APP_VERSION = '1.2.0';
-const APP_BUILD   = '2026.06.26.2';
+const APP_VERSION = '1.4.0';
+const APP_BUILD   = '2026.06.26.4';
 const APP_UPDATED = 'Jun 26, 2026';
 const APP_VERSION_LABEL = `v${APP_VERSION} · ${APP_UPDATED}`;
 const APP_VERSION_KEY = 'vz_app_version_seen';
@@ -2057,6 +2110,32 @@ const DEFAULT = [
     link: 'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid',
     builtin: true
   },
+  // ── Entry 5: 12V battery replacement ──────────────────────────
+  {
+    id: 2026062667820,
+    date: '2026-06-26',
+    mi: 67820,
+    type: 'battery',
+    desc: '12V battery replaced — original battery removed; installed Toyota TrueStart Battery Group H5 (LN2) · Part #00544-H5061-540 · 84-month warranty. Receipt: subtotal $131.12, discount -$6.56, tax $15.04, shipping $0.00, core charge $11.00, grand total $150.60. Next proactive replacement target: Jun 26, 2031. Warranty through Jun 26, 2033.',
+    cost: 150.60,
+    shop: 'DIY · Toyota TrueStart / Toyota Parts',
+    link: '',
+    items: [
+      {
+        name: 'Toyota TrueStart Battery, Group H5 (LN2) - 84 Month Warranty',
+        category: '12v_battery',
+        partNum: '00544-H5061-540',
+        store: 'Toyota Parts',
+        link: '',
+        price: 150.60,
+        qty: 1,
+        note: 'Receipt total includes discount, tax, and $11.00 core charge. Subtotal before discount/tax/core: $131.12.',
+        saveToParts: true
+      }
+    ],
+    inventoryUses: [],
+    builtin: true
+  },
   // ── ADD NEW ENTRIES BELOW THIS LINE ──────────────────────────
   // Copy the format above and paste here before the closing ];
 ];
@@ -2069,7 +2148,7 @@ const LABELS = {
   alignment:'Wheel Alignment',tires_new:'New Tires',brakes:'Brake Service',
   plugs:'Spark Plugs',hvfilter_inspect:'HV Battery Filter — Inspect',
   hvfilter_clean:'HV Battery Filter — Clean',valvomax:'ValvoMax Install',
-  wipers:'Wiper Blades',other:'Service'
+  wipers:'Wiper Blades',battery:'12V Battery',other:'Service'
 };
 
 const PREFILLS = {
@@ -2085,6 +2164,7 @@ const PREFILLS = {
   hvfilter_clean:'HV battery cooling filter — removed and cleaned',
   valvomax:'ValvoMax M12-1.25 drain valve installed (permanent) — first oil change with new valve',
   wipers:'Wiper blades replaced',
+  battery:'12V battery replaced — Toyota TrueStart Battery Group H5 (LN2) · Part #00544-H5061-540 · installed at 67,820 mi · 84-month warranty · grand total $150.60',
 };
 
 const DEFAULT_INVENTORY = [];
@@ -2351,6 +2431,7 @@ function getAverageServiceOptions(){
     {id:'alignment',label:'Alignment'},
     {id:'brakes',label:'Brake Service'},
     {id:'wipers',label:'Wipers'},
+    {id:'battery',label:'12V Battery'},
     {id:'all',label:'All Services'}
   ];
 }
@@ -2383,6 +2464,7 @@ const SIMPLE_SERVICE_NEEDS = {
   inv_coolant:[{id:'inverter_coolant',label:'Toyota SLLC pink coolant',qtyText:'as needed for drain & fill',keywords:['sllc','coolant','pink coolant'],partNums:['00272-SLLC2','00272SLLC2']}],
   plugs:[{id:'spark_plugs',label:'Spark plugs',qtyText:'4 plugs',keywords:['spark plug','spark plugs','plug'],partNums:['90919-01289','9091901289','FC16HR-Q8','FC16HRQ8']}],
   wipers:[{id:'wiper_blades',label:'Wiper blades',qtyText:'front set or individual blades',keywords:['wiper','blade'],partNums:[]}],
+  battery:[{id:'battery_12v',label:'12V battery',qtyText:'1 battery',keywords:['12v battery','battery','truestart','h5','ln2','group h5'],partNums:['00544-H5061-540','00544H5061540']}],
   brakes:[{id:'brake_parts',label:'Brake pads / brake parts',qtyText:'as needed',keywords:['brake pad','brake pads','rotor','brake'],partNums:[]}],
   tires_new:[{id:'tires',label:'Tires',qtyText:'set of 4',keywords:['tire','tyre','225/60r18'],partNums:['225/60R18']}]
 };
@@ -3079,6 +3161,7 @@ const RECURRING_RULES = [
   {id:'cabin', name:'Cabin Air Filter', icon:'💨', entryTypes:['cabin'], milesInterval:15000, monthsInterval:18, soonMiles:1500, upcomingMiles:5000, soonDays:45, upcomingDays:120, note:'Activated carbon filter · custom 15,000 mi / 18 mo'},
   {id:'hvfilter_clean', name:'HV Battery Cooling Filter — Clean', icon:'🧹', entryTypes:['hvfilter_clean'], milesInterval:20000, monthsInterval:24, soonMiles:2000, upcomingMiles:5000, soonDays:60, upcomingDays:180, note:'Toyota manual clean interval', initialAnchor:{date:'2026-02-24', mi:64590, estimated:false}},
   {id:'engine_filter', name:'Engine Air Filter', icon:'🌬️', entryTypes:['engine_filter'], milesInterval:30000, monthsInterval:36, soonMiles:2000, upcomingMiles:7000, soonDays:90, upcomingDays:180, note:'Toyota part #17801-YZZ16'},
+  {id:'battery', name:'12V Battery', icon:'🔋', entryTypes:['battery'], monthsInterval:60, soonDays:90, upcomingDays:365, note:'Proactive replacement target: every 5 years · next target Jun 26, 2031 · TrueStart warranty through Jun 26, 2033', initialAnchor:{date:'2026-06-26', mi:67820, estimated:false}},
   {id:'trans', name:'Transmission Fluid D&F', icon:'⚙️', entryTypes:['trans'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
   {id:'diff', name:'Rear Differential D&F', icon:'🔩', entryTypes:['diff'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
   {id:'coolant', name:'Engine Coolant Drain & Fill', icon:'🌡️', entryTypes:['coolant'], milesInterval:100000, monthsInterval:120, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota SLLC · 100k mi / 120 mo first interval', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
@@ -5511,6 +5594,7 @@ const PART_CATEGORY_OPTIONS = [
   {value:'brake_parts',label:'Brake Parts'},
   {value:'tires',label:'Tires'},
   {value:'wipers',label:'Wipers'},
+  {value:'12v_battery',label:'12V Battery'},
   {value:'other',label:'Other'}
 ];
 const PART_CATEGORY_MAP = Object.fromEntries(PART_CATEGORY_OPTIONS.map(item=>[item.value,item.label]));
@@ -5620,7 +5704,8 @@ function guessPartCategoryForService(serviceType='other'){
     brakes:'brake_parts',
     tires:'tires',
     tires_new:'tires',
-    wipers:'wipers'
+    wipers:'wipers',
+    battery:'12v_battery'
   };
   return map[serviceType] || 'other';
 }
@@ -6403,12 +6488,12 @@ function resetData(){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   VENZA GARAGE — STABILITY + UX UPGRADE v9
+   VENZA GARAGE — STABILITY + UX UPGRADE v12
    Fixes: editable service cost, safer backup/restore, calendar vehicle
    name, factory mileage reset, smarter dashboard summary, and oil-cost math.
    ════════════════════════════════════════════════════════════════ */
 (function(){
-  const UPGRADE_VERSION = 10;
+  const UPGRADE_VERSION = 12;
   const FACTORY_MILEAGE = Math.max(highestMileage(DEFAULT), Number(LAST_SVC_MI||0), 64751);
 
   function getLocalStorageUsageKb(){
@@ -6484,10 +6569,14 @@ function resetData(){
     const upcoming = items.filter(item=>item.status === 'upcoming');
     const customTargets = getResolvedRecurringRules().filter(rule=>!rule.watchOnly && rule.customActive).length;
     const next = items[0];
+    const battery = items.find(item=>item.id === 'battery');
+    const batteryDate = battery?.nextDueDate ? formatDateHuman(battery.nextDueDate) : 'Jun 26, 2031';
+    const batteryTimer = battery ? `${batteryDate} · ${battery.remainingText}` : 'Jun 26, 2031 · target every 5 years';
     const nextText = next ? `${next.name} · ${next.remainingText}` : 'No recurring service found';
     const avg = state.avgMilesPerDay && Number.isFinite(state.avgMilesPerDay) ? `${Math.round(state.avgMilesPerDay)} mi/day` : 'Learning';
     el.innerHTML = `
       <div class="row"><span class="row-key">Next Action</span><span class="row-val ${next?.status==='overdue'?'red':next?.status==='due soon'?'orange':'green'}">${escapeHtml(nextText)}</span></div>
+      <div class="row"><span class="row-key">12V Battery Timer</span><span class="row-val ${battery?.status==='overdue'?'red':battery?.status==='due soon'?'orange':'green'}">${escapeHtml(batteryTimer)}</span></div>
       <div class="row"><span class="row-key">Urgency</span><span class="row-val ${overdue.length?'red':soon.length?'orange':'green'}">${overdue.length} overdue · ${soon.length} soon · ${upcoming.length} upcoming</span></div>
       <div class="row"><span class="row-key">Mileage Pace</span><span class="row-val">${escapeHtml(avg)}</span></div>
       <div class="row"><span class="row-key">Custom Targets</span><span class="row-val ${customTargets?'gold':'green'}">${customTargets} saved</span></div>
@@ -6740,7 +6829,75 @@ function resetData(){
     if(costEl){ costEl.value = ''; delete costEl.dataset.userEdited; }
   };
 
+
+  const BATTERY_MIGRATION_KEY = 'vz_migration_20260626_12v_battery_v1';
+  const BATTERY_ENTRY_ID = 2026062667820;
+  function cloneBatteryReplacementEntry(){
+    return {
+      id: BATTERY_ENTRY_ID,
+      date: '2026-06-26',
+      mi: 67820,
+      type: 'battery',
+      desc: '12V battery replaced — original battery removed; installed Toyota TrueStart Battery Group H5 (LN2) · Part #00544-H5061-540 · 84-month warranty. Receipt: subtotal $131.12, discount -$6.56, tax $15.04, shipping $0.00, core charge $11.00, grand total $150.60. Next proactive replacement target: Jun 26, 2031. Warranty through Jun 26, 2033.',
+      cost: 150.60,
+      shop: 'DIY · Toyota TrueStart / Toyota Parts',
+      link: '',
+      items: [{
+        name: 'Toyota TrueStart Battery, Group H5 (LN2) - 84 Month Warranty',
+        category: '12v_battery',
+        partNum: '00544-H5061-540',
+        store: 'Toyota Parts',
+        link: '',
+        price: 150.60,
+        qty: 1,
+        note: 'Receipt total includes discount, tax, and $11.00 core charge. Subtotal before discount/tax/core: $131.12.',
+        saveToParts: true
+      }],
+      inventoryUses: [],
+      builtin: true
+    };
+  }
+  function entryLooksLikeBatteryReplacement(entry){
+    const desc = String(entry.desc || '').toLowerCase();
+    return String(entry.type || '') === 'battery' && (Number(entry.mi) === 67820 || desc.includes('00544-h5061-540') || desc.includes('truestart'));
+  }
+  window.ensureBatteryReplacementRecord = function(){
+    let changed = false;
+    const d = getData();
+    if(!d.some(entryLooksLikeBatteryReplacement)){
+      d.push(cloneBatteryReplacementEntry());
+      save(d);
+      changed = true;
+    }
+    try{
+      const parts = getBasicPartsList();
+      const existsPart = parts.some(part=>normalizeKey(part.partNum || '') === normalizeKey('00544-H5061-540'));
+      if(!existsPart){
+        saveBasicPartsList([...parts, {
+          id: 'battery_20260626',
+          name: 'Toyota TrueStart Battery, Group H5 (LN2) - 84 Month Warranty',
+          category: '12v_battery',
+          serviceType: 'battery',
+          store: 'Toyota Parts',
+          link: '',
+          partNum: '00544-H5061-540',
+          unitCost: 150.60,
+          note: 'Installed Jun 26, 2026 at 67,820 mi. Receipt total includes discount, tax, and $11 core charge. Warranty 84 months; app replacement target 5 years.'
+        }]);
+        changed = true;
+      }
+    }catch(err){}
+    if(getMi() < 67820){
+      setMi(67820, {source:'entry', entryId:BATTERY_ENTRY_ID, allowLower:false});
+      changed = true;
+    }
+    try{ localStorage.setItem(BATTERY_MIGRATION_KEY, '1'); }catch(err){}
+    return changed;
+  };
+
   window.addEventListener('load', function(){
+    const batteryRecordChanged = typeof ensureBatteryReplacementRecord === 'function' ? ensureBatteryReplacementRecord() : false;
+    if(batteryRecordChanged) renderAll();
     const costEl = document.getElementById('fCost');
     if(costEl && !costEl.dataset.vzBound){
       costEl.dataset.vzBound = '1';
