@@ -85,6 +85,17 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
   font-family:'JetBrains Mono',monospace;
   margin-top:2px;
 }
+.header-version{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:5px;padding:3px 8px;
+  border:1px solid rgba(34,212,110,.22);
+  border-radius:999px;
+  background:rgba(34,212,110,.07);
+  color:var(--green2);
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:.55px;
+  line-height:1.2;
+}
 .mileage-pill{
   background:var(--bg3);
   border:1.5px solid var(--border2);
@@ -834,6 +845,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   .header{padding:10px 12px 8px}
   .header-logo{font-size:22px;letter-spacing:2.4px}
   .header-sub{font-size:9px;letter-spacing:1.2px}
+  .header-version{font-size:8px;padding:3px 7px;margin-top:4px}
   .mileage-pill{padding:5px 10px;border-radius:18px}
   .mi-num{font-size:14px}
   .mi-label{font-size:8px}
@@ -914,6 +926,7 @@ html.modal-open,body.modal-open{overflow:hidden}
       VENZA GARAGE
     </div>
     <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN" role="button" tabindex="0" aria-label="Copy VIN">VIN ··· 062382 · tap to copy</div>
+    <div class="header-version" id="appVersionBadge" title="Current app version">APP v1.2.0 · Jun 26, 2026</div>
   </div>
   <div class="mileage-pill" onclick="openMiModal()" role="button" tabindex="0" aria-label="Edit odometer mileage">
     <div class="mi-num" id="topMi">64,751</div>
@@ -1758,6 +1771,7 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="row"><span class="row-key">Current Mileage</span><span class="row-val" id="bkMi">—</span></div>
     <div class="row"><span class="row-key">Total Invested</span><span class="row-val orange" id="bkTotal">—</span></div>
     <div class="row"><span class="row-key">Last Service</span><span class="row-val" id="bkLast">—</span></div>
+    <div class="row"><span class="row-key">App Version</span><span class="row-val green" id="bkVersion">—</span></div>
     <div class="row"><span class="row-key">App Health</span><span class="row-val green" id="bkHealth">—</span></div>
     <div class="row"><span class="row-key">Local Storage</span><span class="row-val" id="bkStorage">—</span></div>
   </div></div>
@@ -1985,6 +1999,11 @@ html.modal-open,body.modal-open{overflow:hidden}
    ────────────────────────────────────
 */
 const VIN         = 'JTEAAAAAH8MJ062382';
+const APP_VERSION = '1.2.0';
+const APP_BUILD   = '2026.06.26.2';
+const APP_UPDATED = 'Jun 26, 2026';
+const APP_VERSION_LABEL = `v${APP_VERSION} · ${APP_UPDATED}`;
+const APP_VERSION_KEY = 'vz_app_version_seen';
 const LAST_SVC_MI = 64590;   // mileage of last oil change
 const NEXT_SVC_MI = 69590;   // mileage of next oil change due
 
@@ -6389,7 +6408,7 @@ function resetData(){
    name, factory mileage reset, smarter dashboard summary, and oil-cost math.
    ════════════════════════════════════════════════════════════════ */
 (function(){
-  const UPGRADE_VERSION = 9;
+  const UPGRADE_VERSION = 10;
   const FACTORY_MILEAGE = Math.max(highestMileage(DEFAULT), Number(LAST_SVC_MI||0), 64751);
 
   function getLocalStorageUsageKb(){
@@ -6403,6 +6422,29 @@ function resetData(){
       return Math.round((chars * 2) / 1024);
     }catch(err){ return null; }
   }
+
+  window.renderAppVersion = function(){
+    const full = `APP ${APP_VERSION_LABEL} · build ${APP_BUILD}`;
+    const short = `APP ${APP_VERSION_LABEL}`;
+    const headerEl = document.getElementById('appVersionBadge');
+    if(headerEl){
+      headerEl.textContent = short;
+      headerEl.title = full;
+    }
+    const backupEl = document.getElementById('bkVersion');
+    if(backupEl) backupEl.textContent = full;
+    document.documentElement.dataset.appVersion = APP_VERSION;
+  };
+
+  window.showAppUpdatedNotice = function(){
+    try{
+      const seen = localStorage.getItem(APP_VERSION_KEY);
+      if(seen !== APP_VERSION){
+        localStorage.setItem(APP_VERSION_KEY, APP_VERSION);
+        setTimeout(()=>showToast(`Venza Garage updated to ${APP_VERSION_LABEL} ✓`), 650);
+      }
+    }catch(err){}
+  };
 
   window.getManualMileageBaseline = function(){
     const history = getMiHistory();
@@ -6531,8 +6573,9 @@ function resetData(){
       const dt=new Date(last.date+'T00:00:00');
       lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
     }
+    renderAppVersion();
     const healthEl = document.getElementById('bkHealth');
-    if(healthEl) healthEl.textContent = `v${UPGRADE_VERSION} · backup-safe · ${Object.keys(getVerificationOverrides()).length} verified edit${Object.keys(getVerificationOverrides()).length!==1?'s':''}`;
+    if(healthEl) healthEl.textContent = `backup v${UPGRADE_VERSION} · backup-safe · ${Object.keys(getVerificationOverrides()).length} verified edit${Object.keys(getVerificationOverrides()).length!==1?'s':''}`;
     const storageEl = document.getElementById('bkStorage');
     const kb = getLocalStorageUsageKb();
     if(storageEl) storageEl.textContent = kb === null ? 'Unavailable' : `${kb.toLocaleString()} KB used`;
@@ -6554,6 +6597,8 @@ function resetData(){
     });
     const payload={
       version: UPGRADE_VERSION,
+      appVersion: APP_VERSION,
+      appBuild: APP_BUILD,
       exported: new Date().toISOString(),
       vin: VIN,
       vehicle: `${VEHICLE_PROFILE.year} ${VEHICLE_PROFILE.make} ${VEHICLE_PROFILE.model} ${VEHICLE_PROFILE.trim}`.replace(/\s+/g,' ').trim(),
@@ -6703,6 +6748,8 @@ function resetData(){
     }
     renderDashboardSmartSummary();
     renderBackup();
+    renderAppVersion();
+    showAppUpdatedNotice();
   });
 })();
 
