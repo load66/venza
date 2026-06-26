@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Venza">
+<meta name="theme-color" content="#23262f">
 <title>Venza Garage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -289,56 +290,44 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
 .alert.blue{background:rgba(34,114,212,.1);border:1px solid rgba(34,114,212,.25);color:var(--blue2)}
 
 /* ─── SERVICE LOG ──────────────────────────────────────────── */
-/* ─── SERVICE LOG CARDS ─────────────────────────────────────── */
-.log-item{background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
-.log-item:active{box-shadow:none}
-.log-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 10px;border-bottom:1px solid var(--border);gap:10px}
-.log-header-left{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
-.log-type-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.log-type-label{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.2px;color:var(--text);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.log-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
-.log-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}
-.log-mi-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.log-mi{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green2);font-weight:700;white-space:nowrap}
-.log-mi-delta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:1px 6px;white-space:nowrap}
-.log-body{padding:11px 14px}
-.log-desc{font-size:13px;color:var(--text2);line-height:1.6}
-.log-parts-wrap{margin:10px 14px 0;border:1px solid var(--border);border-radius:9px;overflow:hidden}
-.log-parts-head{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,.025);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3)}
-.log-parts-total{font-family:'JetBrains Mono',monospace;color:var(--orange2);font-size:11px;font-weight:700}
-.log-parts-grid{display:flex;flex-direction:column}
-.log-part{padding:8px 10px;border-top:1px solid var(--border)}
-.log-part-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.log-part-name{font-size:13px;color:var(--text);font-weight:600;line-height:1.4}
-.log-part-price{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange2);white-space:nowrap;font-weight:600}
-.log-part-meta{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}
-.log-part-link{font-size:10px;color:var(--blue2);text-decoration:none;display:inline-block;margin-top:4px}
-.log-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid var(--border);margin-top:10px;gap:8px}
-.log-footer-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
-.log-shop-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap}
-.log-shop-badge.diy{background:rgba(34,212,110,.1);color:var(--green2);border:1px solid rgba(34,212,110,.2)}
-.log-shop-badge.shop{background:rgba(34,114,212,.1);color:var(--blue2);border:1px solid rgba(34,114,212,.2)}
+.log-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-left:3px solid var(--green);
+  border-radius:10px;padding:14px 40px 14px 14px;margin-bottom:8px;
+  position:relative;
+  box-shadow:var(--shadow-sm);
+}
+.log-item.user-entry{border-left-color:var(--blue)}
+.log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}
+.log-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}
+.log-mi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green2);white-space:nowrap;font-weight:600}
+.log-type{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:14px;letter-spacing:1px;
+  color:var(--text);margin-bottom:4px;
+}
+.log-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.log-foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.log-shop{font-size:11px;color:var(--text3)}
+.log-cost{
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;font-weight:700;color:var(--orange2);
+}
 .log-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500}
-.log-footer-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.log-cost{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--orange2)}
-.log-cost-zero{color:var(--text3)}
-.log-actions{display:flex;gap:6px}
-.log-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;font-size:16px;border:1px solid var(--border2);background:var(--bg3);transition:all .18s;touch-action:manipulation;cursor:pointer}
-.log-btn:active{transform:scale(.92);opacity:.7}
-.log-btn.edit{color:var(--blue2);border-color:rgba(34,114,212,.3)}
-.log-btn.edit:active{background:rgba(34,114,212,.15)}
-.log-btn.del{color:var(--toyota2);border-color:rgba(235,10,30,.3)}
-.log-btn.del:active{background:rgba(235,10,30,.12)}
-.delete-btn{display:none}
-/* ─── EDIT ENTRY MODAL ─────────────────────────────────────── */
-#editEntryModal{z-index:550}
-.edit-parts-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-.edit-part-row{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px}
-.edit-part-row-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.edit-part-row-label{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.5px}
-.edit-part-remove{font-size:11px;color:var(--toyota);font-weight:700;padding:3px 8px;border:1px solid rgba(235,10,30,.25);border-radius:999px;touch-action:manipulation;cursor:pointer}
-.edit-part-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.edit-part-grid .span2{grid-column:1/-1}
+.delete-btn{
+  position:absolute;top:10px;right:10px;
+  color:#ffffff;
+  background:var(--toyota);
+  border-radius:50%;
+  width:22px;height:22px;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+  opacity:0.7;
+  line-height:1;
+}
+.delete-btn:hover{opacity:1;transform:scale(1.1)}
+.delete-btn:active{transform:scale(.95)}
 .total-row{
   background:var(--bg4);border:1px solid var(--border2);
   border-radius:12px;padding:14px 16px;
@@ -766,23 +755,11 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
   background:#1a1d23;border:1px solid #2d3142;
   border-radius:12px;padding:11px 20px;
   font-size:13px;color:#ffffff;font-weight:500;
-  z-index:600;opacity:0;transition:all .3s;pointer-events:none;
+  white-space:nowrap;z-index:600;
+  opacity:0;transition:all .3s;pointer-events:none;
   box-shadow:0 4px 20px rgba(0,0,0,.25);
-  max-width:calc(100vw - 32px);white-space:normal;text-align:center;line-height:1.5;
 }
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;cursor:pointer}
-/* ─── EMPTY LOG STATE ─────────────────────────────────────── */
-.log-empty{
-  text-align:center;padding:48px 24px;
-  background:var(--bg2);border:1px dashed var(--border2);
-  border-radius:14px;
-}
-.log-empty-icon{font-size:36px;margin-bottom:12px}
-.log-empty-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text);margin-bottom:6px}
-.log-empty-sub{font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:20px}
-/* ─── SHOP COST EDITABLE ─────────────────────────────────── */
-.fi.cost-manual{border-color:var(--blue2);background:rgba(34,114,212,.06)}
-.fi.cost-manual:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(34,114,212,.12)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ─── SCROLLBAR ────────────────────────────────────────────── */
 ::-webkit-scrollbar{width:0;height:0}
@@ -861,7 +838,7 @@ html.modal-open,body.modal-open{overflow:hidden}
   .mi-num{font-size:14px}
   .mi-label{font-size:8px}
 
-  .nav{gap:5px;padding:8px 8px 10px}
+  .nav{gap:5px;padding:8px 8px 10px;grid-template-columns:repeat(3,minmax(0,1fr))}
   .nav-btn{font-size:10px;min-height:40px;padding:8px 5px;border-radius:9px}
 
   .page{padding:12px;padding-bottom:calc(20px + var(--safe-bot))}
@@ -1001,6 +978,11 @@ html.modal-open,body.modal-open{overflow:hidden}
     </div>
   </div>
 
+  <div class="section-label">Smart Summary</div>
+  <div class="card"><div class="card-body" id="dSmartSummary">
+    <div class="row"><span class="row-key">Loading</span><span class="row-val">—</span></div>
+  </div></div>
+
   <div class="section-label">Quick Specs</div>
   <div class="card">
     <div class="card-body">
@@ -1034,81 +1016,6 @@ html.modal-open,body.modal-open{overflow:hidden}
   </div>
 </div>
 
-<!-- ═══ EDIT ENTRY MODAL ══════════════════════════════════════════ -->
-<div class="overlay" id="editEntryModal" onclick="if(event.target===this)closeEditModal()">
-  <div class="modal">
-    <div class="modal-grip"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0">
-      <div class="modal-title" style="margin-bottom:0">Edit Entry</div>
-      <button onclick="closeEditModal()" style="font-size:20px;color:var(--text3);padding:4px 8px;touch-action:manipulation">✕</button>
-    </div>
-    <div class="modal-scroll">
-      <input type="hidden" id="editEntryId">
-      <div class="fl">
-        <label>Service Type</label>
-        <select class="fs" id="editType">
-          <option value="oil">Oil Change</option>
-          <option value="tires">Tire Rotation</option>
-          <option value="cabin">Cabin Air Filter</option>
-          <option value="engine_filter">Engine Air Filter</option>
-          <option value="trans">Transmission Fluid D&F</option>
-          <option value="diff">Rear Differential D&F</option>
-          <option value="coolant">Engine Coolant Drain & Fill</option>
-          <option value="inv_coolant">Inverter Coolant Drain & Fill</option>
-          <option value="alignment">Wheel Alignment</option>
-          <option value="tires_new">New Tires</option>
-          <option value="brakes">Brake Service</option>
-          <option value="plugs">Spark Plugs</option>
-          <option value="hvfilter_inspect">HV Battery Cooling Filter — Inspect</option>
-          <option value="hvfilter_clean">HV Battery Cooling Filter — Clean</option>
-          <option value="valvomax">ValvoMax Drain Valve Install</option>
-          <option value="wipers">Wiper Blades</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="fg2">
-        <div class="fl"><label>Date</label><input type="date" class="fi" id="editDate"></div>
-        <div class="fl">
-          <label>Mileage</label>
-          <input type="number" class="fi" id="editMi" inputmode="numeric" autocomplete="off">
-        </div>
-      </div>
-      <div class="fl">
-        <label>Notes</label>
-        <textarea class="ft" id="editDesc" style="min-height:80px"></textarea>
-      </div>
-      <div class="fg2">
-        <div class="fl">
-          <label id="editCostLabel">Total Cost ($)</label>
-          <input type="number" class="fi" id="editCost" inputmode="decimal" step="0.01" min="0">
-          <div class="auto-cost-note" id="editCostNote">Enter total cost manually.</div>
-        </div>
-        <div class="fl">
-          <label>Where</label>
-          <select class="fs" id="editShop">
-            <option value="DIY">DIY</option>
-            <option value="SHOP">SHOP</option>
-          </select>
-        </div>
-      </div>
-      <label class="item-check" style="margin-bottom:4px">
-        <input type="checkbox" id="editExcludeFromAvg">
-        Exclude this entry from Average Service Cost
-        <span style="font-size:10px;color:var(--text3);display:block;margin-left:24px;margin-top:2px">Use for bundled bills that cover multiple services</span>
-      </label>
-      <!-- Purchased Parts -->
-      <div class="section-label" style="margin-top:16px">Purchased Parts</div>
-      <div id="editPartsList" class="edit-parts-list"></div>
-      <button type="button" class="item-add" style="margin-top:8px" onclick="addEditPartRow()">＋ Add Part</button>
-      <div style="height:16px"></div>
-    </div>
-    <div class="btn-row" style="flex-shrink:0;margin-top:12px">
-      <button class="btn-ghost" onclick="closeEditModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveEditEntry()">Save Changes</button>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ ADD ENTRY ════════════════════════════════════════════════ -->
 <div id="page-add" class="page">
   <div class="form-section">
@@ -1116,6 +1023,16 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="alert blue" style="margin-bottom:16px">
       <div class="alert-icon">💡</div>
       <div><strong>Super basic entry mode.</strong> Save only the date, mileage, service type, total cost, shop/DIY, optional notes, and an optional receipt photo.</div>
+    </div>
+    <div class="fg2">
+      <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
+      <div class="fl">
+        <label>Mileage</label>
+        <input type="number" class="fi" id="fMi" inputmode="numeric" autocomplete="off"
+               placeholder="—" oninput="onMileageInput(this.value)">
+        <div class="mi-hint" id="fMiHint"></div>
+        <div class="mi-warn" id="fMiWarn"></div>
+      </div>
     </div>
     <div class="fl">
       <label>Service Type</label>
@@ -1140,29 +1057,19 @@ html.modal-open,body.modal-open{overflow:hidden}
         <option value="other">Other</option>
       </select>
     </div>
-    <div class="fg2">
-      <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
-      <div class="fl">
-        <label>Mileage</label>
-        <input type="number" class="fi" id="fMi" inputmode="numeric" autocomplete="off"
-               placeholder="—" oninput="onMileageInput(this.value)">
-        <div class="mi-hint" id="fMiHint"></div>
-        <div class="mi-warn" id="fMiWarn"></div>
-      </div>
-    </div>
     <div class="fl">
-      <label>Notes <span style="font-weight:400;color:var(--text3)">(optional)</span></label>
-      <textarea class="ft" id="fDesc" placeholder="Quick notes about what was done — or leave blank and we'll fill it in for you"></textarea>
+      <label>Notes / Details</label>
+      <textarea class="ft" id="fDesc" placeholder="Quick notes about what was done..."></textarea>
     </div>
     <div class="fg2">
       <div class="fl">
-        <label id="fCostLabel">Total Cost ($)</label>
-        <input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01" min="0" readonly inputmode="decimal">
-        <div class="auto-cost-note" id="fCostNote">Auto-calculated from parts added below.</div>
+        <label>Total Cost for This Service ($)</label>
+        <input type="number" class="fi" id="fCost" placeholder="0.00" step="0.01" inputmode="decimal" min="0">
+        <div class="auto-cost-note">Auto-fills from purchased parts when added. You can override it for labor, shop invoices, or no-parts services.</div>
       </div>
       <div class="fl">
-        <label>Where</label>
-        <select class="fs" id="fShop" onchange="onShopChange(this.value)">
+        <label>Shop / DIY</label>
+        <select class="fs" id="fShop">
           <option value="DIY">DIY</option>
           <option value="SHOP">SHOP</option>
         </select>
@@ -1389,66 +1296,32 @@ html.modal-open,body.modal-open{overflow:hidden}
 <!-- ═══ GUIDES ════════════════════════════════════════════════════ -->
 <div id="page-guides" class="page">
 
-  <!-- OIL CHANGE (ValvoMax Installed) -->
+  <!-- OIL CHANGE -->
   <div class="guide-item" data-guide-id="oil_change" data-service-type="oil">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
-        <div class="guide-title">🛢️ Oil Change — ValvoMax Installed</div>
-        <div class="guide-meta">Every 5,000 mi · ~30 min · $34.54 · Mobil 1 0W-16 + filter 90915-YZZN1</div>
+        <div class="guide-title">🔧 Oil Change — ValvoMax</div>
+        <div class="guide-meta">Every 5,000 mi (custom) · ~30 min · $34.54 · Toyota spec: 10k/12 mo</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-warn"><strong>⚠ 0W-16 FULL SYNTHETIC ONLY:</strong> The hybrid engine uses a computer-controlled variable-speed oil pump calibrated for 0W-16. Using 0W-20 can interfere with pump calibration. Check the jug label every time — 0W-16 and 0W-20 look nearly identical on the shelf. Emergency one-time use of 0W-20 is acceptable; replace with 0W-16 at the very next change.</div>
-      <div class="g-info"><strong>Supplies:</strong> Mobil 1 0W-16 Full Synthetic 5 qt (~$27.97 Walmart) · OEM Filter 90915-YZZN1 (~$6.57 Toyota Parts) · ValvoMax Starter Kit drain bag · Nitrile gloves + rags</div>
-      <div class="g-gold"><strong>Torque Reference:</strong> Oil filter: <code>13 ft-lbs / 18 Nm</code> (or hand-snug + ¾ turn) · Access panel screws: snug only — do not overtighten plastic · ValvoMax valve: already permanent, never re-torque</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Verify oil label before opening</strong> — confirm <code>0W-16</code> in bold. Do not proceed with wrong viscosity.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Warm engine 5–10 min, then cool 10–15 min</strong> — warm oil drains faster and carries more contaminants out. Cool enough to work safely.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Drive onto ramps on flat concrete</strong> — front wheels fully seated on VEVOR ramps. Apply parking brake firmly. Place wheel chocks behind both rear tires.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Crack oil filler cap counterclockwise</strong> — just enough to break vacuum seal. Leave cap resting in place. This allows oil to drain without air lock.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Remove underbody access panel</strong> — 4 screws, <code>10mm socket</code>. Keep screws in your pocket so they don't roll away.</div></div>
-      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Attach ValvoMax drain bag and open valve</strong> — thread drain tube counterclockwise onto valve until it seats. Oil begins flowing automatically. Walk away for <strong>15 full minutes</strong>. No tools, no mess — unscrew tube to stop flow instantly.</div></div>
-      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Swap oil filter while draining</strong> — Smart Jerry 64mm wrench, <strong>HEX side only</strong> to break loose (never the square 3/8″ drive hole — can fracture housing). Apply thin film of fresh 0W-16 to new filter O-ring. Hand-thread new filter until O-ring contacts housing, then <strong>¾ turn more only</strong>. Torque spec: <code>13 ft-lbs / 18 Nm</code>. Never install with wrench.</div></div>
-      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Close ValvoMax valve</strong> — once oil flow stops (~15 min), unscrew drain tube counterclockwise. Oil stops the instant tube disengages. Thread steel safety cap back on finger-tight.</div></div>
-      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall underbody panel</strong> — snap panel back up. 4 screws, <code>10mm</code>, snug only. Do not overtighten — plastic panel bosses can crack.</div></div>
-      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Lower vehicle, fill with 4.5 qt of 0W-16</strong> — drive off ramps carefully. Use funnel, pour into filler neck. Reinstall filler cap.</div></div>
-      <div class="step"><div class="step-n">11</div><div class="step-t"><strong>Check dipstick and top off</strong> — wipe yellow dipstick clean, reinsert fully until seated, pull again. Add oil in ¼-qt increments to reach upper hole. Total target: <strong>4.8 qt</strong>. Never overfill — overfill causes foaming and engine damage.</div></div>
-      <div class="step"><div class="step-n">12</div><div class="step-t"><strong>Start engine, idle 60–90 sec, inspect for leaks</strong> — oil pressure light may briefly stay on while passages fill (normal). Shut off, inspect under car. Completely dry around valve and filter. If any drip from ValvoMax: tighten ¼ turn at a time, max 18 ft-lbs total.</div></div>
-      <div class="step"><div class="step-n">13</div><div class="step-t"><strong>Final dipstick check after 5 min</strong> — wait 5 minutes after shutdown, then verify oil level one final time at upper hole.</div></div>
-      <div class="step"><div class="step-n">14</div><div class="step-t"><strong>Reset oil life monitor</strong> — Settings → Vehicle → Maintenance Reset → Oil Maintenance Required. Write next due mileage (current + 5,000) on ValvoMax sticker.</div></div>
-      <div class="step"><div class="step-n">15</div><div class="step-t"><strong>Dispose of used oil free</strong> — AutoZone 1024 S Madison, Webb City (M–Sa 7:30AM–8PM, Su 8AM–8PM) or O'Reilly 1001 S Madison, Webb City (M–Sa 7:30AM–9PM). Bring in any sealed container. Used filters also accepted.</div></div>
-      <div class="g-tip">💡 <strong>Dipstick reference:</strong> Upper hole = FULL. Lower hole = ADD 1 qt. Below lower = critical, do not drive. Above upper = overfilled, drain some out. Always check on level ground — wipe, reinsert fully, pull again. First pull right after filling gives false high reading.</div>
-    </div>
-  </div>
-
-  <!-- VALVOMAX FIRST-TIME INSTALL -->
-  <div class="guide-item" data-guide-id="valvomax_install" data-service-type="valvomax">
-    <div class="guide-head" onclick="toggleGuide(this)">
-      <div class="guide-head-left">
-        <div class="guide-title">🔩 ValvoMax — First-Time Install</div>
-        <div class="guide-meta">One-time only · Do during first oil change · Valve stays permanent forever</div>
-      </div>
-      <div class="guide-chevron">▾</div>
-    </div>
-    <div class="guide-body">
-      <div class="g-warn"><strong>⚠ ONE-TIME PROCEDURE:</strong> Do this ONCE during your first oil change. After the ValvoMax is installed, skip to the regular Oil Change guide above for every future service. The valve stays permanent — never remove it.</div>
-      <div class="g-info"><strong>What you need:</strong> ValvoMax M12-1.25 Quick Twist valve · ValvoMax Starter Kit drain bag · 14mm socket (OEM plug removal, this time only) · 24mm socket · 1/2″ drive torque wrench (10–150 ft-lb) · 10mm socket (access panel) · Clean rag</div>
-      <div class="g-gold"><strong>Torque Reference:</strong> OEM drain plug (removed this time only): <code>30 ft-lbs</code> · ValvoMax M12-1.25 (one time only, permanent): <code>16–18 ft-lbs</code> · Oil filter: <code>13 ft-lbs / 18 Nm</code> or hand + ¾ turn · Access panel screws: snug only</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Warm engine 5–10 min, then cool 10–15 min</strong> — warm oil drains faster and carries more contaminants out. Do not drain scalding oil. Let cool until safe to touch.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Drive onto ramps on flat, level concrete</strong> — VEVOR ramps on flat surface. Drive slowly until front wheels are fully seated on top. Set parking brake. Chocks behind both rear wheels. Never work under a vehicle supported only by a floor jack.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Crack oil filler cap counterclockwise</strong> — just enough to break vacuum seal. Leave resting in filler neck. Allows oil to drain freely without air lock.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Remove underbody access panel</strong> — <code>10mm socket</code>, 4 screws. Set screws somewhere safe.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Attach ValvoMax drain bag, then remove OEM drain plug</strong> — connect Starter Kit drain bag per ValvoMax instructions. Use <code>14mm socket</code> to remove OEM drain plug counterclockwise. Torque reference (for info only): OEM reinstall would be <code>30 ft-lbs</code>. Let oil drain fully — <strong>15+ minutes</strong>. Keep the OEM drain plug as a spare.</div></div>
-      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Clean drain port threads thoroughly</strong> — use clean, dry rag to wipe out the drain opening. Remove any old gasket material or grit. Threads must be clean and dry for the ValvoMax O-rings to seat correctly.</div></div>
-      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Hand-thread ValvoMax M12-1.25 straight into drain port</strong> — thread in straight by hand, do NOT cross-thread. Rotate the valve body 360° to choose the drain port orientation for convenient future access. <em>Position chosen now is permanent.</em></div></div>
-      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Torque to exactly 16–18 ft-lbs</strong> using <code>24mm socket</code> and 1/2″ drive torque wrench. Do NOT exceed 18 ft-lbs — overtightening can damage the O-ring sealing surface. <em>This is the only time you will ever torque this valve. It stays here permanently.</em></div></div>
-      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Swap oil filter</strong> — Smart Jerry 64mm wrench, HEX side only to break loose, then hand-unscrew. Apply thin film of fresh 0W-16 to new filter O-ring. Hand-thread until O-ring contacts housing, then <strong>¾ turn more</strong>. Torque spec: <code>13 ft-lbs / 18 Nm</code>. Never use wrench to install.</div></div>
-      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Reinstall access panel</strong> — snap panel back up. <code>10mm</code>, 4 screws, snug only.</div></div>
-      <div class="step"><div class="step-n">11</div><div class="step-t"><strong>Lower vehicle, fill with 4.5 qt of 0W-16</strong> — drive off ramps. Use funnel into filler neck. Reinstall filler cap finger-tight.</div></div>
-      <div class="step"><div class="step-n">12</div><div class="step-t"><strong>Dipstick check — top off to upper hole</strong> — wipe, reinsert fully, pull again. Add in ¼-qt increments. Total target: <strong>4.8 qt</strong>. Slightly under full is better than overfilled.</div></div>
-      <div class="step"><div class="step-n">13</div><div class="step-t"><strong>Start engine, idle 60–90 sec, inspect for leaks</strong> — oil pressure light may briefly stay on (normal, passages filling). Shut off after 90 sec. Inspect under car: ValvoMax and filter must be completely dry. If any drip from ValvoMax: tighten ¼ turn at a time, max 18 ft-lbs total.</div></div>
-      <div class="step"><div class="step-n">14</div><div class="step-t"><strong>Final dipstick check after 5 min, reset oil monitor</strong> — wait 5 min after shutdown, verify at upper hole. Reset: Settings → Vehicle → Maintenance Reset → Oil. Write next service mileage on ValvoMax sticker.</div></div>
-      <div class="g-tip">💡 No crush washer needed on any future oil change — the ValvoMax VITON O-ring triple seal is the permanent seal. All future drains: thread on drain tube → oil flows → unscrew tube → oil stops instantly. No tools, no mess, no crush washer ever again.</div>
+      <div class="g-warn"><strong>⚠ OIL ONLY:</strong> SAE 0W-16 Full Synthetic — Mobil 1 5 qt from Walmart. The 0W-20 label looks nearly identical. Verify before pouring. Toyota manual confirms: 0W-20 only acceptable as one-time emergency substitute.</div>
+      <div class="g-info"><strong>Parts:</strong> Mobil 1 0W-16 (5 qt) · Filter 90915-YZZN1 · ValvoMax drain bag kit · Fresh gloves + rags</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Confirm oil label</strong> — verify <code>0W-16</code> in bold on jug. Double-check before opening.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Warm engine 5–10 min</strong>, then shut off and cool 10–15 min. Oil should be warm (flows better) but not scalding hot.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Drive onto ramps</strong>, apply parking brake firmly, place wheel chocks behind rear tires.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Crack oil filler cap</strong> on top of engine — do not remove, just loosen to allow air flow during drain.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Remove undercover panel</strong> — 4 screws, <code>10mm socket</code>. Snug only when reinstalling. Never overtighten plastic fasteners.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Attach ValvoMax drain bag</strong> — screw drain tube onto valve clockwise. Oil flows automatically. Let drain <strong>15 full minutes</strong> for complete drain.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Swap filter while draining</strong> — Smart Jerry wrench, <strong>HEX side only</strong> to break loose (never use the square drive to loosen — can fracture). Hand-thread new filter then tighten to <code>13 ft-lbs</code> (18 Nm) or hand-snug + ¾ turn.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Close drain valve</strong> — unscrew drain tube counterclockwise. Oil stops instantly. Reinstall the steel safety cap hand-tight.</div></div>
+      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall undercover</strong> — 4 screws, 10mm, finger-snug only. Do not torque plastic.</div></div>
+      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Lower vehicle, add 4.5 qt</strong> of 0W-16. Start engine, idle 60–90 sec, shut off. Wait 5 min. Check dipstick — top off to <strong>upper hole</strong>. Total target: 4.8 qt.</div></div>
+      <div class="step"><div class="step-n">11</div><div class="step-t"><strong>Visual leak check</strong> — inspect under car around drain valve and filter. Should be completely dry.</div></div>
+      <div class="step"><div class="step-n">12</div><div class="step-t"><strong>Reset oil life</strong> — Settings → Vehicle → Maintenance Reset → Oil Maintenance Required.</div></div>
+      <div class="step"><div class="step-n">13</div><div class="step-t"><strong>Dispose free</strong> at AutoZone or O'Reilly in Webb City. Sealed container — they pump it out and accept used filters too.</div></div>
+      <div class="g-tip">💡 <strong>Dipstick (yellow handle):</strong> Upper hole = FULL. Lower hole = ADD. Always wipe, reinsert fully, pull again — first pull gives false high reading. Slightly under full is safer than overfilled.</div>
     </div>
   </div>
 
@@ -1457,24 +1330,24 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🌡️ Engine Coolant Drain & Fill</div>
-        <div class="guide-meta">Due ~100,000 mi / 120 months first change · Toyota SLLC pink pre-mixed 50/50</div>
+        <div class="guide-meta">Due ~100,000 mi / 120 months · Car Care Nut method</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-warn"><strong>⚠ FLUID ONLY:</strong> Toyota Super Long Life Coolant (SLLC) Part# 00272-SLLC2 — pink, pre-mixed 50/50. DO NOT use universal green/orange coolants. Toyota specifies non-silicate, non-amine, non-borate ethylene-glycol with long-life hybrid organic acid technology (HOAT).</div>
-      <div class="g-info"><strong>Important — Two Separate Systems:</strong> The Venza Hybrid has TWO independent cooling loops: Engine coolant (100k first change) and Inverter coolant (150k first change). Both use Toyota SLLC pink. Best reference videos: 2019+ RAV4 Hybrid coolant change — same A25A-FXS engine.</div>
-      <div class="g-gold"><strong>Parts & Tools:</strong> Toyota SLLC #00272-SLLC2 (pre-mixed 50/50) · Lisle 24680 spill-free funnel · 5/16″ ID drain hose · Drain pan · Petcock is at radiator bottom — no torque spec, hand-snug only when closing</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Let engine cool completely</strong> — minimum 2 hours after driving. Opening a hot pressurized cooling system causes serious burns.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Locate radiator petcock</strong> at the bottom of the radiator. Attach a <code>5/16″ ID hose</code> to the petcock spout to direct coolant into drain pan. Open petcock — drain fully.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>No water flush needed</strong> — Toyota manual and Car Care Nut method: straight drain-and-refill is correct procedure. Flushing with water dilutes the new coolant unnecessarily on a well-maintained system.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Close petcock finger-snug</strong> once fully drained. Do not overtighten — plastic petcock threads are easy to strip.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Attach Lisle 24680 spill-free funnel</strong> to radiator fill neck. This funnel prevents air pockets and messy overfill spills during bleeding.</div></div>
-      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Fill with Toyota SLLC through the funnel</strong> until funnel stays consistently full. Leave funnel attached during the bleeding step.</div></div>
-      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Activate Maintenance Mode</strong> to run gas engine for air bleeding. Sequence: Gas pedal 2× → Neutral → 2× → Park → 2× → Start. Engine will run in gas mode with coolant circulating.</div></div>
-      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Hold ~2,000 RPM until cooling fan cycles twice</strong> — add coolant to funnel as level drops. Air is purging from the system. Fan cycling twice confirms the thermostat has opened and the system is fully bled.</div></div>
-      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Remove funnel, install radiator cap</strong>. Let engine cool completely, then check coolant reservoir — top off to FULL line with Toyota SLLC if needed.</div></div>
-      <div class="g-tip">💡 Inverter coolant service is separate at ~150k miles. The inverter cooling loop has its own reservoir and bleeding procedure (consult owner's manual for reservoir location). Both systems use identical Toyota SLLC pink coolant.</div>
+      <div class="g-warn"><strong>⚠ FLUID ONLY:</strong> Toyota Super Long Life Coolant (SLLC) Part# 00272-SLLC2 — pink, pre-mixed 50/50. DO NOT use universal green/orange coolants. Toyota manual specifies SLLC or "similar non-silicate, non-amine, non-borate ethylene-glycol with long-life hybrid organic acid technology."</div>
+      <div class="g-info"><strong>Important:</strong> Venza Hybrid has TWO separate cooling systems — Engine coolant (100k first replacement) and Inverter coolant (150k first replacement). Both use Toyota SLLC pink. Best reference videos: search "2019+ RAV4 Hybrid coolant change" — same A25A-FXS engine.</div>
+      <div class="g-gold"><strong>Tools needed:</strong> Lisle 24680 spill-free funnel · 5/16" ID drain hose · Drain pan · Toyota SLLC coolant</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Let engine cool completely</strong> — minimum 2 hours after driving. Opening hot coolant system is dangerous.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Locate radiator petcock</strong> at bottom of radiator. Attach a <code>5/16" ID hose</code> to direct coolant into drain pan. Open petcock — drain fully.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>No water flush needed</strong> — Toyota manual and Car Care Nut method: straight drain and refill is correct. Flushing with water is unnecessary on a properly maintained cooling system.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Close petcock</strong> once fully drained.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Attach Lisle 24680</strong> spill-free funnel to radiator fill neck. This prevents air pockets and messy spills.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Fill with Toyota SLLC</strong> (pre-mixed 50/50) through the funnel until the funnel stays consistently full. Leave funnel attached.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Activate Maintenance Mode</strong> — required to run gas engine for air bleeding. Sequence: Gas pedal 2x → Neutral → 2x → Park → 2x → Start. Engine will run in gas mode.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Hold ~2,000 RPM</strong> until the cooling fan cycles <strong>twice</strong>. Continue adding coolant to funnel as the level drops — air is purging from the system.</div></div>
+      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Remove funnel, cap off</strong>. Let engine cool completely. Check coolant reservoir — top off to FULL line with Toyota SLLC if needed.</div></div>
+      <div class="g-tip">💡 Inverter coolant service is separate at ~150k miles. The inverter cooling system has its own reservoir (check your owner's manual for location). Both reservoirs take the same Toyota SLLC pink coolant.</div>
     </div>
   </div>
 
@@ -1483,19 +1356,19 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">💨 Cabin Air Filter</div>
-        <div class="guide-meta">~15,000 mi (custom) · Toyota spec: 30,000 mi · ~5 min · No tools</div>
+        <div class="guide-meta">~15,000 mi (custom) · Toyota spec: 30k · ~5 min DIY</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-info"><strong>Part:</strong> A-Premium Activated Carbon APCA4605 (Item #1004KW2G) — $11.18 at a-premium.com. Activated carbon removes odors in addition to dust and pollen. No torque specs — no tools required for this job.</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Open glove box and empty completely</strong> — remove all contents before proceeding.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Squeeze sides of glove box inward</strong> — compresses the side pins past the stops, allowing the box to lower fully past the normal open position.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Remove filter housing cover</strong> — unclip or slide the rectangular cover behind the open glove box opening. Set aside.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Note the airflow direction arrow on the old filter</strong> before removing. The new filter must match this orientation exactly.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Slide out old filter, insert new filter</strong> with arrow pointing in the same direction (typically toward cabin/blower). Seat flat with no gaps — unfiltered air bypassing the edges reduces filtration effectiveness.</div></div>
-      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Replace housing cover, restore glove box</strong> — squeeze sides to click back into stops. Done. No tools required.</div></div>
-      <div class="g-tip">💡 Toyota manual: "Replace sooner if airflow from A/C is reduced or windows fog in Fresh mode." Also replace sooner if driving frequently in heavy traffic, on dirt roads, or in dusty areas.</div>
+      <div class="g-info"><strong>Part:</strong> A-Premium Activated Carbon APCA4605 — $11.18. Activated carbon removes odors in addition to dust and pollen. Toyota manual notes: replace sooner if airflow from A/C is reduced or windows fog in Fresh mode.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Open glove box</strong> and completely empty its contents.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Squeeze sides of glove box</strong> inward — this compresses the side pins past the stops. Lower the glove box door fully.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Remove filter housing cover</strong> — unclip or slide the rectangular cover behind the open glove box opening.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Slide out old filter</strong>. Note the <strong>airflow direction arrow</strong> on the filter frame — the new one must match.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Insert new filter</strong> with arrow pointing in the same direction (typically toward the cabin/blower). Seat flat with no gaps at the edges.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Replace cover, restore glove box</strong>. Squeeze sides again to click back into stops. Done — no tools required.</div></div>
+      <div class="g-tip">💡 Toyota manual footnote: "Driving in heavy traffic, on dirt roads or in urban, dusty or desert areas may shorten filter life." If you notice reduced A/C airflow or foggy windows in Fresh mode, replace sooner regardless of mileage.</div>
     </div>
   </div>
 
@@ -1504,44 +1377,46 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🌬️ Engine Air Filter</div>
-        <div class="guide-meta">Toyota spec: 30,000 mi · Part# 17801-YZZ16 · ~5 min · No torque specs</div>
+        <div class="guide-meta">~30,000 mi per Toyota manual · Part# 17801-YZZ16</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-info"><strong>Part:</strong> Toyota OEM #17801-YZZ16 (105A Element) — $17.11 at Frank Fletcher Toyota Parts. Toyota manual: inspect for damage, excessive wear, and oiliness at 30k intervals. No torque specs — spring-clip housing, no tools required.</div>
+      <div class="g-info"><strong>Part:</strong> Toyota OEM #17801-YZZ16 — $15.59 at Frank Fletcher Toyota Parts. Toyota manual says: inspect for damage, excessive wear, and oiliness — replace if necessary at 30k intervals.</div>
       <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Open hood</strong>. Locate the air filter box — black rectangular plastic housing toward the front/side of the engine bay.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Release spring clips</strong> on each side of the air box lid — press outward to release. Open lid fully.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Remove old filter</strong>. Use a dry cloth to wipe out any debris from the housing interior before installing the new one.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Insert new filter</strong> — all 4 edges must seat flat against the housing with no gaps. Any gap allows unfiltered air into the engine, bypassing the filter entirely.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Close lid, secure all clips</strong>. Confirm each clip is fully seated. Done.</div></div>
-      <div class="g-tip">💡 Quick inspection: hold old filter up to a bright light. If you cannot easily see light through it, replace regardless of mileage. Also replace if you see oil contamination on the filter — that indicates an engine issue worth investigating.</div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Release the clips</strong> securing the air box lid — typically spring clips on each side. Open the lid.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Remove old filter</strong>. Inspect the housing interior and wipe out any debris with a dry cloth.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Insert new filter</strong> — ensure all 4 edges seat flat against the housing with no gaps that could let unfiltered air bypass.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Close lid, secure clips</strong>. Done — no tools required for most clip-style housings.</div></div>
+      <div class="g-tip">💡 Quick inspection method: hold the old filter up to a light source. If you can't easily see light through it, it's due for replacement regardless of mileage interval.</div>
     </div>
   </div>
+
 
   <!-- SPARK PLUGS -->
   <div class="guide-item" data-guide-id="spark_plugs" data-service-type="plugs">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">⚡ Spark Plugs</div>
-        <div class="guide-meta">Toyota interval: 120,000 mi · Qty 4 · OEM: 90919-01289 · Torque: 18 ft-lbs</div>
+        <div class="guide-meta">Toyota interval: 120,000 mi / 144 months · Qty 4 · OEM plug: 90919-01289</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-warn"><strong>⚠ COLD ENGINE ONLY + HYBRID SAFETY:</strong> Do this on a fully cooled engine — aluminum cylinder head can be damaged by hot plug removal. Keep key away from engine bay — hybrid system can wake up and energize HV components. Do NOT touch orange wiring or connectors at any time.</div>
-      <div class="g-info"><strong>OEM plug:</strong> Toyota <code>90919-01289</code> (replaces 90919-A1001) · Denso <code>FC16HR-Q8</code> equivalent · Qty: <strong>4 plugs</strong></div>
-      <div class="g-gold"><strong>Torque Reference:</strong> Spark plug: <code>18 ft-lbs / 25 N·m</code> · Ignition coil bolt: <code>80 in-lbs / 9 N·m</code> (10mm) · Tools: 14mm thin-wall spark plug socket · 10mm socket · 3/8″ ratchet · 6″ extension · torque wrench</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Cool engine fully, remove engine cover</strong> — open hood, remove plastic engine cover (spring clips or bolts depending on trim). Place key far away from engine bay.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Locate 4 ignition coils</strong> on top of the inline-4 engine. Each coil sits directly over one spark plug well.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Work one cylinder at a time</strong> — unplug the coil connector (press lock tab), remove single <code>10mm</code> coil bolt, torque spec: <code>80 in-lbs / 9 N·m</code>. Twist and pull coil straight up. Check coil boot for oil, cracking, or carbon tracking.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Clean plug well before opening</strong> — blow out the spark plug tube with compressed air or vacuum it out. Critical step — keeps grit out of the cylinder.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Remove old plug</strong> with <code>14mm thin-wall spark plug socket</code> + 6″ extension. Break loose gently (cold aluminum), then spin out by hand.</div></div>
-      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Verify new plug matches</strong> — Toyota <code>90919-01289</code> / Denso <code>FC16HR-Q8</code>. Hand-start new plug until it spins in freely. If resistance is felt immediately, stop and restart — cross-threading aluminum heads is a serious repair.</div></div>
-      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Torque new plug to <code>18 ft-lbs / 25 N·m</code></strong> with 14mm plug socket and torque wrench. Do not overtighten — aluminum head threads are easily damaged.</div></div>
-      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Reinstall ignition coil</strong> — reseat coil in well, torque bolt to <code>80 in-lbs / 9 N·m</code>, reconnect electrical plug until it clicks. Repeat steps 3–8 for remaining 3 cylinders.</div></div>
-      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall engine cover, start vehicle</strong> — confirm smooth idle, no warning lights. If misfire appears immediately, shut off and recheck coil connectors.</div></div>
-      <div class="g-tip">💡 Replace all 4 as a set, one cylinder at a time. Never leave a plug out while moving to the next — keeping them in sequence prevents mix-ups. Log the service immediately so the app resets your next spark plug interval.</div>
+      <div class="g-warn"><strong>⚠ ENGINE COLD ONLY:</strong> Do this on a fully cooled engine. The cylinder head is aluminum, so do not rush plug removal on a hot engine. Do not touch any orange hybrid high-voltage wiring or connectors.</div>
+      <div class="g-info"><strong>OEM plug:</strong> Toyota <code>90919-01289</code> (replaces <code>90919-A1001</code>) · Denso <code>FC16HR-Q8</code> equivalent · quantity <strong>4</strong>.</div>
+      <div class="g-gold" id="sparkToolsNeeded"><strong>Tools needed:</strong> 10mm socket for coil bolts · 14mm thin-wall spark plug socket · 3/8" ratchet · 6" extension · small wobble extension helpful · torque wrench that can do <code>18 ft-lbs</code> / <code>25 N·m</code> · compressed air or vacuum · trim tool to remove engine cover clips if needed.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Let the engine cool fully</strong>, open the hood, and remove the plastic engine cover. Keep the key away from the engine bay so the hybrid system cannot wake up while you work.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Locate the 4 ignition coils</strong> on top of the inline-4 engine. Each coil sits directly over one spark plug.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Unplug one coil at a time</strong> so parts do not get mixed up. Press the connector lock tab, then remove the single <code>10mm</code> coil bolt.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Twist and lift the coil straight out</strong>. Check the coil boot for oil, cracking, or carbon tracking before reinstalling.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Blow out the spark plug tube</strong> with compressed air or vacuum it before removing the plug. This keeps dirt from dropping into the cylinder.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Remove the old plug</strong> using a <code>14mm thin-wall spark plug socket</code> with extension. Break it loose gently, then spin it out by hand.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Verify the new plug</strong> matches the old one: Toyota <code>90919-01289</code> / Denso <code>FC16HR-Q8</code>. Install the new plug by hand first so it threads smoothly. If it does not spin in easily, back it out and restart to avoid cross-threading.</div></div>
+      <div class="step"><div class="step-n">8</div><div class="step-t" id="sparkTorqueStep"><strong>Torque the new plug</strong> to <code>18 ft-lbs</code> (<code>25 N·m</code>). A 14mm plug socket and proper torque matter here because overtightening can damage the aluminum head.</div></div>
+      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Reinstall the ignition coil</strong>, then snug the coil bolt and reconnect the electrical plug. Repeat the same process for the remaining 3 cylinders.</div></div>
+      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Reinstall the engine cover</strong>, start the vehicle, and confirm smooth idle with no warning lights. If a misfire appears right away, shut it off and recheck the coil connector seating.</div></div>
+      <div class="g-tip">💡 <strong>Best practice:</strong> replace all 4 plugs as a set, one cylinder at a time. Log the service at completion so the app resets your next spark plug interval from the actual mileage and date.</div>
     </div>
   </div>
 
@@ -1550,17 +1425,17 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🔋 HV Battery Cooling Filter</div>
-        <div class="guide-meta">Inspect every 5,000 mi · Clean every 20,000 mi · Per Toyota manual · Near rear seat</div>
+        <div class="guide-meta">Inspect every 5,000 mi · Clean every 20,000 mi · Per Toyota manual</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-gold"><strong>Toyota Manual:</strong> "Visually check the HV battery cooling intake filter for dirt or dust every 5,000 miles and clean if necessary. Clean every 20,000 miles." No torque specs — no fasteners on filter itself. Cover clips are hand-pressure only.</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Locate HV battery cooling intake</strong> — near the rear seat area (consult owner's manual for exact location on your Venza trim). The filter protects the HV battery from dust intake.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Every 5,000 mi — Inspect:</strong> Visually check for visible dust buildup, lint, or debris clogging the mesh. If lightly dusty, a gentle tap or light vacuum from outside is sufficient — no disassembly needed.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Every 20,000 mi — Full clean:</strong> Remove cover (press-fit clips, hand pressure only). Take out filter element. Clean with low-pressure compressed air from inside-out, or soft brush. Do NOT use water or any wet cleaning method.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Reinstall filter and cover</strong> — ensure no gaps. Unfiltered air entering the battery cooling path accelerates battery degradation over time.</div></div>
-      <div class="g-tip">💡 This is the most commonly neglected hybrid-specific maintenance item. A clogged filter causes the HV battery to run hotter, directly shortening battery pack life. A pack replacement on a 2021 Venza is a multi-thousand dollar repair.</div>
+      <div class="g-gold"><strong>Toyota Manual says:</strong> "Visually check the HV battery cooling intake filter for dirt or dust every 5,000 miles and clean if necessary. Clean every 20,000 miles." This is critical for hybrid battery longevity.</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t" id="hvFilterLocationStep"><strong>Locate the HV battery cooling intake</strong> — locate it using your owner's manual before trim removal. Interior layout references can vary by exact Venza configuration.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Every 5,000 mi — Inspect:</strong> Visually check for visible dust buildup, lint, or debris. If lightly dusty, a gentle tap or light vacuum is sufficient.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Every 20,000 mi — Clean:</strong> Remove the filter cover, take out the filter element, and clean with low-pressure air or a soft brush. Do not use water or wet cleaning.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Reinstall filter and cover</strong>. Ensure no gap that could allow unfiltered air into the battery cooling system.</div></div>
+      <div class="g-tip">💡 A clogged HV battery cooling filter can cause the hybrid battery to run hotter, which reduces battery life over time. This is one of the few hybrid-specific maintenance items that matters long-term.</div>
     </div>
   </div>
 
@@ -1569,82 +1444,64 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">🔄 Tire Rotation</div>
-        <div class="guide-meta">Every 5,000 mi · Lug nut torque: 80 ft-lbs · AWD forward-cross pattern</div>
+        <div class="guide-meta">Every 5,000 mi · Lug nut torque: 80 ft-lbs</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-info"><strong>AWD Pattern — Forward Cross:</strong> Rear tires move straight to the front same side. Front tires cross to opposite rear (RF → LR, LF → RR). This is the correct pattern for AWD vehicles per Toyota manual.</div>
-      <div class="g-gold"><strong>Torque Reference:</strong> Lug nuts: <code>80 ft-lbs / 108 N·m</code> · Thread: M12-1.5 · Socket: <code>21mm</code> · Torque in star/cross pattern (never circular) · Target pressure: <code>33 PSI</code> all four corners (cold)</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Loosen all lug nuts with vehicle on ground</strong> — break loose only, do not remove. Breaking loose while the tire is on the ground prevents hub rotation. Use 21mm socket.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Lift and support one corner at a time</strong> — place jack stand under pinch weld (see owner's manual for correct jack point). Never work under a vehicle supported only by a floor jack.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Swap per forward-cross pattern</strong> — while wheels are off, inspect brake pads for wear indicator grooves and rotors for deep scoring, heat cracks, or heavy rust.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Hand-thread lug nuts in star pattern</strong> — never thread in circular order. Lower vehicle until tire contacts ground but doesn't carry full weight.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Torque lug nuts to <code>80 ft-lbs</code> in star pattern</strong> — lower fully, then do a final torque pass on all 5 lug nuts per wheel. Do not use impact gun for final torque.</div></div>
-      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Check and set tire pressure</strong> — target <code>33 PSI</code> cold all four corners. Check TPMS light after driving to confirm sensors reset.</div></div>
-      <div class="g-tip">💡 Current tread depth as of 02/24/26: LF/RF/LR at 6/32″, RR at 7/32″. Toyota recommends replacement at 2/32″. Plan new tires with a simultaneous alignment to maximize tire life from the start.</div>
+      <div class="g-info"><strong>AWD Pattern — Forward Cross:</strong> Rear tires move straight to the front. Front tires cross to opposite rear (RF → LR, LF → RR).</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Loosen all 5 lug nuts per wheel</strong> while tires are still on the ground — break them loose only, don't remove yet.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Jack up and support</strong> one corner at a time. Place jack stand under pinch weld point. Never work under a car on just a jack.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Swap per forward cross pattern</strong>. While wheels are off, visually inspect brake pads for wear and rotors for scoring or rust.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Hand-thread lug nuts</strong> in a star/cross pattern (never circular). Lower vehicle until tire contacts ground but doesn't fully carry weight.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Torque to <code>80 ft-lbs</code></strong> in star pattern with torque wrench. Lower fully, then do a final torque check on each lug.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Check tire pressures</strong> — target <code>33 PSI</code> all four corners. Top up if needed.</div></div>
+      <div class="g-tip">💡 Current tread depth as of 02/24/26: LF/RF/LR at 6/32", RR at 7/32". Toyota recommends replacement at 2/32". Plan for new tires together with alignment to maximize value.</div>
     </div>
   </div>
 
-  <!-- SPARE TIRE CHANGE -->
-  <div class="guide-item" data-guide-id="spare_tire_change">
+  <!-- VALVOMAX INSTALL -->
+  <div class="guide-item" data-guide-id="valvomax_install" data-service-type="valvomax">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
-        <div class="guide-title">🚨 Spare Tire Change — Emergency</div>
-        <div class="guide-meta">Compact spare · Max 50 mph · Get to a shop same day · AWD affected</div>
+        <div class="guide-title">🔩 ValvoMax — First-Time Install</div>
+        <div class="guide-meta">One-time only · Confirm torque at valvomax.com first</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-warn"><strong>⚠ COMPACT SPARE LIMITS — READ BEFORE DRIVING:</strong> The Venza's spare is a temporary "donut" marked <em>TEMPORARY USE ONLY</em> on the sidewall. Maximum speed: <strong>50 mph (80 km/h)</strong> — no exceptions. Do NOT use on highways at highway speed. Replace with a full-size tire as soon as possible — same day if at all possible. Do NOT fit tire chains to the compact spare.</div>
-      <div class="g-warn"><strong>⚠ AWD WARNING:</strong> The compact spare has a different diameter than your regular tires. While the spare is installed, the AWD system cannot operate correctly and may be damaged by extended use. Avoid prolonged driving. Drive gently — no hard acceleration, abrupt steering, or sudden braking.</div>
-      <div class="g-info"><strong>Venza-specific rule — REAR FLAT:</strong> Mount spare directly on the rear. <strong>FRONT FLAT:</strong> Move a rear tire to the front flat position first, then mount the spare on the rear. The spare must always go on the rear axle — never the front.</div>
-      <div class="g-gold"><strong>Torque &amp; Specs:</strong> Lug nuts: <code>76 ft-lbs / 103 N·m</code> (per Toyota owner's manual — torque as soon as you reach a shop) · Socket: <code>21mm</code> · Spare tire pressure: <code>60 PSI</code> (check label on spare sidewall to confirm) · Jack socket: <code>17mm</code> built into lug wrench handle</div>
-
-      <div class="section-label" style="margin:14px 0 8px;font-size:10px">BEFORE JACKING UP</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Get completely off the road</strong> — pull as far from traffic as possible onto a flat, stable surface. Gravel or grass is acceptable; soft ground under the jack is not. Turn on hazard lights immediately.</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Apply parking brake and chock the tires</strong> — shift to Park. Place wheel chocks (or rocks, curb edge) behind the rear tires. Keep everyone out of the vehicle and away from the traffic side.</div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Retrieve spare, jack, and tools from cargo floor</strong> — lift the cargo floor panel in the rear trunk. The compact spare tire, scissor jack, lug wrench (with 21mm and 17mm ends), and jack handle are stored underneath. Lay the spare near the flat tire.</div></div>
-      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Check spare pressure before proceeding</strong> — if the spare looks low, do not install a flat spare. Call roadside assistance. Compact spares require <code>60 PSI</code> and must be checked periodically even when not in use.</div></div>
-      <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Loosen lug nuts BEFORE jacking</strong> — use the 21mm end of the lug wrench to break each lug nut loose about ½ turn counterclockwise while the tire is still on the ground. Do not remove them yet. Loosening while weighted prevents the wheel from spinning.</div></div>
-
-      <div class="section-label" style="margin:14px 0 8px;font-size:10px">JACKING AND SWAPPING</div>
-      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Locate the jack point</strong> — look under the sill of the vehicle near the flat tire. There is a notched reinforced jack point on the pinch weld (the seam where the body panels meet under the door). Position the jack notch directly on this point. Using the wrong point will dent the bodywork.</div></div>
-      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Raise the vehicle</strong> — turn the jack handle clockwise using the 17mm end to extend the scissor jack. Raise slowly until the flat tire is <strong>3–4 inches off the ground</strong>. Stop there — do not raise higher than necessary. Never get under the vehicle while it is on the jack.</div></div>
-      <div class="step"><div class="step-n">8</div><div class="step-t"><strong>Remove lug nuts completely and pull off the flat</strong> — finish removing all 5 lug nuts by hand. Place them somewhere safe (your pocket). Pull the flat tire straight off and lay it flat under the vehicle edge as a safety precaution in case the jack shifts.</div></div>
-      <div class="step"><div class="step-n">9</div><div class="step-t"><strong>Mount the spare tire</strong> — lift the spare onto the studs. Align the 5 holes with the 5 wheel studs. Push it flush against the hub. Hand-thread all 5 lug nuts clockwise until they seat — do not tighten with the wrench yet.</div></div>
-      <div class="step"><div class="step-n">10</div><div class="step-t"><strong>Snug lug nuts in star pattern</strong> — use the lug wrench to snug each nut in a star/cross pattern (never circular: tighten one, then the one across from it, etc.). Snug only — do not fully torque yet.</div></div>
-      <div class="step"><div class="step-n">11</div><div class="step-t"><strong>Lower the vehicle and remove the jack</strong> — turn the handle counterclockwise to lower slowly. Once the tire contacts the ground and takes the vehicle weight, remove the jack.</div></div>
-      <div class="step"><div class="step-n">12</div><div class="step-t"><strong>Final tighten in star pattern</strong> — with the vehicle fully on the ground, use the lug wrench to tighten all 5 nuts firmly in star pattern. You cannot achieve the correct 76 ft-lbs with the lug wrench — this is why you must visit a shop immediately for proper torque.</div></div>
-
-      <div class="section-label" style="margin:14px 0 8px;font-size:10px">AFTER THE SWAP</div>
-      <div class="step"><div class="step-n">13</div><div class="step-t"><strong>Stow the flat tire, jack, and all tools</strong> — place the flat in the spare tire well in the cargo floor. Stow the jack and lug wrench. Secure the cargo floor panel. A loose tire or jack in the cargo area becomes a projectile in a sudden stop.</div></div>
-      <div class="step"><div class="step-n">14</div><div class="step-t"><strong>Check the TPMS warning light</strong> — the low tire pressure warning will likely remain on because the compact spare does not have a pressure sensor matching your Venza's TPMS system. This is expected and will clear after the full-size tire is reinstalled.</div></div>
-      <div class="step"><div class="step-n">15</div><div class="step-t"><strong>Drive to a shop immediately</strong> — stay under 50 mph. Avoid highways. Nearest options: <strong>Discount Tire #2013</strong> — 3519 E 26th St, Joplin MO (your wheels are on file from the alignment visit) · <strong>AutoZone</strong> or <strong>O'Reilly</strong> in Webb City for tire plug/patch referral. Have lug nuts torqued to <code>76 ft-lbs</code> as soon as you arrive.</div></div>
-
-      <div class="g-tip">💡 <strong>Quarterly spare check habit:</strong> Every time you do an oil change, check the compact spare's pressure — it should read 60 PSI. Spares lose pressure over time sitting unused. A flat spare when you need it most is a common and completely avoidable problem. Also inspect the spare visually for cracking or dry-rot since it has been in the cargo floor since the vehicle was new.</div>
+      <div class="g-warn" id="valvomaxWarnText"><strong>⚠ CRITICAL:</strong> ValvoMax official torque spec for M12-1.25 is NOT confirmed from manufacturer documentation. Third-party reference: EZ Oil Drain Valve lists 20 ft-lbs for M12-1.25. Verify directly at valvomax.com before proceeding.</div>
+      <div class="g-info"><strong>What you need:</strong> ValvoMax M12-1.25 · 24mm socket · 1/2" drive torque wrench · Thread-clean rag · Fresh crush washer (included)</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Do this during your first oil change</strong> — do steps 1–6 of oil change guide first (drain old oil through OEM plug before installing ValvoMax).</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Remove OEM drain plug</strong> — <code>14mm socket</code>, <code>30 ft-lbs</code>. Let oil drain completely. Save crush washer only if ValvoMax can't be installed today.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Clean drain hole threads</strong> — wipe the oil pan's drain port threads with a clean dry rag. Remove any old gasket material or grit that could prevent O-ring from seating.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Install crush washer</strong> on ValvoMax — this is a one-time use washer (not needed on future oil changes).</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t" id="valvomaxTorqueStep"><strong>Thread ValvoMax by hand</strong> clockwise until snug. Then apply the saved torque guidance using your <code>24mm socket</code>. Do NOT overtorque — can distort O-ring seat and cause weep.</div></div>
+      <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Continue oil change</strong> — add oil, start engine, run 2 minutes, shut off. Do a visual inspection under the car — drain valve area should be completely dry.</div></div>
+      <div class="step"><div class="step-n">7</div><div class="step-t"><strong>Valve is now permanent</strong> — never remove it. All future oil drains: attach drain bag tube → oil flows. Unscrew tube → oil stops instantly.</div></div>
+      <div class="g-tip">💡 No crush washer needed on any future oil change — the VITON O-ring triple seal is the permanent seal. This saves ~$0.50 per change and one less step.</div>
     </div>
   </div>
 
-  <!-- OIL LIFE RESET -->
+  <!-- OIL RESET -->
   <div class="guide-item" data-guide-id="oil_life_reset">
     <div class="guide-head" onclick="toggleGuide(this)">
       <div class="guide-head-left">
         <div class="guide-title">⚙️ Oil Life Reset</div>
-        <div class="guide-meta">After every oil change · 30 seconds · In-vehicle menu</div>
+        <div class="guide-meta">After every oil change · 30 seconds</div>
       </div>
       <div class="guide-chevron">▾</div>
     </div>
     <div class="guide-body">
-      <div class="g-gold"><strong>Toyota manual:</strong> "Reset the oil replacement reminder ('MAINT REQD') after maintenance at every 5,000 miles." The reset only affects the dash reminder — it does not communicate with the engine or affect any systems.</div>
-      <div class="step"><div class="step-n">1</div><div class="step-t">Turn vehicle to <strong>ON/Ready mode</strong> — power on without starting engine (press Power button without brake pedal).</div></div>
-      <div class="step"><div class="step-n">2</div><div class="step-t">Navigate to: <strong>Settings → Vehicle → Maintenance Reset → Oil Maintenance Required</strong></div></div>
-      <div class="step"><div class="step-n">3</div><div class="step-t">Confirm the reset. The <strong>MAINT REQD</strong> light on the instrument cluster should extinguish immediately.</div></div>
-      <div class="g-tip">💡 If the maintenance reset menu is not visible, use the steering wheel controls to scroll through the multi-information display until you find it. On some Venza configurations this is accessed through the touchscreen center stack rather than the steering wheel controls.</div>
+      <div class="g-gold">Toyota manual: "Reset the oil replacement reminder light ('MAINT REQD') or the message 'OIL MAINTENANCE REQUIRED' on the multi-information display after maintenance at every 5,000 miles."</div>
+      <div class="step"><div class="step-n">1</div><div class="step-t">Turn vehicle to ON/Ready mode (power on, don't start engine).</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Go to: <strong>Settings → Vehicle → Maintenance Reset → Oil Maintenance Required</strong></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Confirm the reset. "MAINT REQD" light should extinguish.</div></div>
+      <div class="g-tip">💡 If the message doesn't appear, you may need to scroll through the multi-information display using the steering wheel controls until you find the maintenance reset menu.</div>
     </div>
   </div>
 
-</div><!-- end page-guides -->
+</div>
 
 <!-- ═══ WARRANTY ══════════════════════════════════════════════════ -->
 <div id="page-warranty" class="page">
@@ -1901,13 +1758,27 @@ html.modal-open,body.modal-open{overflow:hidden}
     <div class="row"><span class="row-key">Current Mileage</span><span class="row-val" id="bkMi">—</span></div>
     <div class="row"><span class="row-key">Total Invested</span><span class="row-val orange" id="bkTotal">—</span></div>
     <div class="row"><span class="row-key">Last Service</span><span class="row-val" id="bkLast">—</span></div>
+    <div class="row"><span class="row-key">App Health</span><span class="row-val green" id="bkHealth">—</span></div>
+    <div class="row"><span class="row-key">Local Storage</span><span class="row-val" id="bkStorage">—</span></div>
   </div></div>
 
   <div class="section-label">Long-Term Alert Strategy</div>
   <div class="form-section" style="background:rgba(34,114,212,.04);border-color:rgba(34,114,212,.18)">
     <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">🔔 Home Screen Reminders</div>
     <div class="reminder-grid">
-
+      <div class="reminder-card">
+        <div class="reminder-card-title">Primary · Web Push for Home Screen</div>
+        <div class="reminder-card-copy">Best long-term path for true out-of-app alerts. This app can check support and request notification permission now. Full automatic due pushes still need a separate push backend + service worker sender.</div>
+        <div class="reminder-meta">
+          <div class="reminder-row"><span>Push support</span><strong id="pushSupportLabel">—</strong></div>
+          <div class="reminder-row"><span>Notification permission</span><strong id="pushPermissionLabel">—</strong></div>
+          <div class="reminder-row"><span>Home Screen mode</span><strong id="pushStandaloneLabel">—</strong></div>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn-ghost" onclick="renderReminderStrategy()">Check Support</button>
+          <button class="btn-primary" style="background:var(--blue)" onclick="requestReminderPermission()">Allow Notifications</button>
+        </div>
+      </div>
       <div class="reminder-card">
         <div class="reminder-card-title">Backup · Add to Calendar Export</div>
         <div class="reminder-card-copy">Works today with no backend. Export the next due service or all recurring reminders into your Calendar app so iPhone can notify you even if web push is not connected yet.</div>
@@ -1917,6 +1788,54 @@ html.modal-open,body.modal-open{overflow:hidden}
         </div>
       </div>
     </div>
+    <div class="lock-note">UI baseline preserved for long-term use — reminder features were added without redesigning the existing layout.</div>
+  </div>
+
+  <div class="section-label">For ChatGPT — Add Log Entry</div>
+  <div class="form-section" style="background:rgba(59,158,255,.05);border-color:rgba(59,158,255,.2)">
+    <div class="form-title" style="margin-bottom:8px;color:var(--blue2)">📋 ChatGPT Instructions</div>
+
+    <div class="alert blue" style="margin-bottom:12px">
+      <div class="alert-icon">ℹ️</div>
+      <div><strong>Two ways to add entries — pick the right one:</strong><br>
+      <strong>Path A (live device):</strong> Export a backup → give JSON to ChatGPT → import it back.<br>
+      <strong>Path B (source file):</strong> Add to DEFAULT array in venza.html → re-upload to GitHub → affects fresh installs only.
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600">PATH A — Live Device (recommended for your current data)</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.7">
+      1. Tap <strong>Export Backup</strong> above → save the .json file<br>
+      2. Send the .json to ChatGPT and say: <em style="color:var(--text)">"Add this service entry to the entries array in my Venza backup file:"</em><br>
+      3. ChatGPT edits the JSON → download it → tap <strong>Import Backup</strong> to restore
+    </p>
+
+    <p style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600">PATH B — Source File (for updating the app baseline)</p>
+    <div id="chatgptTemplate" role="button" tabindex="0" aria-label="Copy ChatGPT template" style="background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer" onclick="copyTemplate()">// In venza.html find: "// ADD NEW ENTRIES BELOW THIS LINE"
+// Paste this object before the closing ];
+// Then re-upload the file to GitHub.
+
+{
+  id: Date.now(),           // unique number — use Date.now() or any unique int
+  date: 'YYYY-MM-DD',       // e.g. '2026-05-01'
+  mi: 69590,                // odometer at time of service
+  type: 'oil',              // see TYPE LIST below
+  desc: 'Description, parts used, part numbers...',
+  cost: 34.54,              // dollar amount (number, not string)
+  shop: 'DIY or shop name',
+  link: 'https://...',      // purchase link, or empty string ''
+  builtin: true             // true = shows gray delete btn (factory entry)
+},
+
+// TYPE LIST (use exact string):
+// oil, tires, cabin, engine_filter,
+// trans, diff, coolant, inv_coolant, alignment,
+// tires_new, brakes, plugs, hvfilter_inspect,
+// hvfilter_clean, valvomax, wipers, other
+
+// NOTE: DEFAULT array only affects fresh installs or after Reset.
+// If localStorage already has data, the app reads that — not DEFAULT.</div>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px">Tap the box above to copy Path B template to clipboard.</p>
   </div>
 
   <div class="section-label">Danger Zone</div>
@@ -2081,8 +2000,7 @@ const DEFAULT = [
     cost: 409.29,
     shop: 'Frank Fletcher Toyota, Joplin MO',
     link: '',
-    builtin: true,
-    excludeFromAvg: true  // bundled dealer bill — cost covers 4 services, not a true oil-only cost
+    builtin: true
   },
   // ── Entry 2: Engine air filter DIY ───────────────────────────
   {
@@ -2157,28 +2075,6 @@ const MI_STATE_KEY = 'vz_mi_state_v1';
 const MI_HISTORY_KEY = 'vz_mi_history_v1';
 const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
 const AVG_SERVICE_TYPE_KEY = 'vz_avg_service_type';
-/* ─── SAFE STORAGE WRITER ───────────────────────────────────────
-   All localStorage writes go through here. On QuotaExceededError
-   we notify the user immediately rather than silently failing.   */
-function safeStore(key, value){
-  try{
-    localStorage.setItem(key, value);
-    return true;
-  } catch(err){
-    const isQuota = err && (
-      err.name === 'QuotaExceededError' ||
-      err.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
-      String(err).includes('quota')
-    );
-    if(isQuota){
-      // Defer toast so it doesn't fire inside tight loops
-      setTimeout(()=>showToast('⚠ Storage full — export a backup then remove some receipt photos to free space'), 0);
-    } else {
-      console.error('safeStore error ['+key+']:', err);
-    }
-    return false;
-  }
-}
 const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
 const SERVICE_REQUIREMENTS_KEY = 'vz_service_part_requirements';
 const MASTER_PARTS_INVENTORY_ONLY_KEY = 'vz_master_parts_inventory_only_v1';
@@ -2227,7 +2123,7 @@ function getResolvedServicePartRequirements(serviceType=''){
   return Array.isArray(map[serviceType]) ? map[serviceType] : [];
 }
 function saveResolvedServiceRequirementsMap(map){
-  safeStore(SERVICE_REQUIREMENTS_KEY, JSON.stringify(normalizeServiceRequirementsMap(map)));
+  localStorage.setItem(SERVICE_REQUIREMENTS_KEY, JSON.stringify(normalizeServiceRequirementsMap(map)));
 }
 function clearSavedServiceRequirementsMap(){ localStorage.removeItem(SERVICE_REQUIREMENTS_KEY); }
 function rebuildMasterPartsFromInventory(){
@@ -2285,7 +2181,7 @@ function getMasterParts(){
   }
 }
 function saveMasterParts(parts){
-  safeStore(MASTER_PARTS_KEY, JSON.stringify(normalizeMasterParts(parts)));
+  localStorage.setItem(MASTER_PARTS_KEY, JSON.stringify(normalizeMasterParts(parts)));
 }
 function normalizeKey(value=''){
   return String(value).toLowerCase().replace(/[^a-z0-9]+/g,'');
@@ -2296,7 +2192,7 @@ function normalizeComparableName(value=''){
     .replace(/mobil\s+1/g,'mobil1')
     .replace(/0w[-\s]?16/g,'0w16')
     .replace(/5\s*(qt|quart|quarts)/g,'5qt')
-    .replace(/(advanced|fuel|economy|full|synthetic|motor|genuine|toyota|oem)/g,' ')
+    .replace(/\b(advanced|fuel|economy|full|synthetic|motor|genuine|toyota|oem)\b/g,' ')
     .replace(/[^a-z0-9]+/g,' ')
     .split(/\s+/)
     .filter(Boolean)
@@ -2445,7 +2341,7 @@ function getAverageServiceType(){
 }
 function setAverageServiceType(type){
   const next = getAverageServiceOptions().some(opt=>opt.id===type) ? type : 'oil_avg';
-  safeStore(AVG_SERVICE_TYPE_KEY, next);
+  localStorage.setItem(AVG_SERVICE_TYPE_KEY, next);
   renderDash();
   renderBackup();
 }
@@ -2512,7 +2408,7 @@ function getInventory(){
   }
 }
 function saveInventory(items){
-  safeStore(INVENTORY_KEY, JSON.stringify(normalizeInventory(items)));
+  localStorage.setItem(INVENTORY_KEY, JSON.stringify(normalizeInventory(items)));
 }
 function getInventoryUseTotal(entry, predicate=()=>true){
   return normalizeInventoryUses(entry.inventoryUses).reduce((sum,use)=>{
@@ -2559,6 +2455,12 @@ function getOilAverageEntryCost(entry){
   const manual = Number(entry.cost||0);
   if(entry.type === 'oil' && Number.isFinite(manual) && manual > 0) return manual;
   return null;
+}
+function getAverageEntryCost(entry, type=getAverageServiceType()){
+  if(!entryMatchesAverageType(entry, type)) return null;
+  if(type === 'oil_avg') return getOilAverageEntryCost(entry);
+  const display = getEntryDisplayCost(entry);
+  return Number.isFinite(display) && display > 0 ? display : null;
 }
 function getLinkHostLabel(url){
   try{return new URL(url).hostname;}catch(err){return 'Open link';}
@@ -2788,6 +2690,33 @@ function createItemRow(data={}){
   renderEntryInventoryUI();
   return wrap;
 }
+function addItemRow(data={}){
+  return createItemRow(data);
+}
+function removeItemRow(btn){
+  const row = btn?.closest('.item-editor');
+  if(row) row.remove();
+  if(!getFormItemRows().length) addItemRow();
+  renderEntryInventoryUI();
+}
+function getFormItems(){
+  return normalizeEntryItems(getFormItemRows().map(row=>({
+    inventoryId: row.dataset.inventoryId || '',
+    name: row.querySelector('.item-name')?.value || '',
+    partNum: row.querySelector('.item-part')?.value || '',
+    store: row.querySelector('.item-store')?.value || '',
+    link: row.querySelector('.item-link')?.value || '',
+    price: row.querySelector('.item-price')?.value || 0,
+    qty: row.querySelector('.item-qty')?.value || 1,
+    useInOilAvg: !!row.querySelector('.item-oilavg')?.checked
+  })));
+}
+function resetEntryInventoryUses(){
+  const list = document.getElementById('fItemsList');
+  if(list) list.innerHTML='';
+  addItemRow();
+  renderEntryInventoryUI();
+}
 function formatEntryInventorySummary(entry){
   const items = normalizeEntryItems(entry.items);
   if(items.length) return items.map(item=>`${item.qty}× ${item.name}`).join(' · ');
@@ -2806,8 +2735,7 @@ function normalizeEntries(entries){
     link: e.link || '',
     items: normalizeEntryItems(e.items),
     inventoryUses: normalizeInventoryUses(e.inventoryUses),
-    builtin: !!e.builtin,
-    excludeFromAvg: !!e.excludeFromAvg
+    builtin: !!e.builtin
   }));
 }
 function getData(){
@@ -2818,9 +2746,7 @@ function getData(){
     return normalizeEntries(DEFAULT);
   }
 }
-function save(d){
-  safeStore('vz_log', JSON.stringify(normalizeEntries(d)));
-}
+function save(d){localStorage.setItem('vz_log',JSON.stringify(normalizeEntries(d)))}
 function highestMileage(entries){
   return normalizeEntries(entries).reduce((max,e)=>{
     const mi = Number(e.mi);
@@ -2853,7 +2779,7 @@ function getMiHistory(){
   }
 }
 function saveMiHistory(items){
-  safeStore(MI_HISTORY_KEY, JSON.stringify(normalizeMileageHistory(items)));
+  localStorage.setItem(MI_HISTORY_KEY, JSON.stringify(normalizeMileageHistory(items)));
 }
 function appendMiHistory(item){
   const history = getMiHistory();
@@ -2923,8 +2849,8 @@ function setMi(m, meta={}){
   const allowLower = !!meta.allowLower || source === 'manual';
   if(!allowLower && Number.isFinite(current) && current > 0 && n < current) return false;
   const updatedAt = meta.updatedAt || new Date().toISOString();
-  safeStore('vz_mi', n);
-  safeStore(MI_STATE_KEY, JSON.stringify({
+  localStorage.setItem('vz_mi', n);
+  localStorage.setItem(MI_STATE_KEY, JSON.stringify({
     value:n,
     source,
     entryId: source === 'entry' && meta.entryId != null ? String(meta.entryId) : null,
@@ -3019,7 +2945,7 @@ function saveScheduleOverrides(overrides){
     if(Object.keys(next).length) clean[ruleId] = next;
   });
   if(Object.keys(clean).length){
-    safeStore(SCHEDULE_OVERRIDE_KEY, JSON.stringify(clean));
+    localStorage.setItem(SCHEDULE_OVERRIDE_KEY, JSON.stringify(clean));
   }else{
     localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
   }
@@ -3119,6 +3045,12 @@ function compareEntriesLatest(a,b){
   return (bd ? bd.getTime() : 0) - (ad ? ad.getTime() : 0);
 }
 const VEHICLE_PROFILE = {
+  year: '2021',
+  make: 'Toyota',
+  model: 'Venza',
+  trim: 'LE Hybrid AWD',
+  color: 'White',
+  location: 'Carterville, MO',
   estimatedInServiceDate: '2021-06-01'
 };
 const RECURRING_RULES = [
@@ -3445,7 +3377,7 @@ async function requestReminderPermission(){
   if(!('Notification' in window)){ showToast('Notifications are not supported on this device'); return; }
   try{
     const result = await Notification.requestPermission();
-    safeStore('vz_notification_pref', result);
+    localStorage.setItem('vz_notification_pref', result);
     renderReminderStrategy();
     showToast(result === 'granted' ? 'Notifications allowed ✓' : result === 'denied' ? 'Notifications denied' : 'Permission dismissed');
   }catch(err){
@@ -3500,7 +3432,7 @@ function saveVerificationOverrides(overrides){
     const next = String(value||'').trim();
     if(next) clean[key] = next;
   });
-  if(Object.keys(clean).length) safeStore(VERIFICATION_OVERRIDES_KEY, JSON.stringify(clean));
+  if(Object.keys(clean).length) localStorage.setItem(VERIFICATION_OVERRIDES_KEY, JSON.stringify(clean));
   else localStorage.removeItem(VERIFICATION_OVERRIDES_KEY);
 }
 function getVerificationValue(key){
@@ -3613,7 +3545,7 @@ window.onload=()=>{
   if(!localStorage.getItem(MASTER_PARTS_INVENTORY_ONLY_KEY)){
     clearSavedServiceRequirementsMap();
     rebuildMasterPartsFromInventory();
-    safeStore(MASTER_PARTS_INVENTORY_ONLY_KEY, '1');
+    localStorage.setItem(MASTER_PARTS_INVENTORY_ONLY_KEY, '1');
   }else{
     syncMasterPartsFromInventory();
     mergeDuplicateMasterParts();
@@ -3622,23 +3554,25 @@ window.onload=()=>{
   const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value = 'DIY';
   populatePartCategoryOptions('partCategory','other');
   setInventoryFormOpen(false);
-  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, .row[onclick], #scheduleControlsToggle');
+  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
   setScheduleControlsExpanded(false);
   if(!localStorage.getItem(MI_HISTORY_KEY)){
     appendMiHistory({value:getMi(),source:'manual',entryId:null,updatedAt:new Date().toISOString()});
   }
-  if(!localStorage.getItem(MI_STATE_KEY)) safeStore(MI_STATE_KEY, JSON.stringify({value:getMi(),source:'legacy',entryId:null,updatedAt:new Date().toISOString()}));
+  if(!localStorage.getItem(MI_STATE_KEY)) localStorage.setItem(MI_STATE_KEY, JSON.stringify({value:getMi(),source:'legacy',entryId:null,updatedAt:new Date().toISOString()}));
   renderAll();
   resetEntryInventoryUses();
   renderReminderStrategy();
 };
 
 function renderAll(){
-  const renderers = [renderDash, renderLog, renderUpcoming, renderParts, renderBackup, ensureGuideActions, updateGuideAccessibility];
-  renderers.forEach(fn => {
-    try{ fn(); }
-    catch(err){ console.error('Renderer error in ' + (fn.name||'unknown') + ':', err); }
-  });
+  renderDash();
+  renderLog();
+  renderUpcoming();
+  renderParts();
+  renderBackup();
+  ensureGuideActions();
+  updateGuideAccessibility();
 }
 
 /* ─── DASHBOARD ──────────────────────────────────────────── */
@@ -3869,6 +3803,84 @@ function renderUpcoming(){
 }
 
 /* ─── LOG/* ─── LOG ────────────────────────────────────────────────── */
+function renderLog(){
+  const d=getData().sort((a,b)=>b.mi-a.mi);
+  const el=document.getElementById('logList');
+  el.innerHTML=d.map(e=>{
+    const dt=new Date(e.date+'T00:00:00');
+    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const safeEntryUrl = safeUrl(e.link);
+    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
+    const del=!e.builtin
+      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
+      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    const items = normalizeEntryItems(e.items);
+    const uses = normalizeInventoryUses(e.inventoryUses);
+    const displayParts = items.length ? items.map(item=>({
+      qty: item.qty,
+      name: item.name,
+      partNum: item.partNum,
+      store: item.store,
+      link: item.link,
+      price: Number(item.price||0),
+      oilAvg: !!item.useInOilAvg,
+      fromInventory: !!item.inventoryId
+    })) : uses.map(use=>({
+      qty: use.qtyUsed,
+      name: use.name,
+      partNum: use.partNum,
+      store: use.store,
+      link: use.link,
+      price: Number(use.unitCost||0),
+      oilAvg: !!use.countInOilAvg,
+      fromInventory: !!use.inventoryId
+    }));
+    const partsHtml = displayParts.length ? `<div class="log-parts">${displayParts.map(part=>{
+      const meta = [part.partNum && `Part # ${part.partNum}`, part.store].filter(Boolean).join(' · ');
+      const safePartUrl = safeUrl(part.link);
+      return `<div class="log-part">
+        <div class="log-part-top">
+          <div class="log-part-name">${part.qty}× ${safeText(part.name)}</div>
+          <div class="log-part-price">$${(part.qty * part.price).toFixed(2)}</div>
+        </div>
+        ${meta ? `<div class="log-part-meta">${safeText(meta)}</div>` : ''}
+        ${safePartUrl ? `<a class="log-part-link" href="${safePartUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safePartUrl))}</a>` : ''}
+        ${part.oilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+        ${part.fromInventory ? `<div class="parts-badge" style="background:rgba(34,114,212,.1);color:var(--blue2);border-color:rgba(34,114,212,.25)">From inventory</div>` : ''}
+      </div>`;
+    }).join('')}</div>` : '';
+    const photo=getPhoto(e.id);
+    const photoHtml=photo
+      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+        </div>`
+      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+          background:none;cursor:pointer;width:100%;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+          📷 Add Receipt Photo
+        </button>`;
+    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+      ${del}
+      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
+      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-desc">${safeText(e.desc)}</div>
+      ${partsHtml}
+      <div class="log-foot">
+        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
+        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
+      </div>
+      ${normalizeServiceEntryItems(e.items).length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${normalizeServiceEntryItems(e.items).map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
+      ${photoHtml}
+    </div>`;
+  }).join('');
+  let tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
+}
+
+/* ─── ADD ENTRY/* ─── ADD ENTRY ──────────────────────────────────────────── */
 function getServiceRuleMasterLabel(masterPartId=''){
   const part = getMasterParts().find(item=>String(item.id)===String(masterPartId));
   return part ? `${part.name}${part.partNum ? ` · ${part.partNum}` : ''}` : 'Unlinked master part';
@@ -3969,6 +3981,86 @@ function renderServiceRuleList(){
   body.innerHTML = rows.map(({serviceType, rule})=>`<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${escapeHtml(rule.label)}</div><div class="inv-meta">${escapeHtml(LABELS[serviceType] || serviceType)} · ID: ${escapeHtml(rule.id)}${rule.toyotaPartNum ? ` · Toyota/ref #: ${escapeHtml(rule.toyotaPartNum)}` : ''}<br>Required qty: ${Number(rule.qty||0)}${rule.masterPartIds?.[0] ? `<br>🔗 ${escapeHtml(getServiceRuleMasterLabel(rule.masterPartIds[0]))}` : '<br>⚠ No linked master part'}</div></div><div class="inv-qty ${rule.masterPartIds?.length ? '' : 'out'}">${rule.masterPartIds?.length ? 'linked' : 'unlinked'}</div></div><div class="inv-actions"><button type="button" class="inv-btn" onclick="editServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Edit</button><button type="button" class="inv-btn danger" onclick="deleteServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Delete</button></div></div>`).join('');
 }
 
+function renderParts(){
+  renderServiceRuleList();
+  const inv = getInventory().sort((a,b)=>{
+    const stockDiff = Number(b.qtyOnHand||0) - Number(a.qtyOnHand||0);
+    if(stockDiff !== 0) return stockDiff;
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  const parts = getMasterParts().sort((a,b)=>{
+    const catA = MASTER_CATEGORY_LABELS[a.category] || 'Other';
+    const catB = MASTER_CATEGORY_LABELS[b.category] || 'Other';
+    if(catA !== catB) return catA.localeCompare(catB);
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  const listEl = document.getElementById('inventoryList');
+  const summaryEl = document.getElementById('inventorySummary');
+  const masterListEl = document.getElementById('masterPartsList');
+  const masterSummaryEl = document.getElementById('masterPartsSummary');
+  if(!listEl || !summaryEl) return;
+  const totalQty = inv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
+  const linkedInvCount = inv.filter(item=>item.masterPartId).length;
+  summaryEl.textContent = `${inv.length} item${inv.length!==1?'s':''} · ${totalQty} total on hand · ${linkedInvCount} linked`;
+  if(!inv.length){
+    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No inventory saved yet. Add parts above when you buy ahead during a sale.</div></div>`;
+  }else{
+    listEl.innerHTML = inv.map(item=>{
+      const qty = Number(item.qtyOnHand||0);
+      const qtyClass = qty===0 ? 'out' : qty<=1 ? 'low' : '';
+      const meta = [LABELS[item.serviceType]||'Other', item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ');
+      const master = parts.find(part=>String(part.id)===String(item.masterPartId||''));
+      return `<div class="inv-row">
+        <div class="inv-top">
+          <div style="flex:1">
+            <div class="inv-name">${item.name}</div>
+            <div class="inv-meta">${meta || 'No extra details saved yet'}${item.note ? `<br>💡 ${item.note}` : ''}${item.link ? `<br><a class="part-link" href="${item.link}" target="_blank">→ ${getLinkHostLabel(item.link)}</a>` : ''}${master ? `<br>🔗 Master DB: <span style="color:var(--text2)">${master.name}</span>` : ''}</div>
+            ${item.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+          </div>
+          <div class="inv-qty ${qtyClass}">${qty} on hand</div>
+        </div>
+        <div class="inv-actions">
+          <button type="button" class="inv-btn" data-edit-inventory="${escapeHtmlAttr(item.id)}">Edit</button>
+          ${master ? `<button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(master.id)}">Master Part</button>` : ''}
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="1">+1</button>
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="-1">-1</button>
+          <button type="button" class="inv-btn danger" data-delete-inventory="${escapeHtmlAttr(item.id)}">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  if(masterListEl && masterSummaryEl){
+    const totalSources = parts.reduce((sum,part)=>sum + (part.sources||[]).length, 0);
+    masterSummaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${totalSources} saved source${totalSources!==1?'s':''}`;
+    if(!parts.length){
+      masterListEl.innerHTML = `<div class="master-empty">No master parts yet. Add an inventory item above and the app will automatically create or update your reference part database here.</div>`;
+    }else{
+      masterListEl.innerHTML = parts.map(part=>{
+        const linkedInv = inv.filter(item=>String(item.masterPartId||'')===String(part.id));
+        const linkedQty = linkedInv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
+        const serviceLabel = LABELS[part.serviceType] || 'Other';
+        const categoryLabel = MASTER_CATEGORY_LABELS[part.category] || 'Other';
+        const defaultPrice = Number(part.unitCost||0) > 0 ? `$${Number(part.unitCost||0).toFixed(2)}` : '—';
+        const sourcesHtml = (part.sources||[]).length
+          ? `<div class="master-source-list">${part.sources.map(source=>`<div class="master-source"><div class="master-source-top"><div><div class="master-source-name">${source.store || source.label || 'Saved source'}</div><div class="master-source-meta">${[source.label && source.label !== (source.store||'') ? source.label : '', source.addedAt ? `saved ${formatDateHuman(source.addedAt.slice(0,10))}` : ''].filter(Boolean).join(' · ')}${source.url ? `<br><a class="part-link" href="${source.url}" target="_blank">→ ${getLinkHostLabel(source.url)}</a>` : ''}</div></div><div class="master-source-price">${Number(source.unitPrice||0) > 0 ? `$${Number(source.unitPrice||0).toFixed(2)}` : '—'}</div></div></div>`).join('')}</div>`
+          : `<div class="part-missing" style="margin-top:10px">No saved purchase sources yet. Add this part through Inventory and the store/link will stack here automatically.</div>`;
+        return `<div class="part-item">
+          <div class="part-row1"><span class="part-name">${part.name}</span><span class="part-price">${defaultPrice}</span></div>
+          <div class="part-num">${[categoryLabel, serviceLabel, part.partNum && `Part # ${part.partNum}`].filter(Boolean).join(' · ')}</div>
+          ${part.note ? `<div class="inv-meta" style="margin-top:6px">💡 ${part.note}</div>` : ''}
+          ${part.statusLabel ? `<div class="parts-badge">${part.statusLabel}</div>` : ''}
+          ${part.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+          <div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>
+          ${sourcesHtml}
+          <div class="inv-actions" style="margin-top:12px">
+            <button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button>
+            <button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
 function setInventoryFormOpen(isOpen){
   const wrap = document.getElementById('inventoryFormWrap');
   const btn = document.getElementById('inventoryFormToggleBtn');
@@ -4161,6 +4253,107 @@ function deleteInventoryItem(id){
   clearInventoryForm();
   showToast('Inventory item deleted');
 }
+function renderEntryInventoryUI(){
+  const block = document.getElementById('inventorySuggestBlock');
+  const needEl = document.getElementById('inventorySuggestList');
+  const inventoryEl = document.getElementById('inventorySelectedList');
+  const summaryEl = document.getElementById('inventoryRequiredSummary');
+  const typeEl = document.getElementById('fType');
+  if(!block || !needEl || !inventoryEl || !typeEl) return;
+  const serviceType = typeEl.value;
+  if(!serviceType){
+    block.style.display='none';
+    needEl.innerHTML='';
+    inventoryEl.innerHTML='';
+    if(summaryEl) summaryEl.textContent='';
+    updateEntrySaveLock();
+    syncEntryCostFromItems();
+    return;
+  }
+  block.style.display='block';
+  const needs = getSimpleServiceNeeds(serviceType);
+  const previewInventory = getEntryPreviewInventory();
+  const selectedCounts = getSelectedInventoryCounts();
+  const matches = getServiceInventoryMatches(serviceType, previewInventory)
+    .map(item=>({
+      ...item,
+      selectedQty:Number(selectedCounts[String(item.id)]||0),
+      available:Math.max(0, Number(item.qtyOnHand||0) - Number(selectedCounts[String(item.id)]||0))
+    }))
+    .sort((a,b)=>{
+      const availDiff = b.available - a.available;
+      if(availDiff !== 0) return availDiff;
+      return String(a.name||'').localeCompare(String(b.name||''));
+    });
+
+  if(summaryEl){
+    summaryEl.textContent = needs.length
+      ? `This ${LABELS[serviceType] || 'service'} usually needs ${needs.length} part${needs.length!==1?'s':''}. Start with the simple checklist below, then tap a saved inventory item if you already bought it.`
+      : `No starter parts list is saved for this service yet. You can still use matching inventory below or enter the service manually.`;
+  }
+
+  needEl.innerHTML = needs.length ? needs.map(need=>{
+    const matched = matches.filter(item=>inventoryMatchesNeed(item, need));
+    const savedQty = matched.reduce((sum,item)=>sum + Number(item.available||0), 0);
+    const sources = getNeedSavedSources(need, matches);
+    return `<div class="need-card">
+      <div class="need-top">
+        <div style="flex:1">
+          <div class="need-name">${need.label}</div>
+          <div class="need-meta">Need: ${need.qtyText}${savedQty>0 ? ` · Saved in inventory: ${savedQty}` : ' · No saved stock yet'}</div>
+        </div>
+        <div class="need-qty">${need.qtyText}</div>
+      </div>
+      ${sources.length ? `<div class="need-links"><select class="fs" onchange="openSavedSourceLink(this)"><option value="">Open saved purchase link…</option>${sources.map(source=>`<option value="${escapeHtmlAttr(source.url)}">${escapeHtml(source.label + (Number(source.unitPrice||0)>0 ? ` — $${Number(source.unitPrice||0).toFixed(2)}` : ''))}</option>`).join('')}</select></div>` : `<div class="need-meta" style="margin-top:8px">No saved purchase links yet for this part.</div>`}
+    </div>`;
+  }).join('') : `<div class="part-missing">No starter parts checklist yet for this service.</div>`;
+
+  inventoryEl.innerHTML = matches.length ? matches.map(item=>`
+    <div class="selected-use">
+      <div class="selected-use-top">
+        <div style="flex:1">
+          <div class="suggest-name">${item.name}</div>
+          <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ') || 'Saved inventory item'}</div>
+        </div>
+        <div class="inv-qty ${item.available===0?'out':item.available<=1?'low':''}">${item.available} free</div>
+      </div>
+      <div class="suggest-meta">On hand: ${Number(item.qtyOnHand||0)} · Selected now: ${item.selectedQty} · $${Number(item.unitCost||0).toFixed(2)} each${item.countInOilAvg ? ' · counts in oil avg' : ''}</div>
+      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Use this part</button>` : `<div class="part-missing" style="margin-top:8px">No more stock left for this item.</div>`}
+    </div>
+  `).join('') : `<div class="part-missing">No saved inventory matches yet for this service. Add the part in Inventory first and it will show here next time.</div>`;
+
+  updateEntrySaveLock();
+  syncEntryCostFromItems();
+}
+
+function useInventoryItem(id){
+  const previewInventory = getEntryPreviewInventory();
+  const item = previewInventory.find(x=>String(x.id)===String(id));
+  if(!item) return;
+  const alreadySelected = Number(getSelectedInventoryCounts()[String(id)]||0);
+  const max = Number(item.qtyOnHand||0);
+  if(alreadySelected >= max){showToast('No more free stock left for this part');return;}
+  addItemRow({
+    inventoryId: item.id,
+    name: item.name,
+    partNum: item.partNum,
+    store: item.store,
+    link: item.link,
+    price: Number(item.unitCost||0),
+    qty: 1,
+    useInOilAvg: !!item.countInOilAvg
+  });
+}
+function removeOneInventoryItem(id){
+  const rows = getFormItemRows().filter(row=>String(row.dataset.inventoryId||'')===String(id));
+  const row = rows[rows.length-1];
+  if(!row) return;
+  row.remove();
+  if(!getFormItemRows().length) addItemRow();
+  renderEntryInventoryUI();
+}
+
+/* ─── MILEAGE FIELD — dynamic placeholder, hint, validation ─── */
 function initAddForm(){
   const input    = document.getElementById('fMi');
   const hintEl   = document.getElementById('fMiHint');
@@ -4170,31 +4363,8 @@ function initAddForm(){
   input.placeholder = cur.toLocaleString();
   if(hintEl) hintEl.textContent = 'Last recorded: ' + cur.toLocaleString() + ' mi';
   if(warnEl) warnEl.classList.remove('visible');
-  // Reset shop mode to DIY on fresh open (unless already set)
-  const shopEl = document.getElementById('fShop');
-  if(shopEl) onShopChange(shopEl.value);
+  // re-validate if a value already exists (e.g. navigating back)
   if(input.value) onMileageInput(input.value);
-}
-/* ─── SHOP / DIY COST MODE ──────────────────────────────────── */
-function onShopChange(val){
-  const costEl   = document.getElementById('fCost');
-  const labelEl  = document.getElementById('fCostLabel');
-  const noteEl   = document.getElementById('fCostNote');
-  if(!costEl) return;
-  if(val === 'SHOP'){
-    costEl.removeAttribute('readonly');
-    costEl.classList.add('cost-manual');
-    if(labelEl) labelEl.textContent = 'Total Shop Cost ($)';
-    if(noteEl)  noteEl.textContent  = 'Enter the total amount charged by the shop.';
-    // Clear auto-calc value so shop can enter their own
-    costEl.value = '';
-  } else {
-    costEl.setAttribute('readonly','');
-    costEl.classList.remove('cost-manual');
-    if(labelEl) labelEl.textContent = 'Total Cost ($)';
-    if(noteEl)  noteEl.textContent  = 'Auto-calculated from parts added below.';
-    syncEntryCostFromItems();
-  }
 }
 function onMileageInput(val){
   const warnEl = document.getElementById('fMiWarn');
@@ -4355,9 +4525,7 @@ function updateReusePartsBar(){
   const total = items.reduce((s,i) => s + Number(i.price||0) * Number(i.qty||0), 0);
   const dt = new Date(lastEntry.date+'T00:00:00');
   const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  const miAgo = getMi() - Number(lastEntry.mi||0);
-  const miAgoStr = miAgo > 0 ? ` · ${miAgo.toLocaleString()} mi ago` : '';
-  meta.textContent = `${ds}${miAgoStr} · $${total.toFixed(2)}`;
+  meta.textContent = `Last ${LABELS[serviceType]||'service'} · ${ds} · $${total.toFixed(2)}`;
   prt.textContent  = items.map(i => `${i.qty}× ${i.name}${Number(i.price)>0 ? ` ($${Number(i.price).toFixed(2)})` : ''}`).join(' · ');
   bar.classList.add('visible');
 }
@@ -4382,6 +4550,57 @@ function prefill(){
   renderEntryInventoryUI();
   updateReusePartsBar();
 }
+function saveEntry(){
+  const date=document.getElementById('fDate').value;
+  const mi=document.getElementById('fMi').value;
+  const type=document.getElementById('fType').value||'other';
+  const desc=document.getElementById('fDesc').value.trim();
+  const cost=document.getElementById('fCost').value;
+  const shop=document.getElementById('fShop').value.trim();
+  const manualItems = getFormItems();
+  if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
+  const inv = getInventory();
+  const items = [...manualItems];
+  const linkedQty = items.filter(item=>item.inventoryId).reduce((map,item)=>{
+    map[String(item.inventoryId)] = (map[String(item.inventoryId)]||0) + Number(item.qty||0);
+    return map;
+  },{});
+  for(const [inventoryId, qtyNeeded] of Object.entries(linkedQty)){
+    const invItem = inv.find(x=>String(x.id)===String(inventoryId));
+    const onHand = Number(invItem?.qtyOnHand || 0);
+    if(qtyNeeded > onHand){
+      showToast(`Not enough stock for ${invItem?.name || 'linked inventory item'}`);
+      return;
+    }
+  }
+  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
+  const newId=Date.now();
+  const d=getData();
+  const inventoryUses = items.filter(item=>item.inventoryId).map(item=>({inventoryId:item.inventoryId,name:item.name,partNum:item.partNum,store:item.store,link:item.link,unitCost:item.price,qtyUsed:item.qty,countInOilAvg:item.useInOilAvg}));
+  d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:false});
+  save(d);
+  if(Object.keys(linkedQty).length){
+    Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
+      const item = inv.find(x=>String(x.id)===String(inventoryId));
+      if(item) item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) - Number(qtyNeeded||0));
+    });
+    saveInventory(inv);
+  }
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
+  if(parseInt(mi,10)>getMi())setMi(parseInt(mi,10));
+  renderAll();go('log');
+  ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value='';
+  resetEntryInventoryUses();
+  clearPhoto();
+  updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
+  showToast('Entry saved ✓');
+}
+
+/* ─── MAINTENANCE ENGINE (whichever comes first) ─────────────── */
 function getSmartStatus(mi=getMi(), referenceDate=todayLocal()){
   return getRecurringServicesState(mi, referenceDate).rules.sort(compareRecurring);
 }
@@ -4428,13 +4647,13 @@ function openMiModal(){
   document.getElementById('miModal').classList.add('open');
   setTimeout(()=>{ renderSmartList(cur); document.getElementById('miInput').focus(); }, 200);
   document.getElementById('miInput').oninput = function(){
-    const v = parseInt(this.value, 10);
+    const v = parseInt(this.value);
     if(v && v > 50000 && v < 300000) renderSmartList(v);
   };
 }
 function closeMiModal(){ document.getElementById('miModal').classList.remove('open'); }
 function saveMi(){
-  const v = parseInt(document.getElementById('miInput').value, 10);
+  const v = parseInt(document.getElementById('miInput').value);
   if(v && v > 0){ setMi(v,{source:'manual',allowLower:true}); renderAll(); showToast('Mileage updated to '+v.toLocaleString()+' mi ✓'); }
   closeMiModal();
 }
@@ -4555,9 +4774,7 @@ function copyVIN(){
 
 /* ─── COPY CHATGPT TEMPLATE ──────────────────────────────── */
 function copyTemplate(){
-  const el=document.getElementById('chatgptTemplate');
-  if(!el) return;
-  const t=el.textContent;
+  const t=document.getElementById('chatgptTemplate').textContent;
   navigator.clipboard.writeText(t).then(()=>showToast('Template copied to clipboard ✓'))
   .catch(()=>{
     const el=document.createElement('textarea');
@@ -4569,9 +4786,32 @@ function copyTemplate(){
 }
 
 /* ─── BACKUP SUMMARY ─────────────────────────────────────── */
+function renderBackup(){
+  const d=getData();
+  const mi=getMi();
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
+  const last=sorted[0];
+  const photoCount=d.filter(e=>getPhoto(e.id)).length;
+  const inventoryCount = getInventory().length;
+  const masterPartsCount = getMasterParts().length;
+  const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
+  document.getElementById('bkCount').textContent=d.length+' entries · '+inventoryCount+' inventory item'+(inventoryCount!==1?'s':'')+' · '+masterPartsCount+' master part'+(masterPartsCount!==1?'s':'')+' · '+scheduleOverrideCount+' custom target'+(scheduleOverrideCount!==1?'s':'')+' · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
+  document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
+  const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
+  document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
+  if(last){
+    const dt=new Date(last.date+'T00:00:00');
+    document.getElementById('bkLast').textContent=
+      dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
+      ' — '+parseInt(last.mi).toLocaleString()+' mi';
+  }
+  renderReminderStrategy();
+}
+
 function resetOilAverageNow(){
   if(!confirm('Reset Avg Oil Change now? This keeps your full history but starts a fresh oil average from today forward.')) return;
-  safeStore(OIL_AVG_RESET_KEY, new Date().toISOString());
+  localStorage.setItem(OIL_AVG_RESET_KEY, new Date().toISOString());
   renderDash();
   renderBackup();
   showToast('Avg Oil Change reset ✓');
@@ -4589,18 +4829,139 @@ function clearOilAverageReset(){
 }
 
 /* ─── EXPORT (BACKUP) ────────────────────────────────────── */
-function showToast(msg, duration=4000){
-  const t=document.getElementById('toast');
-  if(!t) return;
-  clearTimeout(t._toastTimer);
-  t.textContent=msg;
-  t.classList.add('show');
-  t._toastTimer=setTimeout(()=>t.classList.remove('show'), duration);
+function exportData(){
+  // Collect all receipt photos from localStorage
+  const photos = {};
+  const entries = getData();
+  entries.forEach(e=>{
+    const p = getPhoto(e.id);
+    if(p) photos[e.id] = p;
+  });
+
+  const payload={
+    version: 6,
+    exported: new Date().toISOString(),
+    vin: VIN,
+    vehicle: '2021 Toyota Venza Hybrid AWD',
+    mileage: getMi(),
+    oilAverageResetAt: getOilAverageResetAt(),
+    averageServiceType: getAverageServiceType(),
+    scheduleOverrides: getScheduleOverrides(),
+    servicePartRequirements: getSavedServiceRequirementsMap(),
+    mileageHistory: getMiHistory(),
+    entries: entries,
+    inventory: getInventory(),
+    masterParts: getMasterParts(),
+    photos: photos  // base64 images keyed by entry id
+  };
+
+  const photoCount = Object.keys(photos).length;
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().split('T')[0];
+  a.href=url;
+  a.download='venza_backup_'+date+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Backup saved ✓ — ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}`);
 }
-document.addEventListener('DOMContentLoaded',()=>{
+
+/* ─── IMPORT (RESTORE) ───────────────────────────────────── */
+function importData(input){
+  const file=input.files[0];
+  if(!file){return}
+  if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const isLegacyArray = Array.isArray(parsed);
+      const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
+      if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+      const entries=Array.isArray(data.entries)?data.entries:null;
+      const mi=Number(data.mileage||0) || null;
+      const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
+      const inventory=Array.isArray(data.inventory) ? data.inventory : [];
+      const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
+      const oilAverageResetAt=data.oilAverageResetAt||'';
+      const averageServiceType=data.averageServiceType||'oil_avg';
+      const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
+      const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
+      const photoCount=Object.keys(photos).length;
+      const version = Number(data.version || 0);
+      const backupVin = String(data.vin || '').trim();
+
+      if(!entries){
+        showToast('❌ Invalid backup file format'); input.value=''; return;
+      }
+      if(version > 6){
+        showToast('This backup was created by a newer app version'); input.value=''; return;
+      }
+      if(backupVin && backupVin !== VIN){
+        const proceedMismatch = confirm(`This backup VIN does not match this app.
+
+Backup: ${backupVin}
+This app: ${VIN}
+
+Restore anyway?`);
+        if(!proceedMismatch){ input.value=''; return; }
+      }
+      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?
+
+This replaces all current data. Continue?`)){
+        input.value='';return;
+      }
+
+      clearStoredPhotos();
+      save(entries);
+      saveInventory(inventory);
+      saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
+      if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+      saveScheduleOverrides(scheduleOverrides);
+      if(mi&&mi>0)setMi(mi);
+
+      Object.entries(photos).forEach(([id,imgData])=>{
+        try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
+      });
+
+      renderAll();
+      renderBackup();
+      input.value='';
+      showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}!`);
+    }catch(err){
+      showToast('❌ Could not read backup file');
+      input.value='';
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ─── RESET DATA ─────────────────────────────────────────── */
+function resetData(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
+  // Clear all photos first
+  clearStoredPhotos();
+  save(DEFAULT);
+  saveInventory(DEFAULT_INVENTORY);
+  saveMasterParts(DEFAULT_MASTER_PARTS);
+  localStorage.removeItem(OIL_AVG_RESET_KEY);
+  localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  setMi(64751);
+  renderAll();
+  renderBackup();
+  showToast('Reset to factory data ✓');
+}
+
+/* ─── TOAST ──────────────────────────────────────────────── */
+function showToast(msg){
   const t=document.getElementById('toast');
-  if(t) t.addEventListener('click',()=>{ clearTimeout(t._toastTimer); t.classList.remove('show'); });
-});
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
 /* ─── GENERATE PRINT REPORT ──────────────────────────────────── */
 function generatePrint(){
   // Pre-fill mileage if empty
@@ -4609,7 +4970,7 @@ function generatePrint(){
 
   const owner   = document.getElementById('prOwner').value.trim() || 'Vehicle Owner';
   const model   = document.getElementById('prModel').value.trim();
-  const curMi   = parseInt(miEl.value, 10) || getMi();
+  const curMi   = parseInt(miEl.value) || getMi();
   const filter  = document.getElementById('prFilter').value;
   const today   = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   const todayISO = new Date().toISOString().split('T')[0];
@@ -4639,7 +5000,7 @@ function generatePrint(){
     const bg = i%2===0?'#ffffff':'#f8f9fb';
     return `<tr style="background:${bg}">
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${ds}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi, 10).toLocaleString()} mi</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi).toLocaleString()} mi</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${escapeHtml(typeLabel)}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${safeText(e.desc)}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(e.shop||'—')}</td>
@@ -4674,7 +5035,7 @@ function generatePrint(){
         return `<div style="border:1px solid #e2e4e8;border-radius:10px;overflow:hidden">
           <div style="background:#1a1d23;padding:8px 12px;display:flex;justify-content:space-between">
             <span style="color:#fff;font-size:11px;font-weight:600">${escapeHtml(LABELS[e.type]||'Service')}</span>
-            <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi, 10).toLocaleString()} mi</span>
+            <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi).toLocaleString()} mi</span>
           </div>
           <img src="${getPhoto(e.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
           <div style="padding:8px 12px;font-size:11px;color:#555">${escapeHtml(e.shop||'DIY')} · $${getEntryDisplayCost(e).toFixed(2)}</div>
@@ -5082,14 +5443,9 @@ function delEntry(id){
   const deletedEntry = currentEntries.find(e=>String(e.id)===String(id));
 
   // Only the highest-mileage entry may be deleted to keep mileage history reliable.
-  // Tie-break on entry id (timestamp) so two same-mileage entries have a stable order.
   const sortedByMi = [...currentEntries]
     .filter(e=>Number.isFinite(Number(e.mi)) && Number(e.mi)>0)
-    .sort((a,b)=>{
-      const miDiff = Number(b.mi) - Number(a.mi);
-      if(miDiff !== 0) return miDiff;
-      return Number(b.id) - Number(a.id); // newer id = more recent entry
-    });
+    .sort((a,b)=>Number(b.mi)-Number(a.mi));
   const latestEntry = sortedByMi[0];
   if(latestEntry && String(latestEntry.id)!==String(id)){
     showToast(`Delete the latest entry first (${Number(latestEntry.mi).toLocaleString()} mi) — entries must be removed newest-first to keep mileage accurate.`);
@@ -5271,7 +5627,7 @@ function migrateLegacyBasicParts(){
       note:item.note||''
     })));
   }catch(err){ seed = []; }
-  if(seed.length) safeStore(BASIC_PARTS_KEY, JSON.stringify(seed));
+  if(seed.length) localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(seed));
 }
 function getBasicPartsList(){
   migrateLegacyBasicParts();
@@ -5283,7 +5639,7 @@ function getBasicPartsList(){
   }
 }
 function saveBasicPartsList(items){
-  safeStore(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
+  localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
 }
 function upsertBasicPart(payload={}){
   const parts = getBasicPartsList();
@@ -5748,29 +6104,18 @@ function getFormItems(){
   })));
 }
 function syncEntryCostFromItems(){
-  const shopEl = document.getElementById('fShop');
-  if(shopEl && shopEl.value === 'SHOP'){
-    // SHOP mode — cost is manually entered, only update row displays
-    document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
-    return;
-  }
   const items = getFormItems();
   const total = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
   const costEl = document.getElementById('fCost');
   if(costEl) costEl.value = total > 0 ? total.toFixed(2) : '';
+  // Keep each row's header and subtotal in sync
   document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
 }
 function resetEntryInventoryUses(){
   const list = document.getElementById('fItemsList');
   if(list) list.innerHTML = '';
   toggleServicePartsBuilder(false);
-  // Reset cost field to DIY auto-calc state
-  const costEl = document.getElementById('fCost');
-  if(costEl){ costEl.value=''; costEl.setAttribute('readonly',''); costEl.classList.remove('cost-manual'); }
-  const labelEl = document.getElementById('fCostLabel');
-  const noteEl  = document.getElementById('fCostNote');
-  if(labelEl) labelEl.textContent = 'Total Cost ($)';
-  if(noteEl)  noteEl.textContent  = 'Auto-calculated from parts added below.';
+  syncEntryCostFromItems();
   const bar = document.getElementById('reusePartsBar');
   if(bar) bar.classList.remove('visible');
 }
@@ -5779,244 +6124,50 @@ function renderEntryInventoryUI(){
 }
 function useInventoryItem(){ showToast('This form now uses the new purchased parts builder'); }
 function removeOneInventoryItem(){}
-/* ─── SERVICE TYPE ICONS & COLORS ───────────────────────────── */
-const SERVICE_ICONS = {
-  oil:             {icon:'🛢️', bg:'rgba(217,122,0,.15)',  color:'var(--orange2)'},
-  tires:           {icon:'🔄', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
-  cabin:           {icon:'💨', bg:'rgba(34,114,212,.12)', color:'var(--blue2)'},
-  engine_filter:   {icon:'🌬️', bg:'rgba(34,114,212,.12)', color:'var(--blue2)'},
-  trans:           {icon:'⚙️', bg:'rgba(212,150,10,.15)', color:'var(--gold2)'},
-  diff:            {icon:'⚙️', bg:'rgba(212,150,10,.15)', color:'var(--gold2)'},
-  coolant:         {icon:'🌡️', bg:'rgba(34,114,212,.15)', color:'var(--blue2)'},
-  inv_coolant:     {icon:'⚡', bg:'rgba(77,158,255,.15)', color:'var(--blue2)'},
-  alignment:       {icon:'🎯', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
-  tires_new:       {icon:'🔧', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
-  brakes:          {icon:'🛑', bg:'rgba(235,10,30,.12)',  color:'var(--toyota2)'},
-  plugs:           {icon:'⚡', bg:'rgba(212,150,10,.15)', color:'var(--gold2)'},
-  hvfilter_inspect:{icon:'🔍', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
-  hvfilter_clean:  {icon:'🧹', bg:'rgba(34,212,110,.12)', color:'var(--green2)'},
-  valvomax:        {icon:'🔩', bg:'rgba(217,122,0,.15)',  color:'var(--orange2)'},
-  wipers:          {icon:'🌧️', bg:'rgba(34,114,212,.12)', color:'var(--blue2)'},
-  other:           {icon:'🔧', bg:'rgba(90,96,128,.2)',   color:'var(--text2)'},
-};
-
-/* ─── EDIT ENTRY MODAL ──────────────────────────────────────── */
-function openEditModal(id){
-  const entry = getData().find(e => String(e.id) === String(id));
-  if(!entry){ showToast('Entry not found'); return; }
-  document.getElementById('editEntryId').value = String(id);
-  document.getElementById('editType').value    = entry.type || 'other';
-  document.getElementById('editDate').value    = entry.date || '';
-  document.getElementById('editMi').value      = entry.mi   || '';
-  document.getElementById('editDesc').value    = entry.desc || '';
-  document.getElementById('editShop').value    = entry.shop || 'DIY';
-  const excludeEl = document.getElementById('editExcludeFromAvg');
-  if(excludeEl) excludeEl.checked = !!entry.excludeFromAvg;
-  // Cost — always editable in edit mode
-  const cost = getEntryDisplayCost(entry);
-  document.getElementById('editCost').value    = cost > 0 ? cost.toFixed(2) : '';
-  // Parts
-  const partsList = document.getElementById('editPartsList');
-  partsList.innerHTML = '';
-  const parts = normalizeServiceEntryItems(entry.items || []);
-  if(parts.length){
-    parts.forEach(p => addEditPartRow(p));
-  }
-  document.getElementById('editEntryModal').classList.add('open');
-}
-function closeEditModal(){
-  document.getElementById('editEntryModal').classList.remove('open');
-}
-function addEditPartRow(data={}){
-  const list = document.getElementById('editPartsList');
-  const idx  = list.children.length;
-  const row  = document.createElement('div');
-  row.className = 'edit-part-row';
-  row.innerHTML = `
-    <div class="edit-part-row-top">
-      <span class="edit-part-row-label">Part ${idx + 1}</span>
-      <button type="button" class="edit-part-remove" onclick="this.closest('.edit-part-row').remove();renumberEditParts()" touch-action="manipulation">Remove</button>
-    </div>
-    <div class="edit-part-grid">
-      <div class="fl span2" style="margin-bottom:0"><label>Part name</label><input type="text" class="fi ep-name" autocomplete="off" autocorrect="off" value="${escapeHtmlAttr(data.name||'')}"></div>
-      <div class="fl span2" style="margin-bottom:0"><label>Part #</label><input type="text" class="fi ep-part" autocomplete="off" autocorrect="off" autocapitalize="characters" value="${escapeHtmlAttr(data.partNum||'')}"></div>
-      <div class="fl span2" style="margin-bottom:0"><label>Store</label><input type="text" class="fi ep-store" autocorrect="off" value="${escapeHtmlAttr(data.store||'')}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Unit price ($)</label><input type="number" class="fi ep-price" inputmode="decimal" step="0.01" min="0" value="${Number(data.price||0)>0 ? Number(data.price).toFixed(2) : ''}"></div>
-      <div class="fl" style="margin-bottom:0"><label>Qty</label><input type="number" class="fi ep-qty" inputmode="numeric" min="1" step="1" value="${Math.max(1,parseInt(data.qty||1,10)||1)}"></div>
-    </div>`;
-  list.appendChild(row);
-}
-function renumberEditParts(){
-  document.querySelectorAll('#editPartsList .edit-part-row-label').forEach((el,i) => {
-    el.textContent = `Part ${i+1}`;
-  });
-}
-function saveEditEntry(){
-  const id      = document.getElementById('editEntryId').value;
-  const type    = document.getElementById('editType').value   || 'other';
-  const date    = document.getElementById('editDate').value;
-  const mi      = document.getElementById('editMi').value;
-  const desc    = document.getElementById('editDesc').value.trim();
-  const shop    = document.getElementById('editShop').value   || 'DIY';
-  const excludeFromAvg = !!(document.getElementById('editExcludeFromAvg')?.checked);
-  const costRaw = parseFloat(document.getElementById('editCost').value) || 0;
-  if(!date){ showToast('Date is required'); return; }
-  const parsedMi = parseInt(mi, 10);
-  if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
-  const finalDesc = desc || `${LABELS[type]||'Service'} — ${shop}`;
-  // Collect edited parts
-  const parts = Array.from(document.querySelectorAll('#editPartsList .edit-part-row')).map(row => ({
-    name:    row.querySelector('.ep-name')?.value.trim()  || '',
-    partNum: row.querySelector('.ep-part')?.value.trim()  || '',
-    store:   row.querySelector('.ep-store')?.value.trim() || '',
-    price:   parseFloat(row.querySelector('.ep-price')?.value||0) || 0,
-    qty:     Math.max(1, parseInt(row.querySelector('.ep-qty')?.value||1,10)||1),
-    saveToParts: false
-  })).filter(p => p.name || p.price > 0);
-  // Recalculate cost: if parts exist use parts total, otherwise use manual cost field
-  const partsCost = parts.reduce((s,p) => s + p.price * p.qty, 0);
-  const finalCost = partsCost > 0 ? partsCost : costRaw;
-  const d = getData();
-  const idx = d.findIndex(e => String(e.id) === String(id));
-  if(idx === -1){ showToast('Entry not found'); return; }
-  const original = d[idx];
-  d[idx] = {...original, type, date, mi:parsedMi, desc:finalDesc, shop, cost:finalCost, items:normalizeServiceEntryItems(parts), excludeFromAvg};
-  save(d);
-  // Reconcile mileage if the mileage number changed
-  const prevHighest = getData().reduce((max,e,i) => i!==idx ? Math.max(max,Number(e.mi||0)) : max, 0);
-  if(parsedMi >= getMi() || String(getMiState().entryId) === String(id)){
-    setMi(parsedMi, {source:'entry', entryId:id, allowLower:true});
-  }
-  closeEditModal();
-  renderAll();
-  showToast('Entry updated ✓');
-}
-/* ─── SERVICE LOG ─────────────────────────────────────────────── */
 function renderLog(){
-  const d = getData().sort((a,b) => Number(b.mi) - Number(a.mi));
-  const el = document.getElementById('logList');
+  const d=getData().sort((a,b)=>b.mi-a.mi);
+  const el=document.getElementById('logList');
   if(!el) return;
-
-  if(!d.length){
-    el.innerHTML = `
-      <div class="log-empty">
-        <div class="log-empty-icon">🔧</div>
-        <div class="log-empty-title">No service entries yet</div>
-        <div class="log-empty-sub">Every oil change, tire rotation, and repair you log here builds your vehicle's complete service history.</div>
-        <button class="btn-primary" onclick="go('add')" style="max-width:220px;margin:0 auto;display:block">＋ Add First Service Entry</button>
-      </div>`;
-    const totalEl = document.getElementById('totalVal');
-    if(totalEl) totalEl.textContent = '$0.00';
-    return;
-  }
-
-  el.innerHTML = d.map((e, idx) => {
-    const dt     = new Date(e.date+'T00:00:00');
-    const ds     = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const currMi = parseInt(e.mi, 10);
-    const prevMi = Number(d[idx+1]?.mi || 0);
-    const delta  = prevMi > 0 ? currMi - prevMi : 0;
-    const svc    = SERVICE_ICONS[e.type] || SERVICE_ICONS.other;
-    const cost   = getEntryDisplayCost(e);
-
-    const deltaChip = delta > 0
-      ? `<span class="log-mi-delta">+${delta.toLocaleString()} mi</span>` : '';
-
-    const shopVal   = String(e.shop||'DIY').toUpperCase();
-    const shopClass = shopVal === 'SHOP' ? 'shop' : 'diy';
-
+  el.innerHTML=d.map(e=>{
+    const dt=new Date(e.date+'T00:00:00');
+    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const safeEntryUrl = safeUrl(e.link);
-    const linkHtml = safeEntryUrl
-      ? `<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>` : '';
-
-    // Parts
+    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
+    const del=!e.builtin
+      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
+      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    const photo=getPhoto(e.id);
     const parts = normalizeServiceEntryItems(e.items);
-    const partsTotal = parts.reduce((s,p) => s + Number(p.price||0)*Number(p.qty||0), 0);
-    const partsHtml = parts.length ? `
-      <div class="log-parts-wrap">
-        <div class="log-parts-head">
-          <span>Purchased Parts</span>
-          <span class="log-parts-total">$${partsTotal.toFixed(2)}</span>
-        </div>
-        <div class="log-parts-grid">
-          ${parts.map(item => {
-            const sub  = (Number(item.price||0)*Number(item.qty||0)).toFixed(2);
-            const meta = [
-              item.qty > 1 ? `Qty ${item.qty}` : null,
-              item.partNum ? `Part # ${escapeHtml(item.partNum)}` : null,
-              item.store   ? escapeHtml(item.store) : null,
-              item.note    ? escapeHtml(item.note)  : null
-            ].filter(Boolean).join(' · ');
-            const pLink = safeUrl(item.link)
-              ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : '';
-            return `<div class="log-part">
-              <div class="log-part-top">
-                <div class="log-part-name">${item.qty>1?`${item.qty}× `:''}${escapeHtml(item.name||'Part')}</div>
-                <div class="log-part-price">$${sub}</div>
-              </div>
-              ${meta ? `<div class="log-part-meta">${meta}</div>` : ''}
-              ${pLink}
-            </div>`;
-          }).join('')}
-        </div>
-      </div>` : '';
-
-    // Photo
-    const photo = getPhoto(e.id);
-    const photoHtml = photo
-      ? `<div style="margin:10px 14px 0;cursor:pointer" onclick="viewPhoto(${e.id})">
-           <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:9px;border:1px solid var(--border)">
-           <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">
-             📷 Receipt · tap to view · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span>
-           </div>
-         </div>`
-      : `<button onclick="addPhotoToEntry(${e.id})" style="display:block;width:calc(100% - 28px);margin:10px 14px 0;padding:8px 12px;font-size:11px;color:var(--text3);border:1px dashed var(--border2);border-radius:8px;background:none;cursor:pointer;text-align:center;touch-action:manipulation">
-           📷 Add Receipt Photo
-         </button>`;
-
-    // All entries are editable. Built-in entries just use a different delete handler.
-    const editBtn = `<button class="log-btn edit" onclick="openEditModal(${e.id})" title="Edit entry">✏️</button>`;
-    const delBtn  = !e.builtin
-      ? `<button class="log-btn del" onclick="delEntry(${e.id})" title="Delete entry">🗑️</button>`
-      : `<button class="log-btn del" onclick="delBuiltin(${e.id})" title="Delete factory entry" style="opacity:.5">🗑️</button>`;
-
-    return `<div class="log-item">
-      <div class="log-header">
-        <div class="log-header-left">
-          <div class="log-type-icon" style="background:${svc.bg}">${svc.icon}</div>
-          <div class="log-type-label">${LABELS[e.type]||'Service'}</div>
-        </div>
-        <div class="log-header-right">
-          <span class="log-date">${ds}</span>
-          <div class="log-mi-wrap">
-            <span class="log-mi">${currMi.toLocaleString()} mi</span>
-            ${deltaChip}
-          </div>
-        </div>
+    const photoHtml=photo
+      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+        </div>`
+      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+          background:none;cursor:pointer;width:100%;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+          📷 Add Receipt Photo
+        </button>`;
+    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+      ${del}
+      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
+      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-desc">${safeText(e.desc || '')}</div>
+      <div class="log-foot">
+        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
+        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
       </div>
-      ${e.desc ? `<div class="log-body"><div class="log-desc">${safeText(e.desc)}</div></div>` : ''}
-      ${partsHtml}
+      ${parts.length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${parts.map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
       ${photoHtml}
-      <div class="log-footer">
-        <div class="log-footer-left">
-          <span class="log-shop-badge ${shopClass}">${shopVal}</span>
-          ${e.excludeFromAvg ? `<span style="font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:2px 7px;white-space:nowrap">avg excluded</span>` : ''}
-          ${linkHtml}
-        </div>
-        <div class="log-footer-right">
-          <span class="log-cost${cost===0?' log-cost-zero':''}">$${cost.toFixed(2)}</span>
-          <div class="log-actions">${editBtn}${delBtn}</div>
-        </div>
-      </div>
     </div>`;
   }).join('');
-
-  const tot = d.reduce((a,e) => a + getEntryDisplayCost(e), 0);
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
   const totalEl = document.getElementById('totalVal');
-  if(totalEl) totalEl.textContent = '$' + tot.toFixed(2);
+  if(totalEl) totalEl.textContent='$'+tot.toFixed(2);
 }
 function getAverageEntryCost(entry, type=getAverageServiceType()){
-  if(entry.excludeFromAvg) return null;
   if(!entryMatchesAverageType(entry, type)) return null;
   const manual = Number(entry.cost || 0);
   if(Number.isFinite(manual) && manual > 0) return manual;
@@ -6024,46 +6175,40 @@ function getAverageEntryCost(entry, type=getAverageServiceType()){
   return Number.isFinite(legacy) && legacy > 0 ? legacy : null;
 }
 function saveEntry(){
-  const date = document.getElementById('fDate')?.value || '';
-  const mi   = document.getElementById('fMi')?.value || '';
-  const type = document.getElementById('fType')?.value || '';
-  const shop = document.getElementById('fShop')?.value || 'DIY';
-  const items = getFormItems();
-
-  if(!type){ showToast('Select a service type first'); return; }
-  if(!date){ showToast('Please fill in the date'); return; }
-  if(!mi){   showToast('Please fill in the mileage'); return; }
-  const parsedMi = parseInt(mi, 10);
+  const date=document.getElementById('fDate')?.value || '';
+  const mi=document.getElementById('fMi')?.value || '';
+  const type=document.getElementById('fType')?.value || 'other';
+  const desc=document.getElementById('fDesc')?.value.trim() || '';
+  const shop=document.getElementById('fShop')?.value || 'DIY';
+  const items=getFormItems();
+  if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
+  const parsedMi = parseInt(mi,10);
   if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
-
-  // Auto-generate description if left blank
-  const rawDesc = document.getElementById('fDesc')?.value.trim() || '';
-  const finalDesc = rawDesc || `${LABELS[type] || 'Service'} — ${shop}`;
-
-  // Cost: SHOP entries use manual input, DIY entries auto-calc from parts
-  const autoCost = items.reduce((sum,item) => sum + (Number(item.price||0) * Number(item.qty||0)), 0);
-  const costEl   = document.getElementById('fCost');
-  const manualCost = parseFloat(costEl?.value || 0) || 0;
-  const finalCost  = shop === 'SHOP' ? manualCost : autoCost;
-
-  const newId = Date.now();
-  const d = getData();
-  d.push({id:newId, date, mi:parsedMi, type, desc:finalDesc, cost:finalCost, shop, link:'', items, inventoryUses:[], builtin:false});
+  const autoCost = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+  const newId=Date.now();
+  const d=getData();
+  d.push({id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false});
   save(d);
   const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
-  if(window._pendingPhoto){ savePhoto(newId, window._pendingPhoto); window._pendingPhoto=null; }
-  if(parsedMi > getMi()) setMi(parsedMi, {source:'entry', entryId:newId});
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
+  if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
   renderAll();
   go('log');
   ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
   const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value='DIY';
+  const costEl = document.getElementById('fCost'); if(costEl) costEl.value='';
   resetEntryInventoryUses();
   clearPhoto();
-  const wasAutoDesc = !rawDesc;
-  if(!items.length) showToast(wasAutoDesc ? `Entry saved ✓ — description auto-filled` : 'Entry saved ✓');
-  else if(partSyncResult.added) showToast(`Entry saved ✓ · ${partSyncResult.added} part${partSyncResult.added!==1?'s':''} added to Parts`);
-  else showToast('Entry saved ✓');
+  if(!items.length) showToast('Entry saved ✓');
+  else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry saved ✓ Checked parts were added to Parts');
+  else if(!partSyncResult.added && partSyncResult.skippedUnchecked && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ No parts were checked for the Parts tab');
+  else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedUnchecked) showToast('Entry saved ✓ Checked part already exists in Parts');
+  else if(!partSyncResult.added) showToast('Entry saved ✓ No new checked parts were added to Parts');
+  else showToast(`Entry saved ✓ ${partSyncResult.added} checked part${partSyncResult.added!==1?'s':''} added to Parts`);
 }
 
 function renderBackup(){
@@ -6086,7 +6231,7 @@ function renderBackup(){
   if(totalEl) totalEl.textContent = '$'+tot.toFixed(2);
   if(last && lastEl){
     const dt=new Date(last.date+'T00:00:00');
-    lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi, 10).toLocaleString() + ' mi';
+    lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
   }
   renderReminderStrategy();
 }
@@ -6104,13 +6249,11 @@ function exportData(){
     if(p) partPhotos[part.id] = p;
   });
   const payload={
-    version: 9,
+    version: 8,
     exported: new Date().toISOString(),
     vin: VIN,
     vehicle: '2021 Toyota Venza Hybrid AWD',
     mileage: getMi(),
-    miState: getMiState(),
-    mileageHistory: getMiHistory(),
     oilAverageResetAt: getOilAverageResetAt(),
     averageServiceType: getAverageServiceType(),
     scheduleOverrides: getScheduleOverrides(),
@@ -6172,7 +6315,7 @@ function importData(input){
       const version = Number(data.version || 0);
       const backupVin = String(data.vin || '').trim();
       if(!entries){ showToast('❌ Invalid backup file format'); input.value=''; return; }
-      if(version > 9){ showToast('This backup was created by a newer app version'); input.value=''; return; }
+      if(version > 8){ showToast('This backup was created by a newer app version'); input.value=''; return; }
       if(backupVin && backupVin !== VIN){
         const proceedMismatch = confirm(`This backup VIN does not match this app.
 
@@ -6193,8 +6336,8 @@ This replaces all current data. Continue?`)){
       saveBasicPartsList(basicParts);
       saveInventory(inventory);
       saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
-      if(oilAverageResetAt){ safeStore(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
-      safeStore(AVG_SERVICE_TYPE_KEY, averageServiceType);
+      if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+      localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
       saveScheduleOverrides(scheduleOverrides);
       if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
       if(mileageHistory.length) saveMiHistory(mileageHistory); else localStorage.removeItem(MI_HISTORY_KEY);
@@ -6239,6 +6382,330 @@ function resetData(){
   renderBackup();
   showToast('Reset to factory data ✓');
 }
+
+/* ════════════════════════════════════════════════════════════════
+   VENZA GARAGE — STABILITY + UX UPGRADE v9
+   Fixes: editable service cost, safer backup/restore, calendar vehicle
+   name, factory mileage reset, smarter dashboard summary, and oil-cost math.
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  const UPGRADE_VERSION = 9;
+  const FACTORY_MILEAGE = Math.max(highestMileage(DEFAULT), Number(LAST_SVC_MI||0), 64751);
+
+  function getLocalStorageUsageKb(){
+    try{
+      let chars = 0;
+      for(let i=0;i<localStorage.length;i++){
+        const key = localStorage.key(i) || '';
+        const value = localStorage.getItem(key) || '';
+        chars += key.length + value.length;
+      }
+      return Math.round((chars * 2) / 1024);
+    }catch(err){ return null; }
+  }
+
+  window.getManualMileageBaseline = function(){
+    const history = getMiHistory();
+    for(let i=history.length-1; i>=0; i--){
+      const item = history[i];
+      if(item.source==='manual' && Number.isFinite(Number(item.value)) && Number(item.value)>0) return Number(item.value);
+    }
+    return FACTORY_MILEAGE;
+  };
+
+  window.getAverageEntryCost = function(entry, type=getAverageServiceType()){
+    if(!entryMatchesAverageType(entry, type)) return null;
+    if(type === 'oil_avg'){
+      const itemTotal = getEntryItemsTotal(entry, item=>item.useInOilAvg || entry.type === 'oil');
+      if(itemTotal > 0) return itemTotal;
+      const inventoryOil = getInventoryUseTotal(entry, use=>use.countInOilAvg);
+      if(inventoryOil > 0) return inventoryOil;
+      const manual = Number(entry.cost || 0);
+      const desc = String(entry.desc || '').toLowerCase();
+      const looksBundled = entry.type === 'oil' && manual > 125 && (desc.includes('transmission') || desc.includes('rear diff') || desc.includes('tire rotation'));
+      if(looksBundled) return null;
+      return Number.isFinite(manual) && manual > 0 ? manual : null;
+    }
+    const manual = Number(entry.cost || 0);
+    if(Number.isFinite(manual) && manual > 0) return manual;
+    const legacy = getEntryDisplayCost(entry);
+    return Number.isFinite(legacy) && legacy > 0 ? legacy : null;
+  };
+
+  window.renderDashboardSmartSummary = function(){
+    const el = document.getElementById('dSmartSummary');
+    if(!el) return;
+    const state = getRecurringServicesState(getMi());
+    const items = state.rules.filter(rule=>!rule.watchOnly).sort(compareRecurring);
+    const overdue = items.filter(item=>item.status === 'overdue');
+    const soon = items.filter(item=>item.status === 'due soon');
+    const upcoming = items.filter(item=>item.status === 'upcoming');
+    const customTargets = getResolvedRecurringRules().filter(rule=>!rule.watchOnly && rule.customActive).length;
+    const next = items[0];
+    const nextText = next ? `${next.name} · ${next.remainingText}` : 'No recurring service found';
+    const avg = state.avgMilesPerDay && Number.isFinite(state.avgMilesPerDay) ? `${Math.round(state.avgMilesPerDay)} mi/day` : 'Learning';
+    el.innerHTML = `
+      <div class="row"><span class="row-key">Next Action</span><span class="row-val ${next?.status==='overdue'?'red':next?.status==='due soon'?'orange':'green'}">${escapeHtml(nextText)}</span></div>
+      <div class="row"><span class="row-key">Urgency</span><span class="row-val ${overdue.length?'red':soon.length?'orange':'green'}">${overdue.length} overdue · ${soon.length} soon · ${upcoming.length} upcoming</span></div>
+      <div class="row"><span class="row-key">Mileage Pace</span><span class="row-val">${escapeHtml(avg)}</span></div>
+      <div class="row"><span class="row-key">Custom Targets</span><span class="row-val ${customTargets?'gold':'green'}">${customTargets} saved</span></div>
+    `;
+  };
+
+  const baseRenderDash = window.renderDash;
+  window.renderDash = function(){
+    baseRenderDash();
+    renderDashboardSmartSummary();
+  };
+
+  const baseSyncEntryCostFromItems = window.syncEntryCostFromItems;
+  window.syncEntryCostFromItems = function(){
+    const items = getFormItems();
+    const total = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+    const costEl = document.getElementById('fCost');
+    if(costEl && costEl.dataset.userEdited !== '1') costEl.value = total > 0 ? total.toFixed(2) : '';
+    document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
+    if(typeof baseSyncEntryCostFromItems === 'function' && false) baseSyncEntryCostFromItems();
+  };
+
+  window.saveEntry = function(){
+    const date=document.getElementById('fDate')?.value || '';
+    const mi=document.getElementById('fMi')?.value || '';
+    const type=document.getElementById('fType')?.value || 'other';
+    const desc=document.getElementById('fDesc')?.value.trim() || '';
+    const shop=document.getElementById('fShop')?.value || 'DIY';
+    const costRaw = document.getElementById('fCost')?.value || '';
+    const items=getFormItems();
+    if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
+    const parsedMi = parseInt(mi,10);
+    if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
+    const itemTotal = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+    const manualCost = Number(costRaw);
+    if(costRaw && (!Number.isFinite(manualCost) || manualCost < 0)){ showToast('Enter a valid cost or leave it blank'); return; }
+    const finalCost = Number.isFinite(manualCost) && manualCost >= 0 && costRaw !== '' ? manualCost : itemTotal;
+    const newId=Date.now();
+    const d=getData();
+    d.push({id:newId,date,mi:parsedMi,type,desc,cost:finalCost,shop,link:'',items,inventoryUses:[],builtin:false});
+    save(d);
+    const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
+    if(window._pendingPhoto){
+      savePhoto(newId, window._pendingPhoto);
+      window._pendingPhoto=null;
+    }
+    if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
+    renderAll();
+    go('log');
+    ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
+    const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value='DIY';
+    const costEl = document.getElementById('fCost'); if(costEl){ costEl.value=''; delete costEl.dataset.userEdited; }
+    resetEntryInventoryUses();
+    clearPhoto();
+    if(!items.length) showToast('Entry saved ✓');
+    else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry saved ✓ Checked parts were added to Parts');
+    else if(!partSyncResult.added && partSyncResult.skippedUnchecked && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ No parts were checked for the Parts tab');
+    else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedUnchecked) showToast('Entry saved ✓ Checked part already exists in Parts');
+    else if(!partSyncResult.added) showToast('Entry saved ✓ No new checked parts were added to Parts');
+    else showToast(`Entry saved ✓ ${partSyncResult.added} checked part${partSyncResult.added!==1?'s':''} added to Parts`);
+  };
+
+  window.renderBackup = function(){
+    const d=getData();
+    const mi=getMi();
+    const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+    const sorted=[...d].sort((a,b)=>Number(b.mi||0)-Number(a.mi||0));
+    const last=sorted[0];
+    const photoCount=d.filter(e=>getPhoto(e.id)).length;
+    const partCount = getBasicPartsList().length;
+    const partPhotoCount = getBasicPartsList().filter(part=>getBasicPartPhoto(part.id)).length;
+    const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
+    const countEl = document.getElementById('bkCount');
+    const miEl = document.getElementById('bkMi');
+    const totalEl = document.getElementById('bkTotal');
+    const lastEl = document.getElementById('bkLast');
+    if(countEl) countEl.textContent = `${d.length} entries · ${partCount} part${partCount!==1?'s':''} · ${scheduleOverrideCount} custom target${scheduleOverrideCount!==1?'s':''} · ${photoCount} service photo${photoCount!==1?'s':''} · ${partPhotoCount} part photo${partPhotoCount!==1?'s':''}`;
+    if(miEl) miEl.textContent = mi.toLocaleString()+' mi';
+    const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
+    if(totalEl) totalEl.textContent = '$'+tot.toFixed(2);
+    if(last && lastEl){
+      const dt=new Date(last.date+'T00:00:00');
+      lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
+    }
+    const healthEl = document.getElementById('bkHealth');
+    if(healthEl) healthEl.textContent = `v${UPGRADE_VERSION} · backup-safe · ${Object.keys(getVerificationOverrides()).length} verified edit${Object.keys(getVerificationOverrides()).length!==1?'s':''}`;
+    const storageEl = document.getElementById('bkStorage');
+    const kb = getLocalStorageUsageKb();
+    if(storageEl) storageEl.textContent = kb === null ? 'Unavailable' : `${kb.toLocaleString()} KB used`;
+    renderReminderStrategy();
+  };
+
+  window.exportData = function(){
+    const servicePhotos = {};
+    const entries = getData();
+    entries.forEach(e=>{
+      const p = getPhoto(e.id);
+      if(p) servicePhotos[e.id] = p;
+    });
+    const partPhotos = {};
+    const basicParts = getBasicPartsList();
+    basicParts.forEach(part=>{
+      const p = getBasicPartPhoto(part.id);
+      if(p) partPhotos[part.id] = p;
+    });
+    const payload={
+      version: UPGRADE_VERSION,
+      exported: new Date().toISOString(),
+      vin: VIN,
+      vehicle: `${VEHICLE_PROFILE.year} ${VEHICLE_PROFILE.make} ${VEHICLE_PROFILE.model} ${VEHICLE_PROFILE.trim}`.replace(/\s+/g,' ').trim(),
+      mileage: getMi(),
+      mileageHistory: getMiHistory(),
+      oilAverageResetAt: getOilAverageResetAt(),
+      averageServiceType: getAverageServiceType(),
+      scheduleOverrides: getScheduleOverrides(),
+      verificationOverrides: getVerificationOverrides(),
+      servicePartRequirements: getSavedServiceRequirementsMap(),
+      entries: entries,
+      basicParts: basicParts,
+      inventory: getInventory(),
+      masterParts: getMasterParts(),
+      photos: servicePhotos,
+      partPhotos: partPhotos
+    };
+    const photoCount = Object.keys(servicePhotos).length + Object.keys(partPhotos).length;
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const date=new Date().toISOString().split('T')[0];
+    a.href=url;
+    a.download='venza_backup_'+date+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`Backup saved ✓ — ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}`);
+  };
+
+  window.importData = function(input){
+    const file=input.files?.[0];
+    if(!file){return;}
+    if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return;}
+    const reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        const parsed=JSON.parse(e.target.result);
+        const isLegacyArray = Array.isArray(parsed);
+        const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
+        if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+        const entries=Array.isArray(data.entries)?data.entries:null;
+        const mi=Number(data.mileage||0) || null;
+        const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
+        const partPhotos=(data.partPhotos && typeof data.partPhotos === 'object') ? data.partPhotos : {};
+        const inventory=Array.isArray(data.inventory) ? data.inventory : [];
+        const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
+        const basicParts=Array.isArray(data.basicParts) ? data.basicParts : normalizeBasicParts(inventory.map(item=>({
+          id:item.id,
+          name:item.name,
+          category:guessPartCategoryForService(item.serviceType),
+          serviceType:item.serviceType || '',
+          store:item.store,
+          partNum:item.partNum,
+          link:item.link,
+          unitCost:item.unitCost,
+          note:item.note || ''
+        })));
+        const oilAverageResetAt=data.oilAverageResetAt||'';
+        const averageServiceType=data.averageServiceType||'oil_avg';
+        const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
+        const verificationOverrides=(data.verificationOverrides && typeof data.verificationOverrides === 'object' && !Array.isArray(data.verificationOverrides)) ? data.verificationOverrides : {};
+        const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
+        const mileageHistory=Array.isArray(data.mileageHistory) ? normalizeMileageHistory(data.mileageHistory) : [];
+        const photoCount=Object.keys(photos).length + Object.keys(partPhotos).length;
+        const version = Number(data.version || 0);
+        const backupVin = String(data.vin || '').trim();
+        if(!entries){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+        if(version > UPGRADE_VERSION){ showToast('This backup was created by a newer app version'); input.value=''; return; }
+        if(backupVin && backupVin !== VIN){
+          const proceedMismatch = confirm(`This backup VIN does not match this app.\n\nBackup: ${backupVin}\nThis app: ${VIN}\n\nRestore anyway?`);
+          if(!proceedMismatch){ input.value=''; return; }
+        }
+        if(!confirm(`Restore ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}?\n\nThis replaces all current data. Continue?`)){
+          input.value='';return;
+        }
+        clearStoredPhotos();
+        clearStoredPartPhotos();
+        save(entries);
+        saveBasicPartsList(basicParts);
+        saveInventory(inventory);
+        saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
+        if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+        localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
+        saveScheduleOverrides(scheduleOverrides);
+        saveVerificationOverrides(verificationOverrides);
+        if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
+        if(mileageHistory.length) saveMiHistory(mileageHistory); else localStorage.removeItem(MI_HISTORY_KEY);
+        if(mi&&mi>0)setMi(mi,{source:'manual',allowLower:true,skipHistory:!!mileageHistory.length});
+        else if(mileageHistory.length){
+          const restoredMileage = getLatestMileageHistoryCandidate();
+          if(restoredMileage){
+            setMi(restoredMileage.value,{source:restoredMileage.source,entryId:restoredMileage.entryId,allowLower:true,skipHistory:true});
+          }else{
+            recalcMileageFromEntries(entries);
+          }
+        }else recalcMileageFromEntries(entries);
+        Object.entries(photos).forEach(([id,imgData])=>{ try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){} });
+        Object.entries(partPhotos).forEach(([id,imgData])=>{ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id, imgData); }catch(err){} });
+        applyVerificationOverrides();
+        renderAll();
+        renderBackup();
+        input.value='';
+        showToast(`✓ Restored ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}!`);
+      }catch(err){
+        showToast('❌ Could not read backup file');
+        input.value='';
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  window.resetData = function(){
+    if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return;}
+    clearStoredPhotos();
+    clearStoredPartPhotos();
+    save(DEFAULT);
+    saveBasicPartsList([]);
+    saveInventory(DEFAULT_INVENTORY);
+    saveMasterParts(DEFAULT_MASTER_PARTS);
+    localStorage.removeItem(OIL_AVG_RESET_KEY);
+    localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+    localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+    localStorage.removeItem(BASIC_PARTS_KEY);
+    localStorage.removeItem(VERIFICATION_OVERRIDES_KEY);
+    localStorage.removeItem(MI_STATE_KEY);
+    localStorage.removeItem(MI_HISTORY_KEY);
+    setMi(FACTORY_MILEAGE,{source:'manual',allowLower:true});
+    renderAll();
+    renderBackup();
+    showToast('Reset to factory data ✓');
+  };
+
+  const baseResetEntryInventoryUses = window.resetEntryInventoryUses;
+  window.resetEntryInventoryUses = function(){
+    if(typeof baseResetEntryInventoryUses === 'function') baseResetEntryInventoryUses();
+    const costEl = document.getElementById('fCost');
+    if(costEl){ costEl.value = ''; delete costEl.dataset.userEdited; }
+  };
+
+  window.addEventListener('load', function(){
+    const costEl = document.getElementById('fCost');
+    if(costEl && !costEl.dataset.vzBound){
+      costEl.dataset.vzBound = '1';
+      costEl.addEventListener('input', function(){ this.dataset.userEdited = '1'; });
+    }
+    renderDashboardSmartSummary();
+    renderBackup();
+  });
+})();
+
 </script>
 </body>
 </html>
