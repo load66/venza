@@ -1,0 +1,155 @@
+name: Apply oil cost fix
+
+on:
+  push:
+    paths:
+      - .github/workflows/apply-oil-cost-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch Venza oil-change cost logic
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('venza.html')
+          s = p.read_text()
+
+          s = s.replace("const APP_VERSION = '1.5.0';\nconst APP_BUILD   = '2026.07.12.1';", "const APP_VERSION = '1.5.1';\nconst APP_BUILD   = '2026.07.12.2';")
+
+          old_default = """  // ── Entry 6: DIY oil change ───────────────────────────────────
+            {
+              id: 2026071268187,
+              date: '2026-07-12',
+              mi: 68187,
+              type: 'oil',
+              desc: 'DIY oil change completed — SAE 0W-16 full synthetic engine oil. Current mileage: 68,187. Next service target: 73,187 mi or Jan 12, 2027, whichever comes first.',
+              cost: 0,
+              shop: 'DIY',
+              link: '',
+              items: [],
+              inventoryUses: [],
+              builtin: true
+            },
+          """
+          new_default = """  // ── Entry 6: DIY oil change ───────────────────────────────────
+            {
+              id: 2026071268187,
+              date: '2026-07-12',
+              mi: 68187,
+              type: 'oil',
+              desc: 'DIY oil change completed — Mobil 1 SAE 0W-16 full synthetic engine oil purchased from Amazon + Toyota OEM oil filter 90915-YZZN1 purchased from Toyota dealership. Current mileage: 68,187. Next service target: 73,187 mi or Jan 12, 2027, whichever comes first.',
+              cost: 34.54,
+              shop: 'DIY · Oil from Amazon · Filter from Toyota dealership',
+              link: '',
+              items: [
+                {name:'Mobil 1 SAE 0W-16 Full Synthetic Motor Oil',category:'engine_oil',partNum:'',store:'Amazon',link:'',price:0,qty:1,note:'Uses the saved Parts-tab price when available.',saveToParts:false},
+                {name:'Toyota OEM Oil Filter',category:'oil_filter',partNum:'90915-YZZN1',store:'Toyota dealership',link:'',price:0,qty:1,note:'Uses the saved Parts-tab price when available.',saveToParts:false}
+              ],
+              inventoryUses: [],
+              builtin: true
+            },
+          """
+          if old_default in s:
+              s = s.replace(old_default, new_default, 1)
+
+          old_migration = """  const OIL_CHANGE_MIGRATION_KEY = 'vz_migration_20260712_oil_change_v1';
+            const OIL_CHANGE_ENTRY_ID = 2026071268187;
+            function cloneLatestOilChangeEntry(){
+              return {
+                id: OIL_CHANGE_ENTRY_ID,
+                date: '2026-07-12',
+                mi: 68187,
+                type: 'oil',
+                desc: 'DIY oil change completed — SAE 0W-16 full synthetic engine oil. Current mileage: 68,187. Next service target: 73,187 mi or Jan 12, 2027, whichever comes first.',
+                cost: 0,
+                shop: 'DIY',
+                link: '',
+                items: [],
+                inventoryUses: [],
+                builtin: true
+              };
+            }
+            function entryLooksLikeLatestOilChange(entry){
+              return String(entry.type || '') === 'oil' && (String(entry.id) === String(OIL_CHANGE_ENTRY_ID) || (String(entry.date || '') === '2026-07-12' && Number(entry.mi) === 68187));
+            }
+            window.ensureLatestOilChangeRecord = function(){
+              let changed = false;
+              const d = getData();
+              if(!d.some(entryLooksLikeLatestOilChange)){
+                d.push(cloneLatestOilChangeEntry());
+                save(d);
+                changed = true;
+              }
+              if(getMi() < 68187){
+                setMi(68187, {source:'entry', entryId:OIL_CHANGE_ENTRY_ID, allowLower:false});
+                changed = true;
+              }
+              try{ localStorage.setItem(OIL_CHANGE_MIGRATION_KEY, '1'); }catch(err){}
+              return changed;
+            };
+          """
+          new_migration = """  const OIL_CHANGE_MIGRATION_KEY = 'vz_migration_20260712_oil_change_v2';
+            const OIL_CHANGE_ENTRY_ID = 2026071268187;
+            const OIL_CHANGE_FALLBACK_TOTAL = 34.54;
+            function getSavedOilChangeCostPackage(){
+              let parts = [];
+              try{ parts = typeof getBasicPartsList === 'function' ? getBasicPartsList() : []; }catch(err){ parts = []; }
+              const text = part => [part.name,part.store,part.category,part.partNum].filter(Boolean).join(' ').toLowerCase();
+              const oil = parts.find(part=>String(part.category||'')==='engine_oil' && text(part).includes('amazon')) || parts.find(part=>String(part.category||'')==='engine_oil' || text(part).includes('0w-16'));
+              const filter = parts.find(part=>normalizeKey(part.partNum||'')===normalizeKey('90915-YZZN1') && text(part).includes('toyota')) || parts.find(part=>String(part.category||'')==='oil_filter' || normalizeKey(part.partNum||'')===normalizeKey('90915-YZZN1'));
+              const toItem = (part,fallback)=>({name:part?.name||fallback.name,category:part?.category||fallback.category,partNum:part?.partNum||fallback.partNum,store:part?.store||fallback.store,link:safeUrl(part?.link||'')||'',price:Number(part?.unitCost||0)||0,qty:1,note:Number(part?.unitCost||0)>0?'Price reused from the saved Parts tab.':'Service total uses the established app fallback.',saveToParts:false});
+              const items = [toItem(oil,{name:'Mobil 1 SAE 0W-16 Full Synthetic Motor Oil',category:'engine_oil',partNum:'',store:'Amazon'}),toItem(filter,{name:'Toyota OEM Oil Filter',category:'oil_filter',partNum:'90915-YZZN1',store:'Toyota dealership'})];
+              const savedTotal = items.reduce((sum,item)=>sum + Number(item.price||0),0);
+              return {items,total:savedTotal>0?Math.round(savedTotal*100)/100:OIL_CHANGE_FALLBACK_TOTAL};
+            }
+            function applyLatestOilChangeCosts(entry){
+              if(Number(entry.cost||0)>0 && normalizeServiceEntryItems(entry.items).length) return false;
+              const pkg = getSavedOilChangeCostPackage();
+              entry.cost = pkg.total;
+              entry.items = pkg.items;
+              entry.shop = 'DIY · Oil from Amazon · Filter from Toyota dealership';
+              entry.desc = 'DIY oil change completed — Mobil 1 SAE 0W-16 full synthetic engine oil purchased from Amazon + Toyota OEM oil filter 90915-YZZN1 purchased from Toyota dealership. Current mileage: 68,187. Next service target: 73,187 mi or Jan 12, 2027, whichever comes first.';
+              return true;
+            }
+            function cloneLatestOilChangeEntry(){
+              const entry = {id:OIL_CHANGE_ENTRY_ID,date:'2026-07-12',mi:68187,type:'oil',desc:'',cost:0,shop:'DIY',link:'',items:[],inventoryUses:[],builtin:true};
+              applyLatestOilChangeCosts(entry);
+              return entry;
+            }
+            function entryLooksLikeLatestOilChange(entry){
+              return String(entry.type || '') === 'oil' && (String(entry.id) === String(OIL_CHANGE_ENTRY_ID) || (String(entry.date || '') === '2026-07-12' && Number(entry.mi) === 68187));
+            }
+            window.ensureLatestOilChangeRecord = function(){
+              let changed = false;
+              const d = getData();
+              let entry = d.find(entryLooksLikeLatestOilChange);
+              if(!entry){ entry = cloneLatestOilChangeEntry(); d.push(entry); changed = true; }
+              else if(applyLatestOilChangeCosts(entry)){ changed = true; }
+              if(changed) save(d);
+              if(getMi() < 68187){ setMi(68187,{source:'entry',entryId:OIL_CHANGE_ENTRY_ID,allowLower:false}); changed = true; }
+              try{ localStorage.setItem(OIL_CHANGE_MIGRATION_KEY,'1'); }catch(err){}
+              return changed;
+            };
+          """
+          if old_migration not in s:
+              raise SystemExit('Expected oil migration block was not found')
+          s = s.replace(old_migration, new_migration, 1)
+          p.write_text(s)
+          PY
+      - name: Commit patched source
+        shell: bash
+        run: |
+          git config user.name "Venza Garage Updater"
+          git config user.email "actions@users.noreply.github.com"
+          git add venza.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Reuse saved oil and filter costs for latest oil change"
+          git push
