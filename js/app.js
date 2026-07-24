@@ -1,1 +1,5295 @@
+/* Venza Garage extracted app logic */
+/* ─── DATA ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   VENZA GARAGE — DATA LAYER
+   ═══════════════════════════════════════════════════════════════
 
+   TO ADD A LOG ENTRY:
+   ────────────────────────────────────────────────────
+   LIVE DEVICE (already in use): Export backup from ⚙ Backup tab →
+   edit the "entries" array in the JSON → import it back. The app
+   reads from localStorage first, so DEFAULT only matters on a
+   fresh install or after a full Reset.
+
+   SOURCE FILE BASELINE: Add an object to DEFAULT array below.
+   This only affects fresh installs or after Reset. Format:
+   {
+     id: 1234567,            ← any unique number
+     date: 'YYYY-MM-DD',     ← service date
+     mi: 65000,              ← mileage at service
+     type: 'oil',            ← see TYPE LIST below
+     desc: 'Description...',
+     cost: 34.54,            ← dollar amount (number)
+     shop: 'DIY or shop',
+     link: 'https://...',    ← purchase link or empty string ''
+     builtin: true           ← true = no delete button shown
+   }
+
+   TYPE LIST (use exact string):
+   oil, tires, cabin, engine_filter,
+   trans, diff, coolant, inv_coolant, alignment,
+   tires_new, brakes, plugs, hvfilter_inspect,
+   hvfilter_clean, valvomax, wipers, battery, other
+
+   VEHICLE CONSTANTS (easy to update):
+   ────────────────────────────────────
+*/
+const VIN         = 'JTEAAAAAH8MJ062382';
+const APP_VERSION = '1.5.4';
+const APP_BUILD   = '2026.07.24.3';
+const APP_UPDATED = 'Jul 24, 2026';
+const APP_VERSION_LABEL = `v${APP_VERSION} · ${APP_UPDATED}`;
+const APP_VERSION_KEY = 'vz_app_version_seen';
+const LAST_SVC_MI = 68187;   // mileage of last oil change
+const NEXT_SVC_MI = 73187;   // mileage of next oil change due
+
+/* ── DEFAULT LOG — All confirmed service history ─────────────── */
+const DEFAULT = [
+  // ── Entry 1: Full service at dealer ──────────────────────────
+  {
+    id: 1,
+    date: '2026-02-24',
+    mi: 64590,
+    type: 'oil',
+    desc: 'Oil change (Toyota 0W-16 qty 5) + filter 90915-YZZN1, tire rotation, transmission fluid D&F (ATF WS qty 4), rear diff D&F (ATF WS qty 2), multi-point inspection',
+    cost: 409.29,
+    shop: 'Frank Fletcher Toyota, Joplin MO',
+    link: '',
+    builtin: true
+  },
+  // ── Entry 2: Engine air filter DIY ───────────────────────────
+  {
+    id: 2,
+    date: '2026-02-24',
+    mi: 64590,
+    type: 'engine_filter',
+    desc: 'Engine air filter replaced DIY — Part #17801-YZZ16 (105A ELEMENT) | Invoice: 128452',
+    cost: 17.11,
+    shop: 'Frank Fletcher Toyota Parts',
+    link: '',
+    builtin: true
+  },
+  // ── Entry 3: Wheel alignment ──────────────────────────────────
+  {
+    id: 3,
+    date: '2026-02-25',
+    mi: 64629,
+    type: 'alignment',
+    desc: '4-wheel alignment ExpressAlign | Sales Order: 565383924 | Report: R000980 — 4-tire balance FREE under full warranty',
+    cost: 89.99,
+    shop: 'Discount Tire #2013, Joplin MO',
+    link: '',
+    builtin: true
+  },
+  // ── Entry 4: Cabin air filter DIY ────────────────────────────
+  {
+    id: 4,
+    date: '2026-03-03',
+    mi: 64751,
+    type: 'cabin',
+    desc: 'Cabin air filter replaced DIY — A-Premium Activated Carbon APCA4605 (Item #1004KW2G)',
+    cost: 11.18,
+    shop: 'DIY · a-premium.com',
+    link: 'https://a-premium.com/product/Activated-Carbon-Cabin-Air-Filter-for-2021-2022-Toyota-Venza-sg1IibQAid',
+    builtin: true
+  },
+  // ── Entry 5: 12V battery replacement ──────────────────────────
+  {
+    id: 2026062667820,
+    date: '2026-06-26',
+    mi: 67820,
+    type: 'battery',
+    desc: '12V battery replaced — original battery removed; installed Toyota TrueStart Battery Group H5 (LN2) · Part #00544-H5061-540 · 84-month warranty. Receipt: subtotal $131.12, discount -$6.56, tax $15.04, shipping $0.00, core charge $11.00, grand total $150.60. Next proactive replacement target: Jun 26, 2031. Warranty through Jun 26, 2033.',
+    cost: 150.60,
+    shop: 'DIY · Toyota TrueStart / Toyota Parts',
+    link: '',
+    items: [
+      {
+        name: 'Toyota TrueStart Battery, Group H5 (LN2) - 84 Month Warranty',
+        category: '12v_battery',
+        partNum: '00544-H5061-540',
+        store: 'Toyota Parts',
+        link: '',
+        price: 150.60,
+        qty: 1,
+        note: 'Receipt total includes discount, tax, and $11.00 core charge. Subtotal before discount/tax/core: $131.12.',
+        saveToParts: true
+      }
+    ],
+    inventoryUses: [],
+    builtin: true
+  },
+  // ── Entry 6: DIY oil change ───────────────────────────────────
+  {
+    id: 2026071268187,
+    date: '2026-07-12',
+    mi: 68187,
+    type: 'oil',
+    desc: 'DIY oil change completed — Mobil 1 SAE 0W-16 full synthetic engine oil purchased from Amazon + Toyota OEM oil filter 90915-YZZN1 purchased from Toyota dealership. Current mileage: 68,187. Next service target: 73,187 mi or Jan 12, 2027, whichever comes first.',
+    cost: 34.54,
+    shop: 'DIY · Oil from Amazon · Filter from Toyota dealership',
+    link: '',
+    items: [
+      {
+        name: 'Mobil 1 SAE 0W-16 Full Synthetic Motor Oil',
+        category: 'engine_oil',
+        partNum: '',
+        store: 'Amazon',
+        link: '',
+        price: 0,
+        qty: 1,
+        note: 'Uses the saved Parts-tab price when available.',
+        saveToParts: false
+      },
+      {
+        name: 'Toyota OEM Oil Filter',
+        category: 'oil_filter',
+        partNum: '90915-YZZN1',
+        store: 'Toyota dealership',
+        link: '',
+        price: 0,
+        qty: 1,
+        note: 'Uses the saved Parts-tab price when available.',
+        saveToParts: false
+      }
+    ],
+    inventoryUses: [],
+    builtin: true
+  },
+  // ── Entry 7: Spark plugs replacement ──────────────────────────
+  {
+    id: 2026072468484,
+    date: '2026-07-24',
+    mi: 68484,
+    type: 'plugs',
+    desc: 'Spark plugs replaced DIY — Toyota 90919-01289 / Denso FC16HR-Q8 equivalent, qty 4. Installed at 68,484 mi. Torque target: 15 ft-lbs. Next spark plug target: 128,484 mi or Jul 24, 2032, whichever comes first.',
+    cost: 0,
+    shop: 'DIY',
+    link: '',
+    items: [
+      {
+        name: 'Spark Plugs — Toyota 90919-01289 / Denso FC16HR-Q8',
+        category: 'spark_plugs',
+        partNum: '90919-01289',
+        store: '',
+        link: '',
+        price: 0,
+        qty: 4,
+        note: 'Qty 4. Uses the saved Parts-tab price when available.',
+        saveToParts: true
+      }
+    ],
+    inventoryUses: [],
+    builtin: true
+  },
+  // ── ADD NEW ENTRIES BELOW THIS LINE ──────────────────────────
+  // Copy the format above and paste here before the closing ];
+];
+
+const LABELS = {
+  oil:'Oil Change',tires:'Tire Rotation',
+  cabin:'Cabin Air Filter',engine_filter:'Engine Air Filter',
+  trans:'Transmission Fluid D&F',diff:'Rear Differential D&F',
+  coolant:'Engine Coolant D&F',inv_coolant:'Inverter Coolant D&F',
+  alignment:'Wheel Alignment',tires_new:'New Tires',brakes:'Brake Service',
+  plugs:'Spark Plugs',hvfilter_inspect:'HV Battery Filter — Inspect',
+  hvfilter_clean:'HV Battery Filter — Clean',valvomax:'ValvoMax Install',
+  wipers:'Wiper Blades',battery:'12V Battery',other:'Service'
+};
+
+const PREFILLS = {
+  oil:'Oil change — Mobil 1 0W-16 (qty 4.8 qt) + filter 90915-YZZN1',
+  cabin:'Cabin air filter replaced DIY — A-Premium APCA4605',
+  engine_filter:'Engine air filter replaced DIY — Part #17801-YZZ16',
+  trans:'Transmission fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 4 qt)',
+  diff:'Rear differential fluid drain & fill — Toyota ATF WS #00289-ATFWS (qty 2 qt)',
+  coolant:'Engine coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
+  inv_coolant:'Inverter coolant drain & fill — Toyota SLLC #00272-SLLC2 (pre-mixed 50/50)',
+  plugs:'Spark plugs replaced — Toyota 90919-01289 / Denso FC16HR-Q8 (qty 4)',
+  hvfilter_inspect:'HV battery cooling filter — visual inspection',
+  hvfilter_clean:'HV battery cooling filter — removed and cleaned',
+  valvomax:'ValvoMax M12-1.25 drain valve installed (permanent) — first oil change with new valve',
+  wipers:'Wiper blades replaced',
+  battery:'12V battery replaced — Toyota TrueStart Battery Group H5 (LN2) · Part #00544-H5061-540 · installed at 67,820 mi · 84-month warranty · grand total $150.60',
+};
+
+const DEFAULT_INVENTORY = [];
+const INVENTORY_KEY = 'vz_inventory';
+const MASTER_PARTS_KEY = 'vz_master_parts';
+const MI_STATE_KEY = 'vz_mi_state_v1';
+const MI_HISTORY_KEY = 'vz_mi_history_v1';
+const OIL_AVG_RESET_KEY = 'vz_oil_avg_reset_at';
+const AVG_SERVICE_TYPE_KEY = 'vz_avg_service_type';
+const SCHEDULE_OVERRIDE_KEY = 'vz_schedule_overrides';
+const SERVICE_REQUIREMENTS_KEY = 'vz_service_part_requirements';
+const MASTER_PARTS_INVENTORY_ONLY_KEY = 'vz_master_parts_inventory_only_v1';
+const VERIFICATION_OVERRIDES_KEY = 'vz_verification_overrides';
+const DEFAULT_MASTER_PARTS = [];
+const MASTER_CATEGORY_LABELS = {fluids_filters:'Fluids & Filters',valvomax:'ValvoMax',consumables:'Consumables',other:'Other'};
+const SERVICE_PART_REQUIREMENTS = {};
+function normalizeServiceRequirementRule(rule){
+  if(!rule || typeof rule !== 'object') return null;
+  const id = String(rule.id||'').trim();
+  const label = String(rule.label||'').trim();
+  if(!id || !label) return null;
+  return {
+    id,
+    label,
+    qty: Math.max(1, parseInt(rule.qty||1,10) || 1),
+    masterPartIds: Array.isArray(rule.masterPartIds) ? Array.from(new Set(rule.masterPartIds.map(String).filter(Boolean))) : [],
+    toyotaPartNum: String(rule.toyotaPartNum||'').trim()
+  };
+}
+function normalizeServiceRequirementsMap(map){
+  const cleaned = {};
+  const source = map && typeof map === 'object' && !Array.isArray(map) ? map : {};
+  Object.entries(source).forEach(([serviceType, rules])=>{
+    cleaned[String(serviceType)] = Array.isArray(rules) ? rules.map(normalizeServiceRequirementRule).filter(Boolean) : [];
+  });
+  return cleaned;
+}
+function cloneDefaultServiceRequirements(){
+  return normalizeServiceRequirementsMap(SERVICE_PART_REQUIREMENTS);
+}
+function getSavedServiceRequirementsMap(){
+  try{
+    const raw = localStorage.getItem(SERVICE_REQUIREMENTS_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    const cleaned = normalizeServiceRequirementsMap(parsed);
+    return Object.keys(cleaned).length ? cleaned : null;
+  }catch(err){ return null; }
+}
+function getResolvedServiceRequirementsMap(){
+  return getSavedServiceRequirementsMap() || cloneDefaultServiceRequirements();
+}
+function getResolvedServicePartRequirements(serviceType=''){
+  const map = getResolvedServiceRequirementsMap();
+  return Array.isArray(map[serviceType]) ? map[serviceType] : [];
+}
+function saveResolvedServiceRequirementsMap(map){
+  localStorage.setItem(SERVICE_REQUIREMENTS_KEY, JSON.stringify(normalizeServiceRequirementsMap(map)));
+}
+function clearSavedServiceRequirementsMap(){ localStorage.removeItem(SERVICE_REQUIREMENTS_KEY); }
+function rebuildMasterPartsFromInventory(){
+  const inventoryReset = getInventory().map(item=>({...item, masterPartId:''}));
+  saveInventory(inventoryReset);
+  saveMasterParts([]);
+  syncMasterPartsFromInventory();
+}
+function normalizeMasterSourceFingerprint(source){
+  const url = (source.url||'').trim().toLowerCase();
+  const store = (source.store||'').trim().toLowerCase();
+  const label = (source.label||'').trim().toLowerCase();
+  const price = Number.isFinite(Number(source.unitPrice)) ? Number(source.unitPrice).toFixed(2) : '0.00';
+  if(url) return [url,price].join('|');
+  return [store,label,price].join('|');
+}
+function normalizeMasterPartSources(sources){
+  if(!Array.isArray(sources)) return [];
+  const seen = new Set();
+  return sources.filter(Boolean).map(source=>({
+    store:(source.store||'').trim(),
+    url:(source.url||'').trim(),
+    label:(source.label||'').trim(),
+    unitPrice:Number.isFinite(Number(source.unitPrice)) ? Number(source.unitPrice) : 0,
+    addedAt:source.addedAt || new Date().toISOString()
+  })).filter(source=>source.store || source.url || source.label || source.unitPrice>0).filter(source=>{
+    const fp = normalizeMasterSourceFingerprint(source);
+    if(seen.has(fp)) return false;
+    seen.add(fp);
+    return true;
+  });
+}
+function normalizeMasterParts(parts){
+  if(!Array.isArray(parts)) return [];
+  return parts.filter(Boolean).map(part=>({
+    id: part.id ?? `mp_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+    name:(part.name||'').trim(),
+    serviceType:(part.serviceType==='oiltires' ? 'oil' : (part.serviceType || 'other')),
+    category:part.category || 'other',
+    partNum:(part.partNum||'').trim(),
+    unitCost:Number.isFinite(Number(part.unitCost)) ? Number(part.unitCost) : 0,
+    statusLabel:(part.statusLabel||'').trim(),
+    note:(part.note||'').trim(),
+    countInOilAvg:!!part.countInOilAvg,
+    sources:normalizeMasterPartSources(part.sources)
+  })).filter(part=>part.name);
+}
+function getMasterParts(){
+  try{
+    const raw = localStorage.getItem(MASTER_PARTS_KEY);
+    const parsed = normalizeMasterParts(raw ? JSON.parse(raw) : DEFAULT_MASTER_PARTS);
+    return parsed.length ? parsed : normalizeMasterParts(DEFAULT_MASTER_PARTS);
+  }catch(err){
+    return normalizeMasterParts(DEFAULT_MASTER_PARTS);
+  }
+}
+function saveMasterParts(parts){
+  localStorage.setItem(MASTER_PARTS_KEY, JSON.stringify(normalizeMasterParts(parts)));
+}
+function normalizeKey(value=''){
+  return String(value).toLowerCase().replace(/[^a-z0-9]+/g,'');
+}
+function normalizeComparableName(value=''){
+  return String(value)
+    .toLowerCase()
+    .replace(/mobil\s+1/g,'mobil1')
+    .replace(/0w[-\s]?16/g,'0w16')
+    .replace(/5\s*(qt|quart|quarts)/g,'5qt')
+    .replace(/\b(advanced|fuel|economy|full|synthetic|motor|genuine|toyota|oem)\b/g,' ')
+    .replace(/[^a-z0-9]+/g,' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort()
+    .join(' ');
+}
+function getMasterPartMergeKey(part){
+  const pn = normalizeKey(part.partNum || '');
+  if(pn) return `pn:${pn}`;
+  const nameKey = normalizeComparableName(part.name || '');
+  return `nm:${part.serviceType || 'other'}:${nameKey}`;
+}
+function mergeDuplicateMasterParts(){
+  const parts = normalizeMasterParts(getMasterParts());
+  const inventory = getInventory();
+  const map = new Map();
+  const idMap = new Map();
+  parts.forEach(part=>{
+    const key = getMasterPartMergeKey(part);
+    const existing = map.get(key);
+    if(!existing){
+      map.set(key, {...part, sources:[...(part.sources||[])]});
+      idMap.set(String(part.id), String(part.id));
+      return;
+    }
+    existing.name = existing.name.length >= part.name.length ? existing.name : part.name;
+    existing.serviceType = existing.serviceType || part.serviceType || 'other';
+    existing.category = existing.category !== 'other' ? existing.category : (part.category || 'other');
+    existing.partNum = existing.partNum || part.partNum || '';
+    existing.unitCost = Number(existing.unitCost||0) > 0 ? Number(existing.unitCost||0) : Number(part.unitCost||0);
+    existing.statusLabel = existing.statusLabel && existing.statusLabel !== 'From inventory' ? existing.statusLabel : (part.statusLabel || existing.statusLabel);
+    existing.note = existing.note || part.note || '';
+    existing.countInOilAvg = !!existing.countInOilAvg || !!part.countInOilAvg;
+    existing.sources = normalizeMasterPartSources([...(existing.sources||[]), ...(part.sources||[])]);
+    idMap.set(String(part.id), String(existing.id));
+  });
+  const merged = Array.from(map.values());
+  const updatedInventory = inventory.map(item=>({
+    ...item,
+    masterPartId: item.masterPartId ? (idMap.get(String(item.masterPartId)) || item.masterPartId) : item.masterPartId
+  }));
+  saveMasterParts(merged);
+  saveInventory(updatedInventory);
+  return merged;
+}
+function guessMasterCategory(serviceType='other'){
+  if(['oil','cabin','engine_filter','trans','diff','coolant','inv_coolant','wipers','hvfilter_inspect','hvfilter_clean'].includes(serviceType)) return 'fluids_filters';
+  if(serviceType==='valvomax') return 'valvomax';
+  return 'other';
+}
+function findMatchingMasterPart(payload, parts=getMasterParts()){
+  const explicitId = payload.masterPartId;
+  if(explicitId){
+    const byId = parts.find(part=>String(part.id)===String(explicitId));
+    if(byId) return byId;
+  }
+  const partKey = normalizeKey(payload.partNum || '');
+  if(partKey){
+    const byPart = parts.find(part=>normalizeKey(part.partNum || '') === partKey);
+    if(byPart) return byPart;
+  }
+  const nameKey = normalizeKey(payload.name || '');
+  if(nameKey){
+    const byName = parts.find(part=>normalizeKey(part.name || '') === nameKey && (part.serviceType === (payload.serviceType || part.serviceType) || payload.serviceType === 'other'));
+    if(byName) return byName;
+    const looseName = parts.find(part=>normalizeKey(part.name || '') === nameKey);
+    if(looseName) return looseName;
+  }
+  const comparableKey = normalizeComparableName(payload.name || '');
+  if(comparableKey){
+    const fuzzy = parts.find(part=>part.serviceType === (payload.serviceType || part.serviceType) && normalizeComparableName(part.name || '') === comparableKey);
+    if(fuzzy) return fuzzy;
+  }
+  return null;
+}
+function buildMasterSourceFromInventoryPayload(payload){
+  const store = (payload.store||'').trim();
+  const url = (payload.link||'').trim();
+  const price = Number.isFinite(Number(payload.unitCost)) ? Number(payload.unitCost) : 0;
+  if(!store && !url && !(price>0)) return null;
+  return {store,url,label:url ? `${getLinkHostLabel(url)}${store ? ` · ${store}` : ''}` : (store || 'Saved source'),unitPrice:price,addedAt:new Date().toISOString()};
+}
+function upsertMasterPartFromInventoryPayload(payload){
+  const parts = getMasterParts();
+  const source = buildMasterSourceFromInventoryPayload(payload);
+  const existing = findMatchingMasterPart(payload, parts);
+  if(existing){
+    existing.name = payload.name || existing.name;
+    existing.serviceType = payload.serviceType || existing.serviceType;
+    existing.category = existing.category || guessMasterCategory(payload.serviceType || existing.serviceType);
+    existing.partNum = payload.partNum || existing.partNum;
+    if(Number(payload.unitCost||0) > 0) existing.unitCost = Number(payload.unitCost||0);
+    if(payload.note) existing.note = payload.note;
+    existing.countInOilAvg = !!payload.countInOilAvg || !!existing.countInOilAvg;
+    if(source) existing.sources = normalizeMasterPartSources([...(existing.sources||[]), source]);
+    saveMasterParts(parts);
+    return existing.id;
+  }
+  const created = {id:`mp_${Date.now()}_${Math.random().toString(16).slice(2)}`,name:payload.name || 'Unnamed Part',serviceType:payload.serviceType || 'other',category:guessMasterCategory(payload.serviceType || 'other'),partNum:payload.partNum || '',unitCost:Number(payload.unitCost||0) || 0,statusLabel:'From inventory',note:payload.note || '',countInOilAvg:!!payload.countInOilAvg,sources:source ? [source] : []};
+  parts.push(created);
+  saveMasterParts(parts);
+  return created.id;
+}
+function ensureMasterPartsReady(){
+  if(!localStorage.getItem(MASTER_PARTS_KEY)) saveMasterParts([]);
+}
+function syncMasterPartsFromInventory(){
+  const inv = getInventory();
+  let changed = false;
+  inv.forEach(item=>{
+    const masterPartId = upsertMasterPartFromInventoryPayload(item);
+    if(String(item.masterPartId||'') !== String(masterPartId)){
+      item.masterPartId = masterPartId;
+      changed = true;
+    }
+  });
+  if(changed) saveInventory(inv);
+}
+function getOilAverageResetAt(){ return localStorage.getItem(OIL_AVG_RESET_KEY) || ''; }
+function getOilAverageResetDate(){ return parseLocalDate((getOilAverageResetAt() || '').slice(0,10)); }
+function describeOilAverageReset(){
+  const resetAt = getOilAverageResetDate();
+  if(!resetAt) return 'Not reset';
+  return `Active — averaging oil services on or after ${formatDateHuman(resetAt)}`;
+}
+function getAverageServiceOptions(){
+  return [
+    {id:'oil_avg',label:'Oil Service'},
+    {id:'plugs',label:'Spark Plugs'},
+    {id:'cabin',label:'Cabin Filter'},
+    {id:'engine_filter',label:'Engine Air Filter'},
+    {id:'trans',label:'Transmission Fluid'},
+    {id:'diff',label:'Rear Differential'},
+    {id:'coolant',label:'Engine Coolant'},
+    {id:'inv_coolant',label:'Inverter Coolant'},
+    {id:'tires',label:'Tire Rotation'},
+    {id:'alignment',label:'Alignment'},
+    {id:'brakes',label:'Brake Service'},
+    {id:'wipers',label:'Wipers'},
+    {id:'battery',label:'12V Battery'},
+    {id:'all',label:'All Services'}
+  ];
+}
+function getAverageServiceType(){
+  const stored = localStorage.getItem(AVG_SERVICE_TYPE_KEY) || 'oil_avg';
+  return getAverageServiceOptions().some(opt=>opt.id===stored) ? stored : 'oil_avg';
+}
+function setAverageServiceType(type){
+  const next = getAverageServiceOptions().some(opt=>opt.id===type) ? type : 'oil_avg';
+  localStorage.setItem(AVG_SERVICE_TYPE_KEY, next);
+  renderDash();
+  renderBackup();
+}
+function entryMatchesAverageType(entry, type=getAverageServiceType()){
+  if(type === 'all') return true;
+  if(type === 'oil_avg') return entry.type === 'oil';
+  return entry.type === type;
+}
+const SIMPLE_SERVICE_NEEDS = {
+  oil:[
+    {id:'engine_oil',label:'Engine oil',qtyText:'4.8 qt total',keywords:['0w-16','0w16','engine oil','motor oil','mobil 1'],partNums:[]},
+    {id:'oil_filter',label:'Oil filter',qtyText:'1 filter',keywords:['oil filter','filter'],partNums:['90915-YZZN1','90915YZZN1']},
+    {id:'drain_gasket',label:'Drain plug gasket / crush washer',qtyText:'1 gasket',keywords:['drain plug gasket','crush washer','drain washer','oil drain gasket'],partNums:[]}
+  ],
+  cabin:[{id:'cabin_filter',label:'Cabin air filter',qtyText:'1 filter',keywords:['cabin air filter','cabin filter','apca4605'],partNums:['APCA4605','1004KW2G']}],
+  engine_filter:[{id:'engine_air_filter',label:'Engine air filter',qtyText:'1 filter',keywords:['engine air filter','air filter'],partNums:['17801-YZZ16','17801YZZ16']}],
+  trans:[{id:'atf_ws',label:'Toyota ATF WS',qtyText:'about 4 qt',keywords:['atf ws','transmission fluid','toyota ws'],partNums:['00289-ATFWS','00289ATFWS']}],
+  diff:[{id:'diff_fluid',label:'Toyota ATF WS',qtyText:'about 2 qt',keywords:['atf ws','rear differential','diff fluid','toyota ws'],partNums:['00289-ATFWS','00289ATFWS']}],
+  coolant:[{id:'engine_coolant',label:'Toyota SLLC pink coolant',qtyText:'as needed for drain & fill',keywords:['sllc','coolant','pink coolant'],partNums:['00272-SLLC2','00272SLLC2']}],
+  inv_coolant:[{id:'inverter_coolant',label:'Toyota SLLC pink coolant',qtyText:'as needed for drain & fill',keywords:['sllc','coolant','pink coolant'],partNums:['00272-SLLC2','00272SLLC2']}],
+  plugs:[{id:'spark_plugs',label:'Spark plugs',qtyText:'4 plugs',keywords:['spark plug','spark plugs','plug'],partNums:['90919-01289','9091901289','FC16HR-Q8','FC16HRQ8']}],
+  wipers:[{id:'wiper_blades',label:'Wiper blades',qtyText:'front set or individual blades',keywords:['wiper','blade'],partNums:[]}],
+  battery:[{id:'battery_12v',label:'12V battery',qtyText:'1 battery',keywords:['12v battery','battery','truestart','h5','ln2','group h5'],partNums:['00544-H5061-540','00544H5061540']}],
+  brakes:[{id:'brake_parts',label:'Brake pads / brake parts',qtyText:'as needed',keywords:['brake pad','brake pads','rotor','brake'],partNums:[]}],
+  tires_new:[{id:'tires',label:'Tires',qtyText:'set of 4',keywords:['tire','tyre','225/60r18'],partNums:['225/60R18']}]
+};
+function getSimpleServiceNeeds(serviceType=''){
+  return Array.isArray(SIMPLE_SERVICE_NEEDS[serviceType]) ? SIMPLE_SERVICE_NEEDS[serviceType] : [];
+}
+function normalizeInventoryUses(uses){
+  if(!Array.isArray(uses)) return [];
+  return uses.filter(Boolean).map(use=>({
+    inventoryId: use.inventoryId ?? '',
+    name: (use.name||'').trim(),
+    partNum: (use.partNum||'').trim(),
+    store: (use.store||'').trim(),
+    link: (use.link||'').trim(),
+    unitCost: Number.isFinite(Number(use.unitCost)) ? Number(use.unitCost) : 0,
+    qtyUsed: Math.max(1, parseInt(use.qtyUsed||1,10) || 1),
+    countInOilAvg: !!use.countInOilAvg
+  })).filter(use=>use.name || use.partNum || use.link || use.store);
+}
+function normalizeInventory(items){
+  if(!Array.isArray(items)) return [];
+  return items.filter(Boolean).map(item=>({
+    id: item.id ?? Date.now()+Math.random(),
+    name: (item.name||'').trim(),
+    serviceType: (item.serviceType==='oiltires' ? 'oil' : (item.serviceType || 'other')), 
+    qtyOnHand: Math.max(0, parseInt(item.qtyOnHand||0,10) || 0),
+    unitCost: Number.isFinite(Number(item.unitCost)) ? Number(item.unitCost) : 0,
+    partNum: (item.partNum||'').trim(),
+    store: (item.store||'').trim(),
+    link: (item.link||'').trim(),
+    note: (item.note||'').trim(),
+    countInOilAvg: !!item.countInOilAvg,
+    masterPartId: item.masterPartId ?? ''
+  })).filter(item=>item.name);
+}
+function getInventory(){
+  try{
+    const raw = localStorage.getItem(INVENTORY_KEY);
+    return normalizeInventory(raw ? JSON.parse(raw) : DEFAULT_INVENTORY);
+  }catch(err){
+    return normalizeInventory(DEFAULT_INVENTORY);
+  }
+}
+function saveInventory(items){
+  localStorage.setItem(INVENTORY_KEY, JSON.stringify(normalizeInventory(items)));
+}
+function getInventoryUseTotal(entry, predicate=()=>true){
+  return normalizeInventoryUses(entry.inventoryUses).reduce((sum,use)=>{
+    const qty = Number(use.qtyUsed||0);
+    const price = Number(use.unitCost||0);
+    return predicate(use) && Number.isFinite(qty) && Number.isFinite(price) ? sum + (qty * price) : sum;
+  },0);
+}
+function normalizeEntryItems(items){
+  if(!Array.isArray(items)) return [];
+  return items.filter(Boolean).map(item=>({
+    inventoryId: item.inventoryId ?? '',
+    name: (item.name||'').trim(),
+    category: normalizeBasicPartCategory(item.category),
+    partNum: (item.partNum||'').trim(),
+    store: (item.store||'').trim(),
+    link: (item.link||'').trim(),
+    price: Number.isFinite(Number(item.price)) ? Number(item.price) : 0,
+    qty: Math.max(1, parseInt(item.qty||1,10) || 1),
+    note: (item.note||'').trim(),
+    useInOilAvg: !!(item.useInOilAvg ?? item.countInOilAvg)
+  })).filter(item=>item.name || item.partNum || item.store || item.link || Number(item.price||0)>0);
+}
+function getEntryItemsTotal(entry, predicate=()=>true){
+  return normalizeEntryItems(entry.items).reduce((sum,item)=>{
+    const qty = Number(item.qty||0);
+    const price = Number(item.price||0);
+    return predicate(item) && Number.isFinite(qty) && Number.isFinite(price) ? sum + (qty * price) : sum;
+  },0);
+}
+function getEntryDisplayCost(entry){
+  const manual = Number(entry.cost||0);
+  const itemTotal = getEntryItemsTotal(entry);
+  if(Number.isFinite(manual) && manual > 0) return manual;
+  if(itemTotal > 0) return itemTotal;
+  const invTotal = getInventoryUseTotal(entry);
+  return invTotal > 0 ? invTotal : 0;
+}
+function getOilAverageEntryCost(entry){
+  const itemOil = getEntryItemsTotal(entry, item=>item.useInOilAvg);
+  if(itemOil > 0) return itemOil;
+  const invOil = getInventoryUseTotal(entry, use=>use.countInOilAvg);
+  if(invOil > 0) return invOil;
+  const manual = Number(entry.cost||0);
+  if(entry.type === 'oil' && Number.isFinite(manual) && manual > 0) return manual;
+  return null;
+}
+function getAverageEntryCost(entry, type=getAverageServiceType()){
+  if(!entryMatchesAverageType(entry, type)) return null;
+  if(type === 'oil_avg') return getOilAverageEntryCost(entry);
+  const display = getEntryDisplayCost(entry);
+  return Number.isFinite(display) && display > 0 ? display : null;
+}
+function getLinkHostLabel(url){
+  try{return new URL(url).hostname;}catch(err){return 'Open link';}
+}
+function escapeHtmlAttr(value=''){
+  return String(value)
+    .replace(/&/g,'&amp;')
+    .replace(/"/g,'&quot;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+function escapeHtml(value=''){
+  return String(value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function safeText(value=''){
+  return escapeHtml(value).replace(/\n/g,'<br>');
+}
+function safeUrl(url=''){
+  if(!url) return '';
+  try{
+    const parsed = new URL(url, location.href);
+    return /^https?:$/i.test(parsed.protocol) ? parsed.href : '';
+  }catch(err){
+    return '';
+  }
+}
+function openSavedSourceLink(selectEl){
+  const url = selectEl?.value || '';
+  if(!url) return;
+  window.open(url, '_blank', 'noopener,noreferrer');
+  selectEl.selectedIndex = 0;
+}
+function clearStoredPhotos(){
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.startsWith('vz_photo_')) keys.push(key);
+  }
+  keys.forEach(key=>localStorage.removeItem(key));
+}
+function openHtmlInNewTab(html, filename='venza-report.html'){
+  const w = window.open('','_blank','width=900,height=700');
+  if(w){
+    w.document.write(html);
+    w.document.close();
+    return true;
+  }
+  try{
+    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    return true;
+  }catch(err){
+    return false;
+  }
+}
+function updateGuideAccessibility(){
+  document.querySelectorAll('.guide-item').forEach(item=>{
+    const head = item.querySelector('.guide-head');
+    if(head) head.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+  });
+}
+function bindAccessibleClick(selector){
+  document.querySelectorAll(selector).forEach(el=>{
+    if(el.dataset.kbdBound === '1') return;
+    el.dataset.kbdBound = '1';
+    el.addEventListener('keydown', (evt)=>{
+      if(evt.key === 'Enter' || evt.key === ' '){
+        evt.preventDefault();
+        el.click();
+      }
+    });
+  });
+}
+function getSuggestedTypesForService(type){
+  return [type];
+}
+function inventoryMatchesService(item, serviceType){
+  const master = getMasterParts().find(part=>String(part.id)===String(item.masterPartId||''));
+  const effectiveType = master?.serviceType || item.serviceType || 'other';
+  return getSuggestedTypesForService(serviceType).includes(effectiveType);
+}
+function getFormItemRows(){
+  return Array.from(document.querySelectorAll('#fItemsList .item-editor'));
+}
+function getSelectedInventoryCounts(){
+  return getFormItemRows().reduce((map,row)=>{
+    const inventoryId = row.dataset.inventoryId || '';
+    if(!inventoryId) return map;
+    const qtyEl = row.querySelector('.item-qty');
+    const qty = Math.max(1, parseInt(qtyEl?.value || 1,10) || 1);
+    map[inventoryId] = (map[inventoryId] || 0) + qty;
+    return map;
+  },{});
+}
+function sumInventoryCountMaps(...maps){
+  return maps.filter(Boolean).reduce((acc,map)=>{
+    Object.entries(map||{}).forEach(([key,value])=>{
+      acc[String(key)] = (acc[String(key)]||0) + Number(value||0);
+    });
+    return acc;
+  },{});
+}
+function getServicePartRequirements(serviceType=''){
+  return [];
+}
+function getEntryPreviewInventory(){
+  return normalizeInventory(getInventory()).map(item=>({...item}));
+}
+function inventoryMatchesRequirement(item, requirement){
+  const masterId = String(item.masterPartId||'');
+  if(requirement.masterPartIds.includes(masterId)) return true;
+  const itemPartKey = normalizeKey(item.partNum||'');
+  const reqPartKey = normalizeKey(requirement.toyotaPartNum||'');
+  return !!(itemPartKey && reqPartKey && itemPartKey.includes(reqPartKey));
+}
+function buildServiceRequirementPlan(serviceType='', inventoryItems=getEntryPreviewInventory()){
+  return {serviceType, requirements:[], autoItems:[], reservedMap:{}, missingCount:0, complete:true};
+}
+function getInventorySearchText(item){
+  const master = getMasterParts().find(part=>String(part.id)===String(item.masterPartId||''));
+  return [
+    item.name,
+    item.partNum,
+    item.note,
+    item.store,
+    LABELS[item.serviceType] || item.serviceType,
+    master?.name,
+    master?.partNum,
+    ...(Array.isArray(master?.sources) ? master.sources.flatMap(source=>[source.store, source.label, source.url]) : [])
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+function inventoryMatchesNeed(item, need){
+  if(!need) return false;
+  const itemPart = normalizeKey(item.partNum||'');
+  const text = getInventorySearchText(item);
+  const normText = normalizeKey(text);
+  if(Array.isArray(need.partNums) && need.partNums.some(part=>{
+    const key = normalizeKey(part||'');
+    return key && (itemPart === key || normText.includes(key));
+  })) return true;
+  return Array.isArray(need.keywords) && need.keywords.some(keyword=>text.includes(String(keyword||'').toLowerCase()));
+}
+function getServiceInventoryMatches(serviceType, inventoryItems=getEntryPreviewInventory()){
+  const needs = getSimpleServiceNeeds(serviceType);
+  if(!needs.length) return inventoryItems.filter(item=>inventoryMatchesService(item, serviceType));
+  return inventoryItems.filter(item=>needs.some(need=>inventoryMatchesNeed(item, need)));
+}
+function getNeedSavedSources(need, matches){
+  const list = [];
+  const seen = new Set();
+  matches.filter(item=>inventoryMatchesNeed(item, need)).forEach(item=>{
+    const pushSource = (url, label, price=0)=>{
+      const safe = safeUrl(url||'');
+      if(!safe) return;
+      const key = `${safe}|${Number(price||0).toFixed(2)}`;
+      if(seen.has(key)) return;
+      seen.add(key);
+      list.push({url:safe,label:label||getLinkHostLabel(safe)||'Saved link',unitPrice:Number(price||0)});
+    };
+    pushSource(item.link, item.store || item.name, item.unitCost);
+    const master = getMasterParts().find(part=>String(part.id)===String(item.masterPartId||''));
+    (Array.isArray(master?.sources) ? master.sources : []).forEach(source=>pushSource(source.url, source.store || source.label || master?.name, source.unitPrice));
+  });
+  return list;
+}
+function updateEntrySaveLock(){
+  const saveBtn = document.getElementById('entrySaveBtn');
+  const noteEl = document.getElementById('inventoryStockLockNote');
+  if(saveBtn){
+    saveBtn.disabled = false;
+    saveBtn.style.opacity = '1';
+    saveBtn.style.cursor = 'pointer';
+  }
+  if(noteEl){
+    noteEl.style.color = 'var(--text3)';
+    noteEl.textContent = 'Simple mode: review the recommended parts above, then tap a saved inventory item below if you already have it on hand.';
+  }
+}
+function createItemRow(data={}){
+  const wrap = document.createElement('div');
+  wrap.className = 'item-editor';
+  if(data.inventoryId!==undefined && data.inventoryId!==null && data.inventoryId!==''){
+    wrap.dataset.inventoryId = String(data.inventoryId);
+  }
+  wrap.innerHTML = `
+    <div class="item-editor-top">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="item-editor-title">Purchased item</div>
+        ${wrap.dataset.inventoryId ? '<span class="item-linked">Linked to inventory</span>' : ''}
+      </div>
+      <button type="button" class="item-remove" onclick="removeItemRow(this)">Remove</button>
+    </div>
+    <div class="item-grid">
+      <div class="fl" style="margin-bottom:0"><label>Name</label><input type="text" class="fi item-name" placeholder="Mobil 1 0W-16" value="${escapeHtmlAttr(data.name||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Part #</label><input type="text" class="fi item-part" placeholder="90915-YZZN1" value="${escapeHtmlAttr(data.partNum||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Store</label><input type="text" class="fi item-store" placeholder="Walmart / Toyota / Amazon" value="${escapeHtmlAttr(data.store||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Link</label><input type="url" class="fi item-link" placeholder="https://..." value="${escapeHtmlAttr(data.link||'')}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Unit Price ($ per unit)</label><input type="number" class="fi item-price" placeholder="0.00" step="0.01" value="${Number.isFinite(Number(data.price)) && Number(data.price)!==0 ? Number(data.price) : ''}"></div>
+      <div class="fl" style="margin-bottom:0"><label>Qty used</label><input type="number" min="1" step="1" class="fi item-qty" value="${Math.max(1, parseInt(data.qty||1,10) || 1)}"></div>
+    </div>
+    <label class="item-check"><input type="checkbox" class="item-oilavg" ${data.useInOilAvg ? 'checked' : ''}> Use in oil avg</label>
+  `;
+  const list = document.getElementById('fItemsList');
+  if(list) list.appendChild(wrap);
+  getFormItemRows().forEach(row=>{
+    const qtyInput = row.querySelector('.item-qty');
+    if(qtyInput && !qtyInput.dataset.bound){
+      qtyInput.dataset.bound='1';
+      qtyInput.addEventListener('input', ()=>renderEntryInventoryUI());
+      qtyInput.addEventListener('change', ()=>renderEntryInventoryUI());
+    }
+  });
+  renderEntryInventoryUI();
+  return wrap;
+}
+function addItemRow(data={}){
+  return createItemRow(data);
+}
+function removeItemRow(btn){
+  const row = btn?.closest('.item-editor');
+  if(row) row.remove();
+  if(!getFormItemRows().length) addItemRow();
+  renderEntryInventoryUI();
+}
+function getFormItems(){
+  return normalizeEntryItems(getFormItemRows().map(row=>({
+    inventoryId: row.dataset.inventoryId || '',
+    name: row.querySelector('.item-name')?.value || '',
+    partNum: row.querySelector('.item-part')?.value || '',
+    store: row.querySelector('.item-store')?.value || '',
+    link: row.querySelector('.item-link')?.value || '',
+    price: row.querySelector('.item-price')?.value || 0,
+    qty: row.querySelector('.item-qty')?.value || 1,
+    useInOilAvg: !!row.querySelector('.item-oilavg')?.checked
+  })));
+}
+function resetEntryInventoryUses(){
+  const list = document.getElementById('fItemsList');
+  if(list) list.innerHTML='';
+  addItemRow();
+  renderEntryInventoryUI();
+}
+function formatEntryInventorySummary(entry){
+  const items = normalizeEntryItems(entry.items);
+  if(items.length) return items.map(item=>`${item.qty}× ${item.name}`).join(' · ');
+  return normalizeInventoryUses(entry.inventoryUses).map(use=>`${use.qtyUsed}× ${use.name}`).join(' · ');
+}
+
+function normalizeEntries(entries){
+  if(!Array.isArray(entries)) return [];
+  return entries.filter(Boolean).map(e=>({
+    ...e,
+    id: e.id ?? Date.now()+Math.random(),
+    type: (e.type==='oiltires' ? 'oil' : (e.type || 'other')), 
+    desc: e.desc || '',
+    cost: Number.isFinite(Number(e.cost)) ? Number(e.cost) : 0,
+    shop: e.shop || '',
+    link: e.link || '',
+    items: normalizeEntryItems(e.items),
+    inventoryUses: normalizeInventoryUses(e.inventoryUses),
+    builtin: !!e.builtin
+  }));
+}
+function getData(){
+  try{
+    const raw = localStorage.getItem('vz_log');
+    return normalizeEntries(raw ? JSON.parse(raw) : DEFAULT);
+  }catch(err){
+    return normalizeEntries(DEFAULT);
+  }
+}
+function save(d){localStorage.setItem('vz_log',JSON.stringify(normalizeEntries(d)))}
+function highestMileage(entries){
+  return normalizeEntries(entries).reduce((max,e)=>{
+    const mi = Number(e.mi);
+    return Number.isFinite(mi) ? Math.max(max, mi) : max;
+  }, 0);
+}
+function getMi(){
+  const stored = parseInt(localStorage.getItem('vz_mi')||'',10);
+  if(Number.isFinite(stored) && stored > 0) return stored;
+  const state = getMiState();
+  if(Number.isFinite(Number(state.value)) && Number(state.value) > 0) return Number(state.value);
+  const historyValue = getLatestMileageHistoryCandidate()?.value;
+  if(Number.isFinite(Number(historyValue)) && Number(historyValue) > 0) return Number(historyValue);
+  return highestMileage(getData()) || getManualMileageBaseline();
+}
+function normalizeMileageHistory(items){
+  if(!Array.isArray(items)) return [];
+  return items.filter(Boolean).map(item=>({
+    value: Number.isFinite(Number(item.value)) ? Number(item.value) : 0,
+    source: item.source === 'entry' ? 'entry' : item.source === 'manual' ? 'manual' : 'legacy',
+    entryId: item.entryId != null && item.entryId !== '' ? String(item.entryId) : null,
+    updatedAt: item.updatedAt || new Date().toISOString()
+  })).filter(item=>item.value > 0);
+}
+function getMiHistory(){
+  try{
+    return normalizeMileageHistory(JSON.parse(localStorage.getItem(MI_HISTORY_KEY)||'[]'));
+  }catch(err){
+    return [];
+  }
+}
+function saveMiHistory(items){
+  localStorage.setItem(MI_HISTORY_KEY, JSON.stringify(normalizeMileageHistory(items)));
+}
+function appendMiHistory(item){
+  const history = getMiHistory();
+  const next = normalizeMileageHistory([item])[0];
+  if(!next) return history;
+  const prev = history[history.length-1];
+  if(prev && prev.value === next.value && prev.source === next.source && String(prev.entryId||'') === String(next.entryId||'')) return history;
+  history.push(next);
+  saveMiHistory(history);
+  return history;
+}
+/* Permanently removes all history records tied to a deleted entry's ID.
+   Called on every entry delete so stale mileage values can never resurface. */
+function purgeMiHistoryForEntry(entryId){
+  if(entryId == null || entryId === '') return;
+  const id = String(entryId);
+  const history = getMiHistory();
+  const cleaned = history.filter(item=>!(item.source==='entry' && String(item.entryId||'')===id));
+  saveMiHistory(cleaned);
+}
+function getLatestMileageHistoryCandidate(options={}){
+  const excludedEntryIds = new Set((options.excludeEntryIds || []).map(id=>String(id)));
+  const history = getMiHistory();
+  for(let i=history.length-1; i>=0; i--){
+    const item = history[i];
+    if(item.source === 'entry' && item.entryId && excludedEntryIds.has(String(item.entryId))) continue;
+    if(Number.isFinite(Number(item.value)) && Number(item.value) > 0) return item;
+  }
+  return null;
+}
+/* Returns the most recent manual mileage from history, or the app baseline.
+   This is the floor value when all service entries have been removed. */
+function getManualMileageBaseline(){
+  const history = getMiHistory();
+  for(let i=history.length-1; i>=0; i--){
+    const item = history[i];
+    if(item.source==='manual' && Number.isFinite(Number(item.value)) && Number(item.value)>0) return Number(item.value);
+  }
+  return 66377; // app starting point
+}
+function getMiState(){
+  const current = parseInt(localStorage.getItem('vz_mi')||'',10);
+  try{
+    const parsed = JSON.parse(localStorage.getItem(MI_STATE_KEY)||'null');
+    if(parsed && typeof parsed === 'object'){
+      return {
+        value: Number.isFinite(Number(parsed.value)) ? Number(parsed.value) : current,
+        source: parsed.source === 'entry' ? 'entry' : parsed.source === 'manual' ? 'manual' : 'legacy',
+        entryId: parsed.entryId != null ? String(parsed.entryId) : null,
+        updatedAt: parsed.updatedAt || ''
+      };
+    }
+  }catch(err){}
+  const fallback = getLatestMileageHistoryCandidate();
+  return {
+    value: fallback?.value || current || 0,
+    source: fallback?.source || 'legacy',
+    entryId: fallback?.entryId || null,
+    updatedAt: fallback?.updatedAt || ''
+  };
+}
+function setMi(m, meta={}){
+  const n = parseInt(m,10);
+  if(!(Number.isFinite(n) && n > 0)) return false;
+  const current = parseInt(localStorage.getItem('vz_mi')||'',10);
+  const source = meta.source === 'entry' ? 'entry' : 'manual';
+  const allowLower = !!meta.allowLower || source === 'manual';
+  if(!allowLower && Number.isFinite(current) && current > 0 && n < current) return false;
+  const updatedAt = meta.updatedAt || new Date().toISOString();
+  localStorage.setItem('vz_mi', n);
+  localStorage.setItem(MI_STATE_KEY, JSON.stringify({
+    value:n,
+    source,
+    entryId: source === 'entry' && meta.entryId != null ? String(meta.entryId) : null,
+    updatedAt
+  }));
+  if(!meta.skipHistory){
+    appendMiHistory({
+      value:n,
+      source,
+      entryId: source === 'entry' && meta.entryId != null ? String(meta.entryId) : null,
+      updatedAt
+    });
+  }
+  return true;
+}
+function getHighestMileageEntry(entries=getData()){
+  return normalizeEntries(entries)
+    .filter(entry=>Number.isFinite(Number(entry.mi)) && Number(entry.mi) > 0)
+    .sort((a,b)=>{
+      const diff = Number(b.mi||0) - Number(a.mi||0);
+      if(diff) return diff;
+      return compareEntriesLatest(a,b);
+    })[0] || null;
+}
+function recalcMileageFromEntries(entries=getData()){
+  const highestEntry = getHighestMileageEntry(entries);
+  if(highestEntry){
+    setMi(highestEntry.mi, {source:'entry', entryId:highestEntry.id, allowLower:true});
+    return Number(highestEntry.mi||0);
+  }
+  const fallback = getManualMileageBaseline();
+  setMi(fallback, {source:'manual', allowLower:true});
+  return fallback;
+}
+function reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries){
+  const deletedId = String(deletedEntry?.id ?? '');
+  if(!deletedId) return false;
+
+  // Purge this entry's mileage records from history FIRST so they can never
+  // resurface after deletion (root cause of the stale-mileage bug).
+  purgeMiHistoryForEntry(deletedId);
+
+  const state = getMiState();
+  const usingDeletedEntry = state.source === 'entry' && String(state.entryId||'') === deletedId;
+  if(!usingDeletedEntry) return false;
+
+  // History is already clean — plain lookup, no exclusion needed.
+  const prior = getLatestMileageHistoryCandidate();
+  if(prior){
+    setMi(prior.value, {
+      source: prior.source === 'entry' ? 'entry' : 'manual',
+      entryId: prior.entryId,
+      allowLower: true,
+      skipHistory: true,
+      updatedAt: new Date().toISOString()
+    });
+    return true;
+  }
+
+  // Fallback: highest remaining entry, or the stored manual baseline.
+  const highestEntry = getHighestMileageEntry(remainingEntries);
+  if(highestEntry){
+    setMi(highestEntry.mi, {source:'entry', entryId:highestEntry.id, allowLower:true, skipHistory:true});
+    return true;
+  }
+
+  setMi(getManualMileageBaseline(), {source:'manual', allowLower:true, skipHistory:true});
+  return true;
+}
+function parsePositiveInt(value){
+  const n = parseInt(value,10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function getScheduleOverrides(){
+  try{
+    const raw = localStorage.getItem(SCHEDULE_OVERRIDE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  }catch(err){
+    return {};
+  }
+}
+function saveScheduleOverrides(overrides){
+  const clean = {};
+  Object.entries(overrides||{}).forEach(([ruleId,value])=>{
+    if(!value || typeof value !== 'object') return;
+    const milesInterval = parsePositiveInt(value.milesInterval);
+    const monthsInterval = parsePositiveInt(value.monthsInterval);
+    const next = {};
+    if(milesInterval) next.milesInterval = milesInterval;
+    if(monthsInterval) next.monthsInterval = monthsInterval;
+    if(Object.keys(next).length) clean[ruleId] = next;
+  });
+  if(Object.keys(clean).length){
+    localStorage.setItem(SCHEDULE_OVERRIDE_KEY, JSON.stringify(clean));
+  }else{
+    localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  }
+}
+function formatIntervalSummary(milesInterval, monthsInterval){
+  const bits = [];
+  if(Number.isFinite(Number(milesInterval)) && Number(milesInterval) > 0) bits.push(`${Number(milesInterval).toLocaleString()} mi`);
+  if(Number.isFinite(Number(monthsInterval)) && Number(monthsInterval) > 0) bits.push(`${Number(monthsInterval)} mo`);
+  return bits.length ? bits.join(' / ') : 'Manual';
+}
+function getResolvedRecurringRules(){
+  const overrides = getScheduleOverrides();
+  return RECURRING_RULES.map(rule=>{
+    if(rule.watchOnly) return {...rule};
+    const override = overrides[rule.id] || {};
+    const guidelineMilesInterval = parsePositiveInt(rule.milesInterval);
+    const guidelineMonthsInterval = parsePositiveInt(rule.monthsInterval);
+    const milesInterval = parsePositiveInt(override.milesInterval) || guidelineMilesInterval;
+    const monthsInterval = parsePositiveInt(override.monthsInterval) || guidelineMonthsInterval;
+    const customActive = milesInterval !== guidelineMilesInterval || monthsInterval !== guidelineMonthsInterval;
+    const earlierThanGuideline = (guidelineMilesInterval && milesInterval && milesInterval < guidelineMilesInterval) || (guidelineMonthsInterval && monthsInterval && monthsInterval < guidelineMonthsInterval);
+    const laterThanGuideline = (guidelineMilesInterval && milesInterval && milesInterval > guidelineMilesInterval) || (guidelineMonthsInterval && monthsInterval && monthsInterval > guidelineMonthsInterval);
+    return {
+      ...rule,
+      guidelineMilesInterval,
+      guidelineMonthsInterval,
+      milesInterval,
+      monthsInterval,
+      customActive,
+      earlierThanGuideline: !!earlierThanGuideline,
+      laterThanGuideline: !!laterThanGuideline,
+      activeIntervalText: formatIntervalSummary(milesInterval, monthsInterval),
+      guidelineIntervalText: formatIntervalSummary(guidelineMilesInterval, guidelineMonthsInterval)
+    };
+  });
+}
+function safeNum(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function parseLocalDate(value){
+  if(!value || typeof value !== 'string') return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if(!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2])-1, Number(m[3]), 12, 0, 0, 0);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+function todayLocal(){
+  const d = new Date();
+  d.setHours(12,0,0,0);
+  return d;
+}
+function dateToISO(d){
+  if(!d) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function addMonthsSafe(base, months){
+  if(!base || !Number.isFinite(months)) return null;
+  const d = new Date(base.getTime());
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth()+months);
+  const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
+  return d;
+}
+function diffDays(fromDate, toDate){
+  if(!fromDate || !toDate) return null;
+  const from = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+  const to = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+  return Math.ceil((to-from)/86400000);
+}
+function formatDateHuman(value){
+  const d = value instanceof Date ? value : parseLocalDate(value);
+  return d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+}
+function formatDueDate(value, estimated=false){
+  const txt = formatDateHuman(value);
+  return txt === '—' ? '—' : (estimated ? `Est. ${txt}` : txt);
+}
+function formatDueMileage(value){
+  return Number.isFinite(Number(value)) ? `${Number(value).toLocaleString()} mi` : '—';
+}
+function pluralize(value, unit){
+  const abs = Math.abs(value);
+  return `${abs.toLocaleString()} ${unit}${abs===1?'':'s'}`;
+}
+function compareEntriesLatest(a,b){
+  const ami = safeNum(a.mi) ?? -Infinity;
+  const bmi = safeNum(b.mi) ?? -Infinity;
+  if(bmi !== ami) return bmi - ami;
+  const ad = parseLocalDate(a.date);
+  const bd = parseLocalDate(b.date);
+  return (bd ? bd.getTime() : 0) - (ad ? ad.getTime() : 0);
+}
+const VEHICLE_PROFILE = {
+  year: '2021',
+  make: 'Toyota',
+  model: 'Venza',
+  trim: 'LE Hybrid AWD',
+  color: 'White',
+  location: 'Carterville, MO',
+  estimatedInServiceDate: '2021-06-01'
+};
+const RECURRING_RULES = [
+  {id:'oil', name:'Oil Change', icon:'🔧', entryTypes:['oil'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'0W-16 full synthetic · custom 5,000 mi / 6 mo'},
+  {id:'tires', name:'Tire Rotation', icon:'🔄', entryTypes:['tires'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Rotate every 5,000 mi / 6 mo'},
+  {id:'hvfilter_inspect', name:'HV Battery Cooling Filter — Inspect', icon:'🔋', entryTypes:['hvfilter_inspect'], milesInterval:5000, monthsInterval:6, soonMiles:500, upcomingMiles:2000, soonDays:30, upcomingDays:90, note:'Inspect every 5,000 mi / 6 mo'},
+  {id:'cabin', name:'Cabin Air Filter', icon:'💨', entryTypes:['cabin'], milesInterval:15000, monthsInterval:18, soonMiles:1500, upcomingMiles:5000, soonDays:45, upcomingDays:120, note:'Activated carbon filter · custom 15,000 mi / 18 mo'},
+  {id:'hvfilter_clean', name:'HV Battery Cooling Filter — Clean', icon:'🧹', entryTypes:['hvfilter_clean'], milesInterval:20000, monthsInterval:24, soonMiles:2000, upcomingMiles:5000, soonDays:60, upcomingDays:180, note:'Toyota manual clean interval', initialAnchor:{date:'2026-02-24', mi:64590, estimated:false}},
+  {id:'engine_filter', name:'Engine Air Filter', icon:'🌬️', entryTypes:['engine_filter'], milesInterval:30000, monthsInterval:36, soonMiles:2000, upcomingMiles:7000, soonDays:90, upcomingDays:180, note:'Toyota part #17801-YZZ16'},
+  {id:'battery', name:'12V Battery', icon:'🔋', entryTypes:['battery'], monthsInterval:60, soonDays:90, upcomingDays:365, note:'Proactive replacement target: every 5 years · next target Jun 26, 2031 · TrueStart warranty through Jun 26, 2033', initialAnchor:{date:'2026-06-26', mi:67820, estimated:false}},
+  {id:'trans', name:'Transmission Fluid D&F', icon:'⚙️', entryTypes:['trans'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
+  {id:'diff', name:'Rear Differential D&F', icon:'🔩', entryTypes:['diff'], milesInterval:60000, monthsInterval:72, soonMiles:3000, upcomingMiles:10000, soonDays:120, upcomingDays:240, note:'Custom 60,000 mi / 72 mo interval'},
+  {id:'coolant', name:'Engine Coolant Drain & Fill', icon:'🌡️', entryTypes:['coolant'], milesInterval:100000, monthsInterval:120, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota SLLC · 100k mi / 120 mo first interval', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
+  {id:'plugs', name:'Spark Plugs', icon:'⚡', entryTypes:['plugs'], milesInterval:60000, monthsInterval:72, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Custom 60,000 mi / 72 mo · Toyota 90919-01289 · Denso FC16HR-Q8 · qty 4', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
+  {id:'inv_coolant', name:'Inverter Coolant Drain & Fill', icon:'🌡️', entryTypes:['inv_coolant'], milesInterval:150000, monthsInterval:180, soonMiles:5000, upcomingMiles:15000, soonDays:180, upcomingDays:365, note:'Toyota SLLC · 150k mi / 180 mo first interval', initialAnchor:{date:VEHICLE_PROFILE.estimatedInServiceDate, mi:0, estimated:true}},
+  {id:'tires_new', name:'New Tires + Alignment', icon:'🛞', watchOnly:true, note:'Watch tread depth — 6/32" to 7/32" as of 02/24/26'}
+];
+const RULE_ORDER = Object.fromEntries(RECURRING_RULES.map((rule, index)=>[rule.id, index]));
+function estimateMilesPerDay(entries, currentMi, referenceDate=todayLocal()){
+  const dated = normalizeEntries(entries)
+    .map(e=>({mi:safeNum(e.mi), date:parseLocalDate(e.date)}))
+    .filter(p=>p.mi!==null && p.date)
+    .sort((a,b)=>a.date-b.date);
+  const recent = dated.filter(p=>diffDays(p.date, referenceDate)!==null && diffDays(p.date, referenceDate) <= 365);
+  const base = recent.length >= 2 ? recent : dated;
+  if(base.length >= 2){
+    const first = base[0];
+    const last = base[base.length-1];
+    const days = Math.max(diffDays(first.date, last.date), 1);
+    const miles = last.mi - first.mi;
+    if(miles > 0 && days > 0) return miles / days;
+  }
+  const lastPoint = dated[dated.length-1];
+  if(lastPoint && currentMi > lastPoint.mi){
+    const days = Math.max(diffDays(lastPoint.date, referenceDate), 1);
+    const miles = currentMi - lastPoint.mi;
+    if(miles > 0 && days > 0) return miles / days;
+  }
+  return 25;
+}
+function getLatestEntryForRule(rule, entries){
+  return normalizeEntries(entries)
+    .filter(e=>rule.entryTypes && rule.entryTypes.includes(e.type))
+    .sort(compareEntriesLatest)[0] || null;
+}
+function buildRemainingText(item){
+  const d = item.daysRemaining;
+  const m = item.milesRemaining;
+  const overTime = d!==null && d < 0;
+  const overMiles = m!==null && m < 0;
+  if(item.watchOnly) return item.note || 'Monitor manually';
+  if(item.status === 'overdue'){
+    if(overTime && overMiles){
+      return item.currentDriver === 'time'
+        ? `OVERDUE by ${pluralize(d,'day')} · ${Math.abs(m).toLocaleString()} mi`
+        : `OVERDUE by ${Math.abs(m).toLocaleString()} mi · ${pluralize(d,'day')}`;
+    }
+    if(item.currentDriver === 'time' && d!==null) return `OVERDUE by ${pluralize(d,'day')}`;
+    if(item.currentDriver === 'mileage' && m!==null) return `OVERDUE by ${Math.abs(m).toLocaleString()} mi`;
+  }
+  if(item.currentDriver === 'time' && d!==null){
+    if(d === 0) return 'Due today';
+    return `Due in ${pluralize(d,'day')}`;
+  }
+  if(item.currentDriver === 'mileage' && m!==null){
+    if(m === 0) return 'Due now';
+    return `Due in ${m.toLocaleString()} mi`;
+  }
+  if(d!==null) return d < 0 ? `OVERDUE by ${pluralize(d,'day')}` : `Due in ${pluralize(d,'day')}`;
+  if(m!==null) return m < 0 ? `OVERDUE by ${Math.abs(m).toLocaleString()} mi` : `Due in ${m.toLocaleString()} mi`;
+  return 'Schedule unavailable';
+}
+function buildTriggerText(item){
+  if(item.watchOnly) return 'Watch only';
+  if(item.status === 'overdue' && item.isOverdueByTime && item.isOverdueByMileage) return 'Triggered by time & mileage';
+  if(item.currentDriver === 'time') return item.status === 'overdue' ? 'Time trigger' : 'Driven by time';
+  if(item.currentDriver === 'mileage') return item.status === 'overdue' ? 'Mileage trigger' : 'Driven by mileage';
+  return 'Monitor schedule';
+}
+function buildDueReason(item){
+  if(item.watchOnly) return 'watch only';
+  if(item.isOverdueByTime && item.isOverdueByMileage) return 'time & mileage';
+  if(item.isOverdueByTime) return 'time';
+  if(item.isOverdueByMileage) return 'mileage';
+  if(item.currentDriver === 'time') return 'time first';
+  if(item.currentDriver === 'mileage') return 'mileage first';
+  return 'monitor';
+}
+function getStatusBadgeClass(status){
+  return status === 'overdue' ? 'red' : status === 'due soon' ? 'orange' : status === 'upcoming' ? 'green' : 'gray';
+}
+function getDotClass(status){
+  return status === 'overdue' ? 'next' : status === 'due soon' ? 'watch' : status === 'upcoming' ? 'routine' : 'long';
+}
+function computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDay){
+  if(rule.watchOnly){
+    return {
+      ...rule,
+      watchOnly:true,
+      status:'future',
+      currentDriver:'watch',
+      dueReason:'watch only',
+      lastServiceDate:null,
+      lastServiceMileage:null,
+      nextDueDate:null,
+      nextDueMileage:null,
+      daysRemaining:null,
+      milesRemaining:null,
+      etaDaysToMileage:null,
+      remainingText:rule.note || 'Monitor manually',
+      triggerText:'Watch only',
+      dueLine:rule.note || 'Monitor manually',
+      progressPct:0,
+      sortScore:Number.POSITIVE_INFINITY,
+      estimatedDate:false,
+      watchOnly:true
+    };
+  }
+  const lastEntry = getLatestEntryForRule(rule, entries);
+  const anchor = lastEntry ? {
+    date: lastEntry.date,
+    mi: lastEntry.mi,
+    estimated:false
+  } : (rule.initialAnchor || {});
+  const lastServiceDate = parseLocalDate(anchor.date || '');
+  const lastServiceMileage = safeNum(anchor.mi);
+  const nextDueDate = lastServiceDate && Number.isFinite(rule.monthsInterval) ? addMonthsSafe(lastServiceDate, rule.monthsInterval) : null;
+  const nextDueMileage = lastServiceMileage!==null && Number.isFinite(rule.milesInterval) ? lastServiceMileage + rule.milesInterval : null;
+  const daysRemaining = nextDueDate ? diffDays(referenceDate, nextDueDate) : null;
+  const milesRemaining = nextDueMileage!==null ? nextDueMileage - currentMi : null;
+  const etaDaysToMileage = milesRemaining!==null && Number.isFinite(avgMilesPerDay) && avgMilesPerDay > 0 ? milesRemaining / avgMilesPerDay : null;
+  const isOverdueByTime = daysRemaining!==null && daysRemaining < 0;
+  const isOverdueByMileage = milesRemaining!==null && milesRemaining < 0;
+  const isSoonByTime = !isOverdueByTime && daysRemaining!==null && daysRemaining <= (rule.soonDays ?? 30);
+  const isSoonByMileage = !isOverdueByMileage && milesRemaining!==null && milesRemaining <= (rule.soonMiles ?? 500);
+  const isUpcomingByTime = !isOverdueByTime && !isSoonByTime && daysRemaining!==null && daysRemaining <= (rule.upcomingDays ?? 90);
+  const isUpcomingByMileage = !isOverdueByMileage && !isSoonByMileage && milesRemaining!==null && milesRemaining <= (rule.upcomingMiles ?? 2000);
+
+  let status = 'future';
+  if(isOverdueByTime || isOverdueByMileage) status = 'overdue';
+  else if(isSoonByTime || isSoonByMileage) status = 'due soon';
+  else if(isUpcomingByTime || isUpcomingByMileage) status = 'upcoming';
+
+  let currentDriver = 'unknown';
+  if(nextDueDate && nextDueMileage!==null){
+    if(isOverdueByTime && !isOverdueByMileage) currentDriver = 'time';
+    else if(isOverdueByMileage && !isOverdueByTime) currentDriver = 'mileage';
+    else if(daysRemaining!==null && etaDaysToMileage!==null) currentDriver = etaDaysToMileage <= daysRemaining ? 'mileage' : 'time';
+    else currentDriver = daysRemaining!==null ? 'time' : 'mileage';
+  }else if(nextDueDate){
+    currentDriver = 'time';
+  }else if(nextDueMileage!==null){
+    currentDriver = 'mileage';
+  }
+
+  const dueReason = buildDueReason({watchOnly:false, isOverdueByTime, isOverdueByMileage, currentDriver});
+  const estimatedDate = !!anchor.estimated && !lastEntry;
+  const remainingText = buildRemainingText({status, currentDriver, daysRemaining, milesRemaining, isOverdueByTime, isOverdueByMileage, watchOnly:false});
+  const triggerText = buildTriggerText({status, currentDriver, isOverdueByTime, isOverdueByMileage, watchOnly:false});
+  const dueLine = `Next due: ${formatDueMileage(nextDueMileage)} or ${formatDueDate(nextDueDate, estimatedDate)}`;
+  const progressPct = nextDueMileage!==null && lastServiceMileage!==null && nextDueMileage > lastServiceMileage
+    ? Math.max(0, Math.min(100, ((currentMi-lastServiceMileage)/(nextDueMileage-lastServiceMileage))*100))
+    : 0;
+  const effectiveDays = Math.min(
+    daysRemaining!==null ? daysRemaining : Number.POSITIVE_INFINITY,
+    etaDaysToMileage!==null ? etaDaysToMileage : Number.POSITIVE_INFINITY
+  );
+  const statusRank = {overdue:0,'due soon':1,upcoming:2,future:3}[status] ?? 9;
+  const sortScore = statusRank*1000000 + (Number.isFinite(effectiveDays) ? effectiveDays : 999999);
+
+  return {
+    ...rule,
+    watchOnly:false,
+    lastEntry,
+    lastServiceDate,
+    lastServiceMileage,
+    nextDueDate,
+    nextDueMileage,
+    daysRemaining,
+    milesRemaining,
+    etaDaysToMileage,
+    isOverdueByTime,
+    isOverdueByMileage,
+    status,
+    currentDriver,
+    dueReason,
+    remainingText,
+    triggerText,
+    dueLine,
+    progressPct,
+    sortScore,
+    estimatedDate,
+    avgMilesPerDay
+  };
+}
+function getRecurringServicesState(currentMi=getMi(), referenceDate=todayLocal()){
+  const entries = getData();
+  const avgMilesPerDay = estimateMilesPerDay(entries, currentMi, referenceDate);
+  const rules = getResolvedRecurringRules().map(rule=>computeRuleState(rule, entries, currentMi, referenceDate, avgMilesPerDay));
+  return {entries, rules, avgMilesPerDay, referenceDate};
+}
+function compareRecurring(a,b){
+  if(a.watchOnly && !b.watchOnly) return 1;
+  if(!a.watchOnly && b.watchOnly) return -1;
+  if(a.sortScore !== b.sortScore) return a.sortScore - b.sortScore;
+  return (RULE_ORDER[a.id] ?? 999) - (RULE_ORDER[b.id] ?? 999);
+}
+function sameDueBundle(a,b){
+  return a.status === b.status &&
+    a.currentDriver === b.currentDriver &&
+    dateToISO(a.nextDueDate) === dateToISO(b.nextDueDate) &&
+    (a.nextDueMileage ?? null) === (b.nextDueMileage ?? null);
+}
+function getNextRecurringBundle(state){
+  const recurring = state.rules.filter(r=>!r.watchOnly && (r.nextDueDate || r.nextDueMileage!==null)).sort(compareRecurring);
+  const lead = recurring[0] || null;
+  if(!lead) return null;
+  return {lead, items: recurring.filter(r=>sameDueBundle(r, lead))};
+}
+function heroLastText(bundle){
+  const lead = bundle?.lead;
+  if(!lead) return 'Last: —';
+  const lastDate = lead.lastServiceDate ? formatDateHuman(lead.lastServiceDate) : '—';
+  const lastMi = lead.lastServiceMileage!==null ? `${lead.lastServiceMileage.toLocaleString()} mi` : '—';
+  return `Last: ${lastDate} · ${lastMi}`;
+}
+function escapeICS(value=''){
+  return String(value)
+    .replace(/\\/g,'\\\\')
+    .replace(/\r?\n/g,'\\n')
+    .replace(/,/g,'\\,')
+    .replace(/;/g,'\\;');
+}
+function formatICSDate(date){
+  const d = date instanceof Date ? date : parseLocalDate(date);
+  if(!d) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}${m}${day}`;
+}
+function buildCalendarEventForRule(ruleState){
+  if(!ruleState || !ruleState.nextDueDate) return '';
+  const start = formatICSDate(ruleState.nextDueDate);
+  if(!start) return '';
+  const endDate = new Date(ruleState.nextDueDate.getTime());
+  endDate.setDate(endDate.getDate()+1);
+  const end = formatICSDate(endDate);
+  const stamp = new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+  const profileName = `${VEHICLE_PROFILE.year} ${VEHICLE_PROFILE.make} ${VEHICLE_PROFILE.model}`.replace(/\s+/g,' ').trim();
+  const summary = `${profileName} — ${ruleState.name}`;
+  const lines = [
+    `Service: ${ruleState.name}`,
+    ruleState.dueLine,
+    `Status: ${ruleState.status === 'due soon' ? 'Due Soon' : ruleState.status.charAt(0).toUpperCase()+ruleState.status.slice(1)}`,
+    `Driver: ${ruleState.currentDriver === 'time' ? 'Time first' : ruleState.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}`,
+    `Reason: ${ruleState.dueReason}`,
+    `Remaining: ${ruleState.remainingText}`,
+    'Generated by Venza Garage'
+  ];
+  return [
+    'BEGIN:VEVENT',
+    `UID:${ruleState.id}-${start}@venza-garage`,
+    `DTSTAMP:${stamp}`,
+    `SUMMARY:${escapeICS(summary)}`,
+    `DESCRIPTION:${escapeICS(lines.join('\n'))}`,
+    `DTSTART;VALUE=DATE:${start}`,
+    `DTEND;VALUE=DATE:${end}`,
+    'BEGIN:VALARM',
+    'TRIGGER:-P1D',
+    `DESCRIPTION:${escapeICS(summary + ' due soon')}`,
+    'ACTION:DISPLAY',
+    'END:VALARM',
+    'END:VEVENT'
+  ].join('\r\n');
+}
+function downloadICS(filename, events){
+  const list = Array.isArray(events) ? events.filter(Boolean) : [events].filter(Boolean);
+  if(!list.length){ showToast('No dated reminder available yet'); return; }
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Venza Garage//Maintenance Reminders//EN','CALSCALE:GREGORIAN',...list,'END:VCALENDAR'].join('\r\n');
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
+function downloadRuleCalendar(ruleId){
+  const state = getRecurringServicesState(getMi());
+  const rule = state.rules.find(r=>r.id===ruleId);
+  if(!rule || rule.watchOnly){ showToast('This item does not have a dated recurring reminder'); return; }
+  const event = buildCalendarEventForRule(rule);
+  const filename = `${rule.id}-reminder.ics`;
+  downloadICS(filename, event);
+}
+function downloadNextDueCalendar(){
+  const state = getRecurringServicesState(getMi());
+  const bundle = getNextRecurringBundle(state);
+  if(!bundle?.lead){ showToast('No next due service found'); return; }
+  downloadICS('next-service-reminder.ics', buildCalendarEventForRule(bundle.lead));
+}
+function downloadAllRecurringCalendar(){
+  const state = getRecurringServicesState(getMi());
+  const events = state.rules.filter(r=>!r.watchOnly).map(buildCalendarEventForRule);
+  downloadICS('all-service-reminders.ics', events);
+}
+function isStandaloneMode(){
+  return window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function renderReminderStrategy(){
+  const supportEl = document.getElementById('pushSupportLabel');
+  const permissionEl = document.getElementById('pushPermissionLabel');
+  const standaloneEl = document.getElementById('pushStandaloneLabel');
+  if(!supportEl || !permissionEl || !standaloneEl) return;
+  const secure = location.protocol === 'https:' || location.hostname === 'localhost';
+  const pushCapable = secure && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  supportEl.textContent = pushCapable ? 'Ready for backend hookup' : secure ? 'Notifications only / no full push' : 'Needs HTTPS';
+  permissionEl.textContent = ('Notification' in window) ? Notification.permission : 'Not supported';
+  standaloneEl.textContent = isStandaloneMode() ? 'Home Screen app' : 'Browser tab';
+}
+async function requestReminderPermission(){
+  if(!('Notification' in window)){ showToast('Notifications are not supported on this device'); return; }
+  try{
+    const result = await Notification.requestPermission();
+    localStorage.setItem('vz_notification_pref', result);
+    renderReminderStrategy();
+    showToast(result === 'granted' ? 'Notifications allowed ✓' : result === 'denied' ? 'Notifications denied' : 'Permission dismissed');
+  }catch(err){
+    showToast('Notification permission failed');
+  }
+}
+
+document.addEventListener('click', (e)=>{
+  const editMasterBtn = e.target.closest('[data-edit-master]');
+  if(editMasterBtn){
+    editMasterPart(editMasterBtn.getAttribute('data-edit-master'));
+    return;
+  }
+  const deleteMasterBtn = e.target.closest('[data-delete-master]');
+  if(deleteMasterBtn){
+    deleteMasterPart(deleteMasterBtn.getAttribute('data-delete-master'));
+    return;
+  }
+  const editInventoryBtn = e.target.closest('[data-edit-inventory]');
+  if(editInventoryBtn){
+    editInventoryItem(editInventoryBtn.getAttribute('data-edit-inventory'));
+    return;
+  }
+  const adjustInventoryBtn = e.target.closest('[data-adjust-inventory]');
+  if(adjustInventoryBtn){
+    adjustInventoryQty(adjustInventoryBtn.getAttribute('data-adjust-inventory'), Number(adjustInventoryBtn.getAttribute('data-adjust-delta')||0));
+    return;
+  }
+  const deleteInventoryBtn = e.target.closest('[data-delete-inventory]');
+  if(deleteInventoryBtn){
+    deleteInventoryItem(deleteInventoryBtn.getAttribute('data-delete-inventory'));
+  }
+});
+
+/* ─── INIT ──────────────────────────────────────────────── */
+const VERIFICATION_ITEMS = {
+  spark_plug_torque:{label:'Spark plug torque',scope:'Guides + Specs',defaultValue:'15 ft-lbs',warning:'Use confirmed A25A-FXS service data only. Incorrect spark plug torque matters on an aluminum cylinder head.'},
+  valvomax_torque_note:{label:'ValvoMax torque guidance',scope:'Guides + Specs',defaultValue:'⚠ Verify at valvomax.com before installation',warning:'Only save a new ValvoMax torque value after confirming it from ValvoMax documentation or direct manufacturer support.'},
+  hv_filter_location_note:{label:'HV battery cooling intake location note',scope:'Guide',defaultValue:'Locate the HV battery cooling intake using your owner’s manual before trim removal. Interior layout references can vary by exact Venza configuration.',warning:'Only change this after confirming the intake location on your exact Venza interior layout.'},
+  corrosion_warranty_note:{label:'Corrosion warranty status note',scope:'Warranty',defaultValue:'Date-dependent — verify your in-service date',warning:'This is user-specific. Only replace this note after confirming your true in-service date through Toyota records.'}
+};
+function getVerificationOverrides(){
+  try{
+    const raw = localStorage.getItem(VERIFICATION_OVERRIDES_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  }catch(err){ return {}; }
+}
+function saveVerificationOverrides(overrides){
+  const clean = {};
+  Object.entries(overrides||{}).forEach(([key,value])=>{
+    const next = String(value||'').trim();
+    if(next) clean[key] = next;
+  });
+  if(Object.keys(clean).length) localStorage.setItem(VERIFICATION_OVERRIDES_KEY, JSON.stringify(clean));
+  else localStorage.removeItem(VERIFICATION_OVERRIDES_KEY);
+}
+function getVerificationValue(key){
+  const item = VERIFICATION_ITEMS[key];
+  const overrides = getVerificationOverrides();
+  return String(overrides[key] || item?.defaultValue || '').trim();
+}
+function isVerificationEdited(key){
+  const item = VERIFICATION_ITEMS[key];
+  if(!item) return false;
+  return getVerificationValue(key) !== String(item.defaultValue||'').trim();
+}
+function openVerificationEditor(key){
+  const item = VERIFICATION_ITEMS[key];
+  if(!item) return;
+  const modal = document.getElementById('verificationModal');
+  const title = document.getElementById('verificationModalTitle');
+  const warn = document.getElementById('verificationModalWarning');
+  const value = document.getElementById('verificationEditValue');
+  document.getElementById('verificationEditKey').value = key;
+  if(title) title.textContent = `Edit ${item.label}`;
+  if(warn) warn.innerHTML = `<div class="alert-icon">⚠️</div><div><strong>Confirm before saving.</strong><br>${escapeHtml(item.warning)}</div>`;
+  if(value) value.value = getVerificationValue(key);
+  if(modal) modal.classList.add('open');
+}
+function closeVerificationEditor(){
+  const modal = document.getElementById('verificationModal');
+  if(modal) modal.classList.remove('open');
+  const keyEl = document.getElementById('verificationEditKey');
+  const valEl = document.getElementById('verificationEditValue');
+  if(keyEl) keyEl.value='';
+  if(valEl) valEl.value='';
+}
+function saveVerificationItem(){
+  const key = document.getElementById('verificationEditKey')?.value || '';
+  const item = VERIFICATION_ITEMS[key];
+  const value = document.getElementById('verificationEditValue')?.value.trim() || '';
+  if(!item || !value){ showToast('Value is required'); return; }
+  if(!confirm(`${item.warning}
+
+Save this new value?
+
+${value}`)) return;
+  const overrides = getVerificationOverrides();
+  overrides[key] = value;
+  saveVerificationOverrides(overrides);
+  closeVerificationEditor();
+  renderVerificationOverridesList();
+  applyVerificationOverrides();
+  showToast('Verification item updated ✓');
+}
+function resetVerificationItem(key){
+  const item = VERIFICATION_ITEMS[key];
+  if(!item) return;
+  if(!confirm(`Reset "${item.label}" back to the app default?
+
+${item.defaultValue}`)) return;
+  const overrides = getVerificationOverrides();
+  delete overrides[key];
+  saveVerificationOverrides(overrides);
+  renderVerificationOverridesList();
+  applyVerificationOverrides();
+  showToast('Verification item reset ✓');
+}
+function renderVerificationOverridesList(){
+  const body = document.getElementById('verificationOverridesList');
+  const summary = document.getElementById('verificationSummary');
+  if(!body || !summary) return;
+  const keys = Object.keys(VERIFICATION_ITEMS);
+  const editedCount = keys.filter(isVerificationEdited).length;
+  summary.textContent = `${editedCount} edited · ${keys.length} tracked`;
+  body.innerHTML = keys.map(key=>{
+    const item = VERIFICATION_ITEMS[key];
+    const current = getVerificationValue(key);
+    const edited = isVerificationEdited(key);
+    return `<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${escapeHtml(item.label)}</div><div class="inv-meta">${escapeHtml(item.scope)} · ${edited ? 'user-edited' : 'app default'}<br>${escapeHtml(current)}<br>⚠ ${escapeHtml(item.warning)}</div></div><div class="inv-qty ${edited ? 'low' : ''}">${edited ? 'edited' : 'default'}</div></div><div class="inv-actions"><button type="button" class="inv-btn" onclick="openVerificationEditor('${escapeHtmlAttr(key)}')">Edit</button><button type="button" class="inv-btn danger" onclick="resetVerificationItem('${escapeHtmlAttr(key)}')">Reset</button></div></div>`;
+  }).join('');
+}
+function applyVerificationOverrides(){
+  const sparkTorque = getVerificationValue('spark_plug_torque');
+  const sparkTools = document.getElementById('sparkToolsNeeded');
+  const sparkStep = document.getElementById('sparkTorqueStep');
+  const sparkSpecs = document.getElementById('specsSparkPlugTorque');
+  if(sparkTools) sparkTools.innerHTML = `<strong>Tools needed:</strong> 10mm socket for coil bolts · 14mm thin-wall spark plug socket · 3/8" ratchet · 6" extension · small wobble extension helpful · torque wrench that can do <code>${escapeHtml(sparkTorque)}</code> · compressed air or vacuum · trim tool to remove engine cover clips if needed.`;
+  if(sparkStep) sparkStep.innerHTML = `<strong>Torque the new plug</strong> to <code>${escapeHtml(sparkTorque)}</code>. A 14mm plug socket and proper torque matter here because overtightening can damage the aluminum head.`;
+  if(sparkSpecs) sparkSpecs.textContent = sparkTorque;
+
+  const valvomaxNote = getVerificationValue('valvomax_torque_note');
+  const valvomaxWarn = document.getElementById('valvomaxWarnText');
+  const valvomaxStep = document.getElementById('valvomaxTorqueStep');
+  const valvomaxSpecs = document.getElementById('specsValvomaxTorque');
+  if(valvomaxWarn) valvomaxWarn.innerHTML = `<strong>⚠ CRITICAL:</strong> ${escapeHtml(valvomaxNote)}`;
+  if(valvomaxStep) valvomaxStep.innerHTML = `<strong>Thread ValvoMax by hand</strong> clockwise until snug. Then apply this saved torque guidance with your <code>24mm socket</code>: <strong>${escapeHtml(valvomaxNote)}</strong>. Do NOT overtorque — can distort the seal and cause weep.`;
+  if(valvomaxSpecs) valvomaxSpecs.textContent = valvomaxNote;
+
+  const hvLocation = getVerificationValue('hv_filter_location_note');
+  const hvStep = document.getElementById('hvFilterLocationStep');
+  if(hvStep) hvStep.innerHTML = `<strong>Locate the HV battery cooling intake</strong> — ${escapeHtml(hvLocation)}`;
+
+  const corrosionNote = getVerificationValue('corrosion_warranty_note');
+  const corrosionStatus = document.getElementById('corrosionStatusNote');
+  if(corrosionStatus) corrosionStatus.textContent = corrosionNote;
+}
+window.onload=()=>{
+  if(!localStorage.getItem('vz_log'))save(DEFAULT);
+  if(!localStorage.getItem(INVENTORY_KEY))saveInventory(DEFAULT_INVENTORY);
+  if(!localStorage.getItem(MASTER_PARTS_KEY))saveMasterParts([]);
+  ensureMasterPartModalPortal();
+  ensureMasterPartsReady();
+  if(!localStorage.getItem(MASTER_PARTS_INVENTORY_ONLY_KEY)){
+    clearSavedServiceRequirementsMap();
+    rebuildMasterPartsFromInventory();
+    localStorage.setItem(MASTER_PARTS_INVENTORY_ONLY_KEY, '1');
+  }else{
+    syncMasterPartsFromInventory();
+    mergeDuplicateMasterParts();
+  }
+  document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
+  const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value = 'DIY';
+  populatePartCategoryOptions('partCategory','other');
+  setInventoryFormOpen(false);
+  bindAccessibleClick('.header-sub, .mileage-pill, #fPhotoArea, .guide-head, #chatgptTemplate, .row[onclick], #scheduleControlsToggle');
+  setScheduleControlsExpanded(false);
+  if(!localStorage.getItem(MI_HISTORY_KEY)){
+    appendMiHistory({value:getMi(),source:'manual',entryId:null,updatedAt:new Date().toISOString()});
+  }
+  if(!localStorage.getItem(MI_STATE_KEY)) localStorage.setItem(MI_STATE_KEY, JSON.stringify({value:getMi(),source:'legacy',entryId:null,updatedAt:new Date().toISOString()}));
+  renderAll();
+  resetEntryInventoryUses();
+  renderReminderStrategy();
+};
+
+function renderAll(){
+  renderDash();
+  renderLog();
+  renderUpcoming();
+  renderParts();
+  renderBackup();
+  ensureGuideActions();
+  updateGuideAccessibility();
+}
+
+/* ─── DASHBOARD ──────────────────────────────────────────── */
+function renderDash(){
+  const mi = getMi();
+  const d = getData();
+  const state = getRecurringServicesState(mi);
+  const bundle = getNextRecurringBundle(state);
+
+  document.getElementById('topMi').textContent = mi.toLocaleString();
+  document.getElementById('dMi').textContent = mi.toLocaleString();
+
+  const tot = d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  document.getElementById('dTotal').textContent='$'+tot.toFixed(2);
+  document.getElementById('dCount').textContent=d.length;
+  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
+
+  const avgType = getAverageServiceType();
+  const avgSelect = document.getElementById('avgServiceSelect');
+  if(avgSelect){
+    avgSelect.innerHTML = getAverageServiceOptions().map(opt=>`<option value="${opt.id}">${opt.label}</option>`).join('');
+    avgSelect.value = avgType;
+  }
+  const oilResetDate = getOilAverageResetDate();
+  const avgEntries = d.filter(entry=>{
+    if(!entryMatchesAverageType(entry, avgType)) return false;
+    if(avgType !== 'oil_avg' || !oilResetDate) return true;
+    const entryDate = parseLocalDate(entry.date);
+    return entryDate ? entryDate >= oilResetDate : true;
+  }).sort(compareEntriesLatest);
+  const avgValues = avgEntries.map(entry=>getAverageEntryCost(entry, avgType)).filter(v=>v!==null);
+  const avgCost = avgValues.length
+    ? (avgValues.reduce((a,v)=>a+v,0)/avgValues.length).toFixed(2)
+    : (avgType === 'oil_avg' ? '34.54' : '0.00');
+  document.getElementById('dAvgCost').textContent='$'+avgCost;
+
+  const heroBtn = document.getElementById('heroCalendarBtn');
+  if(bundle){
+    const lead = bundle.lead;
+    const services = [...bundle.items].sort((a,b)=>(RULE_ORDER[a.id] ?? 999)-(RULE_ORDER[b.id] ?? 999)).map(i=>i.name).join(' · ');
+    const statusLabel = lead.status === 'due soon' ? 'Due Soon' : lead.status.charAt(0).toUpperCase()+lead.status.slice(1);
+    document.getElementById('dHeroLabel').textContent = `⭐ True Next Due · ${statusLabel}`;
+    document.getElementById('dHeroTitle').textContent = services;
+    document.getElementById('dHeroDue').textContent = lead.dueLine;
+    document.getElementById('dHeroTrigger').textContent = `${lead.currentDriver === 'time' ? 'Time first' : lead.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'} · ${lead.remainingText}`;
+    document.getElementById('dLast').textContent = heroLastText(bundle);
+    document.getElementById('dRemain').textContent = `Status: ${statusLabel} · ${lead.dueReason}`;
+    if(heroBtn){ heroBtn.disabled = !lead.nextDueDate; heroBtn.style.opacity = lead.nextDueDate ? '1' : '.55'; }
+    setTimeout(()=>{document.getElementById('dProgress').style.width = `${lead.progressPct}%`;}, 100);
+  }else{
+    document.getElementById('dHeroLabel').textContent = '⭐ True Next Due';
+    document.getElementById('dHeroTitle').textContent = 'No recurring schedule found';
+    document.getElementById('dHeroDue').textContent = 'Add a service entry to start the maintenance engine';
+    document.getElementById('dHeroTrigger').textContent = 'Time and mileage logic will update automatically';
+    document.getElementById('dLast').textContent = 'Last: —';
+    document.getElementById('dRemain').textContent = 'Status: Monitor';
+    if(heroBtn){ heroBtn.disabled = true; heroBtn.style.opacity = '.55'; }
+    document.getElementById('dProgress').style.width = '0%';
+  }
+}
+let scheduleControlsExpanded = false;
+function setScheduleControlsExpanded(expanded=false){
+  scheduleControlsExpanded = !!expanded;
+  const toggleEl = document.getElementById('scheduleControlsToggle');
+  const listEl = document.getElementById('scheduleConfigList');
+  if(toggleEl) toggleEl.setAttribute('aria-expanded', scheduleControlsExpanded ? 'true' : 'false');
+  if(listEl){
+    listEl.classList.toggle('expanded', scheduleControlsExpanded);
+    listEl.style.display = scheduleControlsExpanded ? 'block' : 'none';
+  }
+}
+function toggleScheduleControls(force){
+  setScheduleControlsExpanded(typeof force === 'boolean' ? force : !scheduleControlsExpanded);
+}
+function getScheduleFlag(rule){
+  if(!rule.customActive) return {text:'Toyota Guide', cls:'default'};
+  if(rule.earlierThanGuideline && !rule.laterThanGuideline) return {text:'Earlier Than Toyota', cls:'earlier'};
+  if(rule.laterThanGuideline && !rule.earlierThanGuideline) return {text:'Later Than Toyota', cls:'later'};
+  return {text:'Custom Target', cls:'custom'};
+}
+function renderScheduleSettings(){
+  const listEl = document.getElementById('scheduleConfigList');
+  const summaryEl = document.getElementById('scheduleOverrideSummary');
+  const oilGuidanceEl = document.getElementById('scheduleOilGuidanceText');
+  const specsOilIntervalEl = document.getElementById('specsOilIntervalText');
+  if(!listEl || !summaryEl) return;
+  const rules = getResolvedRecurringRules().filter(rule=>!rule.watchOnly);
+  const oilRule = rules.find(rule=>rule.id==='oil');
+  if(oilGuidanceEl && oilRule){
+    const modeText = oilRule.customActive
+      ? `Your current target: ${oilRule.activeIntervalText}. Toyota guide stays ${oilRule.guidelineIntervalText}.`
+      : `You are currently following Toyota's ${oilRule.guidelineIntervalText} guidance.`;
+    oilGuidanceEl.innerHTML = `<strong>Toyota Official:</strong> Oil change every 10,000 mi / 12 months when using 0W-16. ${modeText}`;
+  }
+  if(specsOilIntervalEl && oilRule){
+    specsOilIntervalEl.textContent = oilRule.customActive
+      ? `${oilRule.activeIntervalText} · personal target`
+      : `${oilRule.activeIntervalText} · Toyota guide`;
+  }
+  const customCount = rules.filter(rule=>rule.customActive).length;
+  summaryEl.textContent = `${customCount} custom target${customCount!==1?'s':''}`;
+  listEl.innerHTML = rules.map(rule=>{
+    const flag = getScheduleFlag(rule);
+    const guideline = rule.guidelineIntervalText || '—';
+    const active = rule.activeIntervalText || guideline;
+    const extraNote = rule.customActive
+      ? `<div class="sched-inline-note">Active target: ${active} · Toyota guide: ${guideline}</div>`
+      : `<div class="sched-inline-note">Using Toyota guide: ${guideline}</div>`;
+    return `<div class="sched-config-item">
+      <div class="sched-config-top">
+        <div style="flex:1">
+          <div class="sched-config-name">${rule.icon} ${rule.name}</div>
+          <div class="sched-config-meta">${safeText(rule.note || 'Schedule managed by recurring maintenance engine')}</div>
+          ${extraNote}
+        </div>
+        <span class="sched-flag ${flag.cls}">${flag.text}</span>
+      </div>
+      <div class="sched-config-grid">
+        <div class="fl" style="margin-bottom:0">
+          <label>Mileage Target</label>
+          <input type="number" class="fi" id="schedMiles_${rule.id}" value="${rule.milesInterval || ''}" min="1" step="1" placeholder="${rule.guidelineMilesInterval || ''}">
+        </div>
+        <div class="fl" style="margin-bottom:0">
+          <label>Month Target</label>
+          <input type="number" class="fi" id="schedMonths_${rule.id}" value="${rule.monthsInterval || ''}" min="1" step="1" placeholder="${rule.guidelineMonthsInterval || ''}">
+        </div>
+      </div>
+      <div class="sched-config-actions">
+        <button type="button" class="mini-btn" onclick="saveScheduleRule('${rule.id}')">Save Target</button>
+        <button type="button" class="mini-btn" onclick="resetScheduleRule('${rule.id}')">Reset to Toyota</button>
+      </div>
+    </div>`;
+  }).join('');
+  setScheduleControlsExpanded(scheduleControlsExpanded);
+}
+function saveScheduleRule(ruleId){
+  const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
+  if(!baseRule || baseRule.watchOnly) return;
+  const milesEl = document.getElementById(`schedMiles_${ruleId}`);
+  const monthsEl = document.getElementById(`schedMonths_${ruleId}`);
+  const baseMiles = parsePositiveInt(baseRule.milesInterval);
+  const baseMonths = parsePositiveInt(baseRule.monthsInterval);
+  const milesInterval = parsePositiveInt(milesEl?.value) || baseMiles;
+  const monthsInterval = parsePositiveInt(monthsEl?.value) || baseMonths;
+  const nextText = formatIntervalSummary(milesInterval, monthsInterval);
+  const guideText = formatIntervalSummary(baseMiles, baseMonths);
+  const changingToToyota = milesInterval === baseMiles && monthsInterval === baseMonths;
+  const confirmText = changingToToyota
+    ? `Follow Toyota guide again for ${baseRule.name}?
+
+Toyota guide: ${guideText}
+
+This removes your custom target.`
+    : `Save target for ${baseRule.name}?
+
+New target: ${nextText}
+Toyota guide: ${guideText}`;
+  if(!confirm(confirmText)) return;
+  const overrides = getScheduleOverrides();
+  const next = {};
+  if(milesInterval && milesInterval !== baseMiles) next.milesInterval = milesInterval;
+  if(monthsInterval && monthsInterval !== baseMonths) next.monthsInterval = monthsInterval;
+  if(Object.keys(next).length) overrides[ruleId] = next; else delete overrides[ruleId];
+  saveScheduleOverrides(overrides);
+  renderAll();
+  const resolved = getResolvedRecurringRules().find(rule=>rule.id===ruleId);
+  showToast(`${baseRule.name} target saved · ${resolved ? resolved.activeIntervalText : nextText} ✓`);
+}
+function resetScheduleRule(ruleId){
+  const baseRule = RECURRING_RULES.find(rule=>rule.id===ruleId);
+  if(!baseRule || baseRule.watchOnly) return;
+  const overrides = getScheduleOverrides();
+  if(!overrides[ruleId]){ showToast(`${baseRule.name} already matches Toyota guide`); return; }
+  const guideText = formatIntervalSummary(baseRule.milesInterval, baseRule.monthsInterval);
+  if(!confirm(`Reset ${baseRule.name} back to Toyota guide?
+
+Toyota guide: ${guideText}
+
+This removes your custom target.`)) return;
+  delete overrides[ruleId];
+  saveScheduleOverrides(overrides);
+  renderAll();
+  showToast(`${baseRule.name} reset to Toyota guide ✓`);
+}
+function renderUpcoming(){
+  renderScheduleSettings();
+  const mi = getMi();
+  const state = getRecurringServicesState(mi);
+  const recurring = state.rules.filter(r=>!r.watchOnly).sort(compareRecurring);
+  const watchOnly = state.rules.filter(r=>r.watchOnly);
+  const recurringEl = document.getElementById('upcomingRecurringList');
+  const watchEl = document.getElementById('upcomingWatchList');
+  if(recurringEl){
+    recurringEl.innerHTML = recurring.map(item=>`
+      <div class="svc-item">
+        <div class="svc-dot ${getDotClass(item.status)}"></div>
+        <div class="svc-info">
+          <div class="svc-name">${item.name}</div>
+          <div class="svc-note">${item.dueLine}</div>
+          <div class="svc-note">${item.remainingText} · ${item.triggerText}</div>
+          <div class="svc-note">Active target: ${item.activeIntervalText || formatIntervalSummary(item.milesInterval, item.monthsInterval)}${item.customActive ? ` · Toyota guide: ${item.guidelineIntervalText || '—'}` : ''}</div>
+          <div class="svc-actions">
+            <button class="mini-btn" onclick="downloadRuleCalendar('${item.id}')">📅 Add to Calendar</button>
+          </div>
+        </div>
+        <div class="svc-right">
+          <div class="svc-mi">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</div>
+          <div class="badge ${getStatusBadgeClass(item.status)}">${item.status === 'due soon' ? 'Due Soon' : item.status.charAt(0).toUpperCase()+item.status.slice(1)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  if(watchEl){
+    watchEl.innerHTML = watchOnly.map(item=>`
+      <div class="svc-item">
+        <div class="svc-dot watch"></div>
+        <div class="svc-info">
+          <div class="svc-name">${item.name}</div>
+          <div class="svc-note">${item.note || 'Monitor manually'}</div>
+        </div>
+        <div class="svc-right">
+          <div class="svc-mi">Manual</div>
+          <div class="badge orange">Watch</div>
+        </div>
+      </div>
+    `).join('') || `<div class="svc-item"><div class="svc-info"><div class="svc-name">No watch-only items</div><div class="svc-note">All tracked items are recurring services.</div></div></div>`;
+  }
+}
+
+/* ─── LOG/* ─── LOG ────────────────────────────────────────────────── */
+function renderLog(){
+  const d=getData().sort((a,b)=>b.mi-a.mi);
+  const el=document.getElementById('logList');
+  el.innerHTML=d.map(e=>{
+    const dt=new Date(e.date+'T00:00:00');
+    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const safeEntryUrl = safeUrl(e.link);
+    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
+    const del=!e.builtin
+      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
+      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    const items = normalizeEntryItems(e.items);
+    const uses = normalizeInventoryUses(e.inventoryUses);
+    const displayParts = items.length ? items.map(item=>({
+      qty: item.qty,
+      name: item.name,
+      partNum: item.partNum,
+      store: item.store,
+      link: item.link,
+      price: Number(item.price||0),
+      oilAvg: !!item.useInOilAvg,
+      fromInventory: !!item.inventoryId
+    })) : uses.map(use=>({
+      qty: use.qtyUsed,
+      name: use.name,
+      partNum: use.partNum,
+      store: use.store,
+      link: use.link,
+      price: Number(use.unitCost||0),
+      oilAvg: !!use.countInOilAvg,
+      fromInventory: !!use.inventoryId
+    }));
+    const partsHtml = displayParts.length ? `<div class="log-parts">${displayParts.map(part=>{
+      const meta = [part.partNum && `Part # ${part.partNum}`, part.store].filter(Boolean).join(' · ');
+      const safePartUrl = safeUrl(part.link);
+      return `<div class="log-part">
+        <div class="log-part-top">
+          <div class="log-part-name">${part.qty}× ${safeText(part.name)}</div>
+          <div class="log-part-price">$${(part.qty * part.price).toFixed(2)}</div>
+        </div>
+        ${meta ? `<div class="log-part-meta">${safeText(meta)}</div>` : ''}
+        ${safePartUrl ? `<a class="log-part-link" href="${safePartUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safePartUrl))}</a>` : ''}
+        ${part.oilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+        ${part.fromInventory ? `<div class="parts-badge" style="background:rgba(34,114,212,.1);color:var(--blue2);border-color:rgba(34,114,212,.25)">From inventory</div>` : ''}
+      </div>`;
+    }).join('')}</div>` : '';
+    const photo=getPhoto(e.id);
+    const photoHtml=photo
+      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+        </div>`
+      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+          background:none;cursor:pointer;width:100%;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+          📷 Add Receipt Photo
+        </button>`;
+    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+      ${del}
+      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
+      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-desc">${safeText(e.desc)}</div>
+      ${partsHtml}
+      <div class="log-foot">
+        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
+        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
+      </div>
+      ${normalizeServiceEntryItems(e.items).length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${normalizeServiceEntryItems(e.items).map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
+      ${photoHtml}
+    </div>`;
+  }).join('');
+  let tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  document.getElementById('totalVal').textContent='$'+tot.toFixed(2);
+}
+
+/* ─── ADD ENTRY/* ─── ADD ENTRY ──────────────────────────────────────────── */
+function getServiceRuleMasterLabel(masterPartId=''){
+  const part = getMasterParts().find(item=>String(item.id)===String(masterPartId));
+  return part ? `${part.name}${part.partNum ? ` · ${part.partNum}` : ''}` : 'Unlinked master part';
+}
+function buildServiceRuleMasterOptions(selectedId=''){
+  const select = document.getElementById('srMasterPart');
+  if(!select) return;
+  const parts = getMasterParts().slice().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+  select.innerHTML = ['<option value="">— No linked master part —</option>', ...parts.map(part=>`<option value="${escapeHtmlAttr(part.id)}">${escapeHtml(part.name)}${part.partNum ? ` · ${escapeHtml(part.partNum)}` : ''}</option>`)].join('');
+  select.value = selectedId || '';
+}
+function openServiceRuleEditor(rule=null, serviceType='oil'){
+  const modal = document.getElementById('serviceRuleModal');
+  if(!modal) return;
+  buildServiceRuleMasterOptions(rule?.masterPartIds?.[0] || '');
+  document.getElementById('srOriginalServiceType').value = rule ? serviceType : '';
+  document.getElementById('srOriginalId').value = rule?.id || '';
+  document.getElementById('srServiceType').value = serviceType || 'oil';
+  document.getElementById('srQty').value = Number(rule?.qty||1) || 1;
+  document.getElementById('srRuleId').value = rule?.id || '';
+  document.getElementById('srToyotaPart').value = rule?.toyotaPartNum || '';
+  document.getElementById('srLabel').value = rule?.label || '';
+  const titleEl = document.getElementById('srModalTitle'); if(titleEl) titleEl.textContent = rule ? `Edit ${rule.label}` : 'Add Service-Part Rule';
+  modal.classList.add('open');
+  requestAnimationFrame(()=>{ const first=document.getElementById('srLabel'); if(first && typeof first.focus === 'function') first.focus({preventScroll:true}); });
+}
+function closeServiceRuleEditor(){
+  const modal = document.getElementById('serviceRuleModal');
+  if(modal) modal.classList.remove('open');
+  ['srOriginalServiceType','srOriginalId','srRuleId','srToyotaPart','srLabel'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const qtyEl=document.getElementById('srQty'); if(qtyEl) qtyEl.value='1';
+  const serviceEl=document.getElementById('srServiceType'); if(serviceEl) serviceEl.value='oil';
+  buildServiceRuleMasterOptions('');
+}
+function editServiceRule(serviceType, ruleId){
+  const rules = getResolvedServicePartRequirements(serviceType);
+  const rule = rules.find(item=>String(item.id)===String(ruleId));
+  if(!rule) return;
+  openServiceRuleEditor(rule, serviceType);
+}
+function saveServiceRule(){
+  const originalServiceType = document.getElementById('srOriginalServiceType').value || '';
+  const originalId = document.getElementById('srOriginalId').value || '';
+  const serviceType = document.getElementById('srServiceType').value || 'other';
+  const qty = Math.max(1, parseInt(document.getElementById('srQty').value||1,10) || 1);
+  const id = document.getElementById('srRuleId').value.trim();
+  const toyotaPartNum = document.getElementById('srToyotaPart').value.trim();
+  const label = document.getElementById('srLabel').value.trim();
+  const masterPartId = document.getElementById('srMasterPart').value || '';
+  if(!id || !label){ showToast('Rule ID and label are required'); return; }
+  const map = getResolvedServiceRequirementsMap();
+  Object.keys(map).forEach(key=>{ map[key] = Array.isArray(map[key]) ? map[key].map(normalizeServiceRequirementRule).filter(Boolean) : []; });
+  if(originalServiceType && originalId && Array.isArray(map[originalServiceType])) map[originalServiceType] = map[originalServiceType].filter(rule=>String(rule.id)!==String(originalId));
+  map[serviceType] = Array.isArray(map[serviceType]) ? map[serviceType] : [];
+  if(map[serviceType].some(rule=>String(rule.id)===String(id))){ showToast('Rule ID must be unique within that service type'); return; }
+  const saved = normalizeServiceRequirementRule({id,label,qty,masterPartIds:masterPartId ? [masterPartId] : [],toyotaPartNum});
+  if(!saved){ showToast('Rule could not be saved'); return; }
+  map[serviceType].push(saved);
+  map[serviceType].sort((a,b)=>String(a.label||'').localeCompare(String(b.label||'')));
+  saveResolvedServiceRequirementsMap(map);
+  closeServiceRuleEditor();
+  renderParts();
+  renderEntryInventoryUI();
+  showToast('Service-part rule saved ✓');
+}
+function deleteServiceRule(serviceType, ruleId){
+  const rules = getResolvedServicePartRequirements(serviceType);
+  const rule = rules.find(item=>String(item.id)===String(ruleId));
+  if(!rule) return;
+  if(!confirm(`Delete service rule "${rule.label}"?`)) return;
+  const map = getResolvedServiceRequirementsMap();
+  map[serviceType] = Array.isArray(map[serviceType]) ? map[serviceType].filter(item=>String(item.id)!==String(ruleId)) : [];
+  saveResolvedServiceRequirementsMap(map);
+  renderParts();
+  renderEntryInventoryUI();
+  showToast('Service-part rule deleted');
+}
+function resetServiceRequirementRules(){
+  if(!confirm('Reset all service-part rules to the app defaults?')) return;
+  clearSavedServiceRequirementsMap();
+  renderParts();
+  renderEntryInventoryUI();
+  showToast('Service-part rules reset to default ✓');
+}
+function renderServiceRuleList(){
+  const body = document.getElementById('serviceRuleList');
+  const summary = document.getElementById('serviceRuleSummary');
+  if(!body || !summary) return;
+  const map = getResolvedServiceRequirementsMap();
+  const rows = Object.entries(map).flatMap(([serviceType, rules])=>Array.isArray(rules) ? rules.map(rule=>({serviceType, rule})) : []).sort((a,b)=>{
+    const serviceDiff = String(LABELS[a.serviceType]||a.serviceType).localeCompare(String(LABELS[b.serviceType]||b.serviceType));
+    if(serviceDiff!==0) return serviceDiff;
+    return String(a.rule.label||'').localeCompare(String(b.rule.label||''));
+  });
+  const isCustom = !!getSavedServiceRequirementsMap();
+  summary.textContent = `${rows.length} rule${rows.length!==1?'s':''} · ${isCustom ? 'custom active' : 'app default'}`;
+  if(!rows.length){ body.innerHTML = `<div class="master-empty">No service-part rules saved.</div>`; return; }
+  body.innerHTML = rows.map(({serviceType, rule})=>`<div class="inv-row"><div class="inv-top"><div style="flex:1"><div class="inv-name">${escapeHtml(rule.label)}</div><div class="inv-meta">${escapeHtml(LABELS[serviceType] || serviceType)} · ID: ${escapeHtml(rule.id)}${rule.toyotaPartNum ? ` · Toyota/ref #: ${escapeHtml(rule.toyotaPartNum)}` : ''}<br>Required qty: ${Number(rule.qty||0)}${rule.masterPartIds?.[0] ? `<br>🔗 ${escapeHtml(getServiceRuleMasterLabel(rule.masterPartIds[0]))}` : '<br>⚠ No linked master part'}</div></div><div class="inv-qty ${rule.masterPartIds?.length ? '' : 'out'}">${rule.masterPartIds?.length ? 'linked' : 'unlinked'}</div></div><div class="inv-actions"><button type="button" class="inv-btn" onclick="editServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Edit</button><button type="button" class="inv-btn danger" onclick="deleteServiceRule('${escapeHtmlAttr(serviceType)}','${escapeHtmlAttr(rule.id)}')">Delete</button></div></div>`).join('');
+}
+
+function renderParts(){
+  renderServiceRuleList();
+  const inv = getInventory().sort((a,b)=>{
+    const stockDiff = Number(b.qtyOnHand||0) - Number(a.qtyOnHand||0);
+    if(stockDiff !== 0) return stockDiff;
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  const parts = getMasterParts().sort((a,b)=>{
+    const catA = MASTER_CATEGORY_LABELS[a.category] || 'Other';
+    const catB = MASTER_CATEGORY_LABELS[b.category] || 'Other';
+    if(catA !== catB) return catA.localeCompare(catB);
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  const listEl = document.getElementById('inventoryList');
+  const summaryEl = document.getElementById('inventorySummary');
+  const masterListEl = document.getElementById('masterPartsList');
+  const masterSummaryEl = document.getElementById('masterPartsSummary');
+  if(!listEl || !summaryEl) return;
+  const totalQty = inv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
+  const linkedInvCount = inv.filter(item=>item.masterPartId).length;
+  summaryEl.textContent = `${inv.length} item${inv.length!==1?'s':''} · ${totalQty} total on hand · ${linkedInvCount} linked`;
+  if(!inv.length){
+    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No inventory saved yet. Add parts above when you buy ahead during a sale.</div></div>`;
+  }else{
+    listEl.innerHTML = inv.map(item=>{
+      const qty = Number(item.qtyOnHand||0);
+      const qtyClass = qty===0 ? 'out' : qty<=1 ? 'low' : '';
+      const meta = [LABELS[item.serviceType]||'Other', item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ');
+      const master = parts.find(part=>String(part.id)===String(item.masterPartId||''));
+      return `<div class="inv-row">
+        <div class="inv-top">
+          <div style="flex:1">
+            <div class="inv-name">${item.name}</div>
+            <div class="inv-meta">${meta || 'No extra details saved yet'}${item.note ? `<br>💡 ${item.note}` : ''}${item.link ? `<br><a class="part-link" href="${item.link}" target="_blank">→ ${getLinkHostLabel(item.link)}</a>` : ''}${master ? `<br>🔗 Master DB: <span style="color:var(--text2)">${master.name}</span>` : ''}</div>
+            ${item.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+          </div>
+          <div class="inv-qty ${qtyClass}">${qty} on hand</div>
+        </div>
+        <div class="inv-actions">
+          <button type="button" class="inv-btn" data-edit-inventory="${escapeHtmlAttr(item.id)}">Edit</button>
+          ${master ? `<button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(master.id)}">Master Part</button>` : ''}
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="1">+1</button>
+          <button type="button" class="inv-btn" data-adjust-inventory="${escapeHtmlAttr(item.id)}" data-adjust-delta="-1">-1</button>
+          <button type="button" class="inv-btn danger" data-delete-inventory="${escapeHtmlAttr(item.id)}">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  if(masterListEl && masterSummaryEl){
+    const totalSources = parts.reduce((sum,part)=>sum + (part.sources||[]).length, 0);
+    masterSummaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${totalSources} saved source${totalSources!==1?'s':''}`;
+    if(!parts.length){
+      masterListEl.innerHTML = `<div class="master-empty">No master parts yet. Add an inventory item above and the app will automatically create or update your reference part database here.</div>`;
+    }else{
+      masterListEl.innerHTML = parts.map(part=>{
+        const linkedInv = inv.filter(item=>String(item.masterPartId||'')===String(part.id));
+        const linkedQty = linkedInv.reduce((sum,item)=>sum + Number(item.qtyOnHand||0), 0);
+        const serviceLabel = LABELS[part.serviceType] || 'Other';
+        const categoryLabel = MASTER_CATEGORY_LABELS[part.category] || 'Other';
+        const defaultPrice = Number(part.unitCost||0) > 0 ? `$${Number(part.unitCost||0).toFixed(2)}` : '—';
+        const sourcesHtml = (part.sources||[]).length
+          ? `<div class="master-source-list">${part.sources.map(source=>`<div class="master-source"><div class="master-source-top"><div><div class="master-source-name">${source.store || source.label || 'Saved source'}</div><div class="master-source-meta">${[source.label && source.label !== (source.store||'') ? source.label : '', source.addedAt ? `saved ${formatDateHuman(source.addedAt.slice(0,10))}` : ''].filter(Boolean).join(' · ')}${source.url ? `<br><a class="part-link" href="${source.url}" target="_blank">→ ${getLinkHostLabel(source.url)}</a>` : ''}</div></div><div class="master-source-price">${Number(source.unitPrice||0) > 0 ? `$${Number(source.unitPrice||0).toFixed(2)}` : '—'}</div></div></div>`).join('')}</div>`
+          : `<div class="part-missing" style="margin-top:10px">No saved purchase sources yet. Add this part through Inventory and the store/link will stack here automatically.</div>`;
+        return `<div class="part-item">
+          <div class="part-row1"><span class="part-name">${part.name}</span><span class="part-price">${defaultPrice}</span></div>
+          <div class="part-num">${[categoryLabel, serviceLabel, part.partNum && `Part # ${part.partNum}`].filter(Boolean).join(' · ')}</div>
+          ${part.note ? `<div class="inv-meta" style="margin-top:6px">💡 ${part.note}</div>` : ''}
+          ${part.statusLabel ? `<div class="parts-badge">${part.statusLabel}</div>` : ''}
+          ${part.countInOilAvg ? `<div class="parts-badge">Counts in oil avg</div>` : ''}
+          <div class="inv-meta" style="margin-top:8px">${linkedInv.length ? `Linked inventory: ${linkedInv.length} item${linkedInv.length!==1?'s':''} · ${linkedQty} total on hand` : 'Linked inventory: none yet'}</div>
+          ${sourcesHtml}
+          <div class="inv-actions" style="margin-top:12px">
+            <button type="button" class="inv-btn" data-edit-master="${escapeHtmlAttr(part.id)}">Edit</button>
+            <button type="button" class="inv-btn danger" data-delete-master="${escapeHtmlAttr(part.id)}">Delete</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+function setInventoryFormOpen(isOpen){
+  const wrap = document.getElementById('inventoryFormWrap');
+  const btn = document.getElementById('inventoryFormToggleBtn');
+  if(!wrap || !btn) return;
+  wrap.style.display = isOpen ? 'block' : 'none';
+  btn.textContent = isOpen ? '− Hide Add Inventory Item' : '＋ Add Inventory Item';
+}
+function toggleInventoryForm(forceOpen){
+  const wrap = document.getElementById('inventoryFormWrap');
+  if(!wrap) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : wrap.style.display === 'none';
+  setInventoryFormOpen(shouldOpen);
+  if(shouldOpen){
+    wrap.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+function clearInventoryForm(){
+  document.getElementById('invEditId').value='';
+  document.getElementById('invMasterPartId').value='';
+  document.getElementById('invFormTitle').textContent='Add Inventory Item';
+  ['invName','invQty','invCost','invPart','invStore','invLink','invNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('invType').value='oil';
+  document.getElementById('invOilAvg').checked=false;
+}
+let masterPartModalScrollY = 0;
+function ensureMasterPartModalPortal(){
+  const modal = document.getElementById('masterPartModal');
+  if(modal && modal.parentElement !== document.body){
+    document.body.appendChild(modal);
+  }
+}
+function lockMasterPartModal(){
+  masterPartModalScrollY = window.scrollY || window.pageYOffset || 0;
+  document.documentElement.classList.add('modal-open');
+  document.body.classList.add('modal-open');
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${masterPartModalScrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+}
+function unlockMasterPartModal(){
+  document.documentElement.classList.remove('modal-open');
+  document.body.classList.remove('modal-open');
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  window.scrollTo(0, masterPartModalScrollY || 0);
+}
+function openMasterPartEditor(part){
+  ensureMasterPartModalPortal();
+  const wrap = document.getElementById('masterPartEditorWrap');
+  const modal = document.getElementById('masterPartModal');
+  if(!wrap || !modal) return;
+  document.getElementById('mpEditId').value = part?.id || '';
+  const titleEl = document.getElementById('mpModalTitle'); if(titleEl) titleEl.textContent = `Edit ${part?.name || 'Master Part'}`;
+  document.getElementById('mpName').value = part?.name || '';
+  document.getElementById('mpType').value = part?.serviceType || 'other';
+  document.getElementById('mpCategory').value = part?.category || 'other';
+  document.getElementById('mpPart').value = part?.partNum || '';
+  document.getElementById('mpCost').value = Number(part?.unitCost||0) > 0 ? Number(part.unitCost||0) : '';
+  document.getElementById('mpStatus').value = part?.statusLabel || '';
+  document.getElementById('mpNote').value = part?.note || '';
+  document.getElementById('mpOilAvg').checked = !!part?.countInOilAvg;
+  const modalScroll = modal.querySelector('.modal-scroll');
+  if(modalScroll) modalScroll.scrollTop = 0;
+  lockMasterPartModal();
+  modal.classList.add('open');
+  requestAnimationFrame(()=>{
+    if(modalScroll) modalScroll.scrollTop = 0;
+    const firstField = document.getElementById('mpName');
+    if(firstField && typeof firstField.focus === 'function') firstField.focus({preventScroll:true});
+  });
+}
+function closeMasterPartEditor(){
+  const modal = document.getElementById('masterPartModal');
+  if(modal) modal.classList.remove('open');
+  unlockMasterPartModal();
+  ['mpEditId','mpName','mpPart','mpCost','mpStatus','mpNote'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const typeEl=document.getElementById('mpType'); if(typeEl) typeEl.value='other';
+  const catEl=document.getElementById('mpCategory'); if(catEl) catEl.value='other';
+  const oilEl=document.getElementById('mpOilAvg'); if(oilEl) oilEl.checked=false;
+}
+function editMasterPart(id){
+  const part = getMasterParts().find(x=>String(x.id)===String(id));
+  if(!part) return;
+  openMasterPartEditor(part);
+}
+function saveMasterPart(){
+  const id = document.getElementById('mpEditId').value;
+  const name = document.getElementById('mpName').value.trim();
+  const serviceType = document.getElementById('mpType').value || 'other';
+  const category = document.getElementById('mpCategory').value || 'other';
+  const partNum = document.getElementById('mpPart').value.trim();
+  const unitCost = Number.isFinite(Number(document.getElementById('mpCost').value)) ? Number(document.getElementById('mpCost').value) : 0;
+  const statusLabel = document.getElementById('mpStatus').value.trim();
+  const note = document.getElementById('mpNote').value.trim();
+  const countInOilAvg = !!document.getElementById('mpOilAvg').checked;
+  if(!name){ showToast('Master part name is required'); return; }
+  const parts = getMasterParts();
+  const idx = parts.findIndex(part=>String(part.id)===String(id));
+  if(idx===-1){ showToast('Master part not found'); return; }
+  parts[idx] = {...parts[idx],name,serviceType,category,partNum,unitCost,statusLabel,note,countInOilAvg};
+  saveMasterParts(parts);
+  mergeDuplicateMasterParts();
+  renderParts();
+  closeMasterPartEditor();
+  showToast('Master part updated ✓');
+}
+function deleteMasterPart(id){
+  const linkedInventory = getInventory().filter(item=>String(item.masterPartId||'')===String(id));
+  const msg = linkedInventory.length ? `Delete this master part and unlink ${linkedInventory.length} inventory item${linkedInventory.length!==1?'s':''}?` : 'Delete this master part?';
+  if(!confirm(msg)) return;
+  saveMasterParts(getMasterParts().filter(part=>String(part.id)!==String(id)));
+  if(linkedInventory.length){
+    const updatedInventory = getInventory().map(item=>String(item.masterPartId||'')===String(id) ? {...item, masterPartId:''} : item);
+    saveInventory(updatedInventory);
+  }
+  mergeDuplicateMasterParts();
+  renderParts();
+  renderEntryInventoryUI();
+  closeMasterPartEditor();
+  showToast('Master part deleted');
+}
+function editInventoryItem(id){
+  const item = getInventory().find(x=>String(x.id)===String(id));
+  if(!item) return;
+  toggleInventoryForm(true);
+  document.getElementById('invEditId').value=item.id;
+  document.getElementById('invMasterPartId').value=item.masterPartId || '';
+  document.getElementById('invFormTitle').textContent='Edit Inventory Item';
+  document.getElementById('invName').value=item.name||'';
+  document.getElementById('invType').value=item.serviceType||'other';
+  document.getElementById('invQty').value=item.qtyOnHand||0;
+  document.getElementById('invCost').value=item.unitCost||'';
+  document.getElementById('invPart').value=item.partNum||'';
+  document.getElementById('invStore').value=item.store||'';
+  document.getElementById('invLink').value=item.link||'';
+  document.getElementById('invNote').value=item.note||'';
+  document.getElementById('invOilAvg').checked=!!item.countInOilAvg;
+  go('parts');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function saveInventoryItem(){
+  const editId = document.getElementById('invEditId').value;
+  const masterPartId = document.getElementById('invMasterPartId').value;
+  const name = document.getElementById('invName').value.trim();
+  const serviceType = document.getElementById('invType').value || 'other';
+  const qtyOnHand = Math.max(0, parseInt(document.getElementById('invQty').value||0,10) || 0);
+  const unitCost = Number.isFinite(Number(document.getElementById('invCost').value)) ? Number(document.getElementById('invCost').value) : 0;
+  const partNum = document.getElementById('invPart').value.trim();
+  const store = document.getElementById('invStore').value.trim();
+  const link = document.getElementById('invLink').value.trim();
+  const note = document.getElementById('invNote').value.trim();
+  const countInOilAvg = document.getElementById('invOilAvg').checked;
+  if(!name){showToast('Inventory item name is required');return;}
+  const linkedMasterPartId = upsertMasterPartFromInventoryPayload({masterPartId,name,serviceType,unitCost,partNum,store,link,note,countInOilAvg});
+  const inv = getInventory();
+  const payload = {id: editId || Date.now(), name, serviceType, qtyOnHand, unitCost, partNum, store, link, note, countInOilAvg, masterPartId: linkedMasterPartId};
+  if(editId){
+    const idx = inv.findIndex(item=>String(item.id)===String(editId));
+    if(idx>-1) inv[idx] = payload;
+  }else{
+    inv.push(payload);
+  }
+  saveInventory(inv);
+  mergeDuplicateMasterParts();
+  clearInventoryForm();
+  setInventoryFormOpen(false);
+  renderParts();
+  renderEntryInventoryUI();
+  showToast(editId ? 'Inventory updated ✓' : 'Inventory item saved ✓');
+}
+function adjustInventoryQty(id, delta){
+  const inv = getInventory();
+  const item = inv.find(x=>String(x.id)===String(id));
+  if(!item) return;
+  item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) + delta);
+  saveInventory(inv);
+  renderParts();
+  renderEntryInventoryUI();
+}
+function deleteInventoryItem(id){
+  if(!confirm('Delete this inventory item?')) return;
+  saveInventory(getInventory().filter(item=>String(item.id)!==String(id)));
+  renderParts();
+  renderEntryInventoryUI();
+  clearInventoryForm();
+  showToast('Inventory item deleted');
+}
+function renderEntryInventoryUI(){
+  const block = document.getElementById('inventorySuggestBlock');
+  const needEl = document.getElementById('inventorySuggestList');
+  const inventoryEl = document.getElementById('inventorySelectedList');
+  const summaryEl = document.getElementById('inventoryRequiredSummary');
+  const typeEl = document.getElementById('fType');
+  if(!block || !needEl || !inventoryEl || !typeEl) return;
+  const serviceType = typeEl.value;
+  if(!serviceType){
+    block.style.display='none';
+    needEl.innerHTML='';
+    inventoryEl.innerHTML='';
+    if(summaryEl) summaryEl.textContent='';
+    updateEntrySaveLock();
+    syncEntryCostFromItems();
+    return;
+  }
+  block.style.display='block';
+  const needs = getSimpleServiceNeeds(serviceType);
+  const previewInventory = getEntryPreviewInventory();
+  const selectedCounts = getSelectedInventoryCounts();
+  const matches = getServiceInventoryMatches(serviceType, previewInventory)
+    .map(item=>({
+      ...item,
+      selectedQty:Number(selectedCounts[String(item.id)]||0),
+      available:Math.max(0, Number(item.qtyOnHand||0) - Number(selectedCounts[String(item.id)]||0))
+    }))
+    .sort((a,b)=>{
+      const availDiff = b.available - a.available;
+      if(availDiff !== 0) return availDiff;
+      return String(a.name||'').localeCompare(String(b.name||''));
+    });
+
+  if(summaryEl){
+    summaryEl.textContent = needs.length
+      ? `This ${LABELS[serviceType] || 'service'} usually needs ${needs.length} part${needs.length!==1?'s':''}. Start with the simple checklist below, then tap a saved inventory item if you already bought it.`
+      : `No starter parts list is saved for this service yet. You can still use matching inventory below or enter the service manually.`;
+  }
+
+  needEl.innerHTML = needs.length ? needs.map(need=>{
+    const matched = matches.filter(item=>inventoryMatchesNeed(item, need));
+    const savedQty = matched.reduce((sum,item)=>sum + Number(item.available||0), 0);
+    const sources = getNeedSavedSources(need, matches);
+    return `<div class="need-card">
+      <div class="need-top">
+        <div style="flex:1">
+          <div class="need-name">${need.label}</div>
+          <div class="need-meta">Need: ${need.qtyText}${savedQty>0 ? ` · Saved in inventory: ${savedQty}` : ' · No saved stock yet'}</div>
+        </div>
+        <div class="need-qty">${need.qtyText}</div>
+      </div>
+      ${sources.length ? `<div class="need-links"><select class="fs" onchange="openSavedSourceLink(this)"><option value="">Open saved purchase link…</option>${sources.map(source=>`<option value="${escapeHtmlAttr(source.url)}">${escapeHtml(source.label + (Number(source.unitPrice||0)>0 ? ` — $${Number(source.unitPrice||0).toFixed(2)}` : ''))}</option>`).join('')}</select></div>` : `<div class="need-meta" style="margin-top:8px">No saved purchase links yet for this part.</div>`}
+    </div>`;
+  }).join('') : `<div class="part-missing">No starter parts checklist yet for this service.</div>`;
+
+  inventoryEl.innerHTML = matches.length ? matches.map(item=>`
+    <div class="selected-use">
+      <div class="selected-use-top">
+        <div style="flex:1">
+          <div class="suggest-name">${item.name}</div>
+          <div class="suggest-meta">${[item.partNum && `Part # ${item.partNum}`, item.store].filter(Boolean).join(' · ') || 'Saved inventory item'}</div>
+        </div>
+        <div class="inv-qty ${item.available===0?'out':item.available<=1?'low':''}">${item.available} free</div>
+      </div>
+      <div class="suggest-meta">On hand: ${Number(item.qtyOnHand||0)} · Selected now: ${item.selectedQty} · $${Number(item.unitCost||0).toFixed(2)} each${item.countInOilAvg ? ' · counts in oil avg' : ''}</div>
+      ${item.available>0 ? `<button type="button" class="suggest-btn" onclick="useInventoryItem(${item.id})">Use this part</button>` : `<div class="part-missing" style="margin-top:8px">No more stock left for this item.</div>`}
+    </div>
+  `).join('') : `<div class="part-missing">No saved inventory matches yet for this service. Add the part in Inventory first and it will show here next time.</div>`;
+
+  updateEntrySaveLock();
+  syncEntryCostFromItems();
+}
+
+function useInventoryItem(id){
+  const previewInventory = getEntryPreviewInventory();
+  const item = previewInventory.find(x=>String(x.id)===String(id));
+  if(!item) return;
+  const alreadySelected = Number(getSelectedInventoryCounts()[String(id)]||0);
+  const max = Number(item.qtyOnHand||0);
+  if(alreadySelected >= max){showToast('No more free stock left for this part');return;}
+  addItemRow({
+    inventoryId: item.id,
+    name: item.name,
+    partNum: item.partNum,
+    store: item.store,
+    link: item.link,
+    price: Number(item.unitCost||0),
+    qty: 1,
+    useInOilAvg: !!item.countInOilAvg
+  });
+}
+function removeOneInventoryItem(id){
+  const rows = getFormItemRows().filter(row=>String(row.dataset.inventoryId||'')===String(id));
+  const row = rows[rows.length-1];
+  if(!row) return;
+  row.remove();
+  if(!getFormItemRows().length) addItemRow();
+  renderEntryInventoryUI();
+}
+
+/* ─── MILEAGE FIELD — dynamic placeholder, hint, validation ─── */
+function initAddForm(){
+  const input    = document.getElementById('fMi');
+  const hintEl   = document.getElementById('fMiHint');
+  const warnEl   = document.getElementById('fMiWarn');
+  if(!input) return;
+  const cur = getMi();
+  input.placeholder = cur.toLocaleString();
+  if(hintEl) hintEl.textContent = 'Last recorded: ' + cur.toLocaleString() + ' mi';
+  if(warnEl) warnEl.classList.remove('visible');
+  // re-validate if a value already exists (e.g. navigating back)
+  if(input.value) onMileageInput(input.value);
+}
+function onMileageInput(val){
+  const warnEl = document.getElementById('fMiWarn');
+  if(!warnEl) return;
+  const entered = parseInt(val, 10);
+  if(!val || !Number.isFinite(entered) || entered <= 0){
+    warnEl.classList.remove('visible');
+    return;
+  }
+  // Find the highest mileage among existing entries (not the dashboard value)
+  const lastEntryMi = getData().reduce((max, e)=>{
+    const m = Number(e.mi||0);
+    return Number.isFinite(m) ? Math.max(max, m) : max;
+  }, 0);
+  if(lastEntryMi > 0 && entered < lastEntryMi){
+    warnEl.textContent = '⚠ Lower than last logged entry (' + lastEntryMi.toLocaleString() + ' mi) — double-check before saving.';
+    warnEl.classList.add('visible');
+  } else {
+    warnEl.classList.remove('visible');
+  }
+}
+
+/* ─── PARTS AUTOCOMPLETE — suggest from saved Parts tab ─────── */
+let _acActiveRow = null; // track which row has the open dropdown
+
+function getPartSuggestionsFor(query){
+  if(!query || query.length < 1) return [];
+  const q = query.toLowerCase();
+  return getBasicPartsList()
+    .filter(p => p.name && (
+      p.name.toLowerCase().includes(q) ||
+      (p.partNum && p.partNum.toLowerCase().includes(q))
+    ))
+    .slice(0, 6);
+}
+
+function buildPartAcDropdown(row){
+  const existing = row.querySelector('.part-ac');
+  if(existing) return existing;
+  const wrap = row.querySelector('.part-ac-wrap');
+  if(!wrap) return null;
+  const ac = document.createElement('div');
+  ac.className = 'part-ac';
+  wrap.appendChild(ac);
+  return ac;
+}
+
+function showPartSuggestions(nameInput){
+  const row = nameInput.closest('.item-editor');
+  if(!row) return;
+  const ac = buildPartAcDropdown(row);
+  if(!ac) return;
+  const suggestions = getPartSuggestionsFor(nameInput.value);
+  if(!suggestions.length){ ac.classList.remove('open'); return; }
+  _acActiveRow = row;
+  ac.innerHTML = suggestions.map((p, i) => {
+    const meta = [p.partNum, p.store].filter(Boolean).join(' · ');
+    const price = Number(p.unitCost||0) > 0 ? ' · $' + Number(p.unitCost).toFixed(2) : '';
+    return `<div class="part-ac-item" ontouchend="event.preventDefault();selectPartSuggestion(this,${i})" onclick="selectPartSuggestion(this,${i})">
+      <div class="part-ac-name">${escapeHtml(p.name)}</div>
+      ${meta || price ? `<div class="part-ac-meta">${escapeHtml(meta)}<span class="part-ac-price">${escapeHtml(price)}</span></div>` : ''}
+    </div>`;
+  }).join('');
+  // Store suggestion data on the element for retrieval
+  ac._suggestions = suggestions;
+  ac.classList.add('open');
+}
+
+function selectPartSuggestion(itemEl, index){
+  const ac   = itemEl.closest('.part-ac');
+  const row  = itemEl.closest('.item-editor');
+  if(!ac || !row) return;
+  const part = ac._suggestions?.[index];
+  if(!part) return;
+  const nameInput  = row.querySelector('.item-name');
+  const partInput  = row.querySelector('.item-part');
+  const storeInput = row.querySelector('.item-store');
+  const linkInput  = row.querySelector('.item-link');
+  const priceInput = row.querySelector('.item-price');
+  const catSelect  = row.querySelector('.item-category');
+  if(nameInput)  nameInput.value  = part.name;
+  if(partInput)  partInput.value  = part.partNum || '';
+  if(storeInput) storeInput.value = part.store || '';
+  if(linkInput)  linkInput.value  = part.link || '';
+  if(priceInput && Number(part.unitCost||0) > 0) priceInput.value = Number(part.unitCost).toFixed(2);
+  if(catSelect && part.category)  catSelect.value  = part.category;
+  ac.classList.remove('open');
+  _acActiveRow = null;
+  updateRowDisplay(row);
+  syncEntryCostFromItems();
+}
+
+function dismissAllAutocomplete(exceptRow){
+  document.querySelectorAll('#fItemsList .part-ac.open').forEach(ac => {
+    if(!exceptRow || !exceptRow.contains(ac)) ac.classList.remove('open');
+  });
+}
+
+// Dismiss autocomplete on outside tap/click
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.part-ac-wrap') && !e.target.closest('.item-name')){
+    dismissAllAutocomplete();
+  }
+});
+
+/* ─── ROW DISPLAY — live header title + per-row subtotal ────── */
+function updateRowDisplay(row){
+  if(!row) return;
+  const titleEl    = row.querySelector('.item-editor-title');
+  const subtotalEl = row.querySelector('.item-subtotal');
+  const nameVal    = row.querySelector('.item-name')?.value?.trim() || '';
+  const price      = parseFloat(row.querySelector('.item-price')?.value || 0) || 0;
+  const qty        = Math.max(1, parseInt(row.querySelector('.item-qty')?.value || 1, 10) || 1);
+  const subtotal   = price * qty;
+  // Header: show part name if filled, else generic label
+  if(titleEl){
+    if(nameVal){
+      const priceStr = price > 0 ? ' · $' + subtotal.toFixed(2) : '';
+      titleEl.textContent = nameVal + priceStr;
+      titleEl.classList.add('named');
+    } else {
+      titleEl.textContent = 'Purchased part';
+      titleEl.classList.remove('named');
+    }
+  }
+  // Subtotal line
+  if(subtotalEl){
+    if(price > 0){
+      const qtyLabel = qty > 1 ? qty + ' × $' + price.toFixed(2) + ' = ' : '';
+      subtotalEl.textContent = qtyLabel + '$' + subtotal.toFixed(2);
+      subtotalEl.classList.add('visible');
+    } else {
+      subtotalEl.classList.remove('visible');
+    }
+  }
+}
+
+/* ─── REUSE LAST PARTS ──────────────────────────────────────── */
+/* Find the most recent entry for a given service type that has parts recorded. */
+function getLastPartsForServiceType(serviceType){
+  if(!serviceType) return null;
+  return getData()
+    .filter(e => e.type === serviceType && Array.isArray(e.items) && normalizeServiceEntryItems(e.items).length > 0)
+    .sort((a,b) => Number(b.mi) - Number(a.mi) || (Number(b.id) - Number(a.id)))
+    [0] || null;
+}
+/* Show/hide the reuse bar based on whether the selected service type has prior parts. */
+function updateReusePartsBar(){
+  const bar  = document.getElementById('reusePartsBar');
+  const meta = document.getElementById('reuseBarMeta');
+  const prt  = document.getElementById('reuseBarParts');
+  if(!bar) return;
+  const serviceType = document.getElementById('fType')?.value;
+  if(!serviceType){ bar.classList.remove('visible'); return; }
+  const lastEntry = getLastPartsForServiceType(serviceType);
+  if(!lastEntry){ bar.classList.remove('visible'); return; }
+  const items = normalizeServiceEntryItems(lastEntry.items);
+  const total = items.reduce((s,i) => s + Number(i.price||0) * Number(i.qty||0), 0);
+  const dt = new Date(lastEntry.date+'T00:00:00');
+  const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  meta.textContent = `Last ${LABELS[serviceType]||'service'} · ${ds} · $${total.toFixed(2)}`;
+  prt.textContent  = items.map(i => `${i.qty}× ${i.name}${Number(i.price)>0 ? ` ($${Number(i.price).toFixed(2)})` : ''}`).join(' · ');
+  bar.classList.add('visible');
+}
+/* Fill the parts builder with items from the last matching entry.
+   Prices/quantities are pre-filled but remain fully editable. */
+function applyLastParts(){
+  const serviceType = document.getElementById('fType')?.value;
+  const lastEntry = getLastPartsForServiceType(serviceType);
+  if(!lastEntry) return;
+  const items = normalizeServiceEntryItems(lastEntry.items);
+  const list = document.getElementById('fItemsList');
+  if(list) list.innerHTML = '';
+  items.forEach(item => buildServicePartRow({...item, saveToParts:false}));
+  toggleServicePartsBuilder(true);
+  syncEntryCostFromItems();
+  showToast(`↩ Parts loaded · edit prices or qty if anything changed`);
+}
+function prefill(){
+  const t=document.getElementById('fType').value;
+  const descEl = document.getElementById('fDesc');
+  if(PREFILLS[t] && descEl && !descEl.value.trim()) descEl.value=PREFILLS[t];
+  renderEntryInventoryUI();
+  updateReusePartsBar();
+}
+function saveEntry(){
+  const date=document.getElementById('fDate').value;
+  const mi=document.getElementById('fMi').value;
+  const type=document.getElementById('fType').value||'other';
+  const desc=document.getElementById('fDesc').value.trim();
+  const cost=document.getElementById('fCost').value;
+  const shop=document.getElementById('fShop').value.trim();
+  const manualItems = getFormItems();
+  if(!date||!mi||!desc){showToast('Please fill in date, mileage & description');return}
+  const inv = getInventory();
+  const items = [...manualItems];
+  const linkedQty = items.filter(item=>item.inventoryId).reduce((map,item)=>{
+    map[String(item.inventoryId)] = (map[String(item.inventoryId)]||0) + Number(item.qty||0);
+    return map;
+  },{});
+  for(const [inventoryId, qtyNeeded] of Object.entries(linkedQty)){
+    const invItem = inv.find(x=>String(x.id)===String(inventoryId));
+    const onHand = Number(invItem?.qtyOnHand || 0);
+    if(qtyNeeded > onHand){
+      showToast(`Not enough stock for ${invItem?.name || 'linked inventory item'}`);
+      return;
+    }
+  }
+  const manualCost = Number.isFinite(Number(cost)) ? Number(cost) : 0;
+  const newId=Date.now();
+  const d=getData();
+  const inventoryUses = items.filter(item=>item.inventoryId).map(item=>({inventoryId:item.inventoryId,name:item.name,partNum:item.partNum,store:item.store,link:item.link,unitCost:item.price,qtyUsed:item.qty,countInOilAvg:item.useInOilAvg}));
+  d.push({id:newId,date,mi:parseInt(mi,10),type,desc,cost:manualCost,shop,items,inventoryUses,builtin:false});
+  save(d);
+  if(Object.keys(linkedQty).length){
+    Object.entries(linkedQty).forEach(([inventoryId, qtyNeeded])=>{
+      const item = inv.find(x=>String(x.id)===String(inventoryId));
+      if(item) item.qtyOnHand = Math.max(0, Number(item.qtyOnHand||0) - Number(qtyNeeded||0));
+    });
+    saveInventory(inv);
+  }
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
+  if(parseInt(mi,10)>getMi())setMi(parseInt(mi,10));
+  renderAll();go('log');
+  ['fMi','fCost','fShop','fDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value='';
+  resetEntryInventoryUses();
+  clearPhoto();
+  updateEntrySaveLock('', {requirements:[],missingCount:0,complete:true});
+  showToast('Entry saved ✓');
+}
+
+/* ─── MAINTENANCE ENGINE (whichever comes first) ─────────────── */
+function getSmartStatus(mi=getMi(), referenceDate=todayLocal()){
+  return getRecurringServicesState(mi, referenceDate).rules.sort(compareRecurring);
+}
+function renderSmartList(mi){
+  const items = getSmartStatus(mi);
+  const el = document.getElementById('smartList');
+  el.innerHTML = items.map(item => {
+    const badgeText = item.watchOnly
+      ? 'WATCH'
+      : item.status === 'due soon'
+        ? `DUE SOON · ${item.currentDriver === 'time' && item.daysRemaining!==null ? `${Math.max(item.daysRemaining,0)}d` : item.milesRemaining!==null ? `${Math.max(item.milesRemaining,0).toLocaleString()}mi` : 'soon'}`
+        : item.status === 'overdue'
+          ? item.currentDriver === 'time' && item.daysRemaining!==null
+            ? `OVERDUE ${Math.abs(item.daysRemaining)}d`
+            : item.milesRemaining!==null
+              ? `OVERDUE ${Math.abs(item.milesRemaining).toLocaleString()}mi`
+              : 'OVERDUE'
+          : item.currentDriver === 'time' && item.daysRemaining!==null
+            ? `${item.daysRemaining}d left`
+            : item.milesRemaining!==null
+              ? `${item.milesRemaining.toLocaleString()} mi left`
+              : item.status.toUpperCase();
+    const badgeClass = item.watchOnly ? 'sm-future' : item.status === 'overdue' ? 'sm-overdue' : item.status === 'due soon' ? 'sm-soon' : item.status === 'upcoming' ? 'sm-upcoming' : 'sm-future';
+    const dueLine = item.watchOnly ? (item.note || 'Monitor manually') : item.dueLine;
+    const triggerLine = item.watchOnly ? 'Watch only' : `${item.remainingText} · ${item.triggerText}`;
+    return `<div class="sm-item">
+      <div class="sm-icon">${item.icon}</div>
+      <div class="sm-info">
+        <div class="sm-name">${item.name}</div>
+        <div class="sm-detail">${dueLine}</div>
+        <div class="sm-detail">${triggerLine}</div>
+      </div>
+      <div class="sm-badge ${badgeClass}">${badgeText}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('smartPreview').style.display='block';
+}
+
+/* ─── MILEAGE MODAL/* ─── MILEAGE MODAL ──────────────────────────────────────────── */
+function openMiModal(){
+  const cur = getMi();
+  document.getElementById('miInput').value = cur;
+  document.getElementById('smartPreview').style.display = 'none';
+  document.getElementById('miModal').classList.add('open');
+  setTimeout(()=>{ renderSmartList(cur); document.getElementById('miInput').focus(); }, 200);
+  document.getElementById('miInput').oninput = function(){
+    const v = parseInt(this.value);
+    if(v && v > 50000 && v < 300000) renderSmartList(v);
+  };
+}
+function closeMiModal(){ document.getElementById('miModal').classList.remove('open'); }
+function saveMi(){
+  const v = parseInt(document.getElementById('miInput').value);
+  if(v && v > 0){ setMi(v,{source:'manual',allowLower:true}); renderAll(); showToast('Mileage updated to '+v.toLocaleString()+' mi ✓'); }
+  closeMiModal();
+}
+document.getElementById('miModal').addEventListener('click',function(e){
+  if(e.target===this) closeMiModal();
+});
+
+/* ─── NAV ────────────────────────────────────────────────── */
+/* ─── NAV ────────────────────────────────────────────────── */
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,add:-1};
+  document.getElementById('page-'+id).classList.add('active');
+  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
+  if(id==='backup')renderBackup();
+  if(id==='upcoming')renderUpcoming();
+  if(id==='parts')renderParts();
+  if(id==='add'){ renderEntryInventoryUI(); initAddForm(); }
+  if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─── GUIDES ─────────────────────────────────────────────── */
+function startServiceFromGuide(serviceType='other'){
+  const typeEl = document.getElementById('fType');
+  if(typeEl){
+    typeEl.value = serviceType;
+    prefill();
+    renderEntryInventoryUI();
+  }
+  go('add');
+  setTimeout(()=>{ initAddForm(); document.getElementById('fDate')?.focus(); }, 140);
+}
+function ensureGuideActions(){
+  document.querySelectorAll('.guide-item').forEach(item=>{
+    const body = item.querySelector('.guide-body');
+    if(!body || body.querySelector('.guide-actions')) return;
+    const guideId = item.dataset.guideId || '';
+    const serviceType = item.dataset.serviceType || '';
+    const actions = document.createElement('div');
+    actions.className = 'guide-actions';
+    actions.innerHTML = `${serviceType ? `<button type="button" class="guide-btn primary" onclick="startServiceFromGuide('${serviceType}')">＋ Add to Service Log</button>` : ''}<button type="button" class="guide-btn print" onclick="printGuide('${guideId}')">🖨 Print Guide</button>`;
+    body.appendChild(actions);
+  });
+}
+function buildGuidePrintHtml(item){
+  const title = item.querySelector('.guide-title')?.textContent?.trim() || 'Guide';
+  const meta = item.querySelector('.guide-meta')?.textContent?.trim() || '';
+  const cloned = item.querySelector('.guide-body')?.cloneNode(true);
+  if(!cloned) return '';
+  cloned.querySelectorAll('.guide-actions').forEach(el=>el.remove());
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escapeHtml(title)} — Printable Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',Arial,sans-serif;background:#fff;color:#1a1d23;padding:28px;line-height:1.65;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .header{border-bottom:2px solid #111827;padding-bottom:14px;margin-bottom:18px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280}
+  .title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1.5px;color:#111827;margin-top:4px}
+  .meta{font-size:12px;color:#4b5563;margin-top:4px}
+  .guide-body{display:block!important;padding:0;border:none}
+  .g-warn,.g-info,.g-tip,.g-gold{border-radius:10px;padding:12px 14px;margin:0 0 12px 0;font-size:12px;line-height:1.7;border:1px solid transparent}
+  .g-warn{background:#fff1f2;border-color:#fecdd3;color:#b91c1c}
+  .g-info{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+  .g-gold{background:#fffbeb;border-color:#fcd34d;color:#b45309}
+  .g-tip{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+  .step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;page-break-inside:avoid}
+  .step-n{width:24px;height:24px;border-radius:50%;background:#eb0a1e;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .step-t{font-size:13px;color:#1f2937}
+  .step-t strong{color:#111827}
+  .step-t code{font-family:'JetBrains Mono',monospace;font-size:11px;background:#f3f4f6;padding:1px 5px;border-radius:4px;color:#c2410c}
+  .print-btn{position:fixed;right:24px;bottom:24px;background:#eb0a1e;color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;box-shadow:0 8px 24px rgba(235,10,30,.25);cursor:pointer}
+  @media print{.print-btn{display:none}body{padding:20px}}
+</style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save PDF</button>
+  <div class="header">
+    <div class="eyebrow">Venza Garage · Printable Service Guide</div>
+    <div class="title">${escapeHtml(title)}</div>
+    <div class="meta">${escapeHtml(meta)}</div>
+  </div>
+  <div class="guide-body">${cloned.innerHTML}</div>
+</body>
+</html>`;
+}
+function printGuide(guideId=''){
+  const item = guideId ? document.querySelector(`.guide-item[data-guide-id="${guideId}"]`) : null;
+  if(!item){ showToast('Guide not found'); return; }
+  const html = buildGuidePrintHtml(item);
+  if(!html){ showToast('Could not build printable guide'); return; }
+  openHtmlInNewTab(html, `venza-guide-${guideId || 'print'}.html`);
+}
+function toggleGuide(head){
+  head.closest('.guide-item').classList.toggle('open');
+  updateGuideAccessibility();
+}
+
+/* ─── COPY VIN ───────────────────────────────────────────── */
+function copyVIN(){
+  navigator.clipboard.writeText(VIN).then(()=>{
+    showToast('VIN copied: '+VIN);
+  }).catch(()=>{
+    // fallback for older Safari
+    const el=document.createElement('textarea');
+    el.value=VIN;document.body.appendChild(el);
+    el.select();document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('VIN copied: '+VIN);
+  });
+}
+
+/* ─── COPY CHATGPT TEMPLATE ──────────────────────────────── */
+function copyTemplate(){
+  const t=document.getElementById('chatgptTemplate').textContent;
+  navigator.clipboard.writeText(t).then(()=>showToast('Template copied to clipboard ✓'))
+  .catch(()=>{
+    const el=document.createElement('textarea');
+    el.value=t;document.body.appendChild(el);
+    el.select();document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('Template copied ✓');
+  });
+}
+
+/* ─── BACKUP SUMMARY ─────────────────────────────────────── */
+function renderBackup(){
+  const d=getData();
+  const mi=getMi();
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
+  const last=sorted[0];
+  const photoCount=d.filter(e=>getPhoto(e.id)).length;
+  const inventoryCount = getInventory().length;
+  const masterPartsCount = getMasterParts().length;
+  const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
+  document.getElementById('bkCount').textContent=d.length+' entries · '+inventoryCount+' inventory item'+(inventoryCount!==1?'s':'')+' · '+masterPartsCount+' master part'+(masterPartsCount!==1?'s':'')+' · '+scheduleOverrideCount+' custom target'+(scheduleOverrideCount!==1?'s':'')+' · '+photoCount+' receipt photo'+(photoCount!==1?'s':'');
+  document.getElementById('bkMi').textContent=mi.toLocaleString()+' mi';
+  const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
+  document.getElementById('bkTotal').textContent='$'+tot.toFixed(2);
+  if(last){
+    const dt=new Date(last.date+'T00:00:00');
+    document.getElementById('bkLast').textContent=
+      dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
+      ' — '+parseInt(last.mi).toLocaleString()+' mi';
+  }
+  renderReminderStrategy();
+}
+
+function resetOilAverageNow(){
+  if(!confirm('Reset Avg Oil Change now? This keeps your full history but starts a fresh oil average from today forward.')) return;
+  localStorage.setItem(OIL_AVG_RESET_KEY, new Date().toISOString());
+  renderDash();
+  renderBackup();
+  showToast('Avg Oil Change reset ✓');
+}
+function clearOilAverageReset(){
+  if(!getOilAverageResetAt()){
+    showToast('No oil average reset is active');
+    return;
+  }
+  if(!confirm('Undo the Avg Oil Change reset and include older oil services again?')) return;
+  localStorage.removeItem(OIL_AVG_RESET_KEY);
+  renderDash();
+  renderBackup();
+  showToast('Oil average reset cleared');
+}
+
+/* ─── EXPORT (BACKUP) ────────────────────────────────────── */
+function exportData(){
+  // Collect all receipt photos from localStorage
+  const photos = {};
+  const entries = getData();
+  entries.forEach(e=>{
+    const p = getPhoto(e.id);
+    if(p) photos[e.id] = p;
+  });
+
+  const payload={
+    version: 6,
+    exported: new Date().toISOString(),
+    vin: VIN,
+    vehicle: '2021 Toyota Venza Hybrid AWD',
+    mileage: getMi(),
+    oilAverageResetAt: getOilAverageResetAt(),
+    averageServiceType: getAverageServiceType(),
+    scheduleOverrides: getScheduleOverrides(),
+    servicePartRequirements: getSavedServiceRequirementsMap(),
+    mileageHistory: getMiHistory(),
+    entries: entries,
+    inventory: getInventory(),
+    masterParts: getMasterParts(),
+    photos: photos  // base64 images keyed by entry id
+  };
+
+  const photoCount = Object.keys(photos).length;
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().split('T')[0];
+  a.href=url;
+  a.download='venza_backup_'+date+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Backup saved ✓ — ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}`);
+}
+
+/* ─── IMPORT (RESTORE) ───────────────────────────────────── */
+function importData(input){
+  const file=input.files[0];
+  if(!file){return}
+  if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const isLegacyArray = Array.isArray(parsed);
+      const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
+      if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+      const entries=Array.isArray(data.entries)?data.entries:null;
+      const mi=Number(data.mileage||0) || null;
+      const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
+      const inventory=Array.isArray(data.inventory) ? data.inventory : [];
+      const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
+      const oilAverageResetAt=data.oilAverageResetAt||'';
+      const averageServiceType=data.averageServiceType||'oil_avg';
+      const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
+      const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
+      const photoCount=Object.keys(photos).length;
+      const version = Number(data.version || 0);
+      const backupVin = String(data.vin || '').trim();
+
+      if(!entries){
+        showToast('❌ Invalid backup file format'); input.value=''; return;
+      }
+      if(version > 6){
+        showToast('This backup was created by a newer app version'); input.value=''; return;
+      }
+      if(backupVin && backupVin !== VIN){
+        const proceedMismatch = confirm(`This backup VIN does not match this app.
+
+Backup: ${backupVin}
+This app: ${VIN}
+
+Restore anyway?`);
+        if(!proceedMismatch){ input.value=''; return; }
+      }
+      if(!confirm(`Restore ${entries.length} entries + ${photoCount} receipt photo${photoCount!==1?'s':''}?
+
+This replaces all current data. Continue?`)){
+        input.value='';return;
+      }
+
+      clearStoredPhotos();
+      save(entries);
+      saveInventory(inventory);
+      saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
+      if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+      saveScheduleOverrides(scheduleOverrides);
+      if(mi&&mi>0)setMi(mi);
+
+      Object.entries(photos).forEach(([id,imgData])=>{
+        try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){ console.warn('Photo too large to restore:',id); }
+      });
+
+      renderAll();
+      renderBackup();
+      input.value='';
+      showToast(`✓ Restored ${entries.length} entries + ${photoCount} photo${photoCount!==1?'s':''}!`);
+    }catch(err){
+      showToast('❌ Could not read backup file');
+      input.value='';
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ─── RESET DATA ─────────────────────────────────────────── */
+function resetData(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return}
+  // Clear all photos first
+  clearStoredPhotos();
+  save(DEFAULT);
+  saveInventory(DEFAULT_INVENTORY);
+  saveMasterParts(DEFAULT_MASTER_PARTS);
+  localStorage.removeItem(OIL_AVG_RESET_KEY);
+  localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  setMi(64751);
+  renderAll();
+  renderBackup();
+  showToast('Reset to factory data ✓');
+}
+
+/* ─── TOAST ──────────────────────────────────────────────── */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+/* ─── GENERATE PRINT REPORT ──────────────────────────────────── */
+function generatePrint(){
+  // Pre-fill mileage if empty
+  const miEl = document.getElementById('prMileage');
+  if(!miEl.value) miEl.value = getMi();
+
+  const owner   = document.getElementById('prOwner').value.trim() || 'Vehicle Owner';
+  const model   = document.getElementById('prModel').value.trim();
+  const curMi   = parseInt(miEl.value) || getMi();
+  const filter  = document.getElementById('prFilter').value;
+  const today   = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const todayISO = new Date().toISOString().split('T')[0];
+
+  // Filter entries
+  let entries = getData().sort((a,b)=>a.mi-b.mi);
+  if(filter==='oil') entries = entries.filter(e=>e.type==='oil');
+  if(filter==='recent'){
+    const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear()-1);
+    entries = entries.filter(e=>new Date(e.date)>=cutoff);
+  }
+
+  const totalCost = entries.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+
+  const maintenanceState = getRecurringServicesState(curMi);
+  const upcoming = maintenanceState.rules.filter(i=>!i.watchOnly).sort(compareRecurring).slice(0,6);
+  const heroBundle = getNextRecurringBundle(maintenanceState);
+  const oilRule = maintenanceState.rules.find(item=>item.id==='oil') || null;
+  const oilIntervalLine = oilRule ? formatIntervalSummary(oilRule.milesInterval, oilRule.monthsInterval) : 'Every 5,000 Miles';
+  const oilGuidelineLine = oilRule ? (oilRule.guidelineIntervalText || '10,000 mi / 12 mo') : '10,000 mi / 12 mo';
+
+  // Build rows
+  const rows = entries.map((e,i)=>{
+    const dt = new Date(e.date+'T00:00:00');
+    const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const typeLabel = LABELS[e.type]||'Service';
+    const bg = i%2===0?'#ffffff':'#f8f9fb';
+    return `<tr style="background:${bg}">
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${ds}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;white-space:nowrap">${parseInt(e.mi).toLocaleString()} mi</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#1a1d23">${escapeHtml(typeLabel)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555;line-height:1.5">${safeText(e.desc)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(e.shop||'—')}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #e8eaed;font-size:12px;font-weight:600;color:#c05800;text-align:right;white-space:nowrap">$${getEntryDisplayCost(e).toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+
+  const upcomingRows = upcoming.map(item=>{
+    const color = item.status==='overdue'?'#dc2626':item.status==='due soon'?'#c2410c':item.status==='upcoming'?'#15803d':'#9aa0ae';
+    const badge = item.status === 'due soon' ? 'DUE SOON' : item.status.toUpperCase();
+    return `<tr>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px">${escapeHtml(item.icon + " " + item.name)}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${escapeHtml(item.dueLine.replace('Next due: ',''))}${item.customActive ? `<br><span style='color:#8b90a7'>Target: ${escapeHtml(item.activeIntervalText)} · Toyota: ${escapeHtml(item.guidelineIntervalText || '—')}</span>` : ''}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;color:#555">${item.currentDriver === 'time' ? 'Time first' : item.currentDriver === 'mileage' ? 'Mileage first' : 'Monitor'}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #e8eaed;font-size:11px;font-weight:700;color:${color}">${badge} · ${item.remainingText}</td>
+    </tr>`;
+  }).join('');
+
+  // Collect photos for PDF
+  const photoEntries = entries.filter(e => getPhoto(e.id));
+  const photoSection = photoEntries.length > 0 ? `
+  <!-- SECTION: RECEIPT PHOTOS -->
+  <div class="section" style="page-break-before:always">
+    <div class="section-head">
+      <div class="section-num">${photoEntries.length > 0 ? '5' : ''}</div>
+      <div class="section-title">Receipt Photos (${photoEntries.length} Attached)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      ${photoEntries.map(e=>{
+        const dt = new Date(e.date+'T00:00:00');
+        const ds = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        return `<div style="border:1px solid #e2e4e8;border-radius:10px;overflow:hidden">
+          <div style="background:#1a1d23;padding:8px 12px;display:flex;justify-content:space-between">
+            <span style="color:#fff;font-size:11px;font-weight:600">${escapeHtml(LABELS[e.type]||'Service')}</span>
+            <span style="color:rgba(255,255,255,.5);font-size:10px">${ds} · ${parseInt(e.mi).toLocaleString()} mi</span>
+          </div>
+          <img src="${getPhoto(e.id)}" style="width:100%;display:block;max-height:320px;object-fit:contain;background:#f8f9fb">
+          <div style="padding:8px 12px;font-size:11px;color:#555">${escapeHtml(e.shop||'DIY')} · $${getEntryDisplayCost(e).toFixed(2)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>` : '';
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vehicle Maintenance Record — ${model}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',Arial,sans-serif;color:#1a1d23;background:#fff;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+  /* ── HEADER ── */
+  .header{background:#1a1d23;color:#fff;padding:28px 32px 22px;position:relative;overflow:hidden}
+  .header::after{content:'';position:absolute;right:-30px;top:-30px;width:200px;height:200px;
+    border-radius:50%;background:rgba(235,10,30,.12);pointer-events:none}
+  .header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand-icon{width:46px;height:46px;background:#eb0a1e;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px}
+  .brand-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;line-height:1}
+  .brand-sub{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+  .doc-label{text-align:right}
+  .doc-type{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.4);text-transform:uppercase}
+  .doc-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#fff;margin-top:2px}
+  .doc-date{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px}
+
+  /* ── VEHICLE STRIP ── */
+  .vehicle-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    border-top:1px solid rgba(255,255,255,.1);padding-top:16px}
+  .vs-item{padding-right:20px}
+  .vs-label{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+  .vs-val{font-size:13px;color:#fff;font-weight:600}
+  .vs-val.vin{font-size:10px;color:rgba(255,255,255,.8);font-family:monospace;letter-spacing:1px}
+
+  /* ── SECTIONS ── */
+  .body{padding:28px 32px}
+  .section{margin-bottom:26px}
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;
+    padding-bottom:8px;border-bottom:2px solid #1a1d23}
+  .section-num{width:22px;height:22px;background:#eb0a1e;color:#fff;border-radius:50%;
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#1a1d23}
+
+  /* ── DECLARATION BOX ── */
+  .declaration{background:#f8f9fb;border:1px solid #e2e4e8;border-left:4px solid #eb0a1e;
+    border-radius:8px;padding:16px 18px;margin-bottom:18px}
+  .declaration p{font-size:12px;color:#444;line-height:1.8;margin-bottom:8px}
+  .declaration p:last-child{margin-bottom:0}
+  .declaration strong{color:#1a1d23}
+
+  /* ── TABLE ── */
+  table{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;
+    border:1px solid #e2e4e8}
+  thead th{background:#1a1d23;color:#fff;padding:10px 10px;font-size:10px;
+    letter-spacing:1.5px;text-transform:uppercase;font-weight:600;text-align:left}
+  thead th:last-child{text-align:right}
+
+  /* ── INFO GRID ── */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .info-box{background:#f8f9fb;border:1px solid #e2e4e8;border-radius:8px;padding:12px 14px}
+  .info-label{font-size:9px;color:#9aa0ae;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+  .info-val{font-size:13px;color:#1a1d23;font-weight:600}
+
+  /* ── TOTALS ── */
+  .totals-row{background:#1a1d23;color:#fff;padding:12px 16px;
+    display:flex;justify-content:space-between;align-items:center}
+  .totals-label{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.5)}
+  .totals-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff}
+
+  /* ── SIGNATURE ── */
+  .sig-section{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px}
+  .sig-box{border-top:1.5px solid #1a1d23;padding-top:8px}
+  .sig-label{font-size:10px;color:#9aa0ae;letter-spacing:1px;text-transform:uppercase}
+  .sig-val{font-size:12px;color:#1a1d23;margin-top:4px;font-weight:500}
+
+  /* ── FOOTER ── */
+  .footer{background:#f8f9fb;border-top:1px solid #e2e4e8;
+    padding:14px 32px;display:flex;justify-content:space-between;align-items:center;
+    font-size:9px;color:#9aa0ae;letter-spacing:.5px}
+  .footer-note{max-width:500px;line-height:1.6}
+  .footer-page{text-align:right;flex-shrink:0}
+
+  /* ── PRINT ── */
+  @media print{
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .no-print{display:none!important}
+    .section{page-break-inside:avoid}
+    @page{margin:0;size:letter portrait}
+  }
+  @media screen{
+    body{max-width:820px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,.1)}
+    .print-btn{
+      position:fixed;bottom:30px;right:30px;
+      background:#eb0a1e;color:#fff;border:none;
+      padding:14px 22px;border-radius:12px;font-size:14px;font-weight:700;
+      cursor:pointer;font-family:'Outfit',sans-serif;
+      box-shadow:0 4px 20px rgba(235,10,30,.4);
+      display:flex;align-items:center;gap:8px;
+      z-index:999;transition:all .2s;
+    }
+    .print-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(235,10,30,.5)}
+    .back-btn{
+      position:fixed;bottom:30px;left:30px;
+      background:#1a1d23;color:#fff;border:none;
+      padding:14px 22px;border-radius:12px;font-size:14px;font-weight:700;
+      cursor:pointer;font-family:'Outfit',sans-serif;
+      box-shadow:0 4px 16px rgba(0,0,0,.3);
+      display:flex;align-items:center;gap:8px;z-index:999;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- PRINT / BACK BUTTONS (screen only) -->
+<button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+<button class="back-btn no-print" onclick="window.close()">← Back</button>
+
+<!-- ── HEADER ────────────────────────────────────────────────── -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-icon">🚗</div>
+      <div>
+        <div class="brand-name">VEHICLE MAINTENANCE RECORD</div>
+        <div class="brand-sub">Owner-Kept Service Documentation</div>
+      </div>
+    </div>
+    <div class="doc-label">
+      <div class="doc-type">Document Type</div>
+      <div class="doc-title">Owner Maintenance Log</div>
+      <div class="doc-date">Generated: ${today}</div>
+    </div>
+  </div>
+  <div class="vehicle-strip">
+    <div class="vs-item">
+      <div class="vs-label">Vehicle</div>
+      <div class="vs-val">${escapeHtml(model)}</div>
+    </div>
+    <div class="vs-item">
+      <div class="vs-label">VIN</div>
+      <div class="vs-val vin">${VIN}</div>
+    </div>
+    <div class="vs-item">
+      <div class="vs-label">Owner</div>
+      <div class="vs-val">${escapeHtml(owner)}</div>
+    </div>
+    <div class="vs-item">
+      <div class="vs-label">Current Mileage</div>
+      <div class="vs-val">${curMi.toLocaleString()} mi</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BODY ─────────────────────────────────────────────────── -->
+<div class="body">
+
+  <!-- SECTION 1: OWNER DECLARATION -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div class="section-title">Owner Declaration & Certification</div>
+    </div>
+    <div class="declaration">
+      <p>I, <strong>${owner}</strong>, hereby certify that the vehicle identified above has been maintained according to the manufacturer's recommended maintenance schedule as outlined in the <strong>2021 Toyota Venza Warranty &amp; Maintenance Guide</strong>.</p>
+      <p>All services listed in this record were performed using <strong>manufacturer-specified fluids, filters, and components</strong> per Toyota OEM specifications. Oil changes were performed using <strong>SAE 0W-16 Full Synthetic motor oil (ILSAC GF-6B / API SP)</strong> with genuine Toyota oil filter part #90915-YZZN1, as specified by Toyota for this vehicle.</p>
+      <p><strong>Per the 2021 Toyota Venza Warranty &amp; Maintenance Guide, Page 31:</strong> <em>"Maintenance and repair services may be performed by you or by any automotive service provider you choose. Toyota will not deny a warranty claim solely because you used a service provider other than a Toyota dealership for maintenance and repairs."</em></p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="info-label">Required Oil Specification</div>
+        <div class="info-val">SAE 0W-16 Full Synthetic</div>
+        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">ILSAC GF-6B / API SP · 4.8 qt capacity</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Oil Filter</div>
+        <div class="info-val">Toyota OEM #90915-YZZN1</div>
+        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Genuine Toyota / Denso · 13 ft-lbs torque</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Service Interval (Custom)</div>
+        <div class="info-val">${escapeHtml(oilIntervalLine)}</div>
+        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Toyota guideline: ${escapeHtml(oilGuidelineLine)} with 0W-16</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Toyota Warranty Contact</div>
+        <div class="info-val">(800) 331-4331</div>
+        <div style="font-size:10px;color:#9aa0ae;margin-top:3px">Toyota Customer Experience Center</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: SERVICE HISTORY -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div class="section-title">Complete Service History (${entries.length} Entries)</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Mileage</th>
+          <th>Service</th>
+          <th>Description / Notes</th>
+          <th>Performed By</th>
+          <th style="text-align:right">Cost</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="totals-row" style="border-radius:0 0 8px 8px">
+      <span class="totals-label">Total Invested in Maintenance</span>
+      <span class="totals-val">$${totalCost.toFixed(2)}</span>
+    </div>
+  </div>
+
+  <!-- SECTION 3: UPCOMING SCHEDULE -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <div class="section-title">Upcoming Maintenance Schedule</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Service Item</th>
+          <th>Next Due</th>
+          <th>Driver</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>${upcomingRows}</tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 4: SIGNATURE -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <div class="section-title">Owner Certification</div>
+    </div>
+    <p style="font-size:12px;color:#555;line-height:1.7;margin-bottom:24px">
+      I declare that the information contained in this maintenance record is accurate and complete to the best of my knowledge. All services were performed using manufacturer-specified parts and fluids. This document serves as the official maintenance record for the vehicle identified herein.
+    </p>
+    <div class="sig-section">
+      <div class="sig-box">
+        <div class="sig-label">Owner Signature</div>
+        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
+        <div class="sig-val">${escapeHtml(owner)}</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-label">Date Signed</div>
+        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
+        <div class="sig-val">${today}</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-label">Vehicle Mileage at Signing</div>
+        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
+        <div class="sig-val">${curMi.toLocaleString()} miles</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-label">Next Service Due</div>
+        <div class="sig-val" style="margin-top:30px;border-bottom:1px solid #ccc;padding-bottom:4px">&nbsp;</div>
+        <div class="sig-val">${heroBundle?.lead ? heroBundle.lead.dueLine.replace('Next due: ','') : 'See schedule above'}</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+${photoSection}
+
+<!-- ── FOOTER ────────────────────────────────────────────────── -->
+<div class="footer">
+  <div class="footer-note">
+    <strong>Vehicle:</strong> ${model} · <strong>VIN:</strong> ${VIN} · <strong>Generated:</strong> ${today} by Venza Garage App<br>
+    This record was prepared by the vehicle owner per the 2021 Toyota Venza Warranty &amp; Maintenance Guide, which states Toyota will not deny a warranty claim solely because maintenance was performed by a non-dealer. Retain all receipts and invoices with this record.
+  </div>
+  <div class="footer-page">Multi-page if needed<br>Document #VMR-${todayISO.replace(/-/g,'')}</div>
+</div>
+
+</body>
+</html>`;
+
+  if(!openHtmlInNewTab(html, `venza-maintenance-record-${todayISO}.html`)){
+    showToast('Could not open report — allow popups and try again');
+    return;
+  }
+}
+/* ════════════════════════════════════════════════════════════════
+   PHOTO RECEIPT SYSTEM
+   ════════════════════════════════════════════════════════════════ */
+
+/* Storage: photos kept separate from log data to avoid size issues */
+function getPhoto(id){ return localStorage.getItem('vz_photo_'+id)||null; }
+function savePhoto(id,data){ try{ localStorage.setItem('vz_photo_'+id,data); }catch(e){ showToast('Photo too large — try a smaller image'); } }
+function removePhoto(id){ localStorage.removeItem('vz_photo_'+id); renderLog(); showToast('Photo removed'); }
+
+/* Compress image to max 800px wide, 70% quality JPEG */
+function compressImage(file, cb){
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const MAX = 900;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = Math.round(h * MAX/w); w = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      cb(canvas.toDataURL('image/jpeg', 0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Handle photo selected from file input on ADD FORM */
+function handlePhotoSelect(input){
+  if(!input.files[0]) return;
+  compressImage(input.files[0], function(data){
+    window._pendingPhoto = data;
+    document.getElementById('fPhotoImg').src = data;
+    document.getElementById('fPhotoPreview').style.display = 'block';
+    document.getElementById('fPhotoPlaceholder').style.display = 'none';
+    document.getElementById('fPhotoArea').style.borderColor = 'var(--green2)';
+  });
+}
+
+/* Handle drag-and-drop */
+function handlePhotoDrop(e){
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if(file && file.type.startsWith('image/')){
+    compressImage(file, function(data){
+      window._pendingPhoto = data;
+      document.getElementById('fPhotoImg').src = data;
+      document.getElementById('fPhotoPreview').style.display = 'block';
+      document.getElementById('fPhotoPlaceholder').style.display = 'none';
+    });
+  }
+}
+
+/* Clear photo from ADD FORM */
+function clearPhoto(){
+  window._pendingPhoto = null;
+  document.getElementById('fPhotoInput').value = '';
+  document.getElementById('fPhotoPreview').style.display = 'none';
+  document.getElementById('fPhotoPlaceholder').style.display = 'block';
+  document.getElementById('fPhotoArea').style.borderColor = 'var(--border2)';
+  const img = document.getElementById('fPhotoImg');
+  if(img) img.src = '';
+}
+
+/* Add photo to EXISTING log entry */
+function addPhotoToEntry(id){
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = function(){
+    if(!input.files[0]) return;
+    compressImage(input.files[0], function(data){
+      savePhoto(id, data);
+      renderLog();
+      showToast('Receipt photo saved ✓');
+    });
+  };
+  input.click();
+}
+
+/* View photo full screen */
+function viewPhoto(id){
+  const data = getPhoto(id);
+  if(!data) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'vz-lightbox';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px';
+  overlay.innerHTML = `
+    <img src="${data}" style="max-width:100%;max-height:75vh;border-radius:10px;object-fit:contain">
+    <div style="display:flex;gap:12px">
+      <button onclick="this.closest('.vz-lightbox').remove()"
+        style="background:#fff;color:#1a1d23;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
+        ✕ Close
+      </button>
+    </div>`;
+  overlay.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
+  document.body.appendChild(overlay);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DELETE FOR ALL ENTRIES (including builtin — for testing)
+   ════════════════════════════════════════════════════════════════ */
+/* ─── DELETE INDIVIDUAL ENTRY ────────────────────────────────── */
+function delEntry(id){
+  const currentEntries = getData();
+  const deletedEntry = currentEntries.find(e=>String(e.id)===String(id));
+
+  // Only the highest-mileage entry may be deleted to keep mileage history reliable.
+  const sortedByMi = [...currentEntries]
+    .filter(e=>Number.isFinite(Number(e.mi)) && Number(e.mi)>0)
+    .sort((a,b)=>Number(b.mi)-Number(a.mi));
+  const latestEntry = sortedByMi[0];
+  if(latestEntry && String(latestEntry.id)!==String(id)){
+    showToast(`Delete the latest entry first (${Number(latestEntry.mi).toLocaleString()} mi) — entries must be removed newest-first to keep mileage accurate.`);
+    return;
+  }
+
+  if(!confirm('Delete this service entry?\n\nThis cannot be undone.')) return;
+  const remainingEntries = currentEntries.filter(e=>String(e.id)!==String(id));
+  save(remainingEntries);
+  localStorage.removeItem('vz_photo_'+id);
+  const mileageAdjusted = deletedEntry ? reconcileMileageAfterEntryDelete(deletedEntry, remainingEntries) : false;
+  renderAll();
+  showToast(mileageAdjusted ? 'Entry deleted · mileage recalculated ✓' : 'Entry deleted');
+}
+/* For builtin entries — asks extra confirmation */
+function delBuiltin(id){
+  if(!confirm('Delete this original service record?\n\n(This is a factory entry — only delete for testing purposes.)')) return;
+  delEntry(id);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SMART SHOPPING LIST
+   ════════════════════════════════════════════════════════════════ */
+
+
+/* ════════════════════════════════════════════════════════════════
+   SIMPLE MODE OVERRIDES — BASIC SERVICE ENTRY + BASIC PARTS LIST
+   ════════════════════════════════════════════════════════════════ */
+const BASIC_PARTS_KEY = 'vz_basic_parts';
+const BASIC_PART_PHOTO_PREFIX = 'vz_part_photo_';
+const PART_CATEGORY_OPTIONS = [
+  {value:'engine_oil',label:'Engine Oil'},
+  {value:'oil_filter',label:'Oil Filter'},
+  {value:'drain_gasket',label:'Drain Plug Gasket'},
+  {value:'cabin_air_filter',label:'Cabin Air Filter'},
+  {value:'engine_air_filter',label:'Engine Air Filter'},
+  {value:'spark_plugs',label:'Spark Plugs'},
+  {value:'transmission_fluid',label:'Transmission Fluid'},
+  {value:'rear_differential_fluid',label:'Rear Differential Fluid'},
+  {value:'engine_coolant',label:'Engine Coolant'},
+  {value:'inverter_coolant',label:'Inverter Coolant'},
+  {value:'hv_battery_filter',label:'HV Battery Filter'},
+  {value:'valvomax',label:'ValvoMax'},
+  {value:'brake_parts',label:'Brake Parts'},
+  {value:'tires',label:'Tires'},
+  {value:'wipers',label:'Wipers'},
+  {value:'12v_battery',label:'12V Battery'},
+  {value:'other',label:'Other'}
+];
+const PART_CATEGORY_MAP = Object.fromEntries(PART_CATEGORY_OPTIONS.map(item=>[item.value,item.label]));
+function getPartCategoryLabel(value='other'){
+  return PART_CATEGORY_MAP[value] || PART_CATEGORY_MAP.other;
+}
+function normalizeBasicPartCategory(value='other'){
+  return PART_CATEGORY_MAP[String(value||'').trim()] ? String(value).trim() : 'other';
+}
+function buildBasicSourceIdentity(source={}){
+  const safeLink = safeUrl(String(source.link||'').trim());
+  if(safeLink) return `link:${safeLink.toLowerCase()}`;
+  const store = String(source.store||'').trim().toLowerCase();
+  const note = String(source.note||'').trim().toLowerCase();
+  const price = Number.isFinite(Number(source.unitCost)) ? Number(source.unitCost).toFixed(2) : '0.00';
+  return `manual:${store}|${note}|${price}`;
+}
+function looksLikeDomainLabel(value=''){
+  return /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(String(value||'').trim());
+}
+function pickBetterBasicSourceStore(current='', incoming=''){
+  const curr = String(current||'').trim();
+  const next = String(incoming||'').trim();
+  if(!next) return curr;
+  if(!curr) return next;
+  const currLooksDomain = looksLikeDomainLabel(curr);
+  const nextLooksDomain = looksLikeDomainLabel(next);
+  if(currLooksDomain && !nextLooksDomain) return next;
+  return next;
+}
+function normalizeBasicPartSources(sources, fallback={}){
+  const seed = Array.isArray(sources) ? sources : [];
+  const maybePrimary = (fallback.store || fallback.link || Number(fallback.unitCost||0) > 0 || fallback.sourceNote) ? [{
+    store:String(fallback.store||'').trim(),
+    link:String(fallback.link||'').trim(),
+    unitCost:Number.isFinite(Number(fallback.unitCost)) ? Number(fallback.unitCost) : 0,
+    note:String(fallback.sourceNote||'').trim()
+  }] : [];
+  const merged = [...seed, ...maybePrimary].filter(Boolean).map(source=>({
+    store:String(source.store||'').trim(),
+    link:safeUrl(String(source.link||'').trim()) || String(source.link||'').trim(),
+    unitCost:Number.isFinite(Number(source.unitCost)) ? Number(source.unitCost) : 0,
+    note:String(source.note||'').trim()
+  })).filter(source=>source.store || source.link || source.unitCost > 0 || source.note);
+  const bucket = new Map();
+  merged.forEach(source=>{
+    const key = buildBasicSourceIdentity(source);
+    if(!bucket.has(key)){
+      bucket.set(key, {...source});
+      return;
+    }
+    const current = bucket.get(key);
+    bucket.set(key, {
+      store: pickBetterBasicSourceStore(current.store, source.store),
+      link: safeUrl(source.link) || current.link || source.link || '',
+      unitCost: Number(source.unitCost||0) > 0 ? Number(source.unitCost||0) : Number(current.unitCost||0),
+      note: String(source.note||'').trim() || String(current.note||'').trim()
+    });
+  });
+  return Array.from(bucket.values());
+}
+function buildBasicPartPrimarySource(existingPart={}, source={}){
+  const currentSources = normalizeBasicPartSources(existingPart.sources, existingPart);
+  const oldPrimary = normalizeBasicPartSources([{
+    store:String(existingPart.store||'').trim(),
+    link:String(existingPart.link||'').trim(),
+    unitCost:Number(existingPart.unitCost||0) || 0,
+    note:String(existingPart.sourceNote||'').trim()
+  }])[0];
+  const stripped = oldPrimary ? currentSources.filter(item=>buildBasicSourceIdentity(item)!==buildBasicSourceIdentity(oldPrimary)) : currentSources.slice();
+  const nextPrimary = normalizeBasicPartSources([source])[0];
+  return nextPrimary ? normalizeBasicPartSources([...stripped, nextPrimary]) : normalizeBasicPartSources(stripped);
+}
+function normalizeBasicParts(items){
+  if(!Array.isArray(items)) return [];
+  return items.filter(Boolean).map(item=>{
+    const store = String(item.store||'').trim();
+    const link = String(item.link||'').trim();
+    const unitCost = Number.isFinite(Number(item.unitCost)) ? Number(item.unitCost) : 0;
+    return {
+      id:item.id ?? Date.now()+Math.random(),
+      name:String(item.name||'').trim(),
+      category:normalizeBasicPartCategory(item.category),
+      serviceType:String(item.serviceType||'').trim(),
+      store,
+      link,
+      partNum:String(item.partNum||'').trim(),
+      unitCost,
+      note:String(item.note||'').trim(),
+      sources:normalizeBasicPartSources(item.sources, {store,link,unitCost})
+    };
+  }).filter(item=>item.name);
+}
+function guessPartCategoryForService(serviceType='other'){
+  const map = {
+    oil:'engine_oil',
+    cabin:'cabin_air_filter',
+    engine_filter:'engine_air_filter',
+    trans:'transmission_fluid',
+    diff:'rear_differential_fluid',
+    coolant:'engine_coolant',
+    inv_coolant:'inverter_coolant',
+    plugs:'spark_plugs',
+    hvfilter_inspect:'hv_battery_filter',
+    hvfilter_clean:'hv_battery_filter',
+    valvomax:'valvomax',
+    brakes:'brake_parts',
+    tires:'tires',
+    tires_new:'tires',
+    wipers:'wipers',
+    battery:'12v_battery'
+  };
+  return map[serviceType] || 'other';
+}
+function buildBasicPartMergeKey(item){
+  const pn = normalizeKey(item.partNum||'');
+  if(pn) return `pn:${pn}`;
+  return `nm:${normalizeKey(item.name||'')}|${normalizeBasicPartCategory(item.category)}`;
+}
+function migrateLegacyBasicParts(){
+  if(localStorage.getItem(BASIC_PARTS_KEY)) return;
+  let seed = [];
+  try{
+    const legacyInventory = typeof getInventory === 'function' ? getInventory() : [];
+    seed = normalizeBasicParts(legacyInventory.map(item=>({
+      id:item.id,
+      name:item.name,
+      category:guessPartCategoryForService(item.serviceType),
+      serviceType:item.serviceType||'',
+      store:item.store,
+      partNum:item.partNum,
+      link:item.link,
+      unitCost:item.unitCost,
+      note:item.note||''
+    })));
+  }catch(err){ seed = []; }
+  if(seed.length) localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(seed));
+}
+function getBasicPartsList(){
+  migrateLegacyBasicParts();
+  try{
+    const raw = localStorage.getItem(BASIC_PARTS_KEY);
+    return normalizeBasicParts(raw ? JSON.parse(raw) : []);
+  }catch(err){
+    return [];
+  }
+}
+function saveBasicPartsList(items){
+  localStorage.setItem(BASIC_PARTS_KEY, JSON.stringify(normalizeBasicParts(items)));
+}
+function upsertBasicPart(payload={}){
+  const parts = getBasicPartsList();
+  const normalized = normalizeBasicParts([payload])[0];
+  if(!normalized) return null;
+  const key = buildBasicPartMergeKey(normalized);
+  const idx = parts.findIndex(item=>buildBasicPartMergeKey(item)===key);
+  if(idx > -1){
+    const current = parts[idx];
+    const merged = {
+      ...current,
+      name:normalized.name || current.name,
+      category:normalized.category || current.category,
+      serviceType:normalized.serviceType || current.serviceType,
+      store:normalized.store || current.store,
+      link:normalized.link || current.link,
+      partNum:normalized.partNum || current.partNum,
+      unitCost:Number(normalized.unitCost||0) > 0 ? Number(normalized.unitCost||0) : Number(current.unitCost||0),
+      note:[current.note, normalized.note].filter(Boolean).filter((value,index,arr)=>arr.indexOf(value)===index).join(' · '),
+      sources:normalizeBasicPartSources([...(current.sources||[]), ...(normalized.sources||[])])
+    };
+    parts[idx] = merged;
+    saveBasicPartsList(parts);
+    return merged;
+  }
+  parts.push(normalized);
+  saveBasicPartsList(parts);
+  return normalized;
+}
+function upsertBasicPartsFromServiceItems(items=[], serviceType='other'){
+  const parts = getBasicPartsList();
+  const existingKeys = new Set(parts.map(item=>buildBasicPartMergeKey(item)));
+  const batchKeys = new Set();
+  let added = 0;
+  let skippedDuplicate = 0;
+  let skippedUnchecked = 0;
+  normalizeServiceEntryItems(items).forEach(item=>{
+    if(!item.name) return;
+    if(!item.saveToParts){
+      skippedUnchecked++;
+      return;
+    }
+    const payload = {
+      id:Date.now()+Math.random(),
+      name:item.name,
+      category:item.category || guessPartCategoryForService(serviceType),
+      serviceType,
+      store:item.store || '',
+      link:safeUrl(item.link || ''),
+      partNum:item.partNum || '',
+      unitCost:Number(item.price||0) || 0,
+      note:item.note || ''
+    };
+    const normalized = normalizeBasicParts([payload])[0];
+    if(!normalized) return;
+    const key = buildBasicPartMergeKey(normalized);
+    if(existingKeys.has(key) || batchKeys.has(key)){
+      skippedDuplicate++;
+      return;
+    }
+    upsertBasicPart(normalized);
+    existingKeys.add(key);
+    batchKeys.add(key);
+    added++;
+  });
+  return {added, skippedDuplicate, skippedUnchecked, skipped: skippedDuplicate + skippedUnchecked};
+}
+function populatePartCategoryOptions(selectId, selected='other'){
+  const el = document.getElementById(selectId);
+  if(!el) return;
+  el.innerHTML = PART_CATEGORY_OPTIONS.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');
+  el.value = PART_CATEGORY_MAP[selected] ? selected : 'other';
+}
+function getBasicPartPhoto(id){ return localStorage.getItem(BASIC_PART_PHOTO_PREFIX + id) || null; }
+function saveBasicPartPhoto(id,data){ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id,data); }catch(err){ showToast('Part photo too large — try a smaller image'); } }
+function removeBasicPartPhoto(id){ localStorage.removeItem(BASIC_PART_PHOTO_PREFIX + id); }
+function clearStoredPartPhotos(){
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.startsWith(BASIC_PART_PHOTO_PREFIX)) keys.push(key);
+  }
+  keys.forEach(key=>localStorage.removeItem(key));
+}
+function togglePartForm(forceOpen){
+  const wrap = document.getElementById('partFormWrap');
+  const btn = document.getElementById('partsFormToggleBtn');
+  if(!wrap || !btn) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : wrap.style.display === 'none';
+  wrap.style.display = shouldOpen ? 'block' : 'none';
+  btn.textContent = shouldOpen ? '＋ New Part' : '＋ Add Part';
+  if(shouldOpen) wrap.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function openNewPartForm(){
+  clearPartForm();
+  togglePartForm(true);
+  const firstField = document.getElementById('partName');
+  if(firstField && typeof firstField.focus === 'function') firstField.focus({preventScroll:true});
+}
+function cancelPartForm(){
+  clearPartForm();
+  togglePartForm(false);
+}
+
+function clearPartPhoto(){
+  window._pendingPartPhoto = null;
+  window._pendingPartPhotoRemoved = true;
+  const input = document.getElementById('partPhotoInput'); if(input) input.value = '';
+  const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'none';
+  const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'block';
+  const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--border2)';
+  const img = document.getElementById('partPhotoImg'); if(img) img.src='';
+}
+function clearPartForm(){
+  const fields = ['partEditId','partName','partNumber','partStore','partCost','partLink','partNote'];
+  fields.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  populatePartCategoryOptions('partCategory','other');
+  const title = document.getElementById('partFormTitle'); if(title) title.textContent = 'Add Part';
+  clearPartPhoto();
+  window._pendingPartPhotoRemoved = false;
+}
+function handlePartPhotoSelect(input){
+  if(!input?.files?.[0]) return;
+  compressImage(input.files[0], function(data){
+    window._pendingPartPhoto = data;
+    window._pendingPartPhotoRemoved = false;
+    const img = document.getElementById('partPhotoImg'); if(img) img.src = data;
+    const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'block';
+    const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'none';
+    const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--green2)';
+  });
+}
+function handlePartPhotoDrop(e){
+  e.preventDefault();
+  const file = e.dataTransfer?.files?.[0];
+  if(file && file.type.startsWith('image/')){
+    compressImage(file, function(data){
+      window._pendingPartPhoto = data;
+      window._pendingPartPhotoRemoved = false;
+      const img = document.getElementById('partPhotoImg'); if(img) img.src = data;
+      const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'block';
+      const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'none';
+      const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--green2)';
+    });
+  }
+}
+function viewImageOverlay(data){
+  if(!data) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'vz-lightbox';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px';
+  overlay.innerHTML = `
+    <img src="${data}" style="max-width:100%;max-height:75vh;border-radius:10px;object-fit:contain">
+    <div style="display:flex;gap:12px">
+      <button onclick="this.closest('.vz-lightbox').remove()"
+        style="background:#fff;color:#1a1d23;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
+        ✕ Close
+      </button>
+    </div>`;
+  overlay.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
+  document.body.appendChild(overlay);
+}
+function viewBasicPartPhoto(id){ viewImageOverlay(getBasicPartPhoto(id)); }
+function editBasicPart(id){
+  const part = getBasicPartsList().find(item=>String(item.id)===String(id));
+  if(!part) return;
+  togglePartForm(true);
+  document.getElementById('partEditId').value = part.id;
+  document.getElementById('partName').value = part.name || '';
+  document.getElementById('partNumber').value = part.partNum || '';
+  populatePartCategoryOptions('partCategory', part.category || 'other');
+  document.getElementById('partStore').value = part.store || '';
+  document.getElementById('partCost').value = Number(part.unitCost||0) > 0 ? Number(part.unitCost||0) : '';
+  document.getElementById('partLink').value = part.link || '';
+  document.getElementById('partNote').value = part.note || '';
+  const title = document.getElementById('partFormTitle'); if(title) title.textContent = 'Edit Part';
+  const existingPhoto = getBasicPartPhoto(part.id);
+  if(existingPhoto){
+    window._pendingPartPhoto = existingPhoto;
+    window._pendingPartPhotoRemoved = false;
+    const img = document.getElementById('partPhotoImg'); if(img) img.src = existingPhoto;
+    const preview = document.getElementById('partPhotoPreview'); if(preview) preview.style.display = 'block';
+    const placeholder = document.getElementById('partPhotoPlaceholder'); if(placeholder) placeholder.style.display = 'none';
+    const area = document.getElementById('partPhotoArea'); if(area) area.style.borderColor = 'var(--green2)';
+  }else{
+    clearPartPhoto();
+    window._pendingPartPhotoRemoved = false;
+  }
+  go('parts');
+}
+function saveBasicPart(){
+  const editId = document.getElementById('partEditId')?.value || '';
+  const name = document.getElementById('partName')?.value.trim() || '';
+  const category = document.getElementById('partCategory')?.value || 'other';
+  const store = document.getElementById('partStore')?.value.trim() || '';
+  const partNum = document.getElementById('partNumber')?.value.trim() || '';
+  const link = document.getElementById('partLink')?.value.trim() || '';
+  const note = document.getElementById('partNote')?.value.trim() || '';
+  const unitCost = Number.isFinite(Number(document.getElementById('partCost')?.value)) ? Number(document.getElementById('partCost').value) : 0;
+  if(!name){ showToast('Part name is required'); return; }
+  const list = getBasicPartsList();
+  const existing = editId ? list.find(item=>String(item.id)===String(editId)) : null;
+  const payload = {
+    id: editId || Date.now(),
+    name,
+    category,
+    serviceType: existing?.serviceType || '',
+    store,
+    partNum,
+    link,
+    unitCost,
+    note,
+    sources: buildBasicPartPrimarySource(existing || {}, {store,link,unitCost})
+  };
+  let savedPart = payload;
+  if(editId){
+    const idx = list.findIndex(item=>String(item.id)===String(editId));
+    if(idx>-1) list[idx] = payload;
+    else list.push(payload);
+    saveBasicPartsList(list);
+  }else{
+    savedPart = upsertBasicPart(payload) || payload;
+  }
+  if(window._pendingPartPhoto){
+    saveBasicPartPhoto(savedPart.id, window._pendingPartPhoto);
+  }else if(editId && window._pendingPartPhotoRemoved){
+    removeBasicPartPhoto(savedPart.id);
+  }
+  clearPartForm();
+  togglePartForm(false);
+  renderParts();
+  renderBackup();
+  showToast(editId ? 'Part updated ✓' : 'Part saved ✓');
+}
+function deleteBasicPart(id){
+  if(!confirm('Delete this part from your list?')) return;
+  saveBasicPartsList(getBasicPartsList().filter(item=>String(item.id)!==String(id)));
+  removeBasicPartPhoto(id);
+  if(String(document.getElementById('partEditId')?.value||'') === String(id)) clearPartForm();
+  renderParts();
+  renderBackup();
+  showToast('Part deleted');
+}
+function deleteBasicPartSource(partId, encodedSourceKey){
+  const sourceKey = decodeURIComponent(String(encodedSourceKey||''));
+  if(!sourceKey) return;
+  const list = getBasicPartsList();
+  const idx = list.findIndex(item=>String(item.id)===String(partId));
+  if(idx < 0) return;
+  const part = {...list[idx]};
+  const currentSources = normalizeBasicPartSources(part.sources, part);
+  const nextSources = currentSources.filter(source=>buildBasicSourceIdentity(source)!==sourceKey);
+  if(nextSources.length === currentSources.length){
+    showToast('Source not found');
+    return;
+  }
+  const primaryIdentity = buildBasicSourceIdentity({store:part.store, link:part.link, unitCost:part.unitCost});
+  if(primaryIdentity === sourceKey){
+    const fallback = nextSources[0] || null;
+    part.store = fallback?.store || '';
+    part.link = fallback?.link || '';
+    part.unitCost = fallback ? (Number(fallback.unitCost||0) || 0) : 0;
+  }
+  part.sources = nextSources;
+  list[idx] = part;
+  saveBasicPartsList(list);
+  if(String(document.getElementById('partEditId')?.value||'') === String(partId)){
+    editBasicPart(partId);
+  }
+  renderParts();
+  renderBackup();
+  showToast('Saved source removed');
+}
+function renderParts(){
+  const listEl = document.getElementById('basicPartsList');
+  const summaryEl = document.getElementById('basicPartsSummary');
+  if(!listEl || !summaryEl) return;
+  const parts = getBasicPartsList().sort((a,b)=>{
+    const categoryCompare = getPartCategoryLabel(a.category).localeCompare(getPartCategoryLabel(b.category));
+    if(categoryCompare !== 0) return categoryCompare;
+    return String(a.name||'').localeCompare(String(b.name||''));
+  });
+  const photoCount = parts.filter(part=>getBasicPartPhoto(part.id)).length;
+  const categoryCount = Object.keys(parts.reduce((map, part)=>{ map[part.category || 'other'] = true; return map; }, {})).length;
+  const sourceCount = parts.reduce((sum,part)=>sum + normalizeBasicPartSources(part.sources, part).length, 0);
+  summaryEl.textContent = `${parts.length} part${parts.length!==1?'s':''} · ${categoryCount} section${categoryCount!==1?'s':''} · ${sourceCount} saved source${sourceCount!==1?'s':''} · ${photoCount} receipt photo${photoCount!==1?'s':''}`;
+  if(!parts.length){
+    listEl.innerHTML = `<div class="part-item"><div class="part-missing">No saved parts yet. Add parts manually here or check the save box on service-entry parts you want stored in this library.</div></div>`;
+    return;
+  }
+  const groups = PART_CATEGORY_OPTIONS.map(option=>({
+    ...option,
+    parts: parts.filter(part=>(part.category || 'other') === option.value)
+  })).filter(group=>group.parts.length);
+  listEl.innerHTML = groups.map(group=>`
+    <div>
+      <div class="parts-group-head">${escapeHtml(group.label)}</div>
+      ${group.parts.map(part=>{
+        const photo = getBasicPartPhoto(part.id);
+        const sources = normalizeBasicPartSources(part.sources, part);
+        return `<div class="part-item">
+          <div class="part-row1"><span class="part-name">${escapeHtml(part.name)}</span><span class="part-price">${Number(part.unitCost||0) > 0 ? '$'+Number(part.unitCost||0).toFixed(2) : '—'}</span></div>
+          ${part.partNum ? `<div class="part-num">Part # ${escapeHtml(part.partNum)}</div>` : `<div class="part-missing">No part number saved</div>`}
+          ${part.serviceType ? `<div class="parts-mini-tag">Linked to ${escapeHtml(LABELS[part.serviceType] || part.serviceType)}</div>` : ''}
+          ${part.note ? `<div class="inv-meta" style="margin-top:8px">${safeText(part.note)}</div>` : ''}
+          ${sources.length ? `<div class="parts-source-row">${sources.map(source=>{
+            const safeLink = safeUrl(source.link);
+            const sourceKey = encodeURIComponent(buildBasicSourceIdentity(source));
+            return `<div class="parts-source-chip">
+              <div class="parts-source-left">
+                <div class="parts-source-store">${escapeHtml(source.store || (safeLink ? getLinkHostLabel(safeLink) : 'Saved source'))}</div>
+                <div class="parts-source-meta">
+                  ${safeLink ? `<a class="part-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeLink))}</a>` : 'No purchase link saved'}
+                  ${source.note ? `<br>${safeText(source.note)}` : ''}
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+                <div class="parts-source-price">${Number(source.unitCost||0) > 0 ? '$'+Number(source.unitCost||0).toFixed(2) : '—'}</div>
+                <button type="button" class="inv-btn danger" style="padding:5px 8px" onclick="deleteBasicPartSource(${part.id}, '${sourceKey}')">Delete link</button>
+              </div>
+            </div>`;
+          }).join('')}</div>` : `<div class="part-missing" style="margin-top:8px">No saved purchase source yet</div>`}
+          ${photo ? `<div style="margin-top:10px;cursor:pointer" onclick="viewBasicPartPhoto(${part.id})"><img src="${photo}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">🧾 Receipt photo · tap to view</div></div>` : `<div class="part-missing" style="margin-top:10px">No receipt photo saved</div>`}
+          <div class="inv-actions" style="margin-top:12px">
+            <button type="button" class="inv-btn" onclick="editBasicPart(${part.id})">Edit</button>
+            <button type="button" class="inv-btn danger" onclick="deleteBasicPart(${part.id})">Delete</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+function ensureServicePartBuilderRow(){
+  const list = document.getElementById('fItemsList');
+  if(!list) return;
+  if(!list.querySelector('.item-editor')) buildServicePartRow();
+}
+function toggleServicePartsBuilder(force){
+  const wrap = document.getElementById('servicePartsWrap');
+  const btn = document.getElementById('servicePartsToggle');
+  if(!wrap || !btn) return;
+  const shouldOpen = typeof force === 'boolean' ? force : !wrap.classList.contains('open');
+  wrap.classList.toggle('open', shouldOpen);
+  btn.classList.toggle('open', shouldOpen);
+  if(shouldOpen) ensureServicePartBuilderRow();
+  syncEntryCostFromItems();
+}
+function normalizeServiceEntryItems(items){
+  return (Array.isArray(items) ? items : []).filter(Boolean).map(item=>({
+    name:String(item.name||'').trim(),
+    category:normalizeBasicPartCategory(item.category),
+    partNum:String(item.partNum||'').trim(),
+    store:String(item.store||'').trim(),
+    link:String(item.link||'').trim(),
+    price:Number.isFinite(Number(item.price)) ? Number(item.price) : 0,
+    qty:Math.max(1, parseInt(item.qty||1,10) || 1),
+    note:String(item.note||'').trim(),
+    saveToParts:!!item.saveToParts
+  })).filter(item=>item.name || item.partNum || item.store || item.link || item.price > 0);
+}
+function buildServicePartRow(data={}){
+  const type = document.getElementById('fType')?.value || 'other';
+  const row = document.createElement('div');
+  row.className = 'item-editor';
+  row.innerHTML = `
+    <div class="item-editor-top">
+      <div class="item-editor-title">Purchased part</div>
+      <button type="button" class="item-remove" onclick="removeItemRow(this)">Remove</button>
+    </div>
+    <div class="item-grid">
+      <div class="fl span2 part-ac-wrap" style="margin-bottom:0;position:relative">
+        <label>Part name</label>
+        <input type="text" class="fi item-name" placeholder="Mobil 1 0W-16"
+               autocomplete="off" autocorrect="off" autocapitalize="words"
+               value="${escapeHtmlAttr(data.name||'')}"
+               oninput="showPartSuggestions(this);updateRowDisplay(this.closest('.item-editor'))">
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Parts section</label>
+        <select class="fs item-category"></select>
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Part #</label>
+        <input type="text" class="fi item-part" placeholder="90915-YZZN1"
+               autocomplete="off" autocorrect="off" autocapitalize="characters"
+               value="${escapeHtmlAttr(data.partNum||'')}">
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Purchased from</label>
+        <input type="text" class="fi item-store" placeholder="Toyota / Walmart / Amazon"
+               autocomplete="off" autocorrect="off" autocapitalize="words"
+               value="${escapeHtmlAttr(data.store||'')}">
+      </div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Purchase link</label>
+        <input type="url" class="fi item-link" placeholder="https://..."
+               inputmode="url" autocomplete="off"
+               value="${escapeHtmlAttr(data.link||'')}">
+      </div>
+      <div class="fl" style="margin-bottom:0">
+        <label>Unit price ($)</label>
+        <input type="number" class="fi item-price" placeholder="0.00"
+               step="0.01" inputmode="decimal" min="0"
+               value="${Number(data.price||0) > 0 ? Number(data.price||0) : ''}"
+               oninput="updateRowDisplay(this.closest('.item-editor'))">
+      </div>
+      <div class="fl" style="margin-bottom:0">
+        <label>Qty</label>
+        <input type="number" min="1" step="1" class="fi item-qty"
+               inputmode="numeric"
+               value="${Math.max(1, parseInt(data.qty||1,10) || 1)}"
+               oninput="updateRowDisplay(this.closest('.item-editor'))">
+      </div>
+      <div class="item-subtotal"></div>
+      <div class="fl span2" style="margin-bottom:0">
+        <label>Quick note (optional)</label>
+        <input type="text" class="fi item-note" placeholder="OEM / sale / bought as a set"
+               autocorrect="off" autocapitalize="sentences"
+               value="${escapeHtmlAttr(data.note||'')}">
+      </div>
+    </div>
+    <label class="item-check"><input type="checkbox" class="item-save-parts" ${data.saveToParts ? 'checked' : ''}> Save this item to the Parts tab</label>
+  `;
+  const list = document.getElementById('fItemsList');
+  if(list) list.appendChild(row);
+  const categorySelect = row.querySelector('.item-category');
+  if(categorySelect){
+    categorySelect.innerHTML = PART_CATEGORY_OPTIONS.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');
+    categorySelect.value = PART_CATEGORY_MAP[data.category] ? data.category : guessPartCategoryForService(type);
+  }
+  // Wire all inputs to cost sync
+  row.querySelectorAll('input, select').forEach(field=>{
+    field.addEventListener('input', syncEntryCostFromItems);
+    field.addEventListener('change', syncEntryCostFromItems);
+  });
+  // Initial display if pre-filled (e.g. from reuse)
+  if(data.name || data.price) updateRowDisplay(row);
+  return row;
+}
+function addItemRow(data={}){
+  toggleServicePartsBuilder(true);
+  const row = buildServicePartRow(data);
+  syncEntryCostFromItems();
+  return row;
+}
+function removeItemRow(btn){
+  const row = btn?.closest('.item-editor');
+  if(row) row.remove();
+  syncEntryCostFromItems();
+}
+function getFormItems(){
+  return normalizeServiceEntryItems(Array.from(document.querySelectorAll('#fItemsList .item-editor')).map(row=>({
+    name:row.querySelector('.item-name')?.value || '',
+    category:row.querySelector('.item-category')?.value || guessPartCategoryForService(document.getElementById('fType')?.value || 'other'),
+    partNum:row.querySelector('.item-part')?.value || '',
+    store:row.querySelector('.item-store')?.value || '',
+    link:row.querySelector('.item-link')?.value || '',
+    price:row.querySelector('.item-price')?.value || 0,
+    qty:row.querySelector('.item-qty')?.value || 1,
+    note:row.querySelector('.item-note')?.value || '',
+    saveToParts:!!row.querySelector('.item-save-parts')?.checked
+  })));
+}
+function syncEntryCostFromItems(){
+  const items = getFormItems();
+  const total = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+  const costEl = document.getElementById('fCost');
+  if(costEl) costEl.value = total > 0 ? total.toFixed(2) : '';
+  // Keep each row's header and subtotal in sync
+  document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
+}
+function resetEntryInventoryUses(){
+  const list = document.getElementById('fItemsList');
+  if(list) list.innerHTML = '';
+  toggleServicePartsBuilder(false);
+  syncEntryCostFromItems();
+  const bar = document.getElementById('reusePartsBar');
+  if(bar) bar.classList.remove('visible');
+}
+function renderEntryInventoryUI(){
+  syncEntryCostFromItems();
+}
+function useInventoryItem(){ showToast('This form now uses the new purchased parts builder'); }
+function removeOneInventoryItem(){}
+function renderLog(){
+  const d=getData().sort((a,b)=>b.mi-a.mi);
+  const el=document.getElementById('logList');
+  if(!el) return;
+  el.innerHTML=d.map(e=>{
+    const dt=new Date(e.date+'T00:00:00');
+    const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const safeEntryUrl = safeUrl(e.link);
+    const lnk=safeEntryUrl?`<a class="log-link" href="${safeEntryUrl}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeEntryUrl))}</a>`:'';
+    const del=!e.builtin
+      ?`<button class="delete-btn" onclick="delEntry(${e.id})" title="Delete this entry">✕</button>`
+      :`<button class="delete-btn" onclick="delBuiltin(${e.id})" title="Delete (test)" style="background:var(--text3)">✕</button>`;
+    const photo=getPhoto(e.id);
+    const parts = normalizeServiceEntryItems(e.items);
+    const photoHtml=photo
+      ?`<div style="margin-top:10px;cursor:pointer" onclick="viewPhoto(${e.id})">
+          <img src="${photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center">📷 Receipt · tap to view full · <span style="color:var(--toyota);cursor:pointer" onclick="event.stopPropagation();removePhoto(${e.id})">remove</span></div>
+        </div>`
+      :`<button onclick="addPhotoToEntry(${e.id})" style="margin-top:8px;font-size:11px;color:var(--text3);
+          border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;
+          background:none;cursor:pointer;width:100%;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--toyota)';this.style.color='var(--toyota)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
+          📷 Add Receipt Photo
+        </button>`;
+    return`<div class="log-item ${!e.builtin?'user-entry':''}">
+      ${del}
+      <div class="log-top"><span class="log-date">${ds}</span><span class="log-mi">${parseInt(e.mi).toLocaleString()} mi</span></div>
+      <div class="log-type">${LABELS[e.type]||'Service'}</div>
+      <div class="log-desc">${safeText(e.desc || '')}</div>
+      <div class="log-foot">
+        <div><div class="log-shop">${safeText(e.shop||'')}</div>${lnk}</div>
+        <div class="log-cost">$${getEntryDisplayCost(e).toFixed(2)}</div>
+      </div>
+      ${parts.length ? `<div class="log-parts-summary"><strong>Purchased parts:</strong></div><div class="log-parts-grid">${parts.map(item=>`<div class="log-part"><div class="log-part-top"><div class="log-part-name">${escapeHtml(item.name || 'Part')}</div><div class="log-part-price">$${(Number(item.price||0) * Number(item.qty||0)).toFixed(2)}</div></div><div class="log-part-meta">${escapeHtml(getPartCategoryLabel(item.category))} · Qty ${Number(item.qty||0)}${item.partNum ? ` · Part # ${escapeHtml(item.partNum)}` : ''}${item.store ? ` · ${escapeHtml(item.store)}` : ''}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</div>${safeUrl(item.link) ? `<a class="log-part-link" href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer">→ ${escapeHtml(getLinkHostLabel(safeUrl(item.link)))}</a>` : ''}</div>`).join('')}</div>` : ''}
+      ${photoHtml}
+    </div>`;
+  }).join('');
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  const totalEl = document.getElementById('totalVal');
+  if(totalEl) totalEl.textContent='$'+tot.toFixed(2);
+}
+function getAverageEntryCost(entry, type=getAverageServiceType()){
+  if(!entryMatchesAverageType(entry, type)) return null;
+  const manual = Number(entry.cost || 0);
+  if(Number.isFinite(manual) && manual > 0) return manual;
+  const legacy = getEntryDisplayCost(entry);
+  return Number.isFinite(legacy) && legacy > 0 ? legacy : null;
+}
+function saveEntry(){
+  const date=document.getElementById('fDate')?.value || '';
+  const mi=document.getElementById('fMi')?.value || '';
+  const type=document.getElementById('fType')?.value || 'other';
+  const desc=document.getElementById('fDesc')?.value.trim() || '';
+  const shop=document.getElementById('fShop')?.value || 'DIY';
+  const items=getFormItems();
+  if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
+  const parsedMi = parseInt(mi,10);
+  if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
+  const autoCost = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+  const newId=Date.now();
+  const d=getData();
+  d.push({id:newId,date,mi:parsedMi,type,desc,cost:autoCost,shop,link:'',items,inventoryUses:[],builtin:false});
+  save(d);
+  const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
+  if(window._pendingPhoto){
+    savePhoto(newId, window._pendingPhoto);
+    window._pendingPhoto=null;
+  }
+  if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
+  renderAll();
+  go('log');
+  ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
+  const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value='DIY';
+  const costEl = document.getElementById('fCost'); if(costEl) costEl.value='';
+  resetEntryInventoryUses();
+  clearPhoto();
+  if(!items.length) showToast('Entry saved ✓');
+  else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry saved ✓ Checked parts were added to Parts');
+  else if(!partSyncResult.added && partSyncResult.skippedUnchecked && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ No parts were checked for the Parts tab');
+  else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedUnchecked) showToast('Entry saved ✓ Checked part already exists in Parts');
+  else if(!partSyncResult.added) showToast('Entry saved ✓ No new checked parts were added to Parts');
+  else showToast(`Entry saved ✓ ${partSyncResult.added} checked part${partSyncResult.added!==1?'s':''} added to Parts`);
+}
+
+function renderBackup(){
+  const d=getData();
+  const mi=getMi();
+  const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+  const sorted=[...d].sort((a,b)=>b.mi-a.mi);
+  const last=sorted[0];
+  const photoCount=d.filter(e=>getPhoto(e.id)).length;
+  const partCount = getBasicPartsList().length;
+  const partPhotoCount = getBasicPartsList().filter(part=>getBasicPartPhoto(part.id)).length;
+  const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
+  const countEl = document.getElementById('bkCount');
+  const miEl = document.getElementById('bkMi');
+  const totalEl = document.getElementById('bkTotal');
+  const lastEl = document.getElementById('bkLast');
+  if(countEl) countEl.textContent = `${d.length} entries · ${partCount} part${partCount!==1?'s':''} · ${scheduleOverrideCount} custom target${scheduleOverrideCount!==1?'s':''} · ${photoCount} service photo${photoCount!==1?'s':''} · ${partPhotoCount} part photo${partPhotoCount!==1?'s':''}`;
+  if(miEl) miEl.textContent = mi.toLocaleString()+' mi';
+  const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
+  if(totalEl) totalEl.textContent = '$'+tot.toFixed(2);
+  if(last && lastEl){
+    const dt=new Date(last.date+'T00:00:00');
+    lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
+  }
+  renderReminderStrategy();
+}
+function exportData(){
+  const servicePhotos = {};
+  const entries = getData();
+  entries.forEach(e=>{
+    const p = getPhoto(e.id);
+    if(p) servicePhotos[e.id] = p;
+  });
+  const partPhotos = {};
+  const basicParts = getBasicPartsList();
+  basicParts.forEach(part=>{
+    const p = getBasicPartPhoto(part.id);
+    if(p) partPhotos[part.id] = p;
+  });
+  const payload={
+    version: 8,
+    exported: new Date().toISOString(),
+    vin: VIN,
+    vehicle: '2021 Toyota Venza Hybrid AWD',
+    mileage: getMi(),
+    oilAverageResetAt: getOilAverageResetAt(),
+    averageServiceType: getAverageServiceType(),
+    scheduleOverrides: getScheduleOverrides(),
+    servicePartRequirements: getSavedServiceRequirementsMap(),
+    entries: entries,
+    basicParts: basicParts,
+    inventory: getInventory(),
+    masterParts: getMasterParts(),
+    photos: servicePhotos,
+    partPhotos: partPhotos
+  };
+  const photoCount = Object.keys(servicePhotos).length + Object.keys(partPhotos).length;
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().split('T')[0];
+  a.href=url;
+  a.download='venza_backup_'+date+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Backup saved ✓ — ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}`);
+}
+function importData(input){
+  const file=input.files?.[0];
+  if(!file){return;}
+  if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const isLegacyArray = Array.isArray(parsed);
+      const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
+      if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+      const entries=Array.isArray(data.entries)?data.entries:null;
+      const mi=Number(data.mileage||0) || null;
+      const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
+      const partPhotos=(data.partPhotos && typeof data.partPhotos === 'object') ? data.partPhotos : {};
+      const inventory=Array.isArray(data.inventory) ? data.inventory : [];
+      const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
+      const basicParts=Array.isArray(data.basicParts) ? data.basicParts : normalizeBasicParts(inventory.map(item=>({
+        id:item.id,
+        name:item.name,
+        category:guessPartCategoryForService(item.serviceType),
+        serviceType:item.serviceType || '',
+        store:item.store,
+        partNum:item.partNum,
+        link:item.link,
+        unitCost:item.unitCost,
+        note:item.note || ''
+      })));
+      const oilAverageResetAt=data.oilAverageResetAt||'';
+      const averageServiceType=data.averageServiceType||'oil_avg';
+      const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
+      const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
+      const mileageHistory=Array.isArray(data.mileageHistory) ? normalizeMileageHistory(data.mileageHistory) : [];
+      const photoCount=Object.keys(photos).length + Object.keys(partPhotos).length;
+      const version = Number(data.version || 0);
+      const backupVin = String(data.vin || '').trim();
+      if(!entries){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+      if(version > 8){ showToast('This backup was created by a newer app version'); input.value=''; return; }
+      if(backupVin && backupVin !== VIN){
+        const proceedMismatch = confirm(`This backup VIN does not match this app.
+
+Backup: ${backupVin}
+This app: ${VIN}
+
+Restore anyway?`);
+        if(!proceedMismatch){ input.value=''; return; }
+      }
+      if(!confirm(`Restore ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}?
+
+This replaces all current data. Continue?`)){
+        input.value='';return;
+      }
+      clearStoredPhotos();
+      clearStoredPartPhotos();
+      save(entries);
+      saveBasicPartsList(basicParts);
+      saveInventory(inventory);
+      saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
+      if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+      localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
+      saveScheduleOverrides(scheduleOverrides);
+      if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
+      if(mileageHistory.length) saveMiHistory(mileageHistory); else localStorage.removeItem(MI_HISTORY_KEY);
+      if(mi&&mi>0)setMi(mi,{source:'manual',allowLower:true,skipHistory:!!mileageHistory.length});
+      else if(mileageHistory.length){
+        const restoredMileage = getLatestMileageHistoryCandidate();
+        if(restoredMileage){
+          setMi(restoredMileage.value,{source:restoredMileage.source,entryId:restoredMileage.entryId,allowLower:true,skipHistory:true});
+        }else{
+          recalcMileageFromEntries(entries);
+        }
+      }else recalcMileageFromEntries(entries);
+      Object.entries(photos).forEach(([id,imgData])=>{ try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){} });
+      Object.entries(partPhotos).forEach(([id,imgData])=>{ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id, imgData); }catch(err){} });
+      renderAll();
+      renderBackup();
+      input.value='';
+      showToast(`✓ Restored ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}!`);
+    }catch(err){
+      showToast('❌ Could not read backup file');
+      input.value='';
+    }
+  };
+  reader.readAsText(file);
+}
+function resetData(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return;}
+  clearStoredPhotos();
+  clearStoredPartPhotos();
+  save(DEFAULT);
+  saveBasicPartsList([]);
+  saveInventory(DEFAULT_INVENTORY);
+  saveMasterParts(DEFAULT_MASTER_PARTS);
+  localStorage.removeItem(OIL_AVG_RESET_KEY);
+  localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+  localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+  localStorage.removeItem(BASIC_PARTS_KEY);
+  localStorage.removeItem(MI_STATE_KEY);
+  localStorage.removeItem(MI_HISTORY_KEY);
+  setMi(66377,{source:'manual',allowLower:true});
+  renderAll();
+  renderBackup();
+  showToast('Reset to factory data ✓');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   VENZA GARAGE — STABILITY + UX UPGRADE v16
+   Fixes: editable service cost, safer backup/restore, calendar vehicle
+   name, factory mileage reset, smarter dashboard summary, and oil-cost math.
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  const UPGRADE_VERSION = 16;
+  const FACTORY_MILEAGE = Math.max(highestMileage(DEFAULT), Number(LAST_SVC_MI||0), 64751);
+
+  function getLocalStorageUsageKb(){
+    try{
+      let chars = 0;
+      for(let i=0;i<localStorage.length;i++){
+        const key = localStorage.key(i) || '';
+        const value = localStorage.getItem(key) || '';
+        chars += key.length + value.length;
+      }
+      return Math.round((chars * 2) / 1024);
+    }catch(err){ return null; }
+  }
+
+  window.renderAppVersion = function(){
+    const full = `APP ${APP_VERSION_LABEL} · build ${APP_BUILD}`;
+    const short = `APP ${APP_VERSION_LABEL}`;
+    const headerEl = document.getElementById('appVersionBadge');
+    if(headerEl){
+      headerEl.textContent = short;
+      headerEl.title = full;
+    }
+    const backupEl = document.getElementById('bkVersion');
+    if(backupEl) backupEl.textContent = full;
+    document.documentElement.dataset.appVersion = APP_VERSION;
+  };
+
+
+  function compareAppVersions(a,b){
+    const pa=String(a||'0').split('.').map(n=>parseInt(n,10)||0);
+    const pb=String(b||'0').split('.').map(n=>parseInt(n,10)||0);
+    for(let i=0;i<Math.max(pa.length,pb.length);i++){
+      const diff=(pa[i]||0)-(pb[i]||0);
+      if(diff) return diff;
+    }
+    return 0;
+  }
+
+  function getCanonicalVenzaUrl(){
+    const url = new URL(window.location.href);
+    const path = url.pathname || '/';
+    if(path.endsWith('/venza') || path.endsWith('/venza/')){
+      url.pathname = '/venza/venza.html';
+    }else if(path.endsWith('/venza.html')){
+      // keep current file path
+    }else if(path.endsWith('/')){
+      url.pathname = path + 'venza.html';
+    }else{
+      url.pathname = path.replace(/[^/]*$/, 'venza.html');
+    }
+    return url;
+  }
+
+  function setAppUpdateStatus(message, cls=''){
+    const el = document.getElementById('appUpdateStatus');
+    if(el){
+      el.textContent = message;
+      el.style.color = cls === 'good' ? 'var(--green2)' : cls === 'warn' ? 'var(--orange2)' : cls === 'bad' ? 'var(--toyota2)' : 'var(--text3)';
+    }
+    const btn = document.getElementById('appUpdateBtn');
+    if(btn && cls === 'warn') btn.textContent = '↻ Update ready';
+    else if(btn) btn.textContent = '↻ Update';
+  }
+
+  window.forceAppUpdate = async function(){
+    setAppUpdateStatus(`Updating app cache for APP ${APP_VERSION_LABEL}...`);
+    try{
+      if('caches' in window){
+        const keys = await caches.keys();
+        await Promise.all(keys.map(key=>caches.delete(key)));
+      }
+    }catch(err){}
+    try{
+      if('serviceWorker' in navigator){
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(reg=>reg.unregister()));
+      }
+    }catch(err){}
+    try{ localStorage.setItem('vz_last_manual_update_click', new Date().toISOString()); }catch(err){}
+    const url = getCanonicalVenzaUrl();
+    url.searchParams.set('v', APP_VERSION);
+    url.searchParams.set('build', APP_BUILD);
+    url.searchParams.set('refresh', Date.now().toString());
+    window.location.replace(url.toString());
+  };
+
+  window.checkForAppUpdate = async function(userTriggered=false){
+    const url = getCanonicalVenzaUrl();
+    url.searchParams.set('check', Date.now().toString());
+    try{
+      if(userTriggered) setAppUpdateStatus('Checking the uploaded GitHub file...');
+      const res = await fetch(url.toString(), {cache:'no-store'});
+      if(!res.ok) throw new Error('fetch failed');
+      const html = await res.text();
+      const match = html.match(/const\s+APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
+      const remoteVersion = match ? match[1] : '';
+      if(remoteVersion && compareAppVersions(remoteVersion, APP_VERSION) > 0){
+        setAppUpdateStatus(`Update available: APP v${remoteVersion}. Tap Update / Reload App.`, 'warn');
+        return true;
+      }
+      if(remoteVersion){
+        setAppUpdateStatus(`You are on the latest uploaded file: APP v${APP_VERSION}.`, 'good');
+        return false;
+      }
+      setAppUpdateStatus(`Current app: APP v${APP_VERSION}. Could not read uploaded version automatically.`, 'warn');
+      return false;
+    }catch(err){
+      setAppUpdateStatus(`Current app: APP v${APP_VERSION}. Version check unavailable; tap Update / Reload after uploading.`, userTriggered ? 'warn' : '');
+      return false;
+    }
+  };
+
+  window.showAppUpdatedNotice = function(){
+    try{
+      const seen = localStorage.getItem(APP_VERSION_KEY);
+      if(seen !== APP_VERSION){
+        localStorage.setItem(APP_VERSION_KEY, APP_VERSION);
+        setTimeout(()=>showToast(`Venza Garage updated to ${APP_VERSION_LABEL} ✓`), 650);
+      }
+    }catch(err){}
+  };
+
+  window.getManualMileageBaseline = function(){
+    const history = getMiHistory();
+    for(let i=history.length-1; i>=0; i--){
+      const item = history[i];
+      if(item.source==='manual' && Number.isFinite(Number(item.value)) && Number(item.value)>0) return Number(item.value);
+    }
+    return FACTORY_MILEAGE;
+  };
+
+  window.getAverageEntryCost = function(entry, type=getAverageServiceType()){
+    if(!entryMatchesAverageType(entry, type)) return null;
+    if(type === 'oil_avg'){
+      const itemTotal = getEntryItemsTotal(entry, item=>item.useInOilAvg || entry.type === 'oil');
+      if(itemTotal > 0) return itemTotal;
+      const inventoryOil = getInventoryUseTotal(entry, use=>use.countInOilAvg);
+      if(inventoryOil > 0) return inventoryOil;
+      const manual = Number(entry.cost || 0);
+      const desc = String(entry.desc || '').toLowerCase();
+      const looksBundled = entry.type === 'oil' && manual > 125 && (desc.includes('transmission') || desc.includes('rear diff') || desc.includes('tire rotation'));
+      if(looksBundled) return null;
+      return Number.isFinite(manual) && manual > 0 ? manual : null;
+    }
+    const manual = Number(entry.cost || 0);
+    if(Number.isFinite(manual) && manual > 0) return manual;
+    const legacy = getEntryDisplayCost(entry);
+    return Number.isFinite(legacy) && legacy > 0 ? legacy : null;
+  };
+
+  window.renderDashboardSmartSummary = function(){
+    const el = document.getElementById('dSmartSummary');
+    if(!el) return;
+    const state = getRecurringServicesState(getMi());
+    const items = state.rules.filter(rule=>!rule.watchOnly).sort(compareRecurring);
+    const overdue = items.filter(item=>item.status === 'overdue');
+    const soon = items.filter(item=>item.status === 'due soon');
+    const upcoming = items.filter(item=>item.status === 'upcoming');
+    const customTargets = getResolvedRecurringRules().filter(rule=>!rule.watchOnly && rule.customActive).length;
+    const next = items[0];
+    const battery = items.find(item=>item.id === 'battery');
+    const batteryDate = battery?.nextDueDate ? formatDateHuman(battery.nextDueDate) : 'Jun 26, 2031';
+    const batteryTimer = battery ? `${batteryDate} · ${battery.remainingText}` : 'Jun 26, 2031 · target every 5 years';
+    const nextText = next ? `${next.name} · ${next.remainingText}` : 'No recurring service found';
+    const avg = state.avgMilesPerDay && Number.isFinite(state.avgMilesPerDay) ? `${Math.round(state.avgMilesPerDay)} mi/day` : 'Learning';
+    el.innerHTML = `
+      <div class="row"><span class="row-key">Next Action</span><span class="row-val ${next?.status==='overdue'?'red':next?.status==='due soon'?'orange':'green'}">${escapeHtml(nextText)}</span></div>
+      <div class="row"><span class="row-key">12V Battery Timer</span><span class="row-val ${battery?.status==='overdue'?'red':battery?.status==='due soon'?'orange':'green'}">${escapeHtml(batteryTimer)}</span></div>
+      <div class="row"><span class="row-key">Urgency</span><span class="row-val ${overdue.length?'red':soon.length?'orange':'green'}">${overdue.length} overdue · ${soon.length} soon · ${upcoming.length} upcoming</span></div>
+      <div class="row"><span class="row-key">Mileage Pace</span><span class="row-val">${escapeHtml(avg)}</span></div>
+      <div class="row"><span class="row-key">Custom Targets</span><span class="row-val ${customTargets?'gold':'green'}">${customTargets} saved</span></div>
+    `;
+  };
+
+  const baseRenderDash = window.renderDash;
+  window.renderDash = function(){
+    baseRenderDash();
+    renderDashboardSmartSummary();
+  };
+
+  const baseSyncEntryCostFromItems = window.syncEntryCostFromItems;
+  window.syncEntryCostFromItems = function(){
+    const items = getFormItems();
+    const total = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+    const costEl = document.getElementById('fCost');
+    if(costEl && costEl.dataset.userEdited !== '1') costEl.value = total > 0 ? total.toFixed(2) : '';
+    document.querySelectorAll('#fItemsList .item-editor').forEach(updateRowDisplay);
+    if(typeof baseSyncEntryCostFromItems === 'function' && false) baseSyncEntryCostFromItems();
+  };
+
+  window.saveEntry = function(){
+    const date=document.getElementById('fDate')?.value || '';
+    const mi=document.getElementById('fMi')?.value || '';
+    const type=document.getElementById('fType')?.value || 'other';
+    const desc=document.getElementById('fDesc')?.value.trim() || '';
+    const shop=document.getElementById('fShop')?.value || 'DIY';
+    const costRaw = document.getElementById('fCost')?.value || '';
+    const items=getFormItems();
+    if(!date || !mi || !type){ showToast('Please fill in date, mileage, and service type'); return; }
+    const parsedMi = parseInt(mi,10);
+    if(!Number.isFinite(parsedMi) || parsedMi <= 0){ showToast('Enter a valid mileage'); return; }
+    const itemTotal = items.reduce((sum,item)=>sum + (Number(item.price||0) * Number(item.qty||0)), 0);
+    const manualCost = Number(costRaw);
+    if(costRaw && (!Number.isFinite(manualCost) || manualCost < 0)){ showToast('Enter a valid cost or leave it blank'); return; }
+    const finalCost = Number.isFinite(manualCost) && manualCost >= 0 && costRaw !== '' ? manualCost : itemTotal;
+    const newId=Date.now();
+    const d=getData();
+    d.push({id:newId,date,mi:parsedMi,type,desc,cost:finalCost,shop,link:'',items,inventoryUses:[],builtin:false});
+    save(d);
+    const partSyncResult = items.length ? upsertBasicPartsFromServiceItems(items, type) : {added:0, skipped:0};
+    if(window._pendingPhoto){
+      savePhoto(newId, window._pendingPhoto);
+      window._pendingPhoto=null;
+    }
+    if(parsedMi > getMi()) setMi(parsedMi,{source:'entry',entryId:newId});
+    renderAll();
+    go('log');
+    ['fMi','fDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const typeEl = document.getElementById('fType'); if(typeEl) typeEl.value='';
+    const shopEl = document.getElementById('fShop'); if(shopEl) shopEl.value='DIY';
+    const costEl = document.getElementById('fCost'); if(costEl){ costEl.value=''; delete costEl.dataset.userEdited; }
+    resetEntryInventoryUses();
+    clearPhoto();
+    if(!items.length) showToast('Entry saved ✓');
+    else if(partSyncResult.added && !partSyncResult.skipped) showToast('Entry saved ✓ Checked parts were added to Parts');
+    else if(!partSyncResult.added && partSyncResult.skippedUnchecked && !partSyncResult.skippedDuplicate) showToast('Entry saved ✓ No parts were checked for the Parts tab');
+    else if(!partSyncResult.added && partSyncResult.skippedDuplicate && !partSyncResult.skippedUnchecked) showToast('Entry saved ✓ Checked part already exists in Parts');
+    else if(!partSyncResult.added) showToast('Entry saved ✓ No new checked parts were added to Parts');
+    else showToast(`Entry saved ✓ ${partSyncResult.added} checked part${partSyncResult.added!==1?'s':''} added to Parts`);
+  };
+
+  window.renderBackup = function(){
+    const d=getData();
+    const mi=getMi();
+    const tot=d.reduce((a,e)=>a+getEntryDisplayCost(e),0);
+    const sorted=[...d].sort((a,b)=>Number(b.mi||0)-Number(a.mi||0));
+    const last=sorted[0];
+    const photoCount=d.filter(e=>getPhoto(e.id)).length;
+    const partCount = getBasicPartsList().length;
+    const partPhotoCount = getBasicPartsList().filter(part=>getBasicPartPhoto(part.id)).length;
+    const scheduleOverrideCount = Object.keys(getScheduleOverrides()).length;
+    const countEl = document.getElementById('bkCount');
+    const miEl = document.getElementById('bkMi');
+    const totalEl = document.getElementById('bkTotal');
+    const lastEl = document.getElementById('bkLast');
+    if(countEl) countEl.textContent = `${d.length} entries · ${partCount} part${partCount!==1?'s':''} · ${scheduleOverrideCount} custom target${scheduleOverrideCount!==1?'s':''} · ${photoCount} service photo${photoCount!==1?'s':''} · ${partPhotoCount} part photo${partPhotoCount!==1?'s':''}`;
+    if(miEl) miEl.textContent = mi.toLocaleString()+' mi';
+    const oilResetEl = document.getElementById('oilAvgResetStatus'); if(oilResetEl) oilResetEl.textContent = describeOilAverageReset();
+    if(totalEl) totalEl.textContent = '$'+tot.toFixed(2);
+    if(last && lastEl){
+      const dt=new Date(last.date+'T00:00:00');
+      lastEl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' — ' + parseInt(last.mi).toLocaleString() + ' mi';
+    }
+    renderAppVersion();
+    setAppUpdateStatus(`Current installed source: APP ${APP_VERSION_LABEL}.`);
+    if(typeof checkForAppUpdate === 'function') checkForAppUpdate(false);
+    const healthEl = document.getElementById('bkHealth');
+    if(healthEl) healthEl.textContent = `backup v${UPGRADE_VERSION} · backup-safe · ${Object.keys(getVerificationOverrides()).length} verified edit${Object.keys(getVerificationOverrides()).length!==1?'s':''}`;
+    const storageEl = document.getElementById('bkStorage');
+    const kb = getLocalStorageUsageKb();
+    if(storageEl) storageEl.textContent = kb === null ? 'Unavailable' : `${kb.toLocaleString()} KB used`;
+    renderReminderStrategy();
+  };
+
+  window.exportData = function(){
+    const servicePhotos = {};
+    const entries = getData();
+    entries.forEach(e=>{
+      const p = getPhoto(e.id);
+      if(p) servicePhotos[e.id] = p;
+    });
+    const partPhotos = {};
+    const basicParts = getBasicPartsList();
+    basicParts.forEach(part=>{
+      const p = getBasicPartPhoto(part.id);
+      if(p) partPhotos[part.id] = p;
+    });
+    const payload={
+      version: UPGRADE_VERSION,
+      appVersion: APP_VERSION,
+      appBuild: APP_BUILD,
+      exported: new Date().toISOString(),
+      vin: VIN,
+      vehicle: `${VEHICLE_PROFILE.year} ${VEHICLE_PROFILE.make} ${VEHICLE_PROFILE.model} ${VEHICLE_PROFILE.trim}`.replace(/\s+/g,' ').trim(),
+      mileage: getMi(),
+      mileageHistory: getMiHistory(),
+      oilAverageResetAt: getOilAverageResetAt(),
+      averageServiceType: getAverageServiceType(),
+      scheduleOverrides: getScheduleOverrides(),
+      verificationOverrides: getVerificationOverrides(),
+      servicePartRequirements: getSavedServiceRequirementsMap(),
+      entries: entries,
+      basicParts: basicParts,
+      inventory: getInventory(),
+      masterParts: getMasterParts(),
+      photos: servicePhotos,
+      partPhotos: partPhotos
+    };
+    const photoCount = Object.keys(servicePhotos).length + Object.keys(partPhotos).length;
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const date=new Date().toISOString().split('T')[0];
+    a.href=url;
+    a.download='venza_backup_'+date+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`Backup saved ✓ — ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}`);
+  };
+
+  window.importData = function(input){
+    const file=input.files?.[0];
+    if(!file){return;}
+    if(!file.name.toLowerCase().endsWith('.json')){showToast('Please select a .json file');return;}
+    const reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        const parsed=JSON.parse(e.target.result);
+        const isLegacyArray = Array.isArray(parsed);
+        const data=isLegacyArray ? {version:0, vin:'', entries:parsed} : (parsed && typeof parsed === 'object' ? parsed : null);
+        if(!data){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+        const entries=Array.isArray(data.entries)?data.entries:null;
+        const mi=Number(data.mileage||0) || null;
+        const photos=(data.photos && typeof data.photos === 'object') ? data.photos : {};
+        const partPhotos=(data.partPhotos && typeof data.partPhotos === 'object') ? data.partPhotos : {};
+        const inventory=Array.isArray(data.inventory) ? data.inventory : [];
+        const masterParts=Array.isArray(data.masterParts) ? data.masterParts : [];
+        const basicParts=Array.isArray(data.basicParts) ? data.basicParts : normalizeBasicParts(inventory.map(item=>({
+          id:item.id,
+          name:item.name,
+          category:guessPartCategoryForService(item.serviceType),
+          serviceType:item.serviceType || '',
+          store:item.store,
+          partNum:item.partNum,
+          link:item.link,
+          unitCost:item.unitCost,
+          note:item.note || ''
+        })));
+        const oilAverageResetAt=data.oilAverageResetAt||'';
+        const averageServiceType=data.averageServiceType||'oil_avg';
+        const scheduleOverrides=(data.scheduleOverrides && typeof data.scheduleOverrides === 'object' && !Array.isArray(data.scheduleOverrides)) ? data.scheduleOverrides : {};
+        const verificationOverrides=(data.verificationOverrides && typeof data.verificationOverrides === 'object' && !Array.isArray(data.verificationOverrides)) ? data.verificationOverrides : {};
+        const servicePartRequirements=(data.servicePartRequirements && typeof data.servicePartRequirements === 'object' && !Array.isArray(data.servicePartRequirements)) ? data.servicePartRequirements : null;
+        const mileageHistory=Array.isArray(data.mileageHistory) ? normalizeMileageHistory(data.mileageHistory) : [];
+        const photoCount=Object.keys(photos).length + Object.keys(partPhotos).length;
+        const version = Number(data.version || 0);
+        const backupVin = String(data.vin || '').trim();
+        if(!entries){ showToast('❌ Invalid backup file format'); input.value=''; return; }
+        if(version > UPGRADE_VERSION){ showToast('This backup was created by a newer app version'); input.value=''; return; }
+        if(backupVin && backupVin !== VIN){
+          const proceedMismatch = confirm(`This backup VIN does not match this app.\n\nBackup: ${backupVin}\nThis app: ${VIN}\n\nRestore anyway?`);
+          if(!proceedMismatch){ input.value=''; return; }
+        }
+        if(!confirm(`Restore ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}?\n\nThis replaces all current data. Continue?`)){
+          input.value='';return;
+        }
+        clearStoredPhotos();
+        clearStoredPartPhotos();
+        save(entries);
+        saveBasicPartsList(basicParts);
+        saveInventory(inventory);
+        saveMasterParts(masterParts.length ? masterParts : DEFAULT_MASTER_PARTS);
+        if(oilAverageResetAt){ localStorage.setItem(OIL_AVG_RESET_KEY, oilAverageResetAt); } else { localStorage.removeItem(OIL_AVG_RESET_KEY); }
+        localStorage.setItem(AVG_SERVICE_TYPE_KEY, averageServiceType);
+        saveScheduleOverrides(scheduleOverrides);
+        saveVerificationOverrides(verificationOverrides);
+        if(servicePartRequirements) saveResolvedServiceRequirementsMap(servicePartRequirements); else clearSavedServiceRequirementsMap();
+        if(mileageHistory.length) saveMiHistory(mileageHistory); else localStorage.removeItem(MI_HISTORY_KEY);
+        if(mi&&mi>0)setMi(mi,{source:'manual',allowLower:true,skipHistory:!!mileageHistory.length});
+        else if(mileageHistory.length){
+          const restoredMileage = getLatestMileageHistoryCandidate();
+          if(restoredMileage){
+            setMi(restoredMileage.value,{source:restoredMileage.source,entryId:restoredMileage.entryId,allowLower:true,skipHistory:true});
+          }else{
+            recalcMileageFromEntries(entries);
+          }
+        }else recalcMileageFromEntries(entries);
+        Object.entries(photos).forEach(([id,imgData])=>{ try{ localStorage.setItem('vz_photo_'+id, imgData); }catch(err){} });
+        Object.entries(partPhotos).forEach(([id,imgData])=>{ try{ localStorage.setItem(BASIC_PART_PHOTO_PREFIX + id, imgData); }catch(err){} });
+        applyVerificationOverrides();
+        renderAll();
+        renderBackup();
+        input.value='';
+        showToast(`✓ Restored ${entries.length} entries + ${basicParts.length} parts + ${photoCount} photo${photoCount!==1?'s':''}!`);
+      }catch(err){
+        showToast('❌ Could not read backup file');
+        input.value='';
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  window.resetData = function(){
+    if(!confirm('Reset ALL data to factory defaults? This cannot be undone.\n\nExport a backup first if you want to keep your entries.')){return;}
+    clearStoredPhotos();
+    clearStoredPartPhotos();
+    save(DEFAULT);
+    saveBasicPartsList([]);
+    saveInventory(DEFAULT_INVENTORY);
+    saveMasterParts(DEFAULT_MASTER_PARTS);
+    localStorage.removeItem(OIL_AVG_RESET_KEY);
+    localStorage.removeItem(AVG_SERVICE_TYPE_KEY);
+    localStorage.removeItem(SCHEDULE_OVERRIDE_KEY);
+    localStorage.removeItem(BASIC_PARTS_KEY);
+    localStorage.removeItem(VERIFICATION_OVERRIDES_KEY);
+    localStorage.removeItem(MI_STATE_KEY);
+    localStorage.removeItem(MI_HISTORY_KEY);
+    setMi(FACTORY_MILEAGE,{source:'manual',allowLower:true});
+    renderAll();
+    renderBackup();
+    showToast('Reset to factory data ✓');
+  };
+
+  const baseResetEntryInventoryUses = window.resetEntryInventoryUses;
+  window.resetEntryInventoryUses = function(){
+    if(typeof baseResetEntryInventoryUses === 'function') baseResetEntryInventoryUses();
+    const costEl = document.getElementById('fCost');
+    if(costEl){ costEl.value = ''; delete costEl.dataset.userEdited; }
+  };
+
+
+  const BATTERY_MIGRATION_KEY = 'vz_migration_20260626_12v_battery_v1';
+  const BATTERY_ENTRY_ID = 2026062667820;
+  function cloneBatteryReplacementEntry(){
+    return {
+      id: BATTERY_ENTRY_ID,
+      date: '2026-06-26',
+      mi: 67820,
+      type: 'battery',
+      desc: '12V battery replaced — original battery removed; installed Toyota TrueStart Battery Group H5 (LN2) · Part #00544-H5061-540 · 84-month warranty. Receipt: subtotal $131.12, discount -$6.56, tax $15.04, shipping $0.00, core charge $11.00, grand total $150.60. Next proactive replacement target: Jun 26, 2031. Warranty through Jun 26, 2033.',
+      cost: 150.60,
+      shop: 'DIY · Toyota TrueStart / Toyota Parts',
+      link: '',
+      items: [{
+        name: 'Toyota TrueStart Battery, Group H5 (LN2) - 84 Month Warranty',
+        category: '12v_battery',
+        partNum: '00544-H5061-540',
+        store: 'Toyota Parts',
+        link: '',
+        price: 150.60,
+        qty: 1,
+        note: 'Receipt total includes discount, tax, and $11.00 core charge. Subtotal before discount/tax/core: $131.12.',
+        saveToParts: true
+      }],
+      inventoryUses: [],
+      builtin: true
+    };
+  }
+  function entryLooksLikeBatteryReplacement(entry){
+    const desc = String(entry.desc || '').toLowerCase();
+    return String(entry.type || '') === 'battery' && (Number(entry.mi) === 67820 || desc.includes('00544-h5061-540') || desc.includes('truestart'));
+  }
+  window.ensureBatteryReplacementRecord = function(){
+    let changed = false;
+    const d = getData();
+    if(!d.some(entryLooksLikeBatteryReplacement)){
+      d.push(cloneBatteryReplacementEntry());
+      save(d);
+      changed = true;
+    }
+    try{
+      const parts = getBasicPartsList();
+      const existsPart = parts.some(part=>normalizeKey(part.partNum || '') === normalizeKey('00544-H5061-540'));
+      if(!existsPart){
+        saveBasicPartsList([...parts, {
+          id: 'battery_20260626',
+          name: 'Toyota TrueStart Battery, Group H5 (LN2) - 84 Month Warranty',
+          category: '12v_battery',
+          serviceType: 'battery',
+          store: 'Toyota Parts',
+          link: '',
+          partNum: '00544-H5061-540',
+          unitCost: 150.60,
+          note: 'Installed Jun 26, 2026 at 67,820 mi. Receipt total includes discount, tax, and $11 core charge. Warranty 84 months; app replacement target 5 years.'
+        }]);
+        changed = true;
+      }
+    }catch(err){}
+    if(getMi() < 67820){
+      setMi(67820, {source:'entry', entryId:BATTERY_ENTRY_ID, allowLower:false});
+      changed = true;
+    }
+    try{ localStorage.setItem(BATTERY_MIGRATION_KEY, '1'); }catch(err){}
+    return changed;
+  };
+
+  const OIL_CHANGE_MIGRATION_KEY = 'vz_migration_20260712_oil_change_v2';
+  const OIL_CHANGE_ENTRY_ID = 2026071268187;
+  const OIL_CHANGE_FALLBACK_TOTAL = 34.54;
+
+  function getSavedOilChangeParts(){
+    let parts = [];
+    try{ parts = typeof getBasicPartsList === 'function' ? getBasicPartsList() : []; }catch(err){ parts = []; }
+    const score = (part, kind)=>{
+      const name = String(part.name||'').toLowerCase();
+      const store = String(part.store||'').toLowerCase();
+      const category = String(part.category||'');
+      const partNum = normalizeKey(part.partNum||'');
+      let value = Number(part.unitCost||0) > 0 ? 20 : 0;
+      if(kind === 'oil'){
+        if(category === 'engine_oil') value += 40;
+        if(name.includes('0w-16') || name.includes('0w16') || name.includes('motor oil') || name.includes('engine oil')) value += 35;
+        if(store.includes('amazon')) value += 60;
+      }else{
+        if(category === 'oil_filter') value += 40;
+        if(partNum === normalizeKey('90915-YZZN1')) value += 60;
+        if(name.includes('oil filter')) value += 25;
+        if(store.includes('toyota')) value += 50;
+      }
+      return value;
+    };
+    const pick = kind => parts
+      .filter(part=>score(part,kind) > 0)
+      .sort((a,b)=>score(b,kind)-score(a,kind))[0] || null;
+    const oil = pick('oil');
+    const filter = pick('filter');
+    const toItem = (part, fallback)=>({
+      name: part?.name || fallback.name,
+      category: part?.category || fallback.category,
+      partNum: part?.partNum || fallback.partNum,
+      store: part?.store || fallback.store,
+      link: safeUrl(part?.link || '') || '',
+      price: Number(part?.unitCost||0) || 0,
+      qty: 1,
+      note: Number(part?.unitCost||0) > 0 ? 'Price reused from the saved Parts tab.' : 'Saved source price was not available; service total uses the established app fallback.',
+      saveToParts: false
+    });
+    return [
+      toItem(oil, {name:'Mobil 1 SAE 0W-16 Full Synthetic Motor Oil', category:'engine_oil', partNum:'', store:'Amazon'}),
+      toItem(filter, {name:'Toyota OEM Oil Filter', category:'oil_filter', partNum:'90915-YZZN1', store:'Toyota dealership'})
+    ];
+  }
+
+  function getSavedOilChangeCostPackage(){
+    const items = getSavedOilChangeParts();
+    const savedTotal = items.reduce((sum,item)=>sum + (Number(item.price||0) * Math.max(1, Number(item.qty||1))), 0);
+    return {
+      items,
+      total: savedTotal > 0 ? Math.round(savedTotal * 100) / 100 : OIL_CHANGE_FALLBACK_TOTAL,
+      usedSavedPrices: savedTotal > 0
+    };
+  }
+
+  function applyLatestOilChangeCosts(entry){
+    const pkg = getSavedOilChangeCostPackage();
+    const currentCost = Number(entry.cost||0);
+    const currentItems = normalizeServiceEntryItems(entry.items);
+    const shouldFill = currentCost <= 0 || !currentItems.length;
+    if(!shouldFill) return false;
+    entry.cost = pkg.total;
+    entry.items = pkg.items;
+    entry.shop = 'DIY · Oil from Amazon · Filter from Toyota dealership';
+    entry.desc = 'DIY oil change completed — Mobil 1 SAE 0W-16 full synthetic engine oil purchased from Amazon + Toyota OEM oil filter 90915-YZZN1 purchased from Toyota dealership. Current mileage: 68,187. Next service target: 73,187 mi or Jan 12, 2027, whichever comes first.';
+    return true;
+  }
+
+  function cloneLatestOilChangeEntry(){
+    const entry = {
+      id: OIL_CHANGE_ENTRY_ID,
+      date: '2026-07-12',
+      mi: 68187,
+      type: 'oil',
+      desc: 'DIY oil change completed — Mobil 1 SAE 0W-16 full synthetic engine oil purchased from Amazon + Toyota OEM oil filter 90915-YZZN1 purchased from Toyota dealership. Current mileage: 68,187. Next service target: 73,187 mi or Jan 12, 2027, whichever comes first.',
+      cost: 0,
+      shop: 'DIY · Oil from Amazon · Filter from Toyota dealership',
+      link: '',
+      items: [],
+      inventoryUses: [],
+      builtin: true
+    };
+    applyLatestOilChangeCosts(entry);
+    return entry;
+  }
+  function entryLooksLikeLatestOilChange(entry){
+    return String(entry.type || '') === 'oil' && (String(entry.id) === String(OIL_CHANGE_ENTRY_ID) || (String(entry.date || '') === '2026-07-12' && Number(entry.mi) === 68187));
+  }
+  window.ensureLatestOilChangeRecord = function(){
+    let changed = false;
+    const d = getData();
+    let entry = d.find(entryLooksLikeLatestOilChange);
+    if(!entry){
+      entry = cloneLatestOilChangeEntry();
+      d.push(entry);
+      changed = true;
+    }else if(applyLatestOilChangeCosts(entry)){
+      changed = true;
+    }
+    if(changed) save(d);
+    if(getMi() < 68187){
+      setMi(68187, {source:'entry', entryId:OIL_CHANGE_ENTRY_ID, allowLower:false});
+      changed = true;
+    }
+    try{ localStorage.setItem(OIL_CHANGE_MIGRATION_KEY, '1'); }catch(err){}
+    return changed;
+  };
+
+  const SPARK_PLUG_MIGRATION_KEY = 'vz_migration_20260724_spark_plugs_v2';
+  const SPARK_PLUG_ENTRY_ID = 2026072468484;
+  const SPARK_PLUG_FALLBACK_TOTAL = 0;
+
+  function getSavedSparkPlugCostPackage(){
+    let parts = [];
+    try{ parts = typeof getBasicPartsList === 'function' ? getBasicPartsList() : []; }catch(err){ parts = []; }
+    const score = part => {
+      const name = String(part.name||'').toLowerCase();
+      const store = String(part.store||'').toLowerCase();
+      const note = String(part.note||'').toLowerCase();
+      const category = String(part.category||'');
+      const partNum = normalizeKey(part.partNum||'');
+      let value = Number(part.unitCost||0) > 0 ? 20 : 0;
+      if(category === 'spark_plugs') value += 60;
+      if(partNum === normalizeKey('90919-01289')) value += 70;
+      if(partNum === normalizeKey('FC16HR-Q8')) value += 70;
+      if(name.includes('spark plug') || name.includes('spark plugs')) value += 45;
+      if(name.includes('90919') || name.includes('fc16hr')) value += 30;
+      if(store.includes('toyota') || store.includes('denso') || store.includes('amazon')) value += 10;
+      if(note.includes('spark')) value += 10;
+      return value;
+    };
+    const part = parts.filter(part=>score(part) > 0).sort((a,b)=>score(b)-score(a))[0] || null;
+    const unitPrice = Number(part?.unitCost||0) || 0;
+    const partText = [part?.name, part?.note].filter(Boolean).join(' ').toLowerCase();
+    const looksLikeSet = /set|pack|qty\s*4|quantity\s*4|4\s*(pc|pcs|piece|pieces|plug|plugs)|x\s*4/.test(partText) || unitPrice >= 60;
+    const qty = unitPrice > 0 && looksLikeSet ? 1 : 4;
+    const items = [{
+      name: part?.name || 'Spark Plugs — Toyota 90919-01289 / Denso FC16HR-Q8',
+      category: part?.category || 'spark_plugs',
+      partNum: part?.partNum || '90919-01289',
+      store: part?.store || '',
+      link: safeUrl(part?.link || '') || '',
+      price: unitPrice,
+      qty: qty,
+      note: unitPrice > 0
+        ? (looksLikeSet ? 'Price reused from the saved Parts tab as a set/receipt total.' : 'Price reused from the saved Parts tab as per-plug cost; qty 4.')
+        : 'Saved spark plug price was not available; service total left at $0.',
+      saveToParts: true
+    }];
+    const savedTotal = items.reduce((sum,item)=>sum + (Number(item.price||0) * Math.max(1, Number(item.qty||1))), 0);
+    return {
+      items,
+      total: savedTotal > 0 ? Math.round(savedTotal * 100) / 100 : SPARK_PLUG_FALLBACK_TOTAL,
+      usedSavedPrices: savedTotal > 0
+    };
+  }
+
+  function applyLatestSparkPlugCosts(entry){
+    const pkg = getSavedSparkPlugCostPackage();
+    const currentCost = Number(entry.cost||0);
+    const currentItems = normalizeServiceEntryItems(entry.items);
+    const shouldFill = currentCost <= 0 || !currentItems.length;
+    const desiredDesc = 'Spark plugs replaced DIY — Toyota 90919-01289 / Denso FC16HR-Q8 equivalent, qty 4. Installed at 68,484 mi. Torque target: 15 ft-lbs. Next spark plug target: 128,484 mi or Jul 24, 2032, whichever comes first.';
+    let changed = false;
+    if(entry.desc !== desiredDesc){ entry.desc = desiredDesc; changed = true; }
+    if(entry.shop !== 'DIY'){ entry.shop = 'DIY'; changed = true; }
+    if(shouldFill){
+      entry.cost = pkg.total;
+      entry.items = pkg.items;
+      changed = true;
+    }
+    return changed;
+  }
+
+  function cloneLatestSparkPlugEntry(){
+    const entry = {
+      id: SPARK_PLUG_ENTRY_ID,
+      date: '2026-07-24',
+      mi: 68484,
+      type: 'plugs',
+      desc: 'Spark plugs replaced DIY — Toyota 90919-01289 / Denso FC16HR-Q8 equivalent, qty 4. Installed at 68,484 mi. Torque target: 15 ft-lbs. Next spark plug target: 128,484 mi or Jul 24, 2032, whichever comes first.',
+      cost: 0,
+      shop: 'DIY',
+      link: '',
+      items: [],
+      inventoryUses: [],
+      builtin: true
+    };
+    applyLatestSparkPlugCosts(entry);
+    return entry;
+  }
+
+  function entryLooksLikeLatestSparkPlugChange(entry){
+    return String(entry.type || '') === 'plugs' && (String(entry.id) === String(SPARK_PLUG_ENTRY_ID) || (String(entry.date || '') === '2026-07-24' && Number(entry.mi) === 68484));
+  }
+
+  window.ensureLatestSparkPlugRecord = function(){
+    let changed = false;
+    const d = getData();
+    let entry = d.find(entryLooksLikeLatestSparkPlugChange);
+    if(!entry){
+      entry = cloneLatestSparkPlugEntry();
+      d.push(entry);
+      changed = true;
+    }else if(applyLatestSparkPlugCosts(entry)){
+      changed = true;
+    }
+    if(changed) save(d);
+    try{
+      const parts = getBasicPartsList();
+      const existsPart = parts.some(part=>String(part.category||'') === 'spark_plugs' && (normalizeKey(part.partNum||'') === normalizeKey('90919-01289') || normalizeKey(part.partNum||'') === normalizeKey('FC16HR-Q8') || String(part.name||'').toLowerCase().includes('spark plug')));
+      if(!existsPart){
+        saveBasicPartsList([...parts, {
+          id: 'spark_plugs_20260724',
+          name: 'Spark Plugs — Toyota 90919-01289 / Denso FC16HR-Q8',
+          category: 'spark_plugs',
+          serviceType: 'plugs',
+          store: '',
+          link: '',
+          partNum: '90919-01289',
+          unitCost: 0,
+          note: 'Installed Jul 24, 2026 at 68,484 mi. Qty 4. Torque target 15 ft-lbs. Custom replacement interval: 60,000 mi / 72 months.'
+        }]);
+        changed = true;
+      }else{
+        const updatedParts = parts.map(part=>{
+          const isSparkPart = String(part.category||'') === 'spark_plugs' && (normalizeKey(part.partNum||'') === normalizeKey('90919-01289') || normalizeKey(part.partNum||'') === normalizeKey('FC16HR-Q8') || String(part.name||'').toLowerCase().includes('spark plug'));
+          if(!isSparkPart) return part;
+          const updatedNote = 'Installed Jul 24, 2026 at 68,484 mi. Qty 4. Torque target 15 ft-lbs. Custom replacement interval: 60,000 mi / 72 months.';
+          return String(part.note||'') === updatedNote ? part : {...part, note:updatedNote};
+        });
+        if(JSON.stringify(updatedParts) !== JSON.stringify(parts)){
+          saveBasicPartsList(updatedParts);
+          changed = true;
+        }
+      }
+    }catch(err){}
+    if(getMi() < 68484){
+      setMi(68484, {source:'entry', entryId:SPARK_PLUG_ENTRY_ID, allowLower:false});
+      changed = true;
+    }
+    try{ localStorage.setItem(SPARK_PLUG_MIGRATION_KEY, '1'); }catch(err){}
+    return changed;
+  };
+
+
+  window.addEventListener('load', function(){
+    const batteryRecordChanged = typeof ensureBatteryReplacementRecord === 'function' ? ensureBatteryReplacementRecord() : false;
+    const oilRecordChanged = typeof ensureLatestOilChangeRecord === 'function' ? ensureLatestOilChangeRecord() : false;
+    const sparkPlugRecordChanged = typeof ensureLatestSparkPlugRecord === 'function' ? ensureLatestSparkPlugRecord() : false;
+    if(batteryRecordChanged || oilRecordChanged || sparkPlugRecordChanged) renderAll();
+    const costEl = document.getElementById('fCost');
+    if(costEl && !costEl.dataset.vzBound){
+      costEl.dataset.vzBound = '1';
+      costEl.addEventListener('input', function(){ this.dataset.userEdited = '1'; });
+    }
+    renderDashboardSmartSummary();
+    renderBackup();
+    renderAppVersion();
+    showAppUpdatedNotice();
+    if(typeof checkForAppUpdate === 'function') setTimeout(()=>checkForAppUpdate(false), 1200);
+  });
+})();
