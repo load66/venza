@@ -1,0 +1,28 @@
+[
+  {
+    "version": "1.5.4",
+    "build": "2026.07.24.3",
+    "updated": "Jul 24, 2026",
+    "changes": [
+      "Restructured Venza Garage into separate CSS and JS files for faster future updates.",
+      "Added version.json for update checks.",
+      "Added separate update helper for cache clearing and update reloads.",
+      "Spark plug interval remains 60,000 miles / 72 months with 15 ft-lbs torque note."
+    ]
+  },
+  {
+    "version": "1.5.3",
+    "updated": "Jul 24, 2026",
+    "changes": [
+      "Spark plugs set to 60,000-mile interval.",
+      "Spark plug torque note changed to 15 ft-lbs."
+    ]
+  },
+  {
+    "version": "1.5.2",
+    "updated": "Jul 24, 2026",
+    "changes": [
+      "Added spark plug service entry at 68,484 miles."
+    ]
+  }
+]

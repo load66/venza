@@ -1,0 +1,16 @@
+{
+  "version": "1.5.4",
+  "build": "2026.07.24.3",
+  "updated": "Jul 24, 2026",
+  "entrypoints": [
+    "index.html",
+    "venza",
+    "venza.html"
+  ],
+  "notes": [
+    "Restructured Venza Garage into separate CSS and JS files for faster future updates.",
+    "Added version.json for update checks.",
+    "Added separate update helper for cache clearing and update reloads.",
+    "Spark plug interval remains 60,000 miles / 72 months with 15 ft-lbs torque note."
+  ]
+}
