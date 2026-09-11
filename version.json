@@ -1,15 +1,15 @@
 {
-  "version": "1.5.5",
-  "build": "2026.09.11.1",
+  "version": "1.5.6",
+  "build": "2026.09.11.2",
   "updated": "Sep 11, 2026",
   "entrypoints": [
     "index.html",
     "venza.html"
   ],
   "notes": [
-    "Logged new Goodyear Assurance MaxLife 2 tire purchase and installation package from Gmail receipt.",
-    "Added Sam's Club order #10455235542, item #984273957, tire size 225/60R18 100V, qty 4, paid total $696.51, and rebate claim #ULSFX4NZRZ.",
-    "New tire install now counts as the tire-rotation baseline for the 5,000-mile / 6-month rotation countdown.",
-    "Added a small runtime patch loader so future updates can be delivered with smaller files."
+    "Corrected Goodyear tire install odometer from the Sam's Club paper service sheet to 69,921 miles.",
+    "Set next balance + rotate target to 74,921 miles or Mar 8, 2027, whichever comes first.",
+    "Added receipt details: tire pressure 33 PSI all around, tread depth 12/32 all around, TPMS relearn complete, vehicle stability stable, wiper check good, and lug torque recorded 76 ft-lbs.",
+    "Kept Sam's Club paid total at $696.51 and Goodyear rebate claim #ULSFX4NZRZ."
   ]
 }
