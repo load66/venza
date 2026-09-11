@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.5.6",
+    "build": "2026.09.11.2",
+    "updated": "Sep 11, 2026",
+    "changes": [
+      "Corrected Goodyear tire install odometer from the Sam's Club paper service sheet to 69,921 miles.",
+      "Set next balance + rotate target to 74,921 miles or Mar 8, 2027, whichever comes first.",
+      "Added receipt details: tire pressure 33 PSI all around, tread depth 12/32 all around, TPMS relearn complete, vehicle stability stable, wiper check good, and lug torque recorded 76 ft-lbs.",
+      "Kept Sam's Club paid total at $696.51 and Goodyear rebate claim #ULSFX4NZRZ."
+    ]
+  },
+  {
     "version": "1.5.5",
     "build": "2026.09.11.1",
     "updated": "Sep 11, 2026",
