@@ -1,12 +1,13 @@
 /* Venza Garage update helper — separate from main app for faster future fixes. */
+/* Runtime patch loader added for small future updates. */
 (function(){
   const VERSION_URL = './version.json';
 
   function readCurrentVersion(){
-    try{ return typeof APP_VERSION !== 'undefined' ? APP_VERSION : '0.0.0'; }catch(err){ return '0.0.0'; }
+    try{ return window.VENZA_RUNTIME_VERSION || (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '0.0.0'); }catch(err){ return '0.0.0'; }
   }
   function readCurrentBuild(){
-    try{ return typeof APP_BUILD !== 'undefined' ? APP_BUILD : ''; }catch(err){ return ''; }
+    try{ return window.VENZA_RUNTIME_BUILD || (typeof APP_BUILD !== 'undefined' ? APP_BUILD : ''); }catch(err){ return ''; }
   }
   function compareVersions(a,b){
     const pa = String(a||'0').split('.').map(n=>parseInt(n,10)||0);
@@ -80,4 +81,39 @@
       return false;
     }
   };
+
+  const PATCH_SCRIPTS = [
+    './js/updates/tires-20260908.js?v=1.5.5'
+  ];
+  const PATCH_LOADER_KEY = '__venzaPatchLoaderLoaded';
+  function loadScriptOnce(src){
+    return new Promise(resolve=>{
+      try{
+        const url = new URL(src, window.location.href).toString();
+        if(document.querySelector(`script[data-venza-patch="${url}"]`)) return resolve(true);
+        const el = document.createElement('script');
+        el.src = url;
+        el.async = false;
+        el.dataset.venzaPatch = url;
+        el.onload = ()=>resolve(true);
+        el.onerror = ()=>resolve(false);
+        document.head.appendChild(el);
+      }catch(err){ resolve(false); }
+    });
+  }
+  window.loadVenzaPatchScripts = async function(){
+    if(window[PATCH_LOADER_KEY]) return true;
+    window[PATCH_LOADER_KEY] = true;
+    for(const src of PATCH_SCRIPTS){ await loadScriptOnce(src); }
+    try{
+      if(typeof window.renderAppVersion === 'function') window.renderAppVersion();
+      if(typeof window.renderAll === 'function') window.renderAll();
+      if(typeof window.renderBackup === 'function') window.renderBackup();
+    }catch(err){}
+    return true;
+  };
+  const bootPatches = ()=>window.loadVenzaPatchScripts().then(()=>setTimeout(()=>window.checkForAppUpdate(false), 300));
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootPatches, {once:true});
+  else bootPatches();
+
 })();
