@@ -84,7 +84,8 @@
 
   const PATCH_SCRIPTS = [
     './js/updates/tires-20260908.js?v=1.5.5',
-    './js/updates/tires-20260908-odo.js?v=1.5.6'
+    './js/updates/tires-20260908-odo.js?v=1.5.6',
+    './js/updates/average-tires-20260911.js?v=1.5.7'
   ];
   const PATCH_LOADER_KEY = '__venzaPatchLoaderLoaded';
   function loadScriptOnce(src){
