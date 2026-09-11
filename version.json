@@ -1,16 +1,15 @@
 {
-  "version": "1.5.4",
-  "build": "2026.07.24.3",
-  "updated": "Jul 24, 2026",
+  "version": "1.5.5",
+  "build": "2026.09.11.1",
+  "updated": "Sep 11, 2026",
   "entrypoints": [
     "index.html",
-    "venza",
     "venza.html"
   ],
   "notes": [
-    "Restructured Venza Garage into separate CSS and JS files for faster future updates.",
-    "Added version.json for update checks.",
-    "Added separate update helper for cache clearing and update reloads.",
-    "Spark plug interval remains 60,000 miles / 72 months with 15 ft-lbs torque note."
+    "Logged new Goodyear Assurance MaxLife 2 tire purchase and installation package from Gmail receipt.",
+    "Added Sam's Club order #10455235542, item #984273957, tire size 225/60R18 100V, qty 4, paid total $696.51, and rebate claim #ULSFX4NZRZ.",
+    "New tire install now counts as the tire-rotation baseline for the 5,000-mile / 6-month rotation countdown.",
+    "Added a small runtime patch loader so future updates can be delivered with smaller files."
   ]
 }
