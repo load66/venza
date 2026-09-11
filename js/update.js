@@ -83,7 +83,8 @@
   };
 
   const PATCH_SCRIPTS = [
-    './js/updates/tires-20260908.js?v=1.5.5'
+    './js/updates/tires-20260908.js?v=1.5.5',
+    './js/updates/tires-20260908-odo.js?v=1.5.6'
   ];
   const PATCH_LOADER_KEY = '__venzaPatchLoaderLoaded';
   function loadScriptOnce(src){
