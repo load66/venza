@@ -24,7 +24,7 @@
   const stamp = Date.now();
   const status = document.getElementById('bootStatus');
   try{
-    let remote = {version:'latest',build:String(stamp),updated:''};
+    let remote = {version:'latest',build:String(stamp),updated:'',patches:[]};
     try{
       const vr = await fetch('./version.json?cache=' + stamp, {cache:'no-store'});
       if(vr.ok) remote = Object.assign(remote, await vr.json());
@@ -42,6 +42,13 @@
     if(remote.version){
       html = html.replace(/APP v[0-9.]+ · [A-Za-z]{3} \d{1,2}, \d{4}/g, 'APP v' + remote.version + (remote.updated ? ' · ' + remote.updated : ''));
       html = html.replace(/Current installed source: APP v[0-9.]+\./g, 'Current installed source: APP v' + remote.version + '.');
+    }
+    if(Array.isArray(remote.patches) && remote.patches.length){
+      const tags = remote.patches.map(src=>{
+        const sep = String(src).includes('?') ? '&' : '?';
+        return '<script src="' + String(src) + sep + 'build=' + assetTag + '"><\/script>';
+      }).join('\n');
+      html = html.replace('</body>', tags + '\n</body>');
     }
     document.open();
     document.write(html);
