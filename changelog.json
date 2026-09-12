@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.5.8",
+    "build": "2026.09.12.1",
+    "updated": "Sep 12, 2026",
+    "changes": [
+      "Added exact Toyota oil-filter purchase details from Frank Fletcher Toyota order #T24076003003709.",
+      "Added exact Amazon Mobil 1 0W-16 purchase details from order #114-3966183-9088235.",
+      "Updated the Jul 12, 2026 DIY oil + filter service at 68,187 miles to $23.32.",
+      "Parts inventory now starts with one remaining 5-qt Mobil 1 bottle and one remaining Toyota 90915-YZZN1 filter.",
+      "Added dynamic patch loading from version.json for easier future updates."
+    ]
+  },
+  {
     "version": "1.5.7",
     "build": "2026.09.11.3",
     "updated": "Sep 11, 2026",
