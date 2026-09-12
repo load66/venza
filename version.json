@@ -1,14 +1,19 @@
 {
-  "version": "1.5.7",
-  "build": "2026.09.11.3",
-  "updated": "Sep 11, 2026",
+  "version": "1.5.8",
+  "build": "2026.09.12.1",
+  "updated": "Sep 12, 2026",
   "entrypoints": [
     "index.html",
     "venza.html"
   ],
+  "patches": [
+    "./js/updates/oil-filter-20260712.js"
+  ],
   "notes": [
-    "Added Average Service Cost dropdown options for New Tires / Installation and All Tire Services.",
-    "New tire installation average now counts the Goodyear/Sam's Club tire service total of $696.51.",
-    "Kept tire rotation average separate from new tire installation average so routine rotations do not distort tire-purchase cost."
+    "Added the exact Toyota oil-filter purchase from Frank Fletcher Toyota to Parts and inventory.",
+    "Added the exact Amazon Mobil 1 0W-16 purchase to Parts and inventory.",
+    "Updated the Jul 12, 2026 DIY oil + filter service at 68,187 miles to $23.32 based on one $18.36 oil bottle plus one $4.96 filter.",
+    "Remaining inventory now starts at one 5-qt Mobil 1 bottle and one Toyota 90915-YZZN1 filter.",
+    "Root loader now reads patch files from version.json so future small updates do not require editing the large app file."
   ]
 }
