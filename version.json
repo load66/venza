@@ -1,19 +1,23 @@
 {
-  "version": "1.5.8",
-  "build": "2026.09.12.1",
-  "updated": "Sep 12, 2026",
+  "version": "1.5.9",
+  "build": "2026.09.15.1",
+  "updated": "Sep 15, 2026",
   "entrypoints": [
     "index.html",
     "venza.html"
   ],
   "patches": [
-    "./js/updates/oil-filter-20260712.js"
+    "./js/updates/tires-20260908.js",
+    "./js/updates/tires-20260908-odo.js",
+    "./js/updates/average-tires-20260911.js",
+    "./js/updates/oil-filter-20260712.js",
+    "./js/updates/rockauto-stock-20260915.js"
   ],
   "notes": [
-    "Added the exact Toyota oil-filter purchase from Frank Fletcher Toyota to Parts and inventory.",
-    "Added the exact Amazon Mobil 1 0W-16 purchase to Parts and inventory.",
-    "Updated the Jul 12, 2026 DIY oil + filter service at 68,187 miles to $23.32 based on one $18.36 oil bottle plus one $4.96 filter.",
-    "Remaining inventory now starts at one 5-qt Mobil 1 bottle and one Toyota 90915-YZZN1 filter.",
-    "Root loader now reads patch files from version.json so future small updates do not require editing the large app file."
+    "Added RockAuto order #360079453 as stocked/incoming parts inventory.",
+    "Added 2 Bosch 3311 oil filters, 3 Bosch 6092C cabin air filters, and 3 MAHLE/CLEVITE LX5472 engine air filters.",
+    "Recorded merchandise $46.69, discount -$2.33, shipping $8.99, tax $4.05, and order total $57.40.",
+    "Allocated the full landed order cost across the stocked parts so future service-cost calculations include discount, shipping, and tax.",
+    "Centralized all runtime patches in version.json so updates load in the correct order."
   ]
 }
