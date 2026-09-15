@@ -1,6 +1,6 @@
 {
-  "version": "1.6.1",
-  "build": "2026.09.15.3",
+  "version": "1.6.2",
+  "build": "2026.09.15.4",
   "updated": "Sep 15, 2026",
   "entrypoints": [
     "index.html",
@@ -13,12 +13,14 @@
     "./js/updates/oil-filter-20260712.js",
     "./js/updates/rockauto-stock-20260915.js",
     "./js/updates/stock-cost-ui-20260915.js",
-    "./js/updates/spark-plug-stock-fix-20260915.js"
+    "./js/updates/spark-plug-stock-fix-20260915.js",
+    "./js/updates/restock-source-ui-20260915.js"
   ],
   "notes": [
-    "Fixed spark plugs installed Jul 24, 2026 at 68,484 miles so they no longer appear as Stock on Hand.",
-    "The completed spark plug service remains in maintenance history; only unused physical parts belong in Stock on Hand.",
-    "Spark plug reference/part information can remain in the Parts library without being counted as available inventory.",
-    "Future spark plug purchases can still be added to inventory normally after this one-time cleanup."
+    "Stock on Hand now clearly shows where each part was purchased.",
+    "Purchase order/date references are shown when they are available in the saved part record.",
+    "Parts with a saved purchase URL now include a Restock button that opens the original source.",
+    "Existing sources include Amazon for Mobil 1, Frank Fletcher Toyota for the OEM filter, and RockAuto for the Bosch/MAHLE stock.",
+    "Purchase source remains attached to the part when it is later consumed in a maintenance service."
   ]
 }
