@@ -1,5 +1,5 @@
 /* Venza Garage update helper — separate from main app for faster future fixes. */
-/* Runtime patch loader added for small future updates. */
+/* Runtime patches are now injected by the root loader from version.json. */
 (function(){
   const VERSION_URL = './version.json';
 
@@ -36,7 +36,7 @@
   window.forceAppUpdate = async function(){
     const currentVersion = readCurrentVersion();
     const currentBuild = readCurrentBuild();
-    status(`Clearing cache and loading latest Venza app...`);
+    status('Clearing cache and loading latest Venza app...');
     try{
       if('caches' in window){
         const names = await caches.keys();
@@ -82,11 +82,7 @@
     }
   };
 
-  const PATCH_SCRIPTS = [
-    './js/updates/tires-20260908.js?v=1.5.5',
-    './js/updates/tires-20260908-odo.js?v=1.5.6',
-    './js/updates/average-tires-20260911.js?v=1.5.7'
-  ];
+  const PATCH_SCRIPTS = [];
   const PATCH_LOADER_KEY = '__venzaPatchLoaderLoaded';
   function loadScriptOnce(src){
     return new Promise(resolve=>{
