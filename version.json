@@ -1,6 +1,6 @@
 {
-  "version": "1.6.2",
-  "build": "2026.09.15.4",
+  "version": "1.6.3",
+  "build": "2026.09.15.5",
   "updated": "Sep 15, 2026",
   "entrypoints": [
     "index.html",
@@ -14,13 +14,12 @@
     "./js/updates/rockauto-stock-20260915.js",
     "./js/updates/stock-cost-ui-20260915.js",
     "./js/updates/spark-plug-stock-fix-20260915.js",
-    "./js/updates/restock-source-ui-20260915.js"
+    "./js/updates/restock-source-ui-20260915.js",
+    "./js/updates/toyota-filter-restock-link-20260915.js"
   ],
   "notes": [
-    "Stock on Hand now clearly shows where each part was purchased.",
-    "Purchase order/date references are shown when they are available in the saved part record.",
-    "Parts with a saved purchase URL now include a Restock button that opens the original source.",
-    "Existing sources include Amazon for Mobil 1, Frank Fletcher Toyota for the OEM filter, and RockAuto for the Bosch/MAHLE stock.",
-    "Purchase source remains attached to the part when it is later consumed in a maintenance service."
+    "Changed the Toyota 90915-YZZN1 oil-filter restock link to the exact Frank Fletcher Toyota product page.",
+    "The exact link is now applied to Stock on Hand, Basic Parts, master Parts sources, and matching maintenance-history item records.",
+    "Restock button for the Toyota filter now opens the exact product listing instead of the dealer home page."
   ]
 }
