@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.5.9",
+    "build": "2026.09.15.1",
+    "updated": "Sep 15, 2026",
+    "changes": [
+      "Added RockAuto order #360079453 to Parts/inventory.",
+      "Added 2 Bosch 3311 oil filters, 3 Bosch 6092C cabin air filters, and 3 MAHLE/CLEVITE LX5472 engine air filters.",
+      "Recorded merchandise $46.69, discount -$2.33, shipping $8.99, tax $4.05, and order total $57.40.",
+      "Allocated the complete landed order cost across the stocked parts for future service-cost tracking.",
+      "Moved runtime patch ordering to version.json so older patches no longer overwrite the newest app version."
+    ]
+  },
+  {
     "version": "1.5.8",
     "build": "2026.09.12.1",
     "updated": "Sep 12, 2026",
