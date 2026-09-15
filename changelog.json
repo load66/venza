@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.6.3",
+    "build": "2026.09.15.5",
+    "updated": "Sep 15, 2026",
+    "changes": [
+      "Changed Toyota oil filter 90915-YZZN1 to the exact Frank Fletcher Toyota product-page restock link.",
+      "Updated the link across Stock on Hand, Basic Parts, master Parts sources, and matching service-history item records.",
+      "Toyota filter Restock now opens the exact product listing instead of the dealer home page."
+    ]
+  },
+  {
     "version": "1.6.2",
     "build": "2026.09.15.4",
     "updated": "Sep 15, 2026",
