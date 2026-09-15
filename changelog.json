@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.6.0",
+    "build": "2026.09.15.2",
+    "updated": "Sep 15, 2026",
+    "changes": [
+      "Added a visible Stock on Hand section to the Parts tab.",
+      "Each stocked part now shows quantity on hand, cost per part, and total stock value.",
+      "RockAuto stock uses landed per-unit cost so shipping, tax, and discount are included.",
+      "Purchase inventory remains separate from maintenance history until the part is actually installed.",
+      "Documented future install workflow: log service at install date/mileage, use the stored part cost, and reduce stock quantity."
+    ]
+  },
+  {
     "version": "1.5.9",
     "build": "2026.09.15.1",
     "updated": "Sep 15, 2026",
