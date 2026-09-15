@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.6.2",
+    "build": "2026.09.15.4",
+    "updated": "Sep 15, 2026",
+    "changes": [
+      "Stock on Hand now clearly shows where each part was purchased.",
+      "Shows saved order/date references when available.",
+      "Added a Restock button for parts that have a saved purchase URL.",
+      "Restock sources currently include Amazon, Frank Fletcher Toyota, and RockAuto where applicable.",
+      "Purchase source stays associated with the part for future maintenance-cost records."
+    ]
+  },
+  {
     "version": "1.6.1",
     "build": "2026.09.15.3",
     "updated": "Sep 15, 2026",
