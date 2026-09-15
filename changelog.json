@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.6.1",
+    "build": "2026.09.15.3",
+    "updated": "Sep 15, 2026",
+    "changes": [
+      "Removed the spark plugs installed Jul 24, 2026 at 68,484 miles from Stock on Hand.",
+      "Kept the completed spark plug replacement in maintenance history.",
+      "Stock on Hand now represents only unused physical inventory.",
+      "Future spark plug purchases can still be stocked normally after this one-time cleanup."
+    ]
+  },
+  {
     "version": "1.6.0",
     "build": "2026.09.15.2",
     "updated": "Sep 15, 2026",
