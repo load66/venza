@@ -1,6 +1,6 @@
 {
-  "version": "1.6.0",
-  "build": "2026.09.15.2",
+  "version": "1.6.1",
+  "build": "2026.09.15.3",
   "updated": "Sep 15, 2026",
   "entrypoints": [
     "index.html",
@@ -12,13 +12,13 @@
     "./js/updates/average-tires-20260911.js",
     "./js/updates/oil-filter-20260712.js",
     "./js/updates/rockauto-stock-20260915.js",
-    "./js/updates/stock-cost-ui-20260915.js"
+    "./js/updates/stock-cost-ui-20260915.js",
+    "./js/updates/spark-plug-stock-fix-20260915.js"
   ],
   "notes": [
-    "Added a visible Stock on Hand section in the Parts tab.",
-    "Each stocked part now shows quantity on hand, true cost per part, and total stock value.",
-    "RockAuto parts show landed per-unit cost so shipping, tax, and discount are included in future service cost.",
-    "Purchase inventory stays separate from maintenance history until the part is actually installed.",
-    "Future install workflow is documented: log the service at the install date/mileage, apply the stored part cost, then reduce stock quantity."
+    "Fixed spark plugs installed Jul 24, 2026 at 68,484 miles so they no longer appear as Stock on Hand.",
+    "The completed spark plug service remains in maintenance history; only unused physical parts belong in Stock on Hand.",
+    "Spark plug reference/part information can remain in the Parts library without being counted as available inventory.",
+    "Future spark plug purchases can still be added to inventory normally after this one-time cleanup."
   ]
 }
