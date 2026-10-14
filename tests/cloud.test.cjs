@@ -6,7 +6,7 @@ const {webcrypto}=require('node:crypto');
 function phone(server,seed={},connected=true){
   class Storage{constructor(){this.data=new Map(Object.entries(seed));}get length(){return this.data.size;}key(i){return [...this.data.keys()][i];}getItem(k){return this.data.get(k)??null;}setItem(k,v){this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}clear(){this.data.clear();}}
   const localStorage=new Storage(),elements=new Map();let offline=false;
-  const context={Storage,localStorage,crypto:webcrypto,TextEncoder,AbortController,console,setTimeout:()=>1,clearTimeout:()=>{},addEventListener:()=>{},confirm:()=>true,document:{readyState:'complete',addEventListener:()=>{},getElementById:id=>{if(!elements.has(id))elements.set(id,{});return elements.get(id);}},VenzaAuth:{connected:()=>connected,token:async()=>'synthetic-token'},location:{reload:()=>{}},fetch:async(url,options)=>{
+  const context={Storage,localStorage,crypto:webcrypto,TextEncoder,AbortController,console,setTimeout:()=>1,clearTimeout:()=>{},addEventListener:()=>{},confirm:()=>true,document:{readyState:'complete',addEventListener:()=>{},getElementById:id=>{if(!elements.has(id))elements.set(id,{dataset:{},setAttribute:()=>{}});return elements.get(id);}},VenzaAuth:{connected:()=>connected,token:async()=>'synthetic-token'},location:{reload:()=>{}},fetch:async(url,options)=>{
     if(offline)throw Error('offline');
     if(options.method==='GET')return {ok:true,json:async()=>server.state||{exists:false,revision:null}};
     const p=JSON.parse(options.body),old=server.state;

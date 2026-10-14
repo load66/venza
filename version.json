@@ -1,6 +1,6 @@
 {
-  "version": "1.7.0",
-  "build": "2026.10.14.1",
+  "version": "1.8.0",
+  "build": "2026.10.14.2",
   "updated": "Oct 14, 2026",
   "entrypoints": [
     "index.html",
@@ -19,8 +19,9 @@
     "./js/updates/cloud-version-20261014.js"
   ],
   "notes": [
-    "Automatic verified R2 cloud saves using the existing Trading Journal backend and sign-in.",
-    "Fresh devices load cloud records before app initialization. Conflicting devices require a choice.",
-    "Compact Home, History, Schedule and Parts navigation, with reference and settings in More."
+    "Complete midnight navy redesign aligned with Bonus Tracker, with compact mobile bottom navigation.",
+    "Cloud sign-in moves to Settings; Home shows a compact connection and save-status indicator.",
+    "New service-history search, guide search, recent-maintenance cards, and collapsible reference sections.",
+    "Service reminders missing a date are clearly marked for review."
   ]
 }

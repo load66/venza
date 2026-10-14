@@ -23,6 +23,15 @@
     const el=document.getElementById('cloudStatus');if(el)el.textContent=message||(!VenzaAuth.connected()?'Sign in once to enable automatic cloud saves.':meta.dirty?'Changes waiting for cloud save.':'Checking cloud connection…');
     const actions=document.getElementById('cloudConflict');if(actions)actions.hidden=!conflict;
     const form=document.getElementById('cloudSignIn');if(form)form.hidden=VenzaAuth.connected();
+    const pill=document.getElementById('cloudStatusInline');
+    if(pill){
+      const unavailable=/unavailable|retrying when connected/i.test(message);
+      const state=!VenzaAuth.connected()?'disconnected':conflict?'conflict':meta.dirty?'pending':unavailable?'offline':!meta.savedAt||message.startsWith('Checking')?'checking':'saved';
+      pill.dataset.state=state;
+      pill.textContent=state==='disconnected'?'Connect cloud':state==='conflict'?'Review cloud':state==='pending'?'Save pending':state==='offline'?'Offline':state==='checking'?'Checking cloud':'Cloud saved';
+      pill.title=message||'Open cloud settings';
+      pill.setAttribute('aria-label',(message||pill.textContent)+'. Open cloud settings.');
+    }
   }
   async function request(method='GET',body){
     let token=await VenzaAuth.token();

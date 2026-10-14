@@ -35,8 +35,8 @@
    ────────────────────────────────────
 */
 const VIN         = 'JTEAAAAAH8MJ062382';
-const APP_VERSION = '1.7.0';
-const APP_BUILD   = '2026.10.14.1';
+const APP_VERSION = '1.8.0';
+const APP_BUILD   = '2026.10.14.2';
 const APP_UPDATED = 'Oct 14, 2026';
 const APP_VERSION_LABEL = `v${APP_VERSION} · ${APP_UPDATED}`;
 const APP_VERSION_KEY = 'vz_app_version_seen';

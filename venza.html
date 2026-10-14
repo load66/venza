@@ -8,15 +8,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Venza">
-<meta name="theme-color" content="#23262f">
+<meta name="theme-color" content="#060a11">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Venza Garage</title>
 <meta name="application-name" content="Venza Garage">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=1.7.0">
+<link rel="stylesheet" href="./css/style.css?v=1.8.0">
+<link rel="stylesheet" href="./css/design.css?v=1.8.0">
 
 </head>
 <body>
@@ -32,7 +31,7 @@
     </div>
     <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN" role="button" tabindex="0" aria-label="Copy VIN">VIN ··· 062382 · tap to copy</div>
     <div class="app-version-line">
-      <div class="header-version" id="appVersionBadge" title="Current app version">APP v1.7.0 · Oct 14, 2026</div>
+      <div class="header-version" id="appVersionBadge" title="Current app version">APP v1.8.0 · Oct 14, 2026</div>
       <button class="update-pill" id="appUpdateBtn" onclick="forceAppUpdate()" type="button" title="Clear cache and reload the newest uploaded app">↻ Update</button>
     </div>
   </div>
@@ -57,7 +56,7 @@
         <button class="nav-btn" data-page="warranty" onclick="go('warranty')">Warranty</button>
         <button class="nav-btn" data-page="specs" onclick="go('specs')">Vehicle specs</button>
         <div class="garage-menu-heading">Records &amp; settings</div>
-        <button class="nav-btn" data-page="backup" onclick="go('backup')">Backup &amp; settings</button>
+        <button class="nav-btn" data-page="backup" onclick="go('backup')">Settings &amp; cloud</button>
         <button class="nav-btn" data-page="printlog" onclick="go('printlog')">Print service history</button>
       </div>
     </details>
@@ -170,7 +169,7 @@
     <div class="form-title">New Service Entry</div>
     <div class="alert blue" style="margin-bottom:16px">
       <div class="alert-icon">💡</div>
-      <div><strong>Super basic entry mode.</strong> Save only the date, mileage, service type, total cost, shop/DIY, optional notes, and an optional receipt photo.</div>
+      <div>Add the service date, mileage and cost. Parts, notes and receipts are optional.</div>
     </div>
     <div class="fg2">
       <div class="fl"><label>Date</label><input type="date" class="fi" id="fDate"></div>
@@ -372,7 +371,7 @@
 <!-- ═══ PARTS ═════════════════════════════════════════════════════ -->
 <div id="page-parts" class="page">
 
-  <div class="section-label">Basic Parts List</div>
+  <div class="section-label">Your parts library</div>
   <div class="alert blue">
     <div class="alert-icon">🧩</div>
     <div><strong>Organized parts library.</strong> Parts can be added manually here or saved from the Add Service form only when you check the save box on that item. The list is grouped by section and also saves where you bought each part.</div>
@@ -1160,8 +1159,9 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="./js/app.js?v=1.7.0"></script>
-<script src="./js/update.js?v=1.7.0"></script>
+<script src="./js/app.js?v=1.8.0"></script>
+<script src="./js/update.js?v=1.8.0"></script>
+<script src="./js/design.js?v=1.8.0"></script>
 <script>VenzaCloud.start();</script>
 </body>
 </html>
