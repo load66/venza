@@ -2,6 +2,7 @@
 <!-- Venza Garage restructured build: CSS/JS split for faster updates. -->
 <html lang="en">
 <head>
+<script>if(!window.VenzaCloud)location.replace('./index.html'+location.search);</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +16,7 @@
 <meta name="application-name" content="Venza Garage">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=1.5.4">
+<link rel="stylesheet" href="./css/style.css?v=1.7.0">
 
 </head>
 <body>
@@ -31,7 +32,7 @@
     </div>
     <div class="header-sub" onclick="copyVIN()" style="cursor:pointer" title="Tap to copy VIN" role="button" tabindex="0" aria-label="Copy VIN">VIN ··· 062382 · tap to copy</div>
     <div class="app-version-line">
-      <div class="header-version" id="appVersionBadge" title="Current app version">APP v1.5.4 · Jul 24, 2026</div>
+      <div class="header-version" id="appVersionBadge" title="Current app version">APP v1.7.0 · Oct 14, 2026</div>
       <button class="update-pill" id="appUpdateBtn" onclick="forceAppUpdate()" type="button" title="Clear cache and reload the newest uploaded app">↻ Update</button>
     </div>
   </div>
@@ -43,21 +44,48 @@
 
 <!-- NAV -->
 <div class="nav-wrap">
-  <nav class="nav">
-    <button class="nav-btn active" onclick="go('dash')">Dashboard</button>
-    <button class="nav-btn" onclick="go('log')">Service Log</button>
-    <button class="nav-btn" onclick="go('upcoming')">Schedule</button>
-    <button class="nav-btn" onclick="go('parts')">Parts</button>
-    <button class="nav-btn" onclick="go('guides')">Guides</button>
-    <button class="nav-btn" onclick="go('warranty')">Warranty</button>
-    <button class="nav-btn" onclick="go('specs')">Specs</button>
-    <button class="nav-btn" onclick="go('backup')">⚙ Backup</button>
-    <button class="nav-btn" onclick="go('printlog')">🖨 Print</button>
+  <nav class="nav" aria-label="Garage navigation">
+    <button class="nav-btn active" data-page="dash" aria-current="page" onclick="go('dash')">Home</button>
+    <button class="nav-btn" data-page="log" onclick="go('log')">History</button>
+    <button class="nav-btn" data-page="upcoming" onclick="go('upcoming')">Schedule</button>
+    <button class="nav-btn" data-page="parts" onclick="go('parts')">Parts</button>
+    <details class="garage-more" id="garageMore">
+      <summary class="nav-more" id="garageMoreLabel">More <span aria-hidden="true">⌄</span></summary>
+      <div class="garage-more-panel">
+        <div class="garage-menu-heading">Vehicle reference</div>
+        <button class="nav-btn" data-page="guides" onclick="go('guides')">DIY guides</button>
+        <button class="nav-btn" data-page="warranty" onclick="go('warranty')">Warranty</button>
+        <button class="nav-btn" data-page="specs" onclick="go('specs')">Vehicle specs</button>
+        <div class="garage-menu-heading">Records &amp; settings</div>
+        <button class="nav-btn" data-page="backup" onclick="go('backup')">Backup &amp; settings</button>
+        <button class="nav-btn" data-page="printlog" onclick="go('printlog')">Print service history</button>
+      </div>
+    </details>
   </nav>
 </div>
 
 <!-- ═══ DASHBOARD ═══════════════════════════════════════════════ -->
 <div id="page-dash" class="page active">
+
+  <div class="garage-quick-actions" aria-label="Quick actions">
+    <button class="garage-action garage-action-primary" onclick="go('add')"><span aria-hidden="true">＋</span> Log service</button>
+    <button class="garage-action" onclick="openMiModal()">Update mileage</button>
+  </div>
+
+  <div class="garage-cloud-card">
+    <div class="garage-cloud-heading">Automatic cloud save</div>
+    <div id="cloudStatus" role="status" aria-live="polite">Sign in once to enable automatic cloud saves.</div>
+    <form id="cloudSignIn" onsubmit="VenzaCloud.signIn(event)">
+      <p class="garage-cloud-intro">Use your Trading Journal account. Your service history, parts, mileage and receipts follow you to a new phone.</p>
+      <label>Email<input name="email" type="email" autocomplete="username" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="garage-action garage-action-primary" type="submit">Sign in &amp; connect garage</button>
+    </form>
+    <div id="cloudConflict" hidden>
+      <button class="garage-action" onclick="VenzaCloud.loadCloud()">Load cloud copy</button>
+      <button class="garage-action" onclick="VenzaCloud.useDevice()">Use this device’s copy</button>
+    </div>
+  </div>
 
   <div class="hero">
     <div class="hero-label" id="dHeroLabel">⭐ True Next Due</div>
@@ -1132,7 +1160,8 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="./js/app.js?v=1.5.4"></script>
-<script src="./js/update.js?v=1.5.4"></script>
+<script src="./js/app.js?v=1.7.0"></script>
+<script src="./js/update.js?v=1.7.0"></script>
+<script>VenzaCloud.start();</script>
 </body>
 </html>

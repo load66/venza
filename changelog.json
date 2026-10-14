@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.7.0",
+    "build": "2026.10.14.1",
+    "updated": "Oct 14, 2026",
+    "changes": [
+      "Automatic verified R2 cloud saves using the existing Trading Journal backend and sign-in.",
+      "Fresh devices load cloud records before app initialization. Conflicting devices require a choice.",
+      "Compact Home, History, Schedule and Parts navigation, with reference and settings in More."
+    ]
+  },
+  {
     "version": "1.6.3",
     "build": "2026.09.15.5",
     "updated": "Sep 15, 2026",

@@ -35,9 +35,9 @@
    ────────────────────────────────────
 */
 const VIN         = 'JTEAAAAAH8MJ062382';
-const APP_VERSION = '1.5.4';
-const APP_BUILD   = '2026.07.24.3';
-const APP_UPDATED = 'Jul 24, 2026';
+const APP_VERSION = '1.7.0';
+const APP_BUILD   = '2026.10.14.1';
+const APP_UPDATED = 'Oct 14, 2026';
 const APP_VERSION_LABEL = `v${APP_VERSION} · ${APP_UPDATED}`;
 const APP_VERSION_KEY = 'vz_app_version_seen';
 const LAST_SVC_MI = 68187;   // mileage of last oil change
@@ -2812,11 +2812,24 @@ document.getElementById('miModal').addEventListener('click',function(e){
 /* ─── NAV ────────────────────────────────────────────────── */
 /* ─── NAV ────────────────────────────────────────────────── */
 function go(id){
+  const page = document.getElementById('page-'+id);
+  if(!page) return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map={dash:0,log:1,upcoming:2,parts:3,guides:4,warranty:5,specs:6,backup:7,printlog:8,add:-1};
-  document.getElementById('page-'+id).classList.add('active');
-  const i=map[id];if(i>=0)document.querySelectorAll('.nav-btn')[i].classList.add('active');
+  document.querySelectorAll('.nav-btn[data-page]').forEach(b=>{
+    const active = b.dataset.page === id;
+    b.classList.toggle('active', active);
+    if(active) b.setAttribute('aria-current','page');
+    else b.removeAttribute('aria-current');
+  });
+  page.classList.add('active');
+  const more = document.getElementById('garageMore');
+  if(more){
+    more.open = false;
+    const secondary = Boolean(more.querySelector('[data-page="'+id+'"]'));
+    more.classList.toggle('has-active-page', secondary);
+    const label = document.getElementById('garageMoreLabel');
+    if(label) label.setAttribute('aria-label', secondary ? 'More — current section: '+more.querySelector('[data-page="'+id+'"]').textContent : 'More sections');
+  }
   if(id==='backup')renderBackup();
   if(id==='upcoming')renderUpcoming();
   if(id==='parts')renderParts();
@@ -2824,6 +2837,22 @@ function go(id){
   if(id==='printlog'){ document.getElementById('prMileage').value = getMi(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+document.addEventListener('click', function(e){
+  const more = document.getElementById('garageMore');
+  if(more && more.open && !more.contains(e.target)) more.open = false;
+});
+document.addEventListener('keydown', function(e){
+  const more = document.getElementById('garageMore');
+  if(e.key === 'Escape' && more && more.open){
+    more.open = false;
+    more.querySelector('summary').focus();
+  }
+  if((e.key === 'Enter' || e.key === ' ') && e.target.matches('.mileage-pill, .header-sub')){
+    e.preventDefault();
+    e.target.click();
+  }
+});
 
 /* ─── GUIDES ─────────────────────────────────────────────── */
 function startServiceFromGuide(serviceType='other'){
