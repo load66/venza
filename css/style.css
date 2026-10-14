@@ -117,7 +117,7 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;touch-acti
 
 /* ─── NAV TABS ─────────────────────────────────────────────── */
 .nav-wrap{
-  position:sticky;top:65px;z-index:190;
+  position:sticky;top:0;z-index:190;
   background:var(--bg1);
   border-bottom:1px solid var(--border);
   box-shadow:var(--shadow-sm);
@@ -914,3 +914,32 @@ html.modal-open,body.modal-open{overflow:hidden}
 
   #miInput{font-size:26px !important;letter-spacing:2px !important}
 }
+
+/* Compact garage navigation and cloud recovery */
+.header{position:relative}
+.nav{grid-template-columns:repeat(5,minmax(0,1fr));max-width:600px;margin:0 auto;padding:8px 12px;gap:5px}
+.nav-btn,.nav-more{min-height:44px;font-size:10px;letter-spacing:0;text-transform:none}
+.garage-more{position:relative;min-width:0}
+.nav-more{box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:5px;list-style:none;cursor:pointer;border:1px solid var(--border2);border-radius:10px;background:var(--bg3);color:var(--text2);font-family:'Outfit',sans-serif;font-weight:600}
+.nav-more::-webkit-details-marker{display:none}
+.garage-more[open] .nav-more,.garage-more.has-active-page .nav-more{color:var(--toyota);border-color:rgba(235,10,30,.38)}
+.garage-more-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(260px,calc(100vw - 24px));box-sizing:border-box;padding:10px;display:grid;gap:6px;border:1px solid var(--border2);border-radius:14px;background:var(--bg1);box-shadow:0 12px 30px rgba(0,0,0,.4);max-height:70vh;overflow-y:auto}
+.garage-more-panel .nav-btn{justify-content:flex-start;padding:10px 12px;font-size:13px}
+.garage-menu-heading{padding:6px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.garage-quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.garage-action{min-height:44px;padding:10px 12px;border:1px solid var(--border2);border-radius:10px;background:var(--bg3);color:var(--text);font:600 13px 'Outfit',sans-serif;cursor:pointer}
+.garage-action-primary{background:var(--toyota);border-color:var(--toyota);color:white}
+.garage-cloud-card{padding:14px;margin-bottom:14px;border:1px solid var(--border2);border-radius:12px;background:var(--bg2);font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.garage-cloud-heading{font-weight:700;margin-bottom:4px;color:var(--text)}
+#cloudStatus{color:var(--text2)}
+#cloudSignIn{display:grid;gap:8px;margin-top:10px}
+#cloudSignIn[hidden],#cloudConflict[hidden]{display:none}
+#cloudSignIn label{display:grid;gap:3px;color:var(--text2)}
+#cloudSignIn input{min-width:0;width:100%;box-sizing:border-box;font-size:16px;padding:10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text)}
+#cloudConflict{display:grid;gap:8px;margin-top:10px}
+.nav-btn:focus-visible,.nav-more:focus-visible,.garage-action:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(max-width:430px){.nav{padding:8px;gap:4px}.nav-btn,.nav-more{min-height:44px;padding:6px 3px;font-size:10px}.garage-quick-actions .garage-action{font-size:12px}}
+.garage-cloud-intro{margin:0 0 4px;color:var(--text2);font-size:12px;line-height:1.6}
+.garage-cloud-heading::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue);margin-right:7px}
+#cloudSignIn .garage-action{margin-top:4px}
+.garage-action:disabled{opacity:.6;cursor:wait}
