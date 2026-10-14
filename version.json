@@ -15,7 +15,8 @@
     "./js/updates/stock-cost-ui-20260915.js",
     "./js/updates/spark-plug-stock-fix-20260915.js",
     "./js/updates/restock-source-ui-20260915.js",
-    "./js/updates/toyota-filter-restock-link-20260915.js"
+    "./js/updates/toyota-filter-restock-link-20260915.js",
+    "./js/updates/cloud-version-20261014.js"
   ],
   "notes": [
     "Automatic verified R2 cloud saves using the existing Trading Journal backend and sign-in.",
