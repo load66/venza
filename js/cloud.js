@@ -12,7 +12,9 @@
   function writeMeta(){rawSet.call(localStorage,META,JSON.stringify(meta));}
   function snapshot(){
     const storageSnapshot={};
-    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(supported(k))storageSnapshot[k]=localStorage.getItem(k);}
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(supported(k))keys.push(k);}
+    for(const k of keys.sort())storageSnapshot[k]=localStorage.getItem(k);
     return JSON.stringify({format:'VenzaCloudState',version:1,storageSnapshot});
   }
   async function hash(text){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
