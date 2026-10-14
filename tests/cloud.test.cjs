@@ -6,7 +6,7 @@ const {webcrypto}=require('node:crypto');
 function phone(server,seed={},connected=true){
   class Storage{constructor(){this.data=new Map(Object.entries(seed));}get length(){return this.data.size;}key(i){return [...this.data.keys()][i];}getItem(k){return this.data.get(k)??null;}setItem(k,v){this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}clear(){this.data.clear();}}
   const localStorage=new Storage(),elements=new Map();let offline=false;
-  const context={Storage,localStorage,crypto:webcrypto,TextEncoder,AbortController,console,setTimeout:()=>1,clearTimeout:()=>{},addEventListener:()=>{},confirm:()=>true,document:{addEventListener:()=>{},getElementById:id=>{if(!elements.has(id))elements.set(id,{});return elements.get(id);}},VenzaAuth:{connected:()=>connected,token:async()=>'synthetic-token'},location:{reload:()=>{}},fetch:async(url,options)=>{
+  const context={Storage,localStorage,crypto:webcrypto,TextEncoder,AbortController,console,setTimeout:()=>1,clearTimeout:()=>{},addEventListener:()=>{},confirm:()=>true,document:{readyState:'complete',addEventListener:()=>{},getElementById:id=>{if(!elements.has(id))elements.set(id,{});return elements.get(id);}},VenzaAuth:{connected:()=>connected,token:async()=>'synthetic-token'},location:{reload:()=>{}},fetch:async(url,options)=>{
     if(offline)throw Error('offline');
     if(options.method==='GET')return {ok:true,json:async()=>server.state||{exists:false,revision:null}};
     const p=JSON.parse(options.body),old=server.state;
@@ -23,6 +23,12 @@ test('first phone auto uploads supported records and new phone restores before a
   assert.equal(JSON.parse(server.state.snapshot).storageSnapshot['trading-journal-auth'],undefined);
   const b=phone(server);await b.cloud.prepare();assert.equal(b.storage.getItem('vz_mi'),'70000');
   assert.equal(JSON.parse(b.storage.getItem('vz_cloud_meta')).dirty,false);
+});
+test('initial app migrations never block automatic new-phone recovery',async()=>{
+  const server={},a=phone(server,seed);await a.cloud.prepare();await a.cloud.flush();
+  const b=phone(server);b.context.document.readyState='loading';b.cloud.start();
+  b.storage.setItem('vz_log','[]');b.storage.setItem('vz_mi','69921');b.storage.setItem('vz_migration_example','1');
+  await b.cloud.prepare();assert.equal(b.storage.getItem('vz_mi'),'70000');
 });
 test('offline edits persist pending state and retry on reconnect',async()=>{
   const server={},a=phone(server,seed);await a.cloud.prepare();await a.cloud.flush();a.cloud.start();

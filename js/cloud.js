@@ -129,7 +129,11 @@
   window.VenzaCloud={prepare:async()=>{
     try{await reconcile();}catch{status('Cloud unavailable. Local records preserved.');}
   },signIn,loadCloud,useDevice,flush,render,start:()=>{
-    started=true;render();if(meta.dirty)schedule();
+    // Baseline/data migrations run through DOMContentLoaded and load. They are
+    // not user edits and must not block automatic recovery on a new phone.
+    if(document.readyState==='complete')started=true;
+    else addEventListener('load',()=>{started=true;},{once:true});
+    render();if(meta.dirty)schedule();
     addEventListener('online',()=>schedule(0));
     addEventListener('storage',e=>{if(e.key===META){meta=readMeta();render();}else if(supported(e.key||'')){meta=readMeta();schedule();}});
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush();});

@@ -933,13 +933,13 @@
 
   <div class="alert blue">
     <div class="alert-icon">📱</div>
-    <div><strong>New phone or lost phone?</strong> Export your data as a JSON file, save it to iCloud/Files, then import it on any device. Service entries, mileage, your parts list, and receipt photos are preserved.</div>
+    <div><strong>New phone or lost phone?</strong> Sign in on Home with your Trading Journal account to load your saved cloud records. On your current phone, wait for <strong>Cloud saved</strong> before switching devices. File export below is optional.</div>
   </div>
 
-  <div class="section-label">Backup</div>
+  <div class="section-label">Optional File Export</div>
   <div class="form-section">
     <div class="form-title" style="margin-bottom:8px">Export All Data</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Downloads a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange2)">venza_backup_<span style="white-space:nowrap">YYYY-MM-DD</span>.json</code> file. Save it to iCloud Drive, Google Drive, or email it to yourself. Keep a copy somewhere safe.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Automatic cloud saves run after you sign in. Export a JSON file only when you want a separate copy or need to transfer records for editing.</p>
     <button class="btn-primary" onclick="exportData()">⬇ Export / Download Backup</button>
   </div>
 
@@ -1068,7 +1068,7 @@
     </div>
 
     <div class="form-title" style="color:var(--toyota);margin-bottom:8px">Reset to Factory Data</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Wipes all user-added entries and resets to the original 4 service records. Cannot be undone unless you have a backup.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Replaces your records with the app’s factory data. When cloud saving is connected, this change also replaces your saved cloud records.</p>
     <button class="btn-ghost" style="border-color:rgba(235,10,30,.4);color:var(--toyota)" onclick="resetData()">🗑 Reset All Data</button>
   </div>
 </div>
